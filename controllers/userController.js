@@ -1,7 +1,7 @@
 import * as userService from '../services/userService.js';
 
 export const getSignup = (req, res) => {
-    res.render('user/signup'); // ✅ fixed
+    res.render('user/signup');
 };
 
 export const postSignup = async (req, res) => {
@@ -17,7 +17,7 @@ export const getLogin = (req, res) => {
     res.render('user/login', {
         error: req.query.error,
         success: req.query.success
-    }); // ✅ fixed (removed 'n')
+    }); 
 };
 
 export const postLogin = async (req, res) => {
@@ -29,4 +29,4 @@ export const postLogin = async (req, res) => {
     } catch (err) {
         res.redirect('/user/login?error=' + encodeURIComponent(err.message)); // ✅ fixed
     }
-};
+}; 
