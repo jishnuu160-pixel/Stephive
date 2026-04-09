@@ -1,0 +1,136 @@
+/* ===== HERO ===== */
+.hero {
+    height: 120vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 100px;
+    background: black;
+}
+
+/* ===== SIGNUP BOX ===== */
+.signup-box {
+    width: 360px;
+    padding: 25px;
+    border-radius: 20px;
+    background: rgba(123, 119, 119, 0.511);
+    backdrop-filter: blur(15px);
+    color: white;
+}
+
+/* ===== HEADINGS ===== */
+.signup-box h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.sub-text {
+    font-size: 11px;
+    color: #bbb;
+    margin-bottom: 15px;
+}
+
+/* ===== FORM ROW (2 COLUMN) ===== */
+.form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.form-row div {
+    width: 100%;
+}
+
+/* ===== LABEL ===== */
+.signup-box label {
+    font-size: 9px;
+    color: #eceaea;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* ===== INPUT ===== */
+.signup-box input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 7px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 11px;
+    outline: none;
+}
+
+/* ===== PASSWORD ICON ===== */
+.password-container {
+    position: relative;
+}
+
+.eye {
+    position: absolute;
+    right: 8px;
+    top: 40%;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* ===== BUTTON ===== */
+.create-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    background: #e5e5e5;
+    color: #000;
+    font-size: 12px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-weight: 300;
+}
+
+/* ===== OR TEXT ===== */
+.continue-text {
+    text-align: center;
+    font-size: 8px;
+    color: #888;
+    margin: 10px 0;
+}
+
+/* ===== GOOGLE BUTTON ===== */
+.google-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.google-icon {
+    width: 14px;
+}
+
+/* ===== LOGIN TEXT ===== */
+.login-text {
+    text-align: center;
+    font-size: 9px;
+    color: #aaa;
+    margin-top: 10px;
+}
+
+.login-text a {
+    color: white;
+    text-decoration: none;
+}
+
+/* ===== RIGHT IMAGE ===== */
+.right-img img {
+    width: 250px;
+    border-radius: 30px;
+}

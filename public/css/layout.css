@@ -1,0 +1,66 @@
+.navbar{
+    height: 10%;
+}
+
+.icons {
+    display: flex;
+    align-items: center;
+    gap:15px;
+}
+
+.nav-icons {
+    width: 15px ;
+    height: 15px ;
+    display: block;
+}
+
+/* Hover effect */
+.nav-icon:hover {
+    transform: scale(1.1);
+    opacity: 0.7;
+}
+
+/* Footer base */
+.footer {
+    background: #111;
+    color: white;
+    height: 50px;       /* set footer height */
+    padding: 0 40px;    /* remove top/bottom padding */
+}
+
+/* 3 column layout */
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* vertically centers content */
+    height: 100%;        /* ensures container fills footer height */
+}
+
+/* LEFT */
+.footer-left a {
+    font-size: 10px;
+    color: #bbb;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.footer-left a:hover {
+    color: white;
+}
+
+/* CENTER */
+.footer-center {
+    font-size: 10px;
+    color: #aaa;
+}
+
+.footer-center a {
+    color: white;
+    text-decoration: none;
+}
+
+/* RIGHT */
+.footer-right {
+    font-size: 10px;
+    color: #aaa;
+}

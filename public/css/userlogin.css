@@ -1,0 +1,207 @@
+/* ===== BODY ===== */
+body {
+    margin: 0;
+    font-family: sans-serif;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: white;
+}
+
+.logo {
+    font-family: 'Arbutus', serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: black;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* ===== HERO ===== */
+.hero {
+    height: 100vh;
+    background: url('/images/login-bg.jpg') no-repeat center center;
+    background-size: cover;
+}
+
+/* ===== LOGIN BOX ===== */
+.signin-box {
+    width: 260px;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(159, 151, 151, 0.37);
+    color: white;
+}
+
+/* ===== HEADINGS ===== */
+.signin-box h2 {
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.signin-box h6 {
+    font-size: 11px;   /* fixed */
+    font-weight: 300;
+    color: #ddd;
+    margin-bottom: 15px;
+}
+
+/* ===== INPUTS ===== */
+.signin-box input {
+    width: 95%;
+    padding: 7px 10px;
+    font-size: 12px;
+    border: none;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    outline: none;
+}
+
+.signin-box label{
+    font-size: 12px;
+}
+
+/* ===== PASSWORD ===== */
+.password-container {
+    position: relative;
+}
+
+.password-container input {
+    width: 87%;
+    padding-right: 30px;
+    margin-bottom: 5px;
+}
+
+.password-container i {
+    position: absolute;
+    right: 8px;
+    top: 48%;
+    font-size: 12px;
+    color: #bbb;
+    cursor: pointer;
+}
+
+/* ===== FORGOT ===== */
+.forgot {
+    display: block;
+    text-align: right;
+    font-size: 9px;
+    color: #bbb;
+    text-decoration: none;
+    margin-bottom: 10px;
+}
+
+.forgot:hover {
+    color: #ff9800;
+}
+
+/* ===== SIGN IN BUTTON ===== */
+.signin-box button {
+    width: 100%;
+    padding: 8px;
+    font-size: 12px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+/* ===== SIGNUP TEXT ===== */
+.signup-text {
+    text-align: center;
+    font-size: 9px;
+    color: #bbb;
+    margin-bottom: 8px;
+}
+
+.signup-text a {
+    color: white;
+    text-decoration: none;
+}
+
+/* ===== OR CONTINUE ===== */
+.continue-text {
+    text-align: center;
+    font-size: 8px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 1.5px;
+    margin: 6px 0;
+}
+
+/* ===== GOOGLE BUTTON ===== */
+.google-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 20px;
+    border: none;
+    background: #e0e0e0;
+    color: #857e7e;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.google-btn i {
+    color: #ccbebc;
+    font-size: 13px;
+}
+
+.google-icon{
+    width:14px;
+    height: 16px;
+    
+}
+/* ===== RIGHT TEXT ===== */
+.right {
+    max-width: 420px;
+    color: #ddd;
+}
+
+.right h1 {
+    font-size: 38px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.right p {
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+/* ===== ICONS ===== */
+.icons a {
+    color: black;
+    font-size: 16px;
+    margin-left: 15px;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    text-align: center;
+    padding: 5px;
+    background: #111;
+    color: white;
+    font-size: 12px;
+}
