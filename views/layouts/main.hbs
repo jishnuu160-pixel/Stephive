@@ -11,48 +11,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-   {{!-- header --}}
-<header class="navbar">
-   <div class="logo">StepHive</div>
-    <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/">Shop</a>
-        <a href="/">About</a>
-    </nav>
-    <div class="icons">
-        <!-- Add icons here -->
-        <img class="nav-icons" src="/icons/search (2).png" >
-       <img class="nav-icons" src="/icons/wishlist.png">
-      <img class="nav-icons" src="/icons/cart.png" >
-      <img class="nav-icons" src="/icons/user.png">
-    </div>
-</header>
+    {{>header}}
 
     {{!-- body --}}
     {{{body}}}
 
 
-     {{!-- footer --}}
-<footer class="footer">
-    <div class="footer-container">
+    {{>footer}}
 
-        <!-- LEFT -->
-        <div class="footer-left">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms & Conditions</a>
-        </div>
-
-        <!-- CENTER -->
-        <div class="footer-center">
-            Need help? <a href="#">Contact</a>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="footer-right">
-            © 2026 StepHive. All systems operational.
-        </div>
-
-    </div>
-</footer>
 </body>
 </html>
