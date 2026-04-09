@@ -1,1 +1,0 @@
-import adminSchema from '../model/adminModel.js';
