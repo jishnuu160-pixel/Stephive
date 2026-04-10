@@ -1,0 +1,99 @@
+/* ===== HERO ===== */
+.reset-hero {
+    min-height: calc(100vh - 120px); /* keeps space for header + footer */
+    background: #000;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 40px 0;
+}
+
+/* ===== BOX ===== */
+.reset-box {
+    width: 300px;
+    height: 300px;
+    padding: 30px;
+    border-radius: 25px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    color: #ddd;
+}
+
+/* ===== TITLE ===== */
+.reset-box h2 {
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.reset-box p {
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+/* ===== LABEL ===== */
+.reset-box label {
+    font-size: 10px;
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+/* ===== INPUT ===== */
+.input-box {
+    position: relative;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 10px 35px 10px 12px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 12px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* ===== EYE ICON ===== */
+.input-box .eye {
+    position: absolute;
+    right: 12px;
+    top: 20%;
+    transform: translateY(-30%);
+    font-size: 12px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+/* ===== BUTTON ===== */
+.update-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 25px;
+    border: none;
+    background: black;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* ===== BACK LINK ===== */
+.back-link {
+    display: block;
+    margin-top: 15px;
+    font-size: 10px;
+    color: #aaa;
+    text-decoration: none;
+    text-align: center;
+}
+
+.back-link:hover {
+    color: white;
+}

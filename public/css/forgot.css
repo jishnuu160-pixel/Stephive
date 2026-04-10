@@ -1,0 +1,91 @@
+/* ===== HERO BACKGROUND ===== */
+.forgot-hero {
+    height: calc(100vh - 110px); /* adjust for navbar + footer */
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 70px;
+}
+
+/* ===== BOX ===== */
+.forgot-box {
+    width: 200px;
+    padding: 25px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    color: #ddd;
+    text-align: center;
+    height: 250px;
+}
+
+/* ===== TEXT ===== */
+.forgot-box h2 {
+    font-size: 17px;
+    
+}
+
+.forgot-box p {
+    font-size: 8px;
+    color: #aaa;
+    margin-bottom: 20px;
+}
+
+/* ===== INPUT ===== */
+.forgot-box label {
+    display: block;
+    text-align: left;
+    font-size: 10px;
+    margin-bottom: 5px;
+}
+
+.input-box {
+    width: 100%;
+}
+
+.input-box input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 30px 8px 15px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 12px;
+    outline: none;
+}
+
+.input-box span {
+    position: absolute;
+    right: 10px;
+    top: 20%;
+    transform: translateY(50%);
+    color: #aaa;
+}
+
+/* ===== BUTTON ===== */
+.verify-btn {
+    width: 100%;
+    margin-top: 15px;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    background: black;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* ===== BACK LINK ===== */
+.back-link {
+    display: block;
+    margin-top: 15px;
+    font-size: 10px;
+    color: #aaa;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    color: white;
+}
