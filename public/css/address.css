@@ -1,0 +1,294 @@
+/* Container & Background */
+.profile-page-container {
+    background-color: #fafdff; /* The very light background from pic */
+    padding: 20px 0 60px 0;
+}
+
+.profile-layout {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+/* Sidebar Styling */
+.profile-sidebar {
+    background: #fff;
+    width: 240px;
+    border-radius: 20px;
+    padding: 30px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    margin-bottom: 5px;
+    border-radius: 12px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.nav-item.active {
+    background-color: #f1f5f9; /* Light grey active background */
+    color: #1e293b;
+    font-weight: 600;
+}
+
+/* Page Header & Green Button */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.btn-add-address {
+    background-color: #4ade80; /* The bright green */
+    color: #064e3b;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 40px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(74, 222, 128, 0.4);
+}
+
+/* Address Card - Matches the pic perfectly */
+.address-card {
+    background: #fff;
+    border: 1px solid #eef2f6;
+    border-radius: 18px;
+    padding: 30px;
+    width: 480px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+}
+
+.badge-home {
+    background: #1e293b;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+.card-content h3 {
+    margin: 20px 0 10px 0;
+    font-size: 18px;
+    color: #1e293b;
+}
+
+.card-content p {
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.card-footer {
+    margin-top: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #475569;
+    font-weight: 500;
+}
+
+/* Breadcrumb */
+.breadcrumb-nav {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.actions-card img{
+    width: 12px;
+    height: 12px;
+}
+
+/* Modal Container */
+.modal-content {
+    background: #fff;
+    width: 450px; /* Slightly wider to match the pic */
+    max-height: 120vh;
+    border-radius: 20px;
+    padding: 20px 25px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+/* Three Column Layout for City/State/Pincode */
+.form-row.three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+}
+
+/* Input Styling */
+.form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #4ade80;
+}
+
+/* Address Type Chips (The pill buttons) */
+.type-selection {
+    display: flex;
+    gap: 12px;
+    margin-top: 5px;
+}
+
+.type-chip {
+    cursor: pointer;
+}
+
+.type-chip input {
+    display: none; /* Hide the actual radio dot */
+}
+
+.type-chip span {
+    display: inline-block;
+    padding: 5px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 30px;
+    font-size: 12px;
+    color: #4b5563;
+    transition: 0.3s;
+}
+
+/* When the radio is checked, change the pill color */
+.type-chip input:checked + span {
+    background-color: #f3f4f6;
+    border-color: #1f2937;
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Save Button */
+.btn-save {
+    background-color: #ffbd03; /* The exact golden yellow */
+    color: #000;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding:10px 25px;
+    font-size: 10px;
+    border-top: 1px solid #f3f4f6;
+}
+
+
+/* --- THE FIX: ADD THIS --- */
+
+/* 1. Initial State: Hidden */
+.modal-overlay {
+    display: none; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120vh;
+    background: rgba(0, 0, 0, 0.4); /* Dimmed background */
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px); /* Matches the blur in your pic */
+}
+
+/* 2. Show state: Triggered by your JS */
+.modal-overlay.active {
+    display: flex !important;
+}
+
+/* 3. Close button 'X' styling */
+.close-x {
+    cursor: pointer;
+    font-size: 24px;
+    color: #94a3b8;
+}
+
+/* 4. Form Rows and Groups (To keep them side-by-side) */
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+}
+
+/* --- END OF FIX --- */
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+
+}
+
+.premium-tag {
+    font-size: 10px;
+    font-weight: bold;
+    color: #d4af37;
+}
+
+
+/* Ensure the header can push items to opposite sides */
+.card-header {
+    display: flex;
+    justify-content: space-between; /* Badge on left, Icons on right */
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Container for the small icons */
+.action-icons {
+    display: flex;
+    gap: 12px; /* Space between edit and delete icons */
+    align-items: center;
+}
+
+/* Target the icons specifically */
+.action-icons img, 
+.icon-small {
+    width: 16px;  /* Smaller size */
+    height: 16px;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.action-icons img:hover {
+    transform: scale(1.1); /* Subtle grow effect on hover */
+    opacity: 0.8;
+}

@@ -1,0 +1,65 @@
+<div class="customers-page">
+    <h2>Users</h2>
+
+    <div class="table-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#if users.length}}
+                    {{#each users}}
+                    <tr>
+                        <td>{{addOne @index}}</td>
+                        <td><strong>{{this.fullName}}</strong></td>
+                        <td>{{this.email}}</td>
+                        <td>
+                            <span class="status-pill {{#if this.isBlocked}}status-blocked{{else}}status-active{{/if}}">
+                                {{#if this.isBlocked}}Blocked{{else}}Active{{/if}}
+                            </span>
+                        </td>
+                        <td>
+                      <form action="/admin/customers/toggle-status/{{this._id}}" method="POST" style="display:inline;">
+        <button class="btn-action {{#if this.isBlocked}}btn-unblock{{else}}btn-block{{/if}}" 
+                onclick="return confirm('Are you sure you want to {{#if this.isBlocked}}unblock{{else}}block{{/if}} this user?')">
+            {{#if this.isBlocked}}
+                Unblock
+            {{else}}
+                Block
+            {{/if}}
+        </button>
+    </form>
+</td>
+                    </tr>
+                    {{/each}}
+                {{else}}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #94a3b8;">
+                            No users found in database.
+                        </td>
+                    </tr>
+                {{/if}}
+            </tbody>
+        </table>
+
+        {{#if users.length}}
+        <div class="pagination">
+            {{#if hasPrevPage}}
+                <a href="/admin/customers?page={{prevPage}}" class="page-link">« Prev</a>
+            {{/if}}
+
+            <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
+
+            {{#if hasNextPage}}
+                <a href="/admin/customers?page={{nextPage}}" class="page-link">Next »</a>
+            {{/if}}
+        </div>
+        {{/if}}
+    </div>
+</div>

@@ -1,0 +1,90 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 200;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* This targets the body only when isLogin is true */
+body.login-page {
+    display: flex;
+    justify-content: center; /* Horizontal centering */
+    align-items: center;     /* Vertical centering */
+    min-height: 100vh;       /* Makes the body at least the height of the screen */
+    margin: 0;
+    background: url('/images/admin-bg.jpg') no-repeat center center/cover;
+    background-color: #f8fafc; /* Optional: light background color */
+}
+
+/* Ensure your login card doesn't stretch too wide */
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.login-card h2 {
+    font-size: 24px;
+    color: #1a1a1a;
+    margin-bottom: 5px;
+}
+
+.login-card p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* Form Styling */
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    margin-left: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    background: #e0e0e0; /* Grayish input as per your screenshot */
+    outline: none;
+    font-size: 14px;
+}
+
+/* Login Button */
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background: #000; /* Black button */
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s ease;
+}
+
+.login-btn:hover {
+    transform: scale(1.02);
+}
+
+/* Error Message */
+.error-msg {
+    color: #e53e3e;
+    font-size: 12px;
+    margin-top: 10px;
+}

@@ -1,0 +1,301 @@
+/* GLOBAL STYLES */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+.hero {
+  height: 120vh;
+  position: relative;
+  color: white;
+}
+
+.home-page .hero {
+  display: flex;
+  align-items: center;
+  padding-left: 100px;
+  background-image: url('/images/home.jpeg');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-text {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+}
+
+/* BIG HEADING */
+.hero-text h1 {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-style: italic;
+}
+
+.hero-text span {
+  color: #e2a11e;
+}
+
+/* GLOBAL PARAGRAPH (This was causing your font issue) */
+.hero-text p {
+  margin: 25px 0;
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* ===== UPDATED AUTH CARD SECTION ===== */
+
+.auth-card {
+  position: absolute;
+  /* Adjust these to move it to the right of the text */
+  right: -360px; 
+  top:-10; 
+  
+  width: 170px;         
+  height: auto;        
+  padding: 25px 15px;  
+  border-radius: 25px; 
+
+  background: rgba(10, 10, 10, 0.85); 
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;           
+  z-index: 100;
+}
+
+/* Targeting specifically to override the 18px p tag rule */
+.auth-card .welcome-text {
+  font-size: 10px !important;    /* Small like the design */
+  font-weight: 800 !important;   /* Bold and punchy */
+  letter-spacing: 2px !important;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 5px 0 !important;  /* Overrides the 25px global margin */
+  text-align: center;
+  width: 100%;
+}
+
+/* Login Button - White Pill */
+.auth-card .login-btn {
+  width: 100%;
+  padding: 5px ;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 20px;
+  text-align: center;
+  text-decoration: none;
+  background: #ffffff;
+  color: #000000 !important;
+  transition: 0.3s ease;
+}
+
+/* Signup Button - Ghost Pill */
+.auth-card .signup-btn {
+  width: 100%;
+  padding: 5px ;
+  font-size: 10px; /* Fixed from 5px */
+  font-weight: 600;
+  border-radius: 20px;
+  text-align: center;
+  text-decoration: none;
+  background: transparent;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: 0.3s ease;
+}
+
+.auth-card .login-btn:hover,
+.auth-card .signup-btn:hover {
+  background: #f4a300;
+  color: #ffffff !important;
+  border-color: #f4a300;
+}
+
+/* OTHER ELEMENTS */
+.btn {
+  background: #f4a300;
+  padding: 8px 12px;
+  border: none;
+  color: white;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* FLOATING SHOE */
+.floating-shoe {
+  position: absolute;
+  right: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+}
+
+.floating-shoe img {
+  width: 350px;
+  filter: drop-shadow(0 20px 30px rgba(22, 22, 22, 0.84));
+  /* Added a slightly longer transition for a "premium" smooth feel */
+  transition: transform 0.4s ease-in-out; 
+}
+
+/* HOVER EFFECT - SCALE ONLY */
+.floating-shoe:hover img {
+  /* This makes it 15% larger without any rotation */
+  transform: scale(1.15); 
+}
+
+
+/* Product Carousel Styling */
+.popular-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 5%;
+}
+
+.product-card {
+    background: #f8f8f8;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: left;
+    transition: transform 0.3s ease;
+}
+
+.product-img-wrapper img {
+    width: 100%;
+    mix-blend-mode: multiply; /* Helps blend shoe images with light backgrounds */
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.arrow-icon {
+    background: #000;
+    color: #fff;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+/* Gradient Banner Styling */
+.sale-banner-container {
+    padding: 40px 5%;
+}
+
+.sale-gradient-box {
+    background: linear-gradient(90deg, #2196F3 0%, #00BCD4 100%);
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 50px;
+    color: white;
+}
+
+.banner-content h3 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.redeem-btn {
+    background: white;
+    color: #00BCD4;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+/* Section Heading */
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    padding-left: 5%;
+}
+
+/* Grid Layout */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns like the image */
+    gap: 20px;
+    padding: 0 5%;
+}
+
+/* Individual Card */
+.category-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 350px; /* Set a fixed height for consistency */
+}
+
+.category-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures images fill the box without stretching */
+    transition: transform 0.5s ease;
+}
+
+.category-card:hover img {
+    transform: scale(1.1); /* Slight zoom effect on hover */
+}
+
+/* Text Overlay */
+.category-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); /* Darkens bottom for text clarity */
+    color: white;
+}
+
+.category-info h4 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.category-info p {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-bottom: 10px;
+}
+
+.discover-link {
+    color: white;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.discover-link span {
+    margin-left: 5px;
+    transition: margin 0.3s;
+}
+
+.category-card:hover .discover-link span {
+    margin-left: 10px;
+}

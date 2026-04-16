@@ -1,0 +1,129 @@
+<div class="profile-page-container">
+    <div class="profile-wrapper">
+        <p class="breadcrumb">My Profile</p>
+        
+        <div class="profile-layout">
+            {{!-- Sidebar --}}
+            <aside class="profile-sidebar">
+                <div class="sidebar-user-header">
+                    <div class="avatar-circle-small">
+                        <img src="/" alt="User">
+                    </div>
+                    <div class="user-meta">
+                        <h4>{{user.name}}</h4>
+                        <span class="premium-tag">PREMIUM MEMBER</span>
+                    </div>
+                </div>
+
+               <nav class="sidebar-nav">
+    {{!-- Profile --}}
+    <a href="/user/profile" class="nav-item {{#if (eq activePage 'profile')}}active{{/if}}">
+        <img src="/icons/profile.png" class="nav-icon"> 
+        <span>Profile</span>
+    </a>
+
+    {{!-- Orders --}}
+    <a href="/user/orders" class="nav-item {{#if (eq activePage 'orders')}}active{{/if}}">
+        <img src="/icons/orders.svg" class="nav-icon"> 
+        <span>Orders</span>
+    </a>
+
+    {{!-- Wallet --}}
+    <a href="/user/wallet" class="nav-item {{#if (eq activePage 'wallet')}}active{{/if}}">
+        <img src="/icons/wallet.png" class="nav-icon"> 
+        <span>Wallet</span>
+    </a>
+
+   {{!-- Address Button --}}
+<a href="/user/address" class="nav-item {{#if (eq activePage 'address')}}active{{/if}}">
+    <img src="/icons/address.png" class="nav-icon"> 
+    <span>Address</span>
+</a>
+
+    {{!-- Refer & Earn --}}
+    <a href="/user/referral" class="nav-item {{#if (eq activePage 'referral')}}active{{/if}}">
+        <img src="/icons/refer.png" class="nav-icon"> 
+        <span>Refer & Earn</span>
+    </a>
+
+    <hr class="sidebar-divider">
+
+    {{!-- Logout --}}
+    <a href="/user/logout" class="nav-item logout-item">
+        <img src="/icons/logout.png" class="nav-icon"> 
+        <span>Logout</span>
+    </a>
+</nav>
+            </aside>
+
+            {{!-- Main Content --}}
+            <main class="profile-main">
+                {{!-- Summary Card --}}
+                <section class="profile-card profile-info-summary">
+                    <div class="avatar-container-large">
+                        <div class="avatar-border">
+                             <img src="/icons/user (1).png" alt="Avatar">
+                             {{!-- <button class="camera-btn">
+                                 <img src="/icons/camera.png" alt="edit">
+                             </button> --}}
+                        </div>
+                    </div>
+                    <div class="summary-text">
+                        <h2>{{user.fullName}}</h2>
+                        <p>{{user.email}}</p>
+                    </div>
+                </section>
+
+                {{!-- Details Card --}}
+                <section class="profile-card profile-details">
+                    <h3><img src="/icons/clipboard.svg" class="section-icon"> Personal Information</h3>
+                    <form action="/user/update-profile" method="POST">
+                        <div class="form-grid">
+                            <div class="input-box">
+                                <label>FULL NAME</label>
+                                <input type="text" name="name" value="{{user.fullName}}">
+                            </div>
+                            <div class="input-box">
+                                <label>EMAIL ADDRESS</label>
+                                <div class="input-wrapper">
+                                    <input type="email" name="email" value="{{user.email}}" readonly>
+                                    <img src="/icons/mail.png" class="field-icon">
+                                </div>
+                            </div>
+                            <div class="input-box">
+                                <label>PHONE NUMBER</label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="phone" value="{{user.phoneNumber}}" placeholder="+91 000 000 0000">
+                                    <img src="/icons/phone.png" class="field-icon">
+                                </div>
+                            </div>
+                          {{!-- Inside the profile-details section --}}
+<div class="input-row">
+  <div class="input-box">
+    <label>GENDER</label>
+    <input type="text" value="{{user.gender}}" readonly style="text-transform: capitalize;">
+</div>
+    
+    <div class="input-box">
+        <label>REFERRAL CODE</label>
+        <input type="text" value="{{user.referralCode}}" readonly class="referral-input">
+    </div>
+</div>
+                        </div>
+                        <div class="form-actions">
+    <a href="/user/edit-profile" class="btn-profile-action">
+        <img src="/icons/edit-profile.png" class="btn-icon"> Edit Profile
+    </a>
+    
+    <a href="/user/change-email" class="btn-profile-action">
+        <img src="/icons/email.png" class="btn-icon"> Change Email
+    </a>
+    
+  
+</div>
+</form>
+</section>
+
+              
+
+                

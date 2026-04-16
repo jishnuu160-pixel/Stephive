@@ -1,0 +1,116 @@
+
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="hero-text">
+    
+{{#if user}}
+  <div id="welcomeToast" class="auth-card logged-in" style="position: absolute; right: 20px; z-index: 1000;">
+    <p class="welcome-text">WELCOME, {{user.name}}</p>
+    <p class="status-text">Ready to upgrade your collection?</p>
+  </div>
+    {{else}}
+      <div class="auth-card">
+        <p class="welcome-text">WELCOME USER</p>
+        <a href="/user/login" class="login-btn">Log in</a>
+        <a href="/user/signup" class="signup-btn">Create Account</a>
+      </div>
+    {{/if}}
+
+    <h1>
+      Step into <br>
+      <span>Effortless <br>Style</span>
+    </h1>
+
+    <p>
+      Discover sleek sneakers crafted for comfort, confidence, and everyday wear.
+    </p>
+
+    <button class="btn">Shop Now</button>
+  </div>
+
+  <div class="floating-shoe">
+    <img src="/images/shoe.png" alt="Shoe">
+    <div class="shoe-info">
+        <h3>Lume  <span class="highlight">Walke</span></h3>
+        <p>price: 2999</p>
+    </div>
+  </div>
+</section>
+
+<!-- POPULAR PRODUCTS -->
+<section class="popular">
+  <div class="popular-header">
+    <div class="header-text">
+        <p class="subtitle">Our Trending Shoes</p>
+        <h2>Most Popular <br> Products</h2>
+    </div>
+    <div class="carousel-controls">
+        <button class="control-btn prev">❮</button>
+        <button class="control-btn next">❯</button>
+    </div>
+  </div>
+
+  <div class="product-carousel">
+    {{#each products}}
+    <div class="product-card">
+      <div class="product-img-wrapper">
+         <img src="{{this.image}}" alt="{{this.name}}">
+      </div>
+      <h4>{{this.name}}</h4>
+      <div class="price-row">
+          <p>Rs. {{this.price}}</p>
+          <span class="arrow-icon">↗</span>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  <div class="carousel-dots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+  </div>
+</section>
+
+<section class="sale-banner-container">
+  <div class="sale-gradient-box">
+    <div class="banner-content">
+        <h3>Limited Innovation Sale</h3>
+        <p>15% off your first shoe acquisition. Use code STEP2336</p>
+    </div>
+    <button class="redeem-btn">REDEEM OFFER</button>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories">
+  <h2 class="section-title">Browse by category</h2>
+
+  <div class="category-grid">
+    {{#each categories}}
+    <div class="category-card">
+      <img src="/public/images/casual.png">
+      <div class="category-info">
+        <h4>{{this.name}}</h4>
+        <p>Power your workouts</p> {{!-- You can make this dynamic too --}}
+        <a href="/category/{{this._id}}" class="discover-link">DISCOVER <span>→</span></a>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</section>
+
+<!-- BEST SELLERS -->
+<section class="best">
+  <h2>Best Sellers</h2>
+
+  <div class="product-list">
+    {{#each bestSellers}}
+    <div class="product-card">
+      <img src="{{this.image}}" alt="{{this.name}}">
+      <h4>{{this.name}}</h4>
+      <p>${{this.price}}</p>
+    </div>
+    {{/each}}
+  </div>
+</section>
+

@@ -1,0 +1,176 @@
+<div class="profile-page-container">
+    <div class="profile-wrapper">
+        <nav class="breadcrumb-nav">
+            <span class="breadcrumb">Home</span>
+            <span class="breadcrumb-separator">></span>
+            <span class="breadcrumb-active">Address</span>
+        </nav>
+        
+        <div class="profile-layout">
+            <aside class="profile-sidebar">
+                <div class="sidebar-user-header">
+                    <div class="avatar-circle">
+                        <img src="/" alt="User">
+                    </div>
+                    <div class="user-meta">
+                        <h4>{{user.fullName}}</h4>
+                        <span class="premium-tag">PREMIUM MEMBER</span>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="/user/profile" class="nav-item">
+                        <img src="/icons/profile.png" class="nav-icon"> Profile
+                    </a>
+                    <a href="/user/orders" class="nav-item">
+                        <img src="/icons/orders.png" class="nav-icon"> My orders
+                    </a>
+                    <a href="/user/wallet" class="nav-item">
+                        <img src="/icons/wallet.png" class="nav-icon"> Wallet
+                    </a>
+                    <a href="/user/address" class="nav-item active">
+                        <img src="/icons/address.png" class="nav-icon"> Address
+                    </a>
+                    <a href="/user/referral" class="nav-item">
+                        <img src="/icons/refer.png" class="nav-icon"> Refer & Earn
+                    </a>
+                    <a href="/user/logout" class="nav-item logout-link">
+                        <img src="/icons/logout.png" class="nav-icon"> Logout
+                    </a>
+                </nav>
+            </aside>
+
+           <main class="profile-main">
+    <div class="page-header">
+        <div class="header-titles">
+            <h1>My Addresses</h1>
+            <p>Manage your saved delivery addresses</p>
+        </div>
+        <button class="btn-add-address" id="openAddressModal">+ Add New Address</button>
+    </div>
+
+    {{!-- This container will now hold all addresses from your DB --}}
+    <div class="address-container">
+        {{#each user.addresses}}
+            <div class="address-card">
+               
+<div class="card-header">
+    <span class="badge-home">{{this.label}}</span>
+    
+    <div class="action-icons">
+        <img src="/public/icons/edit.png" alt="edit" class="edit-btn icon-small"
+        data-id="{{this._id}}"
+        data-name="{{this.fullName}}"
+        data-phone="{{this.phone}}"
+        data-street="{{this.street}}"
+        data-apartment="{{this.apartment}}"
+        data-city="{{this.city}}"
+        data-state="{{this.state}}"
+        data-pincode="{{this.pincode}}"
+        data-label="{{this.label}}"
+        data-default="{{this.isDefault}}"
+        style="cursor:pointer;">
+    
+   <a href="/user/delete-address/{{this._id}}" onclick="return confirm('Delete this?')">
+            <img src="/icons/delete.png" alt="delete" class="icon-small">
+        </a>
+        </div>
+                </div>
+                <div class="card-content">
+                    <h3>{{this.fullName}}</h3>
+                    <p>{{this.street}}</p>
+                    <p>{{this.apartment}}</p>
+                    <p>{{this.city}}, {{this.state}} {{this.pincode}}</p>
+                </div>
+                <div class="card-footer">
+                    <img src="/icons/phone.png" alt="phone" class="icon-small">
+                    <span>{{this.phone}}</span>
+                </div>
+            </div>
+        {{else}}
+            {{!-- This shows if the user has 0 addresses saved --}}
+            <div class="no-address">
+                <p>No addresses found. Click "+ Add New Address" to get started.</p>
+            </div>
+        {{/each}}
+    </div>
+</main>
+        </div>
+    </div>
+</div>
+
+
+<div id="addressModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add <b>New Address</b></h3>
+            <span class="close-x" id="closeX">&times;</span>
+        </div>
+        
+        <form action="/user/add-address" method="POST" id="addressForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="fullName" placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="text" name="phone" placeholder="Enter mobile number">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Address Line 1</label>
+                <input type="text" name="street">
+            </div>
+
+            <div class="form-group">
+                <label>Address Line 2 (Optional)</label>
+                <input type="text" name="apartment">
+            </div>
+
+            <div class="form-row three-col">
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city">
+                </div>
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" name="state">
+                </div>
+                <div class="form-group">
+                    <label>Pincode</label>
+                    <input type="text" name="pincode">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Address Type</label>
+                <div class="type-selection">
+                    <label class="type-chip">
+                        <input type="radio" name="label" value="Home" checked>
+                        <span>Home</span>
+                    </label>
+                    <label class="type-chip">
+                        <input type="radio" name="label" value="Office">
+                        <span>Office</span>
+                    </label>
+                    <label class="type-chip">
+                        <input type="radio" name="label" value="Other">
+                        <span>Other</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="default-check">
+                <input type="checkbox" id="isDefault" name="isDefault">
+                <label for="isDefault">Make this my default address</label>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
+                <button type="submit" class="btn-save">Save Address</button>
+            </div>
+        </form>
+    </div>
+</div>
