@@ -1,9 +1,10 @@
 import app from './app.js';
-import connectDB from './db/connectDB.js';
-
-connectDB();
+import { connectDB } from './config/db.js';
 
 const PORT = 5500;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
 });

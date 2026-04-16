@@ -4,20 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StepHive</title>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/admin-style.css">
+    <link rel="stylesheet" href="/css/address.css">
+    <link rel="stylesheet" href="/css/forgot.css">
+     <link rel="stylesheet" href="/css/otp.css">
+     <link rel="stylesheet" href="/css/reset.css">
     <link rel="stylesheet" href="/css/userlogin.css">
     <link rel="stylesheet" href="/css/signup.css" >
+    <link rel="stylesheet" href="/css/profile.css">
+      <link rel="stylesheet" href="/css/home.css?v=3">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body>
-    {{>header}}
+<body class="{{#if isHome}}home-page{{/if}} {{#if isLogin}}login-page{{/if}} {{#if isSignup}}signup-page{{/if}}">
 
-    {{!-- body --}}
-    {{{body}}}
+    {{#if isAdmin}}
+        <div class="admin-wrapper">
+            {{> admin-header}} 
+            <div class="main-content-area">
+                <header class="top-navbar">
+                    <input type="text" placeholder="Search data, users, or reports">
+                </header>
+                <main class="page-content">
+                    {{{body}}}
+                </main>
+                {{> admin-footer}}
+            </div>
+        </div>
+
+    {{else}}
+        {{!-- This section now handles BOTH Login, Signup, and regular User pages --}}
+        {{> header}}
+        {{{body}}}
+        {{> footer}}
+    {{/if}}
 
 
-    {{>footer}}
-
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+<script src="/js/validation.js"></script>
+<script src="/js/addressModal.js"></script>
+<script src="/js/profile.js"></script>
 </body>
+
 </html>

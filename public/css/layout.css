@@ -1,11 +1,46 @@
-.navbar{
-    height: 10%;
+/* layout.css */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 15px;
+    background: white;
+   
 }
+
+/* ===== NAVBAR ===== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: white;
+    
+}
+
+.logo {
+    font-family: 'Arbutus', serif;
+    font-size: 24px;
+    letter-spacing: 2px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: black;
+    font-size: 12px;
+    font-weight: 500;
+}
+
 
 .icons {
     display: flex;
     align-items: center;
-    gap:15px;
+    gap: 15px;
 }
 
 .nav-icons {
@@ -24,7 +59,7 @@
 .footer {
     background: #111;
     color: white;
-    height: 50px;       /* set footer height */
+    height: 60px;       /* set footer height */
     padding: 0 40px;    /* remove top/bottom padding */
 }
 

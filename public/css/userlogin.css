@@ -1,207 +1,267 @@
-/* ===== BODY ===== */
-body {
-    margin: 0;
-    font-family: sans-serif;
+/* ===== LOGIN PAGE HERO ===== */
+
+.login-page .hero {
+  height: 120vh;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 60px;
+
+  background-image: url('/images/login-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* ===== NAVBAR ===== */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 40px;
-    background: white;
+/* ===== DARK OVERLAY ===== */
+.login-page .hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
 }
 
-.logo {
-    font-family: 'Arbutus', serif;
-    font-size: 24px;
-    letter-spacing: 2px;
+/* ===== CONTENT ABOVE OVERLAY ===== */
+.login-page .hero > * {
+  position: relative;
+  z-index: 2;
 }
 
-.nav-links {
-    display: flex;
-    gap: 30px;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: black;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-/* ===== HERO ===== */
-.hero {
-    height: 100vh;
-    background: url('/images/login-bg.jpg') no-repeat center center;
-    background-size: cover;
-}
-
-/* ===== LOGIN BOX ===== */
+/* ===== LOGIN BOX (GLASS EFFECT) ===== */
 .signin-box {
-    width: 260px;
-    padding: 20px;
-    border-radius: 15px;
-    background: rgba(159, 151, 151, 0.37);
-    color: white;
+  width: 280px;
+  padding: 15px;
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+
+  color: white;
 }
 
 /* ===== HEADINGS ===== */
 .signin-box h2 {
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 5px;
 }
 
 .signin-box h6 {
-    font-size: 11px;   /* fixed */
-    font-weight: 300;
-    color: #ddd;
-    margin-bottom: 15px;
+  font-size: 11px;
+  color: #ccc;
+  margin-bottom: 15px;
 }
 
 /* ===== INPUTS ===== */
 .signin-box input {
-    width: 95%;
-    padding: 7px 10px;
-    font-size: 12px;
-    border: none;
-    border-radius: 6px;
-    margin-bottom: 12px;
-    background: rgba(255,255,255,0.15);
-    color: white;
-    outline: none;
-}
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 12px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 12px;
 
-.signin-box label{
-    font-size: 12px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  outline: none;
 }
 
 /* ===== PASSWORD ===== */
 .password-container {
-    position: relative;
+  position: relative;
 }
 
 .password-container input {
-    width: 87%;
-    padding-right: 30px;
-    margin-bottom: 5px;
+  padding-right: 30px;
 }
 
 .password-container i {
-    position: absolute;
-    right: 8px;
-    top: 48%;
-    font-size: 12px;
-    color: #bbb;
-    cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 45%;
+  font-size: 12px;
+  color: #bbb;
+  cursor: pointer;
 }
 
 /* ===== FORGOT ===== */
 .forgot {
-    display: block;
-    text-align: right;
-    font-size: 9px;
-    color: #bbb;
-    text-decoration: none;
-    margin-bottom: 10px;
+  display: block;
+  text-align: right;
+  font-size: 10px;
+  color: #bbb;
+  text-decoration: none;
+  margin-bottom: 10px;
 }
 
 .forgot:hover {
-    color: #ff9800;
+  color: #f4a300;
 }
 
-/* ===== SIGN IN BUTTON ===== */
+/* ===== BUTTON ===== */
 .signin-box button {
-    width: 100%;
-    padding: 8px;
-    font-size: 12px;
-    background: black;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    margin-bottom: 10px;
+  width: 100%;
+  padding: 10px;
+  font-size: 13px;
+
+  background: black;
+  color: white;
+
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+
+  margin-bottom: 10px;
 }
 
 /* ===== SIGNUP TEXT ===== */
 .signup-text {
-    text-align: center;
-    font-size: 9px;
-    color: #bbb;
-    margin-bottom: 8px;
+  text-align: center;
+  font-size: 10px;
+  color: #bbb;
+  margin-bottom: 10px;
 }
 
 .signup-text a {
-    color: white;
-    text-decoration: none;
+  color: white;
+  text-decoration: none;
 }
 
-/* ===== OR CONTINUE ===== */
+/* ===== CONTINUE TEXT ===== */
 .continue-text {
-    text-align: center;
-    font-size: 8px;
-    color: rgba(255,255,255,0.6);
-    letter-spacing: 1.5px;
-    margin: 6px 0;
+  text-align: center;
+  font-size: 9px;
+  color: rgba(255,255,255,0.6);
+  margin: 10px 0;
 }
 
 /* ===== GOOGLE BUTTON ===== */
 .google-btn {
-    width: 100%;
-    padding: 8px;
-    border-radius: 20px;
-    border: none;
-    background: #e0e0e0;
-    color: #857e7e;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
+  width: 100%;
+  padding: 8px;
+
+  border-radius: 20px;
+  border: none;
+
+  background: rgba(255,255,255,0.2);
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: pointer;
 }
 
-.google-btn i {
-    color: #ccbebc;
-    font-size: 13px;
-}
-
-.google-icon{
-    width:14px;
-    height: 16px;
-    
-}
-/* ===== RIGHT TEXT ===== */
+/* ===== RIGHT SIDE TEXT ===== */
 .right {
-    max-width: 420px;
-    color: #ddd;
+  max-width: 420px;
+  color: white;
 }
 
 .right h1 {
-    font-size: 38px;
-    font-weight: 600;
-    line-height: 1.2;
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .right p {
-    font-size: 15px;
-    margin-top: 10px;
+  font-size: 16px;
+  margin-top: 10px;
+  color: #ddd;
 }
 
-/* ===== ICONS ===== */
-.icons a {
-    color: black;
-    font-size: 16px;
-    margin-left: 15px;
-}
-
-/* ===== FOOTER ===== */
-.footer {
-    text-align: center;
-    padding: 5px;
-    background: #111;
+.toast-error {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background-color: #ff4d4d; /* Bright red */
     color: white;
-    font-size: 12px;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-family: sans-serif;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: none; /* Hidden until error happens */
+    z-index: 9999; /* Ensures it stays above everything */
+    min-width: 200px;
+    text-align: center;
 }
+
+
+/* ===== 1. ALIGN FORGOT LINK TO THE RIGHT ===== */
+.form-options {
+  display: flex;
+  justify-content: flex-end; /* Pushes content to the right */
+  margin-top: -8px;          /* Pulls it closer to the password input */
+  margin-bottom: 15px;
+}
+
+.form-options a {
+  font-size: 10px;
+  color: #bbb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.form-options a:hover {
+  color: #f4a300;
+}
+
+/* ===== 2. CENTER "OR CONTINUE WITH" ===== */
+.separator {
+  text-align: center;
+  margin: 15px 0;
+  position: relative;
+}
+
+.separator span {
+  font-size: 11px;           /* Small text like design */
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+/* ===== 3. GOOGLE BUTTON & ICON FIX ===== */
+.google-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 25px;       /* Pill shape to match design */
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05); /* Subtle dark glass look */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Force the Google icon to appear */
+.google-btn img {
+  width: 16px !important;
+  height: 16px !important;
+  display: inline-block !important;
+  vertical-align: middle;
+}
+
+.google-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ===== 4. MISC TWEAKS ===== */
+.signin-btn {
+  border-radius: 25px !important; /* Ensure sign in is also a pill */
+  font-weight: 600;
+}
+

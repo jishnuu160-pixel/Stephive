@@ -1,67 +1,70 @@
+<section class="signup-section">
+  <div class="signup-container">
+    
+    <!-- Form -->
+    <div class="signup-card">
+      <h2>Create Your Account</h2>
+      <p class="subtitle">Experience the future of technology today.</p>
 
-<section class="hero">
-
-    <!-- LEFT: SIGNUP CARD -->
-    <div class="signup-box">
-
-        <h2>Create Your Account</h2>
-        <p class="sub-text">Experience the future of horology today.</p>
+      <form action="/user/signup" method="post">
 
         <div class="form-row">
-            <div>
-                <label>FULL NAME</label>
-                <input type="text" placeholder="Rahul P K">
-            </div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="fullName" required>
+          </div>
 
-            <div>
-                <label>EMAIL ADDRESS</label>
-                <input type="email" placeholder="rahul@gmail.com">
-            </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" required>
+          </div>
         </div>
 
         <div class="form-row">
-            <div>
-                <label>PHONE NUMBER</label>
-                <input type="text" placeholder="9384838402">
-            </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="text" name="phoneNumber" required>
+          </div>
 
-            <div>
-                <label>REFERRAL CODE</label>
-                <input type="text" placeholder="STEP20">
-            </div>
+          <div class="form-group">
+            <label>Referral Code</label>
+            <input type="text" name="referralCode">
+          </div>
         </div>
 
         <div class="form-row">
-            <div class="password-container">
-                <label>PASSWORD</label>
-                <input type="password">
-                <span class="eye">👁</span>
-            </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" required>
+          </div>
 
-            <div class="password-container">
-                <label>CONFIRM PASSWORD</label>
-                <input type="password">
-                <span class="eye">👁</span>
-            </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" name="confirmPassword" required>
+          </div>
         </div>
 
-        <button class="create-btn">Create Account →</button>
+        <button type="submit" class="btn-primary">
+          Create Account  →
+        </button>
 
-        <div class="continue-text">OR CONTINUE WITH</div>
+        <div class="divider">OR CONTINUE WITH</div>
 
-        <button class="google-btn">
-            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" class="google-icon"></i> Google
+        <button type="button" class="google-btn">
+          <img src="/images/google.png" alt="Google"> Google
         </button>
 
         <p class="login-text">
-            Already have an account? <a href="/user/login">Login</a>
+          Already have an account? <a href="/user/login">Login</a>
         </p>
 
+      </form>
     </div>
 
-    <!-- RIGHT IMAGE -->
-    <div class="right-img">
-        <img src="/images/signup-img.jpg">
+    <!-- Image -->
+    <div class="signup-image">
+      <img src="/images/signup-img.jpg" alt="Shoe">
     </div>
 
+  </div>
 </section>

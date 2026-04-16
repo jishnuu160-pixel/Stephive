@@ -1,6 +1,6 @@
 /* ===== HERO BACKGROUND ===== */
 .forgot-hero {
-    height: calc(100vh - 110px); /* adjust for navbar + footer */
+   height: 100vh;
     background: #000;
     display: flex;
     justify-content: center;
@@ -10,13 +10,13 @@
 
 /* ===== BOX ===== */
 .forgot-box {
-    width: 200px;
+    width: 250px;
     padding: 25px;
     border-radius: 20px;
     background: rgba(255,255,255,0.1);
     color: #ddd;
     text-align: center;
-    height: 250px;
+    height: 300px;
 }
 
 /* ===== TEXT ===== */

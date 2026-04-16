@@ -1,18 +1,18 @@
 /* ===== HERO ===== */
 .otp-hero {
-    min-height: calc(100vh - 120px);
+    height: 120vh;
     background: #000;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 50px;
+
 }
 
 /* ===== BOX ===== */
 .otp-box {
     width: 300px;
-    height: 300px;
-    padding: 30px;
+    height: 350px;
+    padding: 25px;
     border-radius: 20px;
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(10px);

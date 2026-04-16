@@ -1,59 +1,63 @@
-// app.js
 import express from 'express';
+import { engine } from 'express-handlebars';
 import path from 'path';
 import session from 'express-session';
-import nocache from 'nocache';
-import { fileURLToPath } from 'url';
+import { connectDB } from './config/db.js';
 
-import userRoutes from './routes/user.js';
-import adminRoutes from './routes/admin.js';
-
-// 🔧 Fix __dirname in ES6
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import userRoutes from './routes/userRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import homeRoutes from './routes/homeRoutes.js';
 
 const app = express();
 
-// ✅ SESSION FIRST
-app.use(session({
-  secret: 'secretKey',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false
-  }
+connectDB();
+
+app.engine('hbs', engine({
+    extname: '.hbs',
+    defaultLayout: 'main',
+    layoutsDir: path.join(process.cwd(), 'views/layouts'),
+    partialsDir: [
+        path.join(process.cwd(), 'views/partials'),      
+        path.join(process.cwd(), 'views/admin/partials') 
+    ],
+    helpers: {
+        eq: (a, b) => a === b,
+        addOne: (value) => value + 1
+    }
 }));
 
-// ✅ PREVENT CACHING (custom headers)
-app.use((req, res, next) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-  res.set('Pragma', 'no-cache');
-  res.set('Expires', '0');
-  next();
-});
-
-// ✅ PREVENT CACHING (nocache middleware)
-app.use(nocache());
-
-// ✅ BODY PARSERS
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-// ✅ VIEW ENGINE
-app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+app.set('views', path.join(process.cwd(), 'views'));
 
-// ✅ STATIC FILES
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(process.cwd(), 'public')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
 
-// ✅ LANDING PAGE
-app.get('/', (req, res) => {
-  res.render('select-role');
+app.use(session({
+    secret: 'your_secret_key',
+    resave: false,
+    saveUninitialized: false, 
+    cookie: { 
+        secure: false, 
+        maxAge: 24 * 60 * 60 * 1000 
+    }
+}));
+
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    next();
 });
 
-// ✅ ROUTES
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
+app.use('/', homeRoutes);
 
-// ✅ IMPORTANT: DEFAULT EXPORT
+app.get('/login',(req,res)=>{
+    res.render('user/login');
+});
+
+app.get('/signup',(req,res)=>{
+    res.render('user/signup');
+});
+
 export default app;

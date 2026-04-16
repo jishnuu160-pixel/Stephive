@@ -11,6 +11,11 @@
         <img class="nav-icons" src="/icons/search (2).png" >
        <img class="nav-icons" src="/icons/wishlist.png">
       <img class="nav-icons" src="/icons/cart.png" >
+
+      {{#if user}}
+      <a href="/user/profile">
       <img class="nav-icons" src="/icons/user.png">
+      </a>
+      {{/if}}
     </div>
 </header>

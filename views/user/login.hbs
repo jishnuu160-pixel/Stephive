@@ -1,68 +1,50 @@
 
 
+   <div id="jsError" class="toast-error"></div>
 
-<!-- Hero Section -->
 <section class="hero">
-
-    <!-- Login Box -->
     <div class="signin-box">
         <h2>Sign in to your account</h2>
         <h6>Enter valid email to proceed.</h6>
         
-         {{#if error}}
-          <p style="color:red">{{error}}</p>
+        {{#if error}}
+          <p class="server-error" style="color:red; margin-bttom:10px;">{{error}}</p>
         {{/if}}
 
-        {{#if success}}
-        <p style="color:green">{{success}}</p>
-       {{/if}}
-        <form action="/user/login" method="post">
-        <label>Email</label>
-        <input type="email" name="email" placeholder="Email Address">
+         <p id="jsError" class="error-msg" style="color: red;display:none"></p>
 
-        <div class="password-container">
-            <label>Password</label>
-            <input type="password" name="password" id="password" placeholder="Password">
-            <i class="fas fa-eye" id="togglePassword"></i>
-        </div>
+        <form action="/user/login" id="loginForm" method="post">
+            <label>Email</label>
+            
+            <input type="email" name="email" id="email" autocomplete="off" required>
 
-        <a href="#" class="forgot">forgot?</a>
+            <div class="password-container">
+                <label>Password</label>
+               <input type="password" name="password" id="password" autocomplete="new-password" required>
+                <i class="fas fa-eye" id="togglePassword"></i>
+            </div>
+            <div class="form-options">
+                <a href="/user/forgot-password">forgot?</a>
+            </div>
+    
+            <button type="submit" class="signin-btn">Sign In</button>
 
-        <button class="signin-btn">Sign In</button>
-
-        <p class="signup-text">
-            Don’t have an account? <a href="/signup">Sign up</a>
-        </p>
-
-        <div class="continue-text">OR CONTINUE WITH</div>
-
-        <button class="google-btn">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" class="google-icon"></i> Google
-        </button>
-        </form>
+            <p class="signup-text">
+                 Don't have an account?<a href="/signup"> Sign up</a>
+            </p>
+            <div class="separator">
+               <span>OR CONTINUE WITH</span>
+            </div>
+            <button type="button" class="google-btn">
+              <img src="/images/google.png" alt="Google">Google
+            </button>
+            </form>
     </div>
 
-    <!-- Right Text -->
+     <!-- Right Text -->
     <div class="right">
         <h1>Join the movement, one step at a time.</h1>
         <p>Your next pair of kicks awaits.</p>
     </div>
 
 </section>
-
-
-<script>
-const togglePassword = document.getElementById("togglePassword");
-const password = document.getElementById("password");
-
-togglePassword.addEventListener("click", () => {
-    const type = password.type === "password" ? "text" : "password";
-    password.type = type;
-    togglePassword.classList.toggle("fa-eye-slash");
-});
-
-    if (window.location.search) {
-        window.history.replaceState({}, document.title, "/user/login");
-    }
-
-</script>
