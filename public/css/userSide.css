@@ -1,0 +1,58 @@
+/* Sidebar Container */
+.profile-sidebar {
+    width: 260px;
+    background: white;
+    border-radius: 15px;
+    padding: 15px 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    height: fit-content;
+    flex-shrink: 0;
+}
+
+/* Nav Items */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #718096;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.nav-item.active {
+    background: #eef2ff; /* Your primary-blue */
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.nav-icon {
+    width: 11px;
+    height: 11px;
+}
+
+/* Targeting the icons directly */
+.sidebar-icon {
+    width: 16px;          /* THIS is the standard small dashboard size */
+    height: 16px;         /* Forces both dimensions to match */
+    object-fit: contain;  /* Essential: ensures the icon aspect ratio isn't distorted */
+    flex-shrink: 0;       /* Prevents the icon from getting squashed if the text is long */
+}
+
+.user-icon{
+    height: 40px;
+    width: 40px;
+    border-radius: 50px;
+}
+
+.logout{
+    color: red;
+}
+
+.sidebar-user-header{
+    gap: 20px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 6px;
+}
