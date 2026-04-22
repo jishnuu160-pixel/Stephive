@@ -54,9 +54,7 @@ export const sendOTP = async (email) => {
 
     await userRepo.saveOTP(email, otp); 
 
-    console.log("-------------------------------");
-    console.log(`DEBUG: OTP for ${email} is [ ${otp} ]`);
-    console.log("-------------------------------");
+    console.log(`OTP for ${email} is [ ${otp} ]`);
 
    
     return otp; 
@@ -65,17 +63,13 @@ export const sendOTP = async (email) => {
 
 export const verifyOTP = async (email, otp) => {
     const user = await userRepo.findByEmail(email);
-
-    if (!user || !user.otp) {
-        throw new Error("OTP not generated or user not found");
+    
+    if (!user || user.otp !== otp) {
+        throw new Error("Invalid OTP code. Please try again.");
     }
 
-    if (user.otp !== otp) {
-        throw new Error("Invalid OTP");
-    }
-
-    if (user.otpExpiry < Date.now()) {
-        throw new Error("OTP expired");
+    if (Date.now() > user.otpExpiry) {
+        throw new Error("OTP has expired. Please request a new one.");
     }
 
     return true;

@@ -2,18 +2,17 @@ import adminRepository from '../repositories/adminRepository.js';
 import User from '../models/userModel.js'; 
 import bcrypt from 'bcrypt';
 
-// 1. GET Admin Login Page
 export const getAdminLogin = (req, res) => {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
     res.render('admin/login', { 
         title: 'Admin Login',
-        isLogin: true,  
-        isAdmin: false  
+        isAdmin: true,  
+        isAdminLogin: true,
+        isLogin: true  
     });
 };
 
-// 2. POST Admin Login (Updated to use Database + Repository)
 export const postAdminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -22,8 +21,9 @@ export const postAdminLogin = async (req, res) => {
 
         if (!admin) {
             return res.render('admin/login', { 
-                layout: 'admin-auth', 
-                error: "Invalid Admin Email" 
+                isAdmin: true,
+                isAdminLogin: true,
+                error:"Invalid Admin Email"
             });
         }
 
@@ -38,7 +38,8 @@ export const postAdminLogin = async (req, res) => {
             return res.redirect('/admin/dashboard');
         } else {
             return res.render('admin/login', { 
-                layout: 'admin-auth', 
+               isAdmin: true,
+               isAdminLogin: true,
                 error: "Incorrect Password" 
             });
         }
@@ -58,11 +59,24 @@ export const getDashboard = (req, res) => {
 
 export const getCustomers = async (req, res) => {
     try {
+        const search = req.query.search || ''; // 1. Capture search
         const page = parseInt(req.query.page) || 1;
         const limit = 4;
         const skip = (page - 1) * limit;
 
-        const query = { isAdmin: { $ne: true } };
+        let query = { isAdmin: { $ne: true } };
+
+        if (search) {
+            query.$and = [
+                { isAdmin: { $ne: true } },
+                {
+                    $or: [
+                        { fullName: { $regex: search, $options: 'i' } },
+                        { email: { $regex: search, $options: 'i' } }
+                    ]
+                }
+            ];
+        }
 
         const totalUsers = await User.countDocuments(query);
         const totalPages = Math.max(1, Math.ceil(totalUsers / limit));
@@ -75,13 +89,15 @@ export const getCustomers = async (req, res) => {
 
         res.render('admin/customers', {
             isAdmin: true,
+            title: 'Customer Management',
             users: customersData,
             currentPage: page,
             totalPages: totalPages,
             hasNextPage: page < totalPages,
             hasPrevPage: page > 1,
             nextPage: page + 1,
-            prevPage: page - 1
+            prevPage: page - 1,
+            searchQuery: search 
         });
     } catch (error) {
         console.error(error);
@@ -105,4 +121,19 @@ export const toggleUserStatus = async (req, res) => {
         console.error("Status Toggle Error:", error);
         res.status(500).send("Internal Server Error");
     }
+};
+
+
+
+export const adminLogout = (req, res) => {
+    req.session.admin=null;
+
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Logout error:", err);
+            return res.redirect('/admin/dashboard');
+        }
+        res.clearCookie('connect.sid'); 
+        res.redirect('/admin/login');
+    });
 };

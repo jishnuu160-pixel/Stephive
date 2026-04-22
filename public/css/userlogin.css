@@ -145,24 +145,6 @@
   margin: 10px 0;
 }
 
-/* ===== GOOGLE BUTTON ===== */
-.google-btn {
-  width: 100%;
-  padding: 8px;
-
-  border-radius: 20px;
-  border: none;
-
-  background: rgba(255,255,255,0.2);
-  color: white;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  cursor: pointer;
-}
 
 /* ===== RIGHT SIDE TEXT ===== */
 .right {
@@ -186,7 +168,7 @@
     position: absolute;
     top: 70px;
     right: 20px;
-    background-color: #ff4d4d; /* Bright red */
+    background-color: #db2222; /* Bright red */
     color: white;
     padding: 12px 20px;
     border-radius: 5px;
@@ -245,6 +227,7 @@
   justify-content: center;
   cursor: pointer;
   transition: 0.3s;
+  text-decoration: none;
 }
 
 /* Force the Google icon to appear */

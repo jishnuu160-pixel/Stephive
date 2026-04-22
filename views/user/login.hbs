@@ -1,19 +1,14 @@
 
 
-   <div id="jsError" class="toast-error"></div>
-
 <section class="hero">
     <div class="signin-box">
         <h2>Sign in to your account</h2>
         <h6>Enter valid email to proceed.</h6>
         
-        {{#if error}}
-          <p class="server-error" style="color:red; margin-bttom:10px;">{{error}}</p>
-        {{/if}}
+       
 
-         <p id="jsError" class="error-msg" style="color: red;display:none"></p>
 
-        <form action="/user/login" id="loginForm" method="post">
+        <form action="/user/login" id="loginForm" method="post" novalidate>
             <label>Email</label>
             
             <input type="email" name="email" id="email" autocomplete="off" required>
@@ -30,14 +25,15 @@
             <button type="submit" class="signin-btn">Sign In</button>
 
             <p class="signup-text">
-                 Don't have an account?<a href="/signup"> Sign up</a>
+                 Don't have an account?<a href="/user/signup"> Sign up</a>
             </p>
             <div class="separator">
                <span>OR CONTINUE WITH</span>
             </div>
-            <button type="button" class="google-btn">
-              <img src="/images/google.png" alt="Google">Google
-            </button>
+            <a href="/auth/google" class="google-btn">
+               <img src="/images/google.png" alt="Google"> Google
+             </a>
+              
             </form>
     </div>
 
@@ -48,3 +44,5 @@
     </div>
 
 </section>
+
+<div id="toast-container"></div>

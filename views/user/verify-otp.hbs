@@ -1,13 +1,13 @@
 <section class="otp-hero">
     <div class="otp-box">
-       <form action="{{#if isPasswordUpdate}}/user/verify-password-otp{{else}}/user/verify-otp{{/if}}" method="POST" id="otpForm">
+       <form action="{{#if isPasswordUpdate}}/user/verify-password-otp{{else}}/user/verify-otp{{/if}}" method="post" id="otpForm">
             <div class="lock-icon">🔒</div>
 
             <p class="otp-text">
                 Enter the 6-digit code sent to your registered device to authenticate.
             </p>
 
-            <input type="hidden" name="otp" id="fullOtp">
+            <input type="hidden" name="otp" id="serverExpiryTime" value="{{otpExpiryTime}}">
             <input type="hidden" name="email" value="{{email}}"> 
 
             <div class="otp-inputs">
@@ -42,6 +42,8 @@
         </form>
     </div>
 </section>
+
+<div id="toast-container"></div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -94,3 +96,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 </script>
+

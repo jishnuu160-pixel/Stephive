@@ -1,10 +1,59 @@
 import * as userService from '../services/userServices.js';
 import * as userRepo from '../repositories/userRepository.js';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
+import { profile } from 'console';
 
-// 🔹 Show Login Page
+const uploadPath=path.join(process.cwd(),'public/uploads/profile_pics');
+
+if(!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadPath); 
+    },
+    filename: (req, file, cb) => {
+        cb(null, `avatar-${Date.now()}${path.extname(file.originalname)}`);
+    }
+});
+
+export const uploadAvatar = multer({ storage: storage });
+
+
+export const updateAvatar = async (req, res) => {
+
+   console.log('File Info:',req.file);
+   console.log('Body Info:',req.body);
+
+    try {
+        
+        if (!req.file){
+      console.log('No files was found');
+            return res.status(400).json({ success: false });
+        } 
+        const userId = req.session.user.id;
+        const imagePath = `/uploads/profile_pics/${req.file.filename}`;
+
+        await userRepo.updateUserInfo(userId, { profileImage: imagePath });
+
+        req.session.user.profileImage = imagePath;
+
+        req.session.save(() => {
+            res.json({ success: true, imagePath });
+        });
+    } catch (error) {
+        console.error("Avatar Error:", error);
+        res.status(500).json({ success: false });
+    }
+};
+
+
 export const getLogin = (req, res) => {
     res.render('user/login', {
-        layout: 'main', // <--- Force it to use views/layouts/main.hbs
+        layout: 'main', 
         isLogin: true,
         error: req.query.error,
         success: req.query.success
@@ -15,61 +64,60 @@ export const getSignup = (req, res) => {
     res.render('user/signup');
 };
 
-export const postSignup = async (req, res) => {
+export const postSignup = async (req, res, next) => {
     try {
-        // 1. Create the user in the database
+        const { password, confirmPassword, email } = req.body;
+
+        if (password !== confirmPassword) {
+            return res.redirect('/user/signup?error=' + encodeURIComponent("Passwords do not match!"));
+        }
+
         const user = await userService.signup(req.body);
 
-        // 2. LOG THEM IN AUTOMATICALLY
-        // We save the new user's info into the session right here
-        req.session.user = {
-            id: user._id,
-            name: user.fullName, // Ensure this matches your schema field name
-            email: user.email,
-            phoneNumber: user.phoneNumber
-        };
-
-        // 3. Redirect to Home Page
-        // Explicitly save the session before redirecting to ensure it's ready
-        req.session.save((err) => {
-            if (err) {
-                console.error("Session Save Error:", err);
-                return res.redirect('/user/login');
-            }
-            res.redirect('/'); 
-        });
-
-    } catch (err) {
-        console.error("Signup Error:", err.message);
-        // If signup fails, take them back to signup with the error message
-        res.render('user/signup', { error: err.message });
-    }
-};
-
-// userController.js
-export const postLogin = async (req, res) => {
-    try {
-        const user = await userService.login(req.body); // Assume this returns user object { name, email, _id }
-        
-        // 1. SAVE TO SESSION
         req.session.user = {
             id: user._id,
             name: user.fullName,
             email: user.email,
-            phoneNumber:user.phoneNumber
+            phoneNumber: user.phoneNumber
         };
 
-        // 2. FORCE SAVE (Optional but safer)
+        req.session.save((err) => {
+            if (err) {
+                console.error("Session Save Error:", err);
+                return res.redirect('/user/signup?error=' + encodeURIComponent("Session error, please try again."));
+            }
+
+            res.redirect('/?success=' + encodeURIComponent("Account created Successfully.")); 
+        });
+
+    } catch (err) {
+        console.error("Signup Error:", err.message);
+        // This ensures the "already exists" error becomes a toast in your Validation.js
+        res.redirect('/user/signup?error=' + encodeURIComponent(err.message));
+    }
+};
+
+export const postLogin = async (req, res) => {
+    try {
+        const user = await userService.login(req.body);
+        
+        req.session.user = {
+            id: user._id,
+            name: user.fullName,
+            email: user.email,
+            phoneNumber:user.phoneNumber,
+            gender: user.gender
+        };
+
         req.session.save((err) => {
             if (err) return next(err);
-            res.redirect('/'); // Redirect to home
+            res.redirect('/'); 
         });
     } catch (err) {
         res.redirect('/user/login?error=' + encodeURIComponent(err.message));
     }
 };
 
-// 🔹 Forgot Password
 export const postForgot = async (req, res) => {
     try {
         const { email } = req.body;
@@ -80,6 +128,7 @@ export const postForgot = async (req, res) => {
         }
 
         await userService.sendOTP(email);
+        req.session.otpExpiryTime=Date.now() + 60000;
 
         res.redirect(`/user/verify-otp?email=${email}`);
     } catch (err) {
@@ -89,7 +138,6 @@ export const postForgot = async (req, res) => {
 };
 
 
-// 🔹 Verify OTP
 export const postVerifyOTP = async (req, res) => {
     console.log("VERIFY BODY:", req.body); // 👈 ADD THIS
 
@@ -100,19 +148,17 @@ export const postVerifyOTP = async (req, res) => {
 
         res.redirect(`/user/reset-password?email=${email}`);
     } catch (err) {
-        console.log("VERIFY ERROR:", err.message);
+       
         res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${req.body.email}`);
     }
 };
 
 
-// 🔹 Reset Password
 export const postResetPassword = async (req, res) => {
     const { email, password, confirmPassword } = req.body;
 
     try {
         if (password !== confirmPassword) {
-            // Use render instead of redirect so the user doesn't lose their email/form data
             return res.render('user/reset-password', { 
                 error: "Passwords do not match", 
                 email 
@@ -121,7 +167,6 @@ export const postResetPassword = async (req, res) => {
 
         await userService.resetPassword(email, password);
 
-        // SUCCESS: Go to login
         res.redirect('/user/login?success=Password updated successfully');
         
     } catch (err) {
@@ -135,8 +180,32 @@ export const postResetPassword = async (req, res) => {
 
 export const getVerifyOTP = (req, res) => {
     res.render('user/verify-otp', {
-        email: req.query.email   
+        email: req.query.email,
+        error: req.query.error, // Validation.js uses this for the toast
+        isPasswordUpdate: req.query.isPasswordUpdate === 'true',
+        otpExpiryTime:req.session.otpExpiryTime
     });
+};
+
+export const getResendOTP = async (req, res) => {
+    try {
+        const { email, isPasswordUpdate } = req.query;
+
+        if (!email) {
+            return res.redirect('/user/login?error=Email missing, please try again.');
+        }
+
+        await userService.sendOTP(email);
+
+        const redirectPath = (isPasswordUpdate === 'true') 
+            ? '/user/verify-password-otp' 
+            : '/user/verify-otp';
+
+        res.redirect(`${redirectPath}?email=${email}&success=A new OTP has been sent!`);
+    } catch (err) {
+        console.error("Resend Error:", err);
+        res.redirect(`/user/verify-otp?email=${req.query.email}&error=Failed to resend OTP`);
+    }
 };
 
 export const getForgot = (req, res) => {
@@ -169,9 +238,7 @@ export const logout=(req,res)=>{
 export const getProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        // 1. ADD .lean() HERE! (Crucial fix for Handlebars error)
         const user = await userRepo.findById(userId);
-        console.log("Address found:", user.address); 
 
         if (!user) {
             console.log("User not found in database");
@@ -230,7 +297,7 @@ export const postAddAddress = async (req, res) => {
 export const removeAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const addressId = req.params.id; // Pulls ID from the URL link
+        const addressId = req.params.id; 
         
         await userRepo.deleteAddress(userId, addressId);
         
@@ -265,9 +332,9 @@ export const postUpdateProfile = async (req, res) => {
 
         await userRepo.updateUserInfo(userId, { fullName, phoneNumber, gender });
 
-        // 🔹 Update the whole session object
-        req.session.user.name = fullName;
+        req.session.user.fullName = fullName;
         req.session.user.phoneNumber = phoneNumber;
+        req.session.user.gender = gender;
 
         req.session.save(() => {
             res.redirect('/user/profile?success=Profile updated');
@@ -296,15 +363,16 @@ export const getEditProfile = async (req, res) => {
     }
 };
 
+
 export const sendUpdatePasswordOTP = async (req, res) => {
     try {
         const email = req.session.user.email;
-        
         await userService.sendOTP(email);
+
+        req.session.otpExpiryTime = Date.now() + 60000; 
 
         res.redirect(`/user/verify-password-otp?email=${email}`);
     } catch (err) {
-        console.error("OTP Send Error:", err.message);
         res.redirect('/user/profile?error=Could not send verification code');
     }
 };
@@ -312,7 +380,8 @@ export const sendUpdatePasswordOTP = async (req, res) => {
 export const getVerifyPasswordOTP = (req, res) => {
     res.render('user/verify-otp', {
         email: req.query.email,
-        isPasswordUpdate: true 
+        isPasswordUpdate: true ,
+        otpExpiryTime:req.session.otpExpiryTime
     });
 };
 
@@ -415,19 +484,3 @@ export const postChangePassword = async (req, res) => {
     }
 };
 
-export const getResendOTP = async (req, res) => {
-    try {
-        const { email, isPasswordUpdate } = req.query;
-
-        await userService.sendOTP(email);
-
-        const redirectPath = (isPasswordUpdate === 'true') 
-            ? '/user/verify-password-otp' 
-            : '/user/verify-otp';
-
-        res.redirect(`${redirectPath}?email=${email}&success=A new OTP has been sent!`);
-    } catch (err) {
-        console.error("Resend Error:", err);
-        res.redirect('/user/login?error=Failed to resend OTP');
-    }
-};

@@ -6,41 +6,41 @@
       <h2>Create Your Account</h2>
       <p class="subtitle">Experience the future of technology today.</p>
 
-      <form action="/user/signup" method="post">
+      <form action="/user/signup" id="signupForm" method="post" novalidate>
 
-        <div class="form-row">
-          <div class="form-group">
+        <div class="form-row-s">
+          <div class="form-group-s">
             <label>Full Name</label>
-            <input type="text" name="fullName" required>
+            <input type="text" id="fullName" name="fullName" required>
           </div>
 
-          <div class="form-group">
+          <div class="form-group-s">
             <label>Email Address</label>
-            <input type="email" name="email" required>
+            <input type="email" id="email" name="email" required>
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
+        <div class="form-row-s">
+          <div class="form-group-s">
             <label>Phone Number</label>
-            <input type="text" name="phoneNumber" required>
+            <input type="text" id="phoneNumber" name="phoneNumber" required>
           </div>
 
-          <div class="form-group">
+          <div class="form-group-s">
             <label>Referral Code</label>
             <input type="text" name="referralCode">
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
+        <div class="form-row-s">
+          <div class="form-group-s">
             <label>Password</label>
-            <input type="password" name="password" required>
+            <input type="password" id="password" name="password" required>
           </div>
 
-          <div class="form-group">
+          <div class="form-group-s">
             <label>Confirm Password</label>
-            <input type="password" name="confirmPassword" required>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
           </div>
         </div>
 
@@ -50,9 +50,9 @@
 
         <div class="divider">OR CONTINUE WITH</div>
 
-        <button type="button" class="google-btn">
-          <img src="/images/google.png" alt="Google"> Google
-        </button>
+          <a href="/auth/google" class="google-btn">
+               <img src="/images/google.png" alt="Google"> Google
+             </a>
 
         <p class="login-text">
           Already have an account? <a href="/user/login">Login</a>
@@ -68,3 +68,5 @@
 
   </div>
 </section>
+
+<div id="toast-container"></div>

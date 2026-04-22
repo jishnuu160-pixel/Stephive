@@ -3,8 +3,12 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    phoneNumber: { type: String, required: true },
-    password: { type: String, required: true }, 
+    phoneNumber: { type: String, required: false },
+    password: { type: String, required: false }, 
+    profileImage:{
+        type:String,
+        default: ''
+    },
     otp: { type: String, default: null },
     otpExpiry: { type: Date, default: null },
     isBlocked: { type: Boolean, default: false },
@@ -26,7 +30,7 @@ const userSchema = new mongoose.Schema({
 });
 
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default User;
 

@@ -1,130 +1,136 @@
-document.addEventListener("DOMContentLoaded", () => {
-   
     const loginForm = document.getElementById("loginForm");
-    const signupForm = document.getElementById("signupForm");
-    const forgotForm = document.getElementById("forgotForm"); // Added
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const jsError = document.getElementById("jsError");
+      const signupForm = document.getElementById("signupForm");
 
-
-    if (window.location.search.includes('error') || window.location.search.includes('success')) {
-        const cleanUrl = window.location.origin + window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-    }
-
-    const hideErrors = () => {
-        if (jsError) jsError.style.display = "none";
-
-        const serverErrors = document.querySelectorAll(".server-error, .error-msg, .alert");
-        serverErrors.forEach(err => {
-            err.style.display = "none";
-        });
-    };
-
-
-    document.querySelectorAll("input").forEach(input => {
-        input.addEventListener("input", hideErrors);
-    });
-
- 
-    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-    const showError = (message) => {
-        if (jsError) {
-            jsError.textContent = message;
-            jsError.style.display = "block";
-        } else {
-            alert(message);
-        }
-    };
-
-
- 
     if (loginForm) {
         loginForm.addEventListener("submit", (e) => {
+            const emailInput = document.getElementById("email") || document.querySelector('input[name="email"]');
+            const passwordInput = document.getElementById("password") || document.querySelector('input[name="password"]');
+
             const email = emailInput?.value.trim();
             const password = passwordInput?.value.trim();
+
             if (!email || !password) {
-                e.preventDefault();
-                showError("All fields are required!.");
-            } else if (!validateEmail(email)) {
-                e.preventDefault();
-                showError("Please enter a valid email address.");
+                e.preventDefault(); 
+                showToast("All fields are required!");
+                return;
             }
         });
     }
 
-    
-    if (signupForm) {
-        signupForm.addEventListener("submit", (e) => {
-            const email = emailInput?.value.trim();
-            const password = passwordInput?.value;
-            const confirmPassword = document.getElementById("confirmPassword")?.value;
 
-            if (!email || !password) {
+if (signupForm) {
+    signupForm.addEventListener("submit", (e) => {
+       
+        const name = document.getElementById("fullName")?.value.trim();
+        const email = document.getElementById("email")?.value.trim();
+        const phone = document.getElementById("phoneNumber")?.value.trim();
+        const password = document.getElementById("password")?.value;
+        const confirmPass = document.getElementById("confirmPassword")?.value;
+
+       
+        if (!name || !email || !phone || !password || !confirmPass) {
+            e.preventDefault();
+            showToast("All fields are required!");
+            return; 
+        }
+
+        if (password !== confirmPass) {
+            e.preventDefault();
+            showToast("Passwords do not match!");
+            return;
+        }
+        
+    });
+}
+
+
+const showToast = (message, type = "error") => {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`; 
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMsg = urlParams.get('error');
+    const successMsg = urlParams.get('success');
+
+
+    const messageId = errorMsg || successMsg;
+
+    if (messageId) {
+      
+        const alreadyShown = sessionStorage.getItem('lastToast') === messageId;
+
+        if (!alreadyShown) {
+            if (errorMsg) showToast(decodeURIComponent(errorMsg));
+            if (successMsg) showToast(decodeURIComponent(successMsg), "success");
+
+            sessionStorage.setItem('lastToast', messageId);
+
+            const email = urlParams.get('email');
+            const cleanUrl = window.location.origin + window.location.pathname + (email ? `?email=${email}` : '');
+            window.history.replaceState({}, document.title, cleanUrl);
+        }
+    } else {
+        sessionStorage.removeItem('lastToast');
+    }
+
+    if(successMsg) showToast(decodeURIComponent(successMsg), "success");
+
+  
+    const otpForm = document.getElementById("otpForm");
+    if (otpForm) {
+        otpForm.addEventListener("submit", (e) => {
+            const hiddenOtp = document.getElementById("fullOtp");
+            if (!hiddenOtp || hiddenOtp.value.length !== 6) {
                 e.preventDefault();
-                showError("All fields are required.");
-            } else if (password.length < 6) {
-                e.preventDefault();
-                showError("Password must be at least 6 characters.");
-            } else if (confirmPassword !== undefined && password !== confirmPassword) {
-                e.preventDefault();
-                showError("Passwords do not match.");
+                showToast("Please enter the full 6-digit code.");
             }
         });
     }
 
   
-    if (forgotForm) {
-        forgotForm.addEventListener("submit", (e) => {
-            const email = emailInput?.value.trim();
+const timerElement = document.getElementById("timer");
+const serverExpiryInput = document.getElementById("serverExpiryTime");
 
-            if (!email) {
-                e.preventDefault();
-                showError("Please enter your email address.");
-                emailInput.focus();
-            } else if (!validateEmail(email)) {
-                e.preventDefault();
-                showError("Please enter a valid email address.");
-            }
+if (timerElement && serverExpiryInput) {
+    const otpEndTime = parseInt(serverExpiryInput.value);
+
+    const updateTimer = () => {
+        const now = Date.now();
+        const distance = otpEndTime - now;
+        const secondsRemaining = Math.floor(distance / 1000);
+
+        if (secondsRemaining <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById("timer-container").style.display = "none";
+            document.getElementById("resend-link").style.display = "inline";
+        } else {
+            let minutes = Math.floor(secondsRemaining / 60);
+            let seconds = secondsRemaining % 60;
+            timerElement.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    };
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+}
+
+
+    if (resendLink) {
+        resendLink.addEventListener("click", () => {
+            sessionStorage.removeItem("otpEndTime");
         });
     }
 });
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    const welcomeBox = document.getElementById("welcomeToast");
-    if (welcomeBox) {
-        setTimeout(() => {
-            welcomeBox.style.transition = "opacity 1s ease, transform 1s ease";
-            welcomeBox.style.opacity = "0";
-            welcomeBox.style.transform = "translateX(50px)";
-            setTimeout(() => { welcomeBox.remove(); }, 1000); 
-        }, 4000);
-    }
-
-    const timerElement = document.getElementById("timer");
-    const timerContainer = document.getElementById("timer-container");
-    const resendLink = document.getElementById("resend-link");
-
-    if (timerElement) {
-        let timeLeft = 60; 
-
-        const countdown = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                if (timerContainer) timerContainer.style.display = "none";
-                if (resendLink) resendLink.style.display = "inline";
-            } else {
-                timeLeft--;
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                // Formats to 00:00 style
-                timerElement.textContent = 
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
-        }, 1000);
-    }
-});
-

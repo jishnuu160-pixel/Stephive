@@ -12,11 +12,12 @@ import {
     getChangeEmail, postChangeEmail,
     sendUpdatePasswordOTP,getChangePassword,
     getVerifyPasswordOTP,getResendOTP,
-    postChangePassword,postVerifyPasswordOTP
+    postChangePassword,postVerifyPasswordOTP,
+    updateAvatar,uploadAvatar
 } from '../controllers/userController.js';
 import { isAuthenticated, isLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
 
-
+import passport from 'passport';
 
 const router = express.Router();
 
@@ -47,7 +48,13 @@ router.post('/reset-password', postResetPassword);
 router.post('/update-profile', preventCache, isAuthenticated, postUpdateProfile);
 
 
-router.get('/logout', isAuthenticated, logout);
+router.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) console.log(err);
+        res.clearCookie('connect.sid'); 
+        res.redirect('/'); 
+    });
+});
 router.get('/address',isAuthenticated, getAddress);
 
 router.get('/delete-address/:id', isAuthenticated, removeAddress);
@@ -57,7 +64,6 @@ router.post('/edit-address/:id', isAuthenticated, postEditAddress);
 
 
 router.get('/change-email', preventCache, isAuthenticated, getChangeEmail);
-
 router.post('/change-email', preventCache, isAuthenticated, postChangeEmail);
 
 
@@ -70,5 +76,8 @@ router.get('/changepass', isAuthenticated, getChangePassword);
 router.post('/changepass', isAuthenticated, postChangePassword);
 
 router.get('/resend-otp', getResendOTP);
+
+router.post('/update-avatar', isAuthenticated, uploadAvatar.single('profileImage'),updateAvatar);
+
 
 export default router;

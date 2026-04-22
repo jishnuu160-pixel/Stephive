@@ -80,17 +80,33 @@
     width: 100%;
     background: #f8fafc;
     border: none;
-    padding: 10px 15px 10px 40px;
+    padding: 10px 40px 10px 40px;
     border-radius: 10px;
 }
 
-.search-wrapper i {
+.search-wrapper .fa-search{
     position: absolute;
-    left: 15px;
+    left: 10px;
     top: 50%;
     transform: translateY(-50%);
     color: #94a3b8;
+    z-index: 5;
+    pointer-events: none;
 }
+
+.search-clear-btn{
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 5;
+    transition: color 0.2s;
+}
+
 
 /* 3. Icons Zone (Right Corner) */
 .top-bar-right {
@@ -98,7 +114,7 @@
     display: flex;
     justify-content: flex-end; /* Pushes icons to the far right corner */
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .icon-btn {
@@ -225,4 +241,53 @@ admin-footer {
     color: #94a3b8;
     font-size: 13px;
     width: 100%;
+}
+
+.stats-container {
+    display: flex; /* Using flex instead of grid for easier alignment */
+    /* 🟢 This pushes the boxes to the right side */
+    justify-content: flex-end; 
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.stat-card {
+    /* 🟢 Fixed width ensures they stay small and don't stretch */
+    width: 240px; 
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+/* 3. Make the icons smaller */
+.stat-icon {
+    width: 35px; /* Smaller footprint */
+    height: 35px;
+    border-radius: 8px;
+    flex-shrink: 0; /* Prevents icon from squishing */
+    font-size: 14px;
+}
+
+/* 4. Adjust the text sizes */
+.stat-details p {
+    font-size: 11px; /* Smaller label */
+    margin: 0;
+    white-space: nowrap; /* Keeps label on one line */
+}
+
+.stat-details h3 {
+    font-size: 18px; /* Smaller number */
+    margin: 0;
+    font-weight: 700;
+}
+.admin-main-content {
+    margin-left: 260px; /* Width of sidebar */
+    padding: 30px;
+    /* 🟢 This ensures the container stretches to the right edge */
+    width: calc(100% - 260px); 
+    box-sizing: border-box;
 }

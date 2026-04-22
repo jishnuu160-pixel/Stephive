@@ -1,11 +1,15 @@
-/* layout.css */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 15px;
-    background: white;
-   
+/* ===== GLOBAL RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f8fafb;
+    color: #1a202c;
+    overflow-x: hidden; /* Prevents side-scrolling if things break */
 }
 
 /* ===== NAVBAR ===== */
@@ -15,7 +19,7 @@
     align-items: center;
     padding: 15px 40px;
     background: white;
-    
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
 }
 
 .logo {
@@ -32,10 +36,9 @@
 .nav-links a {
     text-decoration: none;
     color: black;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
 }
-
 
 .icons {
     display: flex;
@@ -44,58 +47,59 @@
 }
 
 .nav-icons {
-    width: 15px ;
-    height: 15px ;
-    display: block;
+    width: 16px;
+    height: 16px;
 }
 
-/* Hover effect */
-.nav-icon:hover {
-    transform: scale(1.1);
-    opacity: 0.7;
-}
 
-/* Footer base */
+
+/* ===== FOOTER ===== */
 .footer {
     background: #111;
     color: white;
-    height: 60px;       /* set footer height */
-    padding: 0 40px;    /* remove top/bottom padding */
+    width: 100%;
+    padding: 20px 40px;
+    flex-shrink: 0; 
+    margin-top: auto; 
 }
 
-/* 3 column layout */
 .footer-container {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* vertically centers content */
-    height: 100%;        /* ensures container fills footer height */
+    align-items: center;
+    height: 100%;
 }
 
-/* LEFT */
-.footer-left a {
-    font-size: 10px;
+.footer-left a, .footer-center, .footer-right {
+    font-size: 11px;
     color: #bbb;
     text-decoration: none;
-    margin-right: 10px;
 }
 
-.footer-left a:hover {
-    color: white;
+html, body {
+  height: 100%;
+  margin: 0;
 }
 
-/* CENTER */
-.footer-center {
-    font-size: 10px;
-    color: #aaa;
+.page-wrapper {
+ display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.footer-center a {
+.page-main-container{
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.footer-center a{
     color: white;
     text-decoration: none;
+    font-weight: 600;
+
 }
 
-/* RIGHT */
-.footer-right {
-    font-size: 10px;
-    color: #aaa;
-}
+
+

@@ -89,3 +89,7 @@
 .back-link:hover {
     color: white;
 }
+
+.input-box span{
+    top: -5px;
+}

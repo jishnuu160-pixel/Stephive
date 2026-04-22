@@ -51,13 +51,13 @@
         {{#if users.length}}
         <div class="pagination">
             {{#if hasPrevPage}}
-                <a href="/admin/customers?page={{prevPage}}" class="page-link">« Prev</a>
+                <a href="/admin/customers?page={{prevPage}}&search={{searchQuery}}" class="page-link">« Prev</a>
             {{/if}}
 
             <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
 
             {{#if hasNextPage}}
-                <a href="/admin/customers?page={{nextPage}}" class="page-link">Next »</a>
+                <a href="/admin/customers?page={{nextPage}}&search={{searchQuery}}" class="page-link">Next »</a>
             {{/if}}
         </div>
         {{/if}}

@@ -17,11 +17,13 @@
                 <label>GENDER</label>
                 <div class="gender-selection">
                     <label class="gender-radio">
-                        <input type="radio" name="gender" value="male" {{#if (eq user.gender 'male')}}checked{{/if}}>
+                        {{!-- CHANGE: value="male" to value="Male" --}}
+                        <input type="radio" name="gender" value="Male" {{#if (eq user.gender 'Male')}}checked{{/if}}>
                         <span>Male</span>
                     </label>
                     <label class="gender-radio">
-                        <input type="radio" name="gender" value="female" {{#if (eq user.gender 'female')}}checked{{/if}}>
+                        {{!-- CHANGE: value="female" to value="Female" --}}
+                        <input type="radio" name="gender" value="Female" {{#if (eq user.gender 'Female')}}checked{{/if}}>
                         <span>Female</span>
                     </label>
                 </div>
@@ -34,7 +36,6 @@
                     <img src="/icons/lock.png" class="btn-icon"> Update Password
                 </a>
             </div>
-             
         </form>
     </div>
 </div>

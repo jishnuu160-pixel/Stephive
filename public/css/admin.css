@@ -1,90 +1,146 @@
-/* General Reset */
-* {
-    margin: 0;
-    padding: 200;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-/* This targets the body only when isLogin is true */
+/* --- Root Layout for the Green Frame --- */
 body.login-page {
-    display: flex;
-    justify-content: center; /* Horizontal centering */
-    align-items: center;     /* Vertical centering */
-    min-height: 100vh;       /* Makes the body at least the height of the screen */
     margin: 0;
-    background: url('/images/admin-bg.jpg') no-repeat center center/cover;
-    background-color: #f8fafc; /* Optional: light background color */
+    
+    height: 100vh;
+    display: flex;
+    box-sizing: border-box;
 }
 
-/* Ensure your login card doesn't stretch too wide */
+
+.login-section {
+    /* 🟢 Take up the full width and height of the browser window */
+    width: 100%;
+    height: 100vh; 
+    margin: 0;
+    
+    /* 🟢 The Centering Magic */
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center;     /* Centers vertically */
+
+    /* 🟢 Ensure the background covers everything */
+    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%),
+                url('/images/admin-bg.jpg') no-repeat center center;
+    background-size: cover;
+}
+
+/* Ensure the body doesn't have default spacing that pushes the section */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* --- The Dark Background Area --- */
+.admin-wrapper {
+   width: 100%;
+   height: 100%;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px; /* Slight rounding where green meets dark */
+    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%),
+                url('/images/admin-bg.jpg') no-repeat center center/cover;
+    overflow: hidden;
+}
+
+/* --- The Login Card --- */
 .login-card {
     width: 100%;
-    max-width: 400px;
-    padding: 2rem;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    max-width: 360px;
+    background-color: #e5e5e5; /* The light gray card */
+    padding: 45px 35px;
+    border-radius: 25px; /* Very high radius for that smooth look */
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    text-align: center;
 }
 
 .login-card h2 {
-    font-size: 24px;
-    color: #1a1a1a;
-    margin-bottom: 5px;
+    font-size: 22px;
+    color: #222;
+    margin-bottom: 4px;
+    font-weight: 700;
 }
 
-.login-card p {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 30px;
+.login-card .subtitle {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 10px;
 }
 
-/* Form Styling */
+/* --- Gray-on-Gray Inputs --- */
 .form-group {
     text-align: left;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .form-group label {
     display: block;
     font-size: 12px;
-    font-weight: 600;
+    text-transform: uppercase;
+    font-weight: 700;
     color: #333;
-    margin-bottom: 8px;
-    margin-left: 5px;
+    margin-bottom: 10px;
+    margin-left: 4px;
 }
 
 .form-group input {
     width: 100%;
-    padding: 14px 20px;
-    border-radius: 15px;
-    border: 1px solid #ccc;
-    background: #e0e0e0; /* Grayish input as per your screenshot */
+    box-sizing: border-box;
+    height: 35px;
+    padding:0px 25px 0 18px;
+    border-radius: 14px;
+    border: none;
+    background-color: #bcbcbc; /* Darker gray inside light gray card */
+    font-size: 13px;
+    margin-bottom: 20px;
+    color: #000;
     outline: none;
-    font-size: 14px;
 }
 
-/* Login Button */
+.form-group input::placeholder {
+    color: #666;
+}
+
+/* --- Password Eye Container --- */
+.password-box {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.eye {
+    position: absolute;
+    right: 15px;
+    top: 20%;
+    cursor: pointer;
+    color: rgba(0,0,0,0.3);
+    font-size: 12px;
+}
+
+/* --- The Sign In Button --- */
 .login-btn {
     width: 100%;
-    padding: 14px;
-    background: #000; /* Black button */
+    padding: 13px;
+    background-color: #000;
     color: #fff;
     border: none;
-    border-radius: 30px;
-    font-weight: 600;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
     margin-top: 10px;
-    transition: transform 0.2s ease;
+    transition: opacity 0.2s;
 }
 
 .login-btn:hover {
-    transform: scale(1.02);
+    opacity: 0.9;
 }
 
 /* Error Message */
 .error-msg {
-    color: #e53e3e;
+    color: #d93025;
     font-size: 12px;
-    margin-top: 10px;
+    margin-bottom: 15px;
+    font-weight: 600;
 }

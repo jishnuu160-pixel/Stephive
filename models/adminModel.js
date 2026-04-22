@@ -17,7 +17,7 @@ const adminSchema = new mongoose.Schema({
         default: 'admin'
     }
 }, { 
-    timestamps: true // Automatically creates createdAt and updatedAt fields
+    timestamps: true
 });
 
 const Admin = mongoose.model('Admin', adminSchema);

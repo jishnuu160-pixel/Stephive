@@ -299,3 +299,12 @@
 .category-card:hover .discover-link span {
     margin-left: 10px;
 }
+
+.highlight{
+  font-style: italic;
+  font-weight: 100;
+}
+
+.fas fa-eye{
+     top: 200px;
+}
