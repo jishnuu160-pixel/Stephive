@@ -1,0 +1,37 @@
+<aside class="profile-sidebar">
+    <div class="sidebar-user-header">
+        <div class="avatar-circle-small">
+             <img src="{{#if user.profileImage}}{{user.profileImage}}{{else}}/icons/user (1).png{{/if}}" class="user-icon" alt="User">
+        </div>
+        <div class="user-meta">
+            <h4>{{user.fullName}}</h4>
+            <span class="premium-tag">PREMIUM MEMBER</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="/user/profile" class="nav-item {{#if (eq activePage 'profile')}}active{{/if}}">
+            <img src="/icons/profile.png" class="sidebar-icon"> <span>Profile</span>
+        </a>
+
+        <a href="/user/orders" class="nav-item {{#if (eq activePage 'orders')}}active{{/if}}">
+            <img src="/icons/order (1).png" class="sidebar-icon"> <span>My orders</span>
+        </a>
+
+        <a href="/user/wallet" class="nav-item {{#if (eq activePage 'wallet')}}active{{/if}}">
+            <img src="/icons/wallet.png" class="sidebar-icon"> <span>Wallet</span>
+        </a>
+
+        <a href="/user/address" class="nav-item {{#if (eq activePage 'address')}}active{{/if}}">
+            <img src="/icons/address.png" class="sidebar-icon"> <span>Address</span>
+        </a>
+
+        <a href="/user/referral" class="nav-item {{#if (eq activePage 'referral')}}active{{/if}}">
+            <img src="/icons/refer.png" class="sidebar-icon"> <span>Refer & Earn</span>
+        </a>
+
+        <a href="/user/logout" class="nav-item logout-link">
+            <img src="/icons/logout.png" class="sidebar-icon"> <span class="logout">Logout</span>
+        </a>
+    </nav>
+</aside>
