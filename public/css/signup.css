@@ -14,34 +14,31 @@
   justify-content: center;
 }
 
-/* Card */
 .signup-card {
   background: #2c2c2c;
-  padding: 25px;              /* reduced */
-  border-radius: 16px;        /* slightly smaller */
-  width: 400px;               /* reduced from 500px */
+  padding: 25px;              
+  border-radius: 16px;        
+  width: 400px;              
   color: #fff;
 }
 
 .signup-card h2 {
-  font-size: 20px;            /* smaller */
+  font-size: 20px;           
   margin-bottom: 4px;
 }
 
 .subtitle {
-  font-size: 12px;            /* smaller */
+  font-size: 12px;           
   color: #aaa;
   margin-bottom: 15px;
 }
 
-/* Form */
 .form-row-s {
   display: flex;
-  gap: 8px;                   /* reduced */
+  gap: 8px;                  
   margin-bottom: 10px;
 }
 
-/* Form Group */
 .form-group-s {
   display: flex;
   flex-direction: column;
@@ -49,13 +46,13 @@
 }
 
 .form-group-s label {
-  font-size: 11px;            /* smaller */
+  font-size: 11px;            
   margin-bottom: 3px;
   color: #ccc;
 }
 
 .form-group-s input {
-  padding: 8px;               /* reduced */
+  padding: 8px;               
   font-size: 12px;
   border-radius: 8px;
   border: none;
@@ -164,4 +161,44 @@
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
+}
+
+
+.star{
+  color: #d11a1a;
+}
+
+/* 1. Wrapper handles the layout */
+.password-containers {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-containers input {
+  width: 100%;
+  padding: 8px 35px 8px 10px !important; /* Extra padding on the right for the eye */
+  font-size: 12px;
+  background: #3a3a3a;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  outline: none;
+}
+
+.password-containers i {
+  position: absolute;
+  right: 10px;          
+  top: 50%;              
+  transform: translateY(-50%); 
+  cursor: pointer;
+  color: #888;         
+  font-size: 13px;     
+  z-index: 10;
+  transition: color 0.2s ease;
+}
+
+.password-containers i:hover {
+  color: #69737c;
 }

@@ -57,7 +57,7 @@ export const addAddress = async (userId, addressData) => {
         
         const result = await User.findByIdAndUpdate(
             userId,
-            { $push: { addresses: addressData } }, // Ensure this matches your schema 'addresses'
+            { $push: { addresses: addressData } }, 
             { new: true }
         ).lean();
 
@@ -96,11 +96,16 @@ export const updateAddress = async (userId, addressId, updatedData) => {
 };
 
 
-
 export const updateUserInfo = async (userId, updateData) => {
-    return await User.findByIdAndUpdate(
-        userId, 
-        { $set: updateData }, 
-        { new: true } 
-    );
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            userId, 
+            { $set: updateData }, 
+            { returnDocument: 'after' } 
+        );
+        return updatedUser;
+    } catch (error) {
+        console.error("Repository Error (updateUserInfo):", error.message);
+        throw new Error("Failed to update user in database");
+    }
 };

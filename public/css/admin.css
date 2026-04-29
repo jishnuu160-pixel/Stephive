@@ -46,9 +46,9 @@ body {
 /* --- The Login Card --- */
 .login-card {
     width: 100%;
-    max-width: 360px;
+    max-width: 300px;
     background-color: #e5e5e5; /* The light gray card */
-    padding: 45px 35px;
+    padding: 55px 30px;
     border-radius: 25px; /* Very high radius for that smooth look */
     box-shadow: 0 15px 40px rgba(0,0,0,0.4);
     text-align: center;

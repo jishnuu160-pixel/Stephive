@@ -1,11 +1,28 @@
 <div class="customers-page">
-    <h2>Users</h2>
+    
 
     <div class="table-card">
+        <div class="card-header">
+        <h2>Users</h2>
+           
+        <div class="search-wrapper">
+            <form action="/admin/customers" method="GET" style="display: flex; align-items: center; width: 100%;">
+            <i class="fas fa-search"></i>
+
+            <input type="text" name="search" placeholder="Search users" value="{{searchQuery}}">
+
+            {{#if searchQuery}}
+                <a href="/admin/customers" class="search-clear-btn">
+                    <i class="fas fa-times-circle"></i>
+                </a>
+            {{/if}}
+            </form>
+        </div>
+    </div>
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>No.</th>
                     <th>Full Name</th>
                     <th>Email Address</th>
                     <th>Status</th>
@@ -16,7 +33,7 @@
                 {{#if users.length}}
                     {{#each users}}
                     <tr>
-                        <td>{{addOne @index}}</td>
+                        <td>{{add ../startIndex @index 1}}</td>
                         <td><strong>{{this.fullName}}</strong></td>
                         <td>{{this.email}}</td>
                         <td>
@@ -26,14 +43,11 @@
                         </td>
                         <td>
                       <form action="/admin/customers/toggle-status/{{this._id}}" method="POST" style="display:inline;">
-        <button class="btn-action {{#if this.isBlocked}}btn-unblock{{else}}btn-block{{/if}}" 
-                onclick="return confirm('Are you sure you want to {{#if this.isBlocked}}unblock{{else}}block{{/if}} this user?')">
-            {{#if this.isBlocked}}
-                Unblock
-            {{else}}
-                Block
-            {{/if}}
-        </button>
+       <button type="button" 
+        class="btn-action {{#if this.isBlocked}}btn-unblock{{else}}btn-block{{/if}}" 
+        onclick="confirmToggle(this, '{{this.fullName}}', {{this.isBlocked}})">
+    {{#if this.isBlocked}}Unblock{{else}}Block{{/if}}
+</button>
     </form>
 </td>
                     </tr>
@@ -63,3 +77,36 @@
         {{/if}}
     </div>
 </div>
+
+<div  class="admin-toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+   function confirmToggle(button, name, isBlocked) {
+    const action = isBlocked ? 'unblock' : 'block';
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you really want to ${action} ${name}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: isBlocked ? '#28a745' : '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: `Yes, ${action}!`,
+        
+        // 🟢 THE SHRINK FIXES:
+        width: '320px',             
+        padding: '1rem',           
+        customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            button.closest('form').submit();
+        }
+    });
+}
+</script>
+

@@ -3,7 +3,7 @@ import * as userRepo from '../repositories/userRepository.js';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
-import { profile } from 'console';
+import { error, profile } from 'console';
 
 const uploadPath=path.join(process.cwd(),'public/uploads/profile_pics');
 
@@ -54,9 +54,7 @@ export const updateAvatar = async (req, res) => {
 export const getLogin = (req, res) => {
     res.render('user/login', {
         layout: 'main', 
-        isLogin: true,
-        error: req.query.error,
-        success: req.query.success
+        isLogin: true
     });
 };
 
@@ -92,7 +90,7 @@ export const postSignup = async (req, res, next) => {
 
     } catch (err) {
         console.error("Signup Error:", err.message);
-        // This ensures the "already exists" error becomes a toast in your Validation.js
+
         res.redirect('/user/signup?error=' + encodeURIComponent(err.message));
     }
 };
@@ -100,12 +98,18 @@ export const postSignup = async (req, res, next) => {
 export const postLogin = async (req, res) => {
     try {
         const user = await userService.login(req.body);
+
+        if (user.isBlocked) {
+            
+            req.flash('error', "Your account has been blocked by admin.");
+            return res.redirect('/user/login');
+        }
         
         req.session.user = {
             id: user._id,
             name: user.fullName,
             email: user.email,
-            phoneNumber:user.phoneNumber,
+            phoneNumber: user.phoneNumber,
             gender: user.gender
         };
 
@@ -114,7 +118,11 @@ export const postLogin = async (req, res) => {
             res.redirect('/'); 
         });
     } catch (err) {
-        res.redirect('/user/login?error=' + encodeURIComponent(err.message));
+       
+         console.log("Login Error Caught",err.message);
+        req.flash('error', err.message);
+        res.redirect('/user/login');
+       
     }
 };
 
@@ -122,7 +130,7 @@ export const postForgot = async (req, res) => {
     try {
         const { email } = req.body;
 
-        // 1. Check if email is empty
+        
         if (!email || email.trim() === "") {
             return res.redirect('/user/forgot-password?error=' + encodeURIComponent("Please enter your email address."));
         }
@@ -139,23 +147,29 @@ export const postForgot = async (req, res) => {
 
 
 export const postVerifyOTP = async (req, res) => {
-    console.log("VERIFY BODY:", req.body); // 👈 ADD THIS
-
     try {
-        const { email, otp } = req.body;
+        const { email, otp, target } = req.body;
+        const finalOtp = Array.isArray(otp) ? otp.join('') : otp.toString().trim();
 
-        await userService.verifyOTP(email, otp);
+        await userService.verifyOTP(email, finalOtp);
 
-        res.redirect(`/user/reset-password?email=${email}`);
+        if (target === 'email') {
+            res.redirect(`/user/change-email?verified=true`);
+        }
+        else if (target === 'updatepassword') {
+             res.redirect(`/user/changepass?email=${email}&verified=true`);
+        } 
+        else {
+            res.redirect(`/user/reset-password?email=${email}`);
+        }
     } catch (err) {
-       
-        res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${req.body.email}`);
+        res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${req.body.email}&target=${req.body.target}`);
     }
 };
 
 
 export const postResetPassword = async (req, res) => {
-    const { email, password, confirmPassword } = req.body;
+    const { email, password, confirmPassword,target } = req.body;
 
     try {
         if (password !== confirmPassword) {
@@ -169,6 +183,7 @@ export const postResetPassword = async (req, res) => {
 
         res.redirect('/user/login?success=Password updated successfully');
         
+        
     } catch (err) {
         console.error("Forgot Password Reset Error:", err.message);
         res.render('user/reset-password', { 
@@ -181,7 +196,8 @@ export const postResetPassword = async (req, res) => {
 export const getVerifyOTP = (req, res) => {
     res.render('user/verify-otp', {
         email: req.query.email,
-        error: req.query.error, // Validation.js uses this for the toast
+        error: req.query.error,
+        target: req.query.target,
         isPasswordUpdate: req.query.isPasswordUpdate === 'true',
         otpExpiryTime:req.session.otpExpiryTime
     });
@@ -189,7 +205,7 @@ export const getVerifyOTP = (req, res) => {
 
 export const getResendOTP = async (req, res) => {
     try {
-        const { email, isPasswordUpdate } = req.query;
+        const { email, isPasswordUpdate,target } = req.query;
 
         if (!email) {
             return res.redirect('/user/login?error=Email missing, please try again.');
@@ -197,14 +213,17 @@ export const getResendOTP = async (req, res) => {
 
         await userService.sendOTP(email);
 
+        req.session.otpExpiryTime=Date.now() + 60000;
+
         const redirectPath = (isPasswordUpdate === 'true') 
             ? '/user/verify-password-otp' 
             : '/user/verify-otp';
 
-        res.redirect(`${redirectPath}?email=${email}&success=A new OTP has been sent!`);
+        req.flash('success', 'A new OTP code has been sent!');    
+        res.redirect(`${redirectPath}?email=${email}&target=${target}&success=A new OTP has been sent!`);
     } catch (err) {
         console.error("Resend Error:", err);
-        res.redirect(`/user/verify-otp?email=${req.query.email}&error=Failed to resend OTP`);
+        res.redirect(`/user/verify-otp?email&target=${req.query.email}&error=Failed to resend OTP`);
     }
 };
 
@@ -371,7 +390,7 @@ export const sendUpdatePasswordOTP = async (req, res) => {
 
         req.session.otpExpiryTime = Date.now() + 60000; 
 
-        res.redirect(`/user/verify-password-otp?email=${email}`);
+        res.redirect(`/user/verify-otp?email=${email}&target=updatepassword`);
     } catch (err) {
         res.redirect('/user/profile?error=Could not send verification code');
     }
@@ -436,9 +455,11 @@ export const postChangeEmail = async (req, res) => {
 
         req.session.user.email = sanitizedEmail;
 
+        req.flash('success',"Email updated successfully!");
+
         req.session.save((err) => {
             if (err) return res.redirect('/user/profile?error=Session sync failed');
-            res.redirect('/user/profile?success=Email updated successfully');
+            res.redirect('/user/profile');
         });
 
     } catch (error) {
@@ -452,35 +473,66 @@ export const getChangePassword = (req, res) => {
         return res.redirect('/user/profile'); 
     }
 
-    res.render('user/changepass', {
+    res.render('user/reset-password', {
         email: req.query.email,
+        target: 'updatepassword',
         title: "Create New Password",
-        isLoggedIn: !!req.session.user 
+        isLoggedIn: true 
     });
 };
 
 export const postChangePassword = async (req, res) => {
     const { email, password } = req.body;
-
     try {
-        console.log("--- DEBUG START ---");
-        console.log("Email found in body:", email);
-        console.log("Password received length:", password ? password.length : "EMPTY");
+        await userService.resetPassword(email, password);
+        req.flash('success', 'Password updated successfully');
 
-        const result = await userService.resetPassword(email, password);
-        console.log("Database Update Result:", result ? "SUCCESS" : "USER NOT FOUND");
-
-        if (req.session.user) {
-            console.log("Redirecting to: /user/profile");
-            return res.redirect('/user/profile?success=Password updated');
-        } else {
-            console.log("Redirecting to: /user/login");
-            return res.redirect('/user/login?success=Password reset');
-        }
-
+        // 🟢 Redirect to Profile
+        req.session.save(() => {
+            res.redirect('/user/profile');
+        });
     } catch (err) {
-        console.log("!!! ERROR IN CONTROLLER:", err.message);
-        res.render('user/changepass', { error: err.message, email });
+        res.render('user/reset-password', { error: err.message, email, isLoggedIn: true });
     }
+};
+
+
+export const sendEmailChangeOTP = async (req, res) => {
+    try {
+        const email = req.session.user.email; 
+        await userService.sendOTP(email);
+
+        req.session.otpExpiryTime = Date.now() + 60000; 
+
+        res.redirect(`/user/verify-otp?email=${email}&target=email`);
+    } catch (err) {
+        res.redirect('/user/profile?error=' + encodeURIComponent("Failed to send verification code"));
+    }
+};
+
+export const googleAuthSuccess = (req, res) => {
+    const user = req.user;
+
+if (user.isBlocked) {
+    return req.session.destroy(() => {
+        res.clearCookie('connect.sid');
+        // Redirecting specifically with 'error' parameter
+        res.redirect('/user/login?error=' + encodeURIComponent("Your account has been blocked by administrator"));
+    });
+}
+  
+req.session.user = {
+        id: user._id,
+        name: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        profileImage: user.profileImage,
+        gender: user.gender 
+    };
+
+    req.session.save((err) => {
+        if (err) return res.redirect('/user/login?error=Session+Error');
+        res.redirect('/user/profile'); 
+    });
 };
 

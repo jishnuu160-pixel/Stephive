@@ -4,16 +4,16 @@
     </div>
     
     <nav class="sidebar-links">
-        <a href="/admin/dashboard" class="nav-link active">
+        <a href="/admin/dashboard" class="nav-link {{#if (eq activePage 'dashboard')}}active{{/if}}">
             <i class="fas fa-home"></i> <span>Dashboard</span>
         </a>
-        <a href="/admin/products" class="nav-link">
+        <a href="/admin/products" class="nav-link ">
             <i class="fas fa-box"></i> <span>Product List</span>
         </a>
         <a href="/admin/orders" class="nav-link ">
             <i class="fas fa-shopping-cart"></i> <span>Order Management</span>
         </a>
-        <a href="/admin/customers" class="nav-link">
+        <a href="/admin/customers" class="nav-link {{#if (eq activePage 'customers')}}active{{/if}}">
             <i class="fas fa-users"></i> <span>Users</span>
         </a>
         <a href="/admin/categories" class="nav-link">
@@ -36,7 +36,7 @@
             <i class="fas fa-undo"></i> <span>Return</span>
         </a>
         {{!-- Inside your Sidebar --}}
-<a href="/admin/logout" class="nav-link logout-link">
+<a href="/admin/logout" class="nav-link logout-link {{#if (eq activePage 'logout')}}active{{/if}}">
     <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
 </a>
     </nav>
@@ -47,21 +47,7 @@
         <h2 class="page-title">Dashboard</h2>
     </div>
     
-    <div class="top-bar-middle">
-        <div class="search-wrapper">
-            <form action="/admin/customers" method="GET" style="display: flex; align-items: center; width: 100%;">
-            <i class="fas fa-search"></i>
 
-            <input type="text" name="search" placeholder="Search data, users, or reports" value="{{searchQuery}}">
-
-            {{#if searchQuery}}
-                <a href="/admin/customers" class="search-clear-btn">
-                    <i class="fas fa-times-circle"></i>
-                </a>
-            {{/if}}
-            </form>
-        </div>
-    </div>
     
     <div class="top-bar-right">
         <button class="icon-btn"><i class="fas fa-cog"></i></button>

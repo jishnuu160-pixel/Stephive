@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (openBtn && modal) {
         openBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            // Reset form and title for a fresh address
+            
             addressForm.reset();
             addressForm.action = '/user/add-address';
             modalTitle.innerHTML = 'Add <b>New Address</b>';

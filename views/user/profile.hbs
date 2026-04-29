@@ -37,7 +37,7 @@
                     <form id="profile-form" action="/user/update-profile" method="POST" class="form-grid">
                         <div class="input-group">
                           <label>FULL NAME</label>
-                        <input type="text" name="fullName" value="{{user.fullName}}">
+                        <input type="text" name="fullName" value="{{user.fullName}}" disabled>
                     </div>
 
 <div class="input-group">
@@ -47,7 +47,7 @@
 
 <div class="input-group">
     <label>PHONE NUMBER</label>
-    <input type="text" name="phone" value="{{user.phoneNumber}}">
+    <input type="text" name="phone" value="{{user.phoneNumber}}" disabled>
 </div>
 
 <div class="input-group">
@@ -71,7 +71,7 @@
                     
                         <div class="form-footer">
                             <a href="/user/edit-profile" class="btn-outline"><img src="/icons/edit-profile.png" class="edit-profile">Edit Profile</a>
-                            <a href="/user/verify-otp" class="btn-outline"><img src="/icons/email.png" class="edit-profile"> Change Email</a>
+                            <a href="/user/send-email-change-otp" class="btn-outline"><img src="/icons/email.png" class="edit-profile"> Change Email</a>
                         </div>
                     </form>
                 </section>

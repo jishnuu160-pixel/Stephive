@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const avatarInput = document.getElementById('avatar-upload');
     if (avatarInput) {
         avatarInput.addEventListener('change', async function() {
-            // --- THE CRITICAL FIX: Grab the first file from the list ---
             const file = this.files[0]; 
             
             if (file) {
@@ -48,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     if (response.data.success) {
                         console.log("Upload successful!");
-                        // Update preview immediately
+                       
                         document.getElementById('profile-preview').src = response.data.imagePath;
                         alert("Profile picture updated successfully!"); 
                         window.location.reload(); 

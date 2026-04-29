@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StepHive</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
     <link rel="stylesheet" href="/css/layout.css">
     <link rel="stylesheet" href="/css/userlogin.css">
@@ -34,9 +35,9 @@
 
         <div class="main-content-area">
             {{#unless isAdminLogin}}
-                <header class="top-navbar">
-                    <input type="text" placeholder="Search data, users, or reports">
-                </header>
+               
+   
+</div>
             {{/unless}}
 
             <main class="page-content">
@@ -60,12 +61,54 @@
 {{/if}}
 
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     
-<script src="/js/validation.js"></script>
-<script src="/js/script.js"></script>
-<script src="/js/addressModal.js"></script>
-<script src="/js/profile.js?v=2"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/script.js"></script>
+
+    {{#unless isAdmin}}
+        <script src="/js/validation.js"></script>
+        <script src="/js/addressModal.js"></script>
+        <script src="/js/profile.js?v=2"></script>
+    {{/unless}}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const authPaths = [
+            '/user/login', 
+            '/user/signup', 
+            '/user/forgot-password', 
+            '/user/verify-otp'
+        ];
+        
+        const isAuthPage = authPaths.some(path => window.location.pathname.includes(path));
+
+        {{#unless isAdminLogin}}
+            let successMsg = "{{{success}}}".toString().trim();
+            let errorMsg = "{{{error}}}".toString().trim();
+            
+            if (successMsg && successMsg !== "null" && successMsg !== "") {
+                const isOtpMsg = successMsg.toLowerCase().includes("otp");
+
+                if (!isAuthPage || isOtpMsg) {
+                    if (typeof showToast === "function") {
+                        showToast(successMsg, "success"); 
+                    }
+                }
+            }
+
+            if (errorMsg && errorMsg !== "null" && errorMsg !== "") {
+                
+                if (!isAuthPage) {
+                    if (typeof showToast === "function") {
+                        showToast(errorMsg, "error"); 
+                    }
+                }
+            }
+        {{/unless}}
+    });
+</script>
 </body>
 
 </html>

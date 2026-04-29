@@ -22,6 +22,10 @@ async (accessToken, refreshToken, profile, done) => {
             });
         }
 
+        if (user.isBlocked) {
+            return done(null, false, { message: 'Your account has been blocked by the admin.' });
+        }
+
         return done(null, user);
     } catch (err) {
         return done(err, null);
@@ -33,8 +37,16 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-    const user = await User.findById(id);
-    done(null, user);
+    try{
+      const user = await User.findById(id);
+
+      if(!user || user.isBlocked){
+        return done(null,false);
+      }
+      done(null,user);
+    }catch(err){
+       done(err,null);
+    }
 });
 
 export default passport;

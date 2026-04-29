@@ -1,14 +1,22 @@
 <section class="otp-hero">
     <div class="otp-box">
        <form action="{{#if isPasswordUpdate}}/user/verify-password-otp{{else}}/user/verify-otp{{/if}}" method="post" id="otpForm">
+            {{#if error}}
+            <p class="server-error" style="color: #ff4d4d; text-align: center; margin-bottom: 10px;font-size: 10px">{{error}}</p>
+        {{/if}}
+
+        <div id="js-error-message" style="color: #ff4d4d; text-align: center; margin-bottom: 5px; display: none; font-size: 10px;"></div>
+
             <div class="lock-icon">🔒</div>
 
             <p class="otp-text">
                 Enter the 6-digit code sent to your registered device to authenticate.
             </p>
 
-            <input type="hidden" name="otp" id="serverExpiryTime" value="{{otpExpiryTime}}">
+            <input type="hidden" name="otp" id="fullOtp">
+            <input type="hidden" id="serverExpiryTime" value="{{otpExpiryTime}}">
             <input type="hidden" name="email" value="{{email}}"> 
+            <input type="hidden" name="target" value="{{target}}"> 
 
             <div class="otp-inputs">
                 <input type="text" class="otp" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
@@ -25,20 +33,22 @@
                 Didn’t receive the code? 
                 <span id="timer-container">Resend in <b id="timer">01:00</b></span>
                 
-                <a href="/user/resend-otp?email={{email}}&isPasswordUpdate={{#if isPasswordUpdate}}true{{else}}false{{/if}}" 
+               <a href="/user/resend-otp?email={{email}}&target={{target}}&isPasswordUpdate={{#if isPasswordUpdate}}true{{else}}false{{/if}}" 
    id="resend-link" 
    style="display: none; color: #ffffff; font-weight: bold; text-decoration: none;">
     Resend OTP
 </a>
             </p>
 
-            <a href="{{#if isPasswordUpdate}}/user/profile{{else}}/user/forgot-password{{/if}}" class="back-link">
-                {{#if isPasswordUpdate}}
-                    ← BACK TO PROFILE
-                {{else}}
-                    ← BACK TO FORGOT PASSWORD
-                {{/if}}
-            </a>
+            <a href="{{#if target}}/user/profile{{else}}/user/forgot-password{{/if}}" class="back-link">
+            {{#if (eq target 'email')}}
+             ← BACK TO PROFILE
+             {{else if (eq target 'updatepassword')}}
+             ← BACK TO PROFILE 
+          {{else}}
+              ← BACK TO FORGOT PASSWORD
+           {{/if}}
+          </a>
         </form>
     </div>
 </section>
@@ -50,8 +60,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputs = document.querySelectorAll(".otp");
     const hiddenOtp = document.getElementById("fullOtp");
     const form = document.getElementById("otpForm");
+    const jsErrorBox = document.getElementById("js-error-message"); 
 
-    // Helper to update the hidden field
+    const serverError = document.querySelector(".server-error");
+    if (serverError) {
+        setTimeout(() => {
+            serverError.style.display = "none";
+        }, 3000);
+    }
+
     const updateHiddenInput = () => {
         let otp = "";
         inputs.forEach(i => otp += i.value);
@@ -59,9 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     inputs.forEach((input, index) => {
-        // Handle Typing
         input.addEventListener("input", (e) => {
-            if (e.inputType === "deleteContentBackward") return; // Let backspace handler take over
+            if (e.inputType === "deleteContentBackward") return; 
 
             if (input.value && index < inputs.length - 1) {
                 inputs[index + 1].focus();
@@ -69,14 +85,12 @@ document.addEventListener("DOMContentLoaded", () => {
             updateHiddenInput();
         });
 
-        // Handle Backspace
         input.addEventListener("keydown", (e) => {
             if (e.key === "Backspace" && !input.value && index > 0) {
                 inputs[index - 1].focus();
             }
         });
 
-        // 3. ADDED: Handle Paste (Standard User Behavior)
         input.addEventListener("paste", (e) => {
             const data = e.clipboardData.getData("text").split("");
             if (data.length === inputs.length) {
@@ -87,11 +101,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 4. Client-side check before submit
     form.addEventListener("submit", (e) => {
         if (hiddenOtp.value.length !== 6) {
             e.preventDefault();
-            alert("Please enter the full 6-digit code.");
+            
+            if (jsErrorBox) {
+                jsErrorBox.innerText = "Please enter the full 6-digit code!";
+                jsErrorBox.style.display = "block";
+
+                setTimeout(() => {
+                    jsErrorBox.style.display = "none";
+                }, 3000);
+            }
         }
     });
 });

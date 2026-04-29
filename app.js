@@ -2,12 +2,14 @@ import express from 'express';
 import { engine } from 'express-handlebars';
 import path from 'path';
 import session from 'express-session';
+import flash from 'connect-flash';
 import { connectDB } from './config/db.js';
 
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import homeRoutes from './routes/homeRoutes.js';
 import passport  from './config/passport.js';
+
 
 const app = express();
 
@@ -23,7 +25,7 @@ app.engine('hbs', engine({
     ],
     helpers: {
         eq: (a, b) => a === b,
-        addOne: (value) => value + 1
+        add: (a,b,c) =>  a+b+c
     }
 }));
 
@@ -60,6 +62,20 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+
+    res.locals.success = req.query.success || req.flash('success');
+    res.locals.error = req.query.error || req.flash('error');
+
+    res.locals.user = req.session.user || null;
+    res.locals.admin = req.session.admin || null; 
+    
+    next();
+});
+
 app.get('/auth/google',
     passport.authenticate('google', { 
         scope: ['profile', 'email'], 
@@ -88,6 +104,7 @@ app.get('/auth/google/callback',
         });
     }
 );
+
 
 
 app.use('/user', userRoutes);

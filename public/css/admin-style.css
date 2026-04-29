@@ -63,17 +63,15 @@
     flex: 1; /* Occupies left space */
 }
 
-/* 2. Search Zone (Middle) */
-.top-bar-middle {
-    flex: 2; /* Occupies more space to allow centering */
-    display: flex;
-    justify-content: center; /* Centers the search box */
+.card-header{
+    padding: 20px;
+    margin-bottom: 15px;
 }
 
 .search-wrapper {
     position: relative;
     width: 100%;
-    max-width: 450px; /* Adjust based on your Figma preference */
+    max-width: 300px; /* Adjust based on your Figma preference */
 }
 
 .search-wrapper input {
@@ -141,7 +139,7 @@
 .customers-page {
     /* 🟢 Pushes everything 300px from the left edge */
     margin-left: 300px; 
-    margin-top: 100px;
+    margin-top: 70px;
     margin-right: 40px;
     display: flex;
     flex-direction: column;
@@ -212,12 +210,12 @@
 }
 
 .page-link {
-    padding: 8px 16px;
+    padding: 2px 8px;
     background-color: #f1f5f9;
     color: #334155;
     text-decoration: none;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     transition: background 0.2s;
     border: 1px solid #e2e8f0;
@@ -233,10 +231,10 @@
     font-weight: 500;
 }
 
-admin-footer {
+.admin-footer {
     padding: 20px;
     text-align: center;
-    background: #ffffff;
+    background: #000000;
     border-top: 1px solid #eef2f6;
     color: #94a3b8;
     font-size: 13px;
@@ -245,22 +243,22 @@ admin-footer {
 
 .stats-container {
     display: flex; /* Using flex instead of grid for easier alignment */
-    /* 🟢 This pushes the boxes to the right side */
+      padding: 5px;
     justify-content: flex-end; 
     gap: 10px;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 60px;
 }
 
 .stat-card {
     /* 🟢 Fixed width ensures they stay small and don't stretch */
     width: 240px; 
     background: #ffffff;
-    padding: 25px;
+    padding: 20px;
     border-radius: 15px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 /* 3. Make the icons smaller */
@@ -290,4 +288,105 @@ admin-footer {
     /* 🟢 This ensures the container stretches to the right edge */
     width: calc(100% - 260px); 
     box-sizing: border-box;
+}
+
+/* Container for the whole box */
+.small-popup {
+    border-radius: 10px !important;
+}
+/* Proportionally scale everything down */
+.small-swal-popup {
+    font-size: 0.8rem !important; 
+    border-radius: 12px !important;
+}
+
+/* Shrink the Icon specifically */
+.swal2-icon {
+    width: 3.5em !important;
+    height: 3.5em !important;
+    margin: 0.5em auto !important;
+}
+
+/* Tighten the Title */
+.small-swal-title {
+    font-size: 1.2rem !important;
+    padding: 0 !important;
+    margin-bottom: 5px !important;
+}
+
+/* Tighten the Buttons */
+.swal2-actions {
+    margin-top: 10px !important;
+}
+
+/* 1. The Container: Position it at the top right of the dashboard */
+.admin-toast-container {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    z-index: 9999; /* Higher than sidebar/header */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; /* Allows clicking page elements 'under' the container */
+}
+
+/* 2. The Individual Toast Styling */
+.toast {
+    pointer-events: auto; /* Re-enables clicking on the toast itself */
+    min-width: 280px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 3. Color variants matching your user side */
+.toast.success {
+    background: linear-gradient(135deg, #28a745, #218838);
+    border-left: 5px solid #1e7e34;
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border-left: 5px solid #bd2130;
+}
+
+/* 4. Animation for a smooth entrance */
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* This forces Toastify to float OVER the dashboard instead of pushing it down */
+/* This targets the Toastify box specifically */
+.toastify {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 10000 !important;
+    padding: 12px 24px !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 500 !important;
+    max-width: 300px !important;
+    /* This prevents it from pushing the dashboard down */
+}
+
+/* Ensure the table doesn't shift when new elements are added */
+.table-card {
+    position: relative;
+    margin-top: 20px;
 }
