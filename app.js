@@ -4,6 +4,9 @@ import path from 'path';
 import session from 'express-session';
 import flash from 'connect-flash';
 import { connectDB } from './config/db.js';
+import dotenv from "dotenv";
+dotenv.config();
+
 
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -48,64 +51,25 @@ app.use(session({
     }
 }));
 
-app.use((req, res, next) => {
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    next();
-});
-
-app.use((req, res, next) => {
-    res.locals.user = req.session.user || null;
-    next();
-});
-
+app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(flash());
-
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 
-    res.locals.success = req.query.success || req.flash('success');
-    res.locals.error = req.query.error || req.flash('error');
+    const flashError = req.flash('error');
+    const flashSuccess = req.flash('success');
+
+    res.locals.error = req.query.error || (flashError.length > 0 ? flashError : null);
+    res.locals.success = req.query.success || (flashSuccess.length > 0 ? flashSuccess : null);
 
     res.locals.user = req.session.user || null;
     res.locals.admin = req.session.admin || null; 
     
     next();
 });
-
-app.get('/auth/google',
-    passport.authenticate('google', { 
-        scope: ['profile', 'email'], 
-        prompt: 'select_account' 
-    })
-);
-
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/user/login' }),
-    (req, res) => {
-        req.session.user = {
-            id: req.user._id,
-            name: req.user.fullName,
-            email: req.user.email,
-            profileImage: req.user.profileImage
-        };
-
-       
-        req.session.save((err) => {
-            if (err) {
-                console.error("Session Save Error:", err);
-                return res.redirect('/user/login');
-            }
-            console.log("Session saved successfully for:", req.user.email);
-            res.redirect('/'); 
-        });
-    }
-);
-
-
 
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);

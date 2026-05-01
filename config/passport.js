@@ -1,11 +1,14 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import User from '../models/usermodel.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-passport.use(new GoogleStrategy({
-    clientID: '110269302681-pvanml2gc8a9hse29hrj74ekrs381i3v.apps.googleusercontent.com',
-    clientSecret: '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',
-    callbackURL: 'http://localhost:5500/auth/google/callback'
+passport.use(
+new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL
 },
 async (accessToken, refreshToken, profile, done) => {
     try {
@@ -23,7 +26,7 @@ async (accessToken, refreshToken, profile, done) => {
         }
 
         if (user.isBlocked) {
-            return done(null, false, { message: 'Your account has been blocked by the admin.' });
+            return done(null, false, { message: 'Your account has been blocked by admin.' });
         }
 
         return done(null, user);
