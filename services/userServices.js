@@ -34,7 +34,7 @@ export const login = async (data) => {
     }
 
     if (user.isBlocked) {
-        throw new Error("Your account has been blocked by the administrator.");
+        throw new Error("Your account has been blocked by admin.");
     }
 
     const isMatch = await bcrypt.compare(data.password, user.password);

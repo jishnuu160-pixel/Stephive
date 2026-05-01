@@ -52,12 +52,11 @@ router.get('/auth/google', isLoggedOut, passport.authenticate('google', {
 
 router.get('/auth/google/callback', 
     passport.authenticate('google', { 
-        failureRedirect: '/user/login?error=Your%20account%20has%20been%20blocked', 
-        successRedirect: '/user/profile' 
+        failureRedirect: '/user/login',
+        failureFlash: true 
     }),
-    googleAuthSuccess 
+    googleAuthSuccess
 );
-
 
 router.use(isAuthenticated);
 
