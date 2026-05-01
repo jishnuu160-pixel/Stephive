@@ -119,7 +119,6 @@ export const postLogin = async (req, res) => {
         });
     } catch (err) {
        
-         console.log("Login Error Caught",err.message);
         req.flash('error', err.message);
         res.redirect('/user/login');
        
@@ -181,6 +180,7 @@ export const postResetPassword = async (req, res) => {
 
         await userService.resetPassword(email, password);
 
+        
         res.redirect('/user/login?success=Password updated successfully');
         
         
@@ -487,7 +487,6 @@ export const postChangePassword = async (req, res) => {
         await userService.resetPassword(email, password);
         req.flash('success', 'Password updated successfully');
 
-        // 🟢 Redirect to Profile
         req.session.save(() => {
             res.redirect('/user/profile');
         });
@@ -517,7 +516,7 @@ if (user.isBlocked) {
     return req.session.destroy(() => {
         res.clearCookie('connect.sid');
         // Redirecting specifically with 'error' parameter
-        res.redirect('/user/login?error=' + encodeURIComponent("Your account has been blocked by administrator"));
+        res.redirect('/user/login?error=' + encodeURIComponent("Your account has been blocked by admins"));
     });
 }
   
@@ -532,7 +531,7 @@ req.session.user = {
 
     req.session.save((err) => {
         if (err) return res.redirect('/user/login?error=Session+Error');
-        res.redirect('/user/profile'); 
+        res.redirect('/'); 
     });
 };
 
