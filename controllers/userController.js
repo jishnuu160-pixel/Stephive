@@ -69,25 +69,10 @@ export const postSignup = async (req, res, next) => {
         if (password !== confirmPassword) {
             return res.redirect('/user/signup?error=' + encodeURIComponent("Passwords do not match!"));
         }
-   //test
-   const cleanPhone= phoneNumber.replace(/\D/g,'');
 
-   const existingEmail= await userRepo.findByEmail(email);
-
-   if(existingEmail){
-    return res.redirect('/user/signup?error=' + encodeURIComponent("Email already exists"));
-   }
-
-   const existingPhone= await userRepo.findByPhone(cleanPhone);
-
-   if(existingPhone){
-    return res.redirect('/user/signup?error=' + encodeURIComponent("Phone already registered"));
-   }
-
-   //
        
 
-        const user = await userService.signup({...req.body,phoneNumber:cleanPhone});
+        const user = await userService.signup(req.body);
 
         req.session.user = {
             id: user._id,
