@@ -2,7 +2,7 @@ import express from 'express';
 import { 
     getSignup, postSignup, 
     getLogin, postLogin, 
-    getProfile, logout,
+    getProfile, userLogout,
     getForgot, postForgot,
     getVerifyOTP, postVerifyOTP,
     getResetPassword, postResetPassword,
@@ -16,26 +16,26 @@ import {
     updateAvatar,uploadAvatar,
     sendEmailChangeOTP,googleAuthSuccess
 } from '../controllers/userController.js';
-import { isAuthenticated, isLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
+import { isUserAuthenticated, isUserLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
 
 import passport from 'passport';
 
 const router = express.Router();
 
 
-router.get('/', isAuthenticated, (req, res) => {
+router.get('/', isUserAuthenticated, (req, res) => {
     res.redirect('/user/profile');
 });
 
 
-router.get('/signup', isLoggedOut, getSignup);
-router.post('/signup', isLoggedOut, postSignup); 
+router.get('/signup', isUserLoggedOut, getSignup);
+router.post('/signup', isUserLoggedOut, postSignup); 
 
-router.get('/login', isLoggedOut, getLogin);
-router.post('/login', isLoggedOut, postLogin); 
+router.get('/login', isUserLoggedOut, getLogin);
+router.post('/login', isUserLoggedOut, postLogin); 
 
 
-router.get('/forgot-password', isLoggedOut, getForgot);
+router.get('/forgot-password', isUserLoggedOut, getForgot);
 router.post('/forgot-password', postForgot);
 
 router.get('/verify-otp', getVerifyOTP);
@@ -46,7 +46,7 @@ router.post('/reset-password', postResetPassword);
 
 router.get('/resend-otp', getResendOTP);
 
-router.get('/auth/google', isLoggedOut, passport.authenticate('google', { 
+router.get('/auth/google', isUserLoggedOut, passport.authenticate('google', { 
     scope: ['profile', 'email'] 
 }));
 
@@ -58,46 +58,39 @@ router.get('/auth/google/callback',
     googleAuthSuccess
 );
 
-router.use(isAuthenticated);
+router.use(isUserAuthenticated);
 
-router.get('/profile', isAuthenticated, getProfile);
-router.get('/edit-profile', preventCache, isAuthenticated, getEditProfile);
-
-
-router.post('/update-profile', preventCache, isAuthenticated, postUpdateProfile);
+router.get('/profile', isUserAuthenticated, getProfile);
+router.get('/edit-profile', preventCache, isUserAuthenticated, getEditProfile);
 
 
-router.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) console.log(err);
-        res.clearCookie('connect.sid'); 
-        res.redirect('/'); 
-    });
-});
-router.get('/address',isAuthenticated, getAddress);
+router.post('/update-profile', preventCache, isUserAuthenticated, postUpdateProfile);
 
-router.get('/delete-address/:id', isAuthenticated, removeAddress);
+router.get('/logout', userLogout);
 
-router.post('/add-address', isAuthenticated, postAddAddress);
-router.post('/edit-address/:id', isAuthenticated, postEditAddress);
+router.get('/address',isUserAuthenticated, getAddress);
 
-router.get('/send-email-change-otp', isAuthenticated, sendEmailChangeOTP);
+router.get('/delete-address/:id', isUserAuthenticated, removeAddress);
 
-router.get('/change-email', preventCache, isAuthenticated, getChangeEmail);
-router.post('/change-email', preventCache, isAuthenticated, postChangeEmail);
+router.post('/add-address', isUserAuthenticated, postAddAddress);
+router.post('/edit-address/:id', isUserAuthenticated, postEditAddress);
 
-// Add these two lines
-router.get('/changepass', isAuthenticated, getChangePassword);
-router.post('/changepass', isAuthenticated, postChangePassword);
+router.get('/send-email-change-otp', isUserAuthenticated, sendEmailChangeOTP);
 
-router.get('/update-password-init', isAuthenticated, sendUpdatePasswordOTP);
+router.get('/change-email', preventCache, isUserAuthenticated, getChangeEmail);
+router.post('/change-email', preventCache, isUserAuthenticated, postChangeEmail);
 
-router.get('/verify-password-otp', isAuthenticated, getVerifyPasswordOTP);
-router.post('/verify-password-otp', isAuthenticated, postVerifyPasswordOTP);
+router.get('/changepass', isUserAuthenticated, getChangePassword);
+router.post('/changepass', isUserAuthenticated, postChangePassword);
+
+router.get('/update-password-init', isUserAuthenticated, sendUpdatePasswordOTP);
+
+router.get('/verify-password-otp', isUserAuthenticated, getVerifyPasswordOTP);
+router.post('/verify-password-otp', isUserAuthenticated, postVerifyPasswordOTP);
 
 
 
-router.post('/update-avatar', isAuthenticated, uploadAvatar.single('profileImage'),updateAvatar);
+router.post('/update-avatar', isUserAuthenticated, uploadAvatar.single('profileImage'),updateAvatar);
 
 
 export default router;

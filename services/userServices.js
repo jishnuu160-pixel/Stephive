@@ -9,6 +9,7 @@ export const signup = async (data) => {
     if (existingUser) {
         throw new Error('User already exists');
     }
+   
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(data.password, saltRounds);
