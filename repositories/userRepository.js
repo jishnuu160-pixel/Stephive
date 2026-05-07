@@ -5,6 +5,7 @@ export const findByEmail = async (email) => {
 };
 
 
+
 export const createUser = async (data) => {
     try {
         return await User.create(data);

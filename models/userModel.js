@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
+import { type } from 'os';
 
 const userSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    phoneNumber: { type: String, required: false },
-    password: { type: String, required: false }, 
+    phoneNumber: { type: String, required: true, unique:true },
+    password: { type: String, required: true }, 
     profileImage:{
         type:String,
         default: ''
@@ -24,7 +25,7 @@ const userSchema = new mongoose.Schema({
         city: String,
         state: String,
         pincode: String,
-        label: String, // 'Home', 'Office', etc.
+        label: String, 
         isDefault: { type: Boolean, default: false }
     }]
 });
