@@ -3,7 +3,7 @@ import { engine } from 'express-handlebars';
 import path from 'path';
 import session from 'express-session';
 import flash from 'connect-flash';
-import { connectDB } from './config/db.js';
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -16,7 +16,7 @@ import passport  from './config/passport.js';
 
 const app = express();
 
-connectDB();
+
 
 app.engine('hbs', engine({
     extname: '.hbs',
@@ -42,12 +42,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
 app.use(session({
-    secret: 'your_secret_key',
-    resave: false,
-    saveUninitialized: false, 
+    secret: process.env.SESSION_SECRET || 'stephive_secret_key',
+    resave: false,               
+    saveUninitialized: false,    
+    rolling: false,              
     cookie: { 
-        secure: false, 
-        maxAge: 24 * 60 * 60 * 1000 
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true        
     }
 }));
 
@@ -65,7 +66,14 @@ app.use((req, res, next) => {
     res.locals.error = req.query.error || (flashError.length > 0 ? flashError : null);
     res.locals.success = req.query.success || (flashSuccess.length > 0 ? flashSuccess : null);
 
-    res.locals.user = req.session.user || null;
+    // 🟢 BETTER SEPARATION
+    // Only assign req.user to res.locals.user if it's NOT an admin path
+    if (!req.path.startsWith('/admin')) {
+        res.locals.user = req.session.user || req.user || null;
+    } else {
+        res.locals.user = null; // Ensure User data doesn't bleed into Admin views
+    }
+
     res.locals.admin = req.session.admin || null; 
     
     next();
