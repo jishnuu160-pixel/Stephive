@@ -64,13 +64,30 @@ export const getSignup = (req, res) => {
 
 export const postSignup = async (req, res, next) => {
     try {
-        const { password, confirmPassword, email } = req.body;
+        const { password, confirmPassword, email,phoneNumber } = req.body;
 
         if (password !== confirmPassword) {
             return res.redirect('/user/signup?error=' + encodeURIComponent("Passwords do not match!"));
         }
+   //test
+   const cleanPhone= phoneNumber.replace(/\D/g,'');
 
-        const user = await userService.signup(req.body);
+   const existingEmail= await userRepo.findByEmail(email);
+
+   if(existingEmail){
+    return res.redirect('/user/signup?error=' + encodeURIComponent("Email already exists"));
+   }
+
+   const existingPhone= await userRepo.findByPhone(cleanPhone);
+
+   if(existingPhone){
+    return res.redirect('/user/signup?error=' + encodeURIComponent("Phone already registered"));
+   }
+
+   //
+       
+
+        const user = await userService.signup({...req.body,phoneNumber:cleanPhone});
 
         req.session.user = {
             id: user._id,
@@ -248,11 +265,22 @@ export const getResetPassword = (req, res) => {
     });
 };
 
-export const logout=(req,res)=>{
-    req.session.destroy(()=>{
+export const userLogout = (req, res) => {
+    delete req.session.user;
+
+    if (req.session.passport) {
+        delete req.session.passport.user;
+    }
+
+    req.user = null;
+
+    req.session.save((err) => {
+        if (err) console.error("Session save error:", err);
+        
+        res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate');
         res.redirect('/user/login');
     });
-}
+};
 
 export const getProfile = async (req, res) => {
     try {
@@ -512,15 +540,21 @@ export const sendEmailChangeOTP = async (req, res) => {
 export const googleAuthSuccess = (req, res) => {
     const user = req.user;
 
-if (user.isBlocked) {
-    return req.session.destroy(() => {
-        res.clearCookie('connect.sid');
-        // Redirecting specifically with 'error' parameter
-        res.redirect('/user/login?error=' + encodeURIComponent("Your account has been blocked by admins"));
-    });
-}
-  
-req.session.user = {
+    if (user.isBlocked) {
+        if (req.session.passport) {
+            delete req.session.passport.user; 
+        }
+        delete req.session.user; 
+        req.user = null; 
+
+        return req.session.save((err) => {
+            if (err) console.error("Session save error:", err);
+            res.redirect('/user/login?error=' + encodeURIComponent("Your account has been blocked by admin"));
+        });
+    }
+
+   
+    req.session.user = {
         id: user._id,
         name: user.fullName,
         email: user.email,
@@ -534,4 +568,3 @@ req.session.user = {
         res.redirect('/'); 
     });
 };
-

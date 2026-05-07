@@ -128,7 +128,7 @@ export const toggleUserStatus = async (req, res) => {
             await user.save();
 
             const statusLabel = user.isBlocked ? "blocked" : "unblocked";
-            req.flash('success', `User ${user.fullName} has been ${statusLabel} successfully!`);
+            req.flash('success', `User ${user.fullName} has been ${statusLabel}`);
             
             return req.session.save((err) => {
                 if (err) console.error("Session save error:", err);
@@ -147,13 +147,14 @@ export const toggleUserStatus = async (req, res) => {
 
 
 export const adminLogout = (req, res) => {
-    req.session.admin=null;
-    req.session.destroy((err) => {
+    
+    delete req.session.admin;
+
+    req.session.save((err) => {
         if (err) {
-            console.error("Logout error:", err);
+            console.error("Logout save error:", err);
             return res.redirect('/admin/dashboard');
         }
-        res.clearCookie('connect.sid'); 
         res.redirect('/admin/login');
     });
 };
