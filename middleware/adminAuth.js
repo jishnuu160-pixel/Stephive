@@ -1,17 +1,17 @@
 export const isAdminAuthenticated = (req, res, next) => {
     if (req.session && req.session.admin) {
-        next();
-    } else {
-       
+      return  next();
+    } else {    
         res.redirect('/admin/login');
     }
 };
 
-export const isLoggedOut = (req, res, next) => {
+export const isAdminLoggedOut = (req, res, next) => {
     if (req.session && req.session.admin) {
        
         return res.redirect('/admin/dashboard'); 
     }
+   
     next();
 };
 

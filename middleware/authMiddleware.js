@@ -1,13 +1,15 @@
 import User from '../models/userModel.js';
 
-export const isAuthenticated = async (req, res, next) => {
+export const isUserAuthenticated = async (req, res, next) => {
     if (req.session && req.session.user) {
         try {
             const user = await User.findById(req.session.user.id);
 
             if (user && user.isBlocked) {
-                return req.session.destroy(() => {
-                    res.clearCookie('connect.sid'); 
+                delete req.session.user;
+                if(req.session.passport) delete req.session.passport.user;
+
+                return req.session.save(() => {
                     return res.redirect('/user/login?error=blocked');
                 });
             }
@@ -16,14 +18,14 @@ export const isAuthenticated = async (req, res, next) => {
             return next();
         } catch (error) {
             console.error("Database check failed:", error);
-            next();
+            return next();
         }
     } else {
-        res.redirect('/user/login');
+        return res.redirect('/user/login');
     }
 };
 
-export const isLoggedOut = (req, res, next) => {
+export const isUserLoggedOut = (req, res, next) => {
     if (req.session && req.session.user) {
         const backURL = req.header('Referer') || '/'; 
         return res.redirect(backURL); 
