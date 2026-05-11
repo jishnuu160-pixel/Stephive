@@ -4,6 +4,9 @@ export const findByEmail = async (email) => {
     return await User.findOne({ email: email }).lean();
 };
 
+export const findByPhone = async (phoneNumber) => {
+    return await User.findOne({ phoneNumber: phoneNumber }).lean();
+};
 
 
 export const createUser = async (data) => {
@@ -33,7 +36,7 @@ export const saveOTP = async (email, otp) => {
             { 
                 $set: { 
                     otp: otp, 
-                    otpExpiry: Date.now() + 300000 
+                    otpExpiry: Date.now() + 60000 
                 } 
             },
             { returnDocument: 'after' } 

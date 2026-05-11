@@ -37,6 +37,8 @@ export const updateAvatar = async (req, res) => {
         const userId = req.session.user.id;
         const imagePath = `/uploads/profile_pics/${req.file.filename}`;
 
+       
+
         await userRepo.updateUserInfo(userId, { profileImage: imagePath });
 
         req.session.user.profileImage = imagePath;
@@ -70,9 +72,21 @@ export const postSignup = async (req, res, next) => {
             return res.redirect('/user/signup?error=' + encodeURIComponent("Passwords do not match!"));
         }
 
-       
+        
+        const existingEmail= await userRepo.findByEmail(email);
 
-        const user = await userService.signup(req.body);
+        if(existingEmail){
+            return res.redirect('/user/signup?error=' + encodeURIComponent("Email already exists"));
+        }
+
+        const existingPhone= await userRepo.findByPhone(phoneNumber);
+
+        if(existingPhone){
+            return res.redirect('/user/signup?error=' + encodeURIComponent("Phone already registered"));
+        }
+      
+
+        const user = await userService.signup({...req.body,phoneNumber});
 
         req.session.user = {
             id: user._id,
@@ -99,6 +113,7 @@ export const postSignup = async (req, res, next) => {
 
 export const postLogin = async (req, res) => {
     try {
+
         const user = await userService.login(req.body);
 
         if (user.isBlocked) {
@@ -524,13 +539,16 @@ export const sendEmailChangeOTP = async (req, res) => {
 
 export const googleAuthSuccess = (req, res) => {
     const user = req.user;
+    const adminData = req.session.admin;
 
     if (user.isBlocked) {
         if (req.session.passport) {
             delete req.session.passport.user; 
         }
-        delete req.session.user; 
+
+    
         req.user = null; 
+
 
         return req.session.save((err) => {
             if (err) console.error("Session save error:", err);
@@ -548,8 +566,14 @@ export const googleAuthSuccess = (req, res) => {
         gender: user.gender 
     };
 
+    
+        if(adminData){
+            req.session.admin= adminData;
+        }
+
     req.session.save((err) => {
         if (err) return res.redirect('/user/login?error=Session+Error');
         res.redirect('/'); 
     });
 };
+

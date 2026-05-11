@@ -19,8 +19,9 @@ async (accessToken, refreshToken, profile, done) => {
         if (!user) {
             user = await User.create({
                 fullName: profile.displayName,
-                email,
-            
+                email:email,
+                password:null,
+        
                 profileImage: profile.photos[0].value 
             });
         }

@@ -50,11 +50,26 @@ router.get('/auth/google', isUserLoggedOut, passport.authenticate('google', {
     scope: ['profile', 'email'] 
 }));
 
-router.get('/auth/google/callback', 
+const preserveAdmin=(req,res,next)=>{
+    if(req.session.admin){
+        req._tempAdmin=req.session.admin;
+    }
+    next();
+};
+
+router.get('/auth/google/callback',
+    preserveAdmin, 
     passport.authenticate('google', { 
         failureRedirect: '/user/login',
         failureFlash: true 
     }),
+
+    (req,res,next)=>{
+        if(req._tempAdmin){
+            req.session.admin= req._tempAdmin;
+        }
+        next();
+    },
     googleAuthSuccess
 );
 
@@ -64,7 +79,7 @@ router.get('/profile', isUserAuthenticated, getProfile);
 router.get('/edit-profile', preventCache, isUserAuthenticated, getEditProfile);
 
 
-router.post('/update-profile', preventCache, isUserAuthenticated, postUpdateProfile);
+router.post('/update-profile', uploadAvatar.single('profileImage'), preventCache, isUserAuthenticated, postUpdateProfile);
 
 router.get('/logout', userLogout);
 

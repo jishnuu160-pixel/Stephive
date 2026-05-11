@@ -97,13 +97,19 @@ export const sendOTP = async (email) => {
 export const verifyOTP = async (email, otp) => {
     const user = await userRepo.findByEmail(email);
     
-    if (!user || user.otp !== otp) {
+    if (!user || !user.otp ) {
         throw new Error("Invalid OTP code. Please try again.");
     }
 
     if (Date.now() > user.otpExpiry) {
+        await User.updateOne({email:email},{$unset:{otp:"",otpExpiry:""}});
         throw new Error("OTP has expired. Please request a new one.");
     }
+
+    if (user.otp !== otp){
+        throw new Error('Invalid OTP code. Please try again.');
+    }
+    await User.updateOne({email:email},{$unset:{otp:"",otpExpiry:""}});
 
     return true;
 };

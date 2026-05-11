@@ -7,7 +7,6 @@ import flash from 'connect-flash';
 import dotenv from "dotenv";
 dotenv.config();
 
-
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import homeRoutes from './routes/homeRoutes.js';
@@ -15,7 +14,6 @@ import passport  from './config/passport.js';
 
 
 const app = express();
-
 
 
 app.engine('hbs', engine({
@@ -42,6 +40,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
 app.use(session({
+    name:'user_session',
     secret: process.env.SESSION_SECRET || 'stephive_secret_key',
     resave: false,               
     saveUninitialized: false,    
@@ -80,6 +79,5 @@ app.use((req, res, next) => {
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/', homeRoutes);
-
 
 export default app;

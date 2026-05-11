@@ -205,12 +205,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 30px 50px;
+    padding: 20px 40px;
     color: white;
 }
 
 .banner-content h3 {
-    font-size: 2rem;
+    font-size: 15px;
     margin-bottom: 5px;
 }
 
@@ -218,8 +218,9 @@
     background: white;
     color: #00BCD4;
     border: none;
-    padding: 12px 25px;
+    padding: 10px 20px;
     border-radius: 8px;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
     text-transform: uppercase;

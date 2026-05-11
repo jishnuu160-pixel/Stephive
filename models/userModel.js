@@ -3,9 +3,9 @@ import { type } from 'os';
 
 const userSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    phoneNumber: { type: String, required: true, unique:true },
-    password: { type: String, required: true }, 
+    email: { type: String, required: true, unique: false },
+    phoneNumber: { type: String, required: false, unique:true, sparse:true },
+    password: { type: String, required: false }, 
     profileImage:{
         type:String,
         default: ''
