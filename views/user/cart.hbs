@@ -1,0 +1,203 @@
+<div class="cart-container">
+    
+    <header class="cart-header">
+        <div class="header-left">
+            <nav class="breadcrumbs">HOME / SHOP / <span style="font-weight: 600;color:black">CART</span></nav>
+            <h1>Your Cart <span class="item-count">({{totalUnitsCount}} Items)</span></h1>
+        </div>
+        <a class="continue-shopping-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
+    </header>
+
+    <div class="cart-content">
+        
+        <section class="cart-items-list">
+            {{#if cart.items.length}}
+
+            {{#each cart.items}}
+            <div class="cart-card {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} {{#if this.hasInsufficientStock}}stock-error-border{{/if}}" 
+                 data-product-id="{{this.productId._id}}" 
+                 data-size="{{this.size}}" 
+                 data-color="{{this.color}}">
+                
+                <div class="item-image-wrapper">
+                    {{#if this.productId.productImage}}
+                        <img src="/uploads/{{lookup this.productId.productImage 0}}" alt="{{this.productId.productName}}">
+                    {{else}}
+                        <div class="no-image-placeholder">No Image</div>
+                    {{/if}}
+                </div>
+                
+                <div class="item-details">
+                    <h2 class="item-title">{{this.productId.productName}}</h2>
+                    <p class="item-specs">MATERIAL: {{#if this.productId.material}}{{toUpperCase this.productId.material}}{{else}}LEATHER{{/if}} | COLOR: {{toUpperCase this.color}} | SIZE: {{this.size}}</p>
+                    
+                    {{#if this.isOutOfStock}}
+                        <span class="cart-error-badge">OUT OF STOCK</span>
+                    {{else}}
+                        {{#if this.hasInsufficientStock}}
+                            <span class="cart-error-badge">EXCEEDS STOCK (Only {{this.maxStockLimit}} left)</span>
+                        {{/if}}
+                    {{/if}}
+                    
+                    {{#if this.isUnlisted}}
+                        <span class="cart-error-badge">PRODUCT UNAVAILABLE</span>
+                    {{/if}}
+
+                    <div class="item-pricing-row">
+                        <span class="item-price" data-base-price="{{this.price}}">₹{{this.price}}</span>
+                        
+                        <div class="quantity-selector">
+                            <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
+                            <span class="qty-val">{{this.quantity}}</span>
+                            <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="item-actions-subtotal">
+                    <button class="delete-btn" onclick="removeCartRow(this)" aria-label="Delete item">
+                        <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                    <div class="subtotal-box">
+                        <span class="subtotal-label">SUBTOTAL</span>
+                        <span class="subtotal-price">₹{{this.itemSubtotal}}</span>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+            {{else}}
+            <div class="empty-cart-state" style="text-align: center; padding: 60px 20px; color: #64748b;">
+                <i class="fa-solid fa-bag-shopping" style="font-size: 48px; margin-bottom: 15px; color: #cbd5e1;"></i>
+                <p style="font-size: 18px; margin-bottom: 20px; font-weight: 500;">Your StepHyve cart is empty.</p>
+                <a href="/shop" class="continue-shopping-btn" style="float: none; display: inline-block; padding: 12px 30px; background: #0f172a; color: #fff; border-radius: 6px; text-decoration: none;">Explore Products</a>
+            </div>
+            {{/if}}
+        </section>
+
+        {{#if cart.items.length}}
+        <section class="summary-wrapper">
+            <div class="summary-card">
+                <h3>Order Summary</h3>
+                
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">₹{{cart.subtotal}}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping estimate</span>
+                    <span class="free-text">Free</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax estimate (10%)</span>
+                    <span id="summary-tax">₹{{cart.taxEstimate}}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Discount</span>
+                    <span id="summary-discount">-₹0.00</span>
+                </div>
+
+                <hr class="summary-divider">
+
+                <div class="total-row">
+                    <div class="total-label-box">
+                        <span class="total-title">Total Amount</span>
+                        <span class="total-subtitle">INCLUDING ALL TAXES</span>
+                    </div>
+                    <span class="total-price" id="summary-total">₹{{cart.totalAmount}}</span>
+                </div>
+
+                {{#if hasCheckoutRestrictions}}
+                    <div class="checkout-restriction-notice" style="background: #fef2f2; border: 1px solid #fca5a5; padding: 15px; border-radius: 6px; margin-bottom: 15px; color: #991b1b; font-size: 13px; font-weight: 500;">
+                        ⚠️ Checkout is unavailable because items in your cart are out of stock or no longer available. Please resolve these issues to proceed.
+                    </div>
+                    <button class="checkout-btn" style="background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none;" disabled>
+                        Checkout Disabled
+                    </button>
+                {{else}}
+                    <a href="/checkout" class="checkout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                        <span>Proceed to Checkout</span>
+                        <span class="arrow">→</span>
+                    </a>
+                {{/if}}
+                
+                <p class="security-text">Secure SSL Encryption & 2-Year Warranty</p>
+            </div>
+        </section>
+        {{/if}}
+
+    </div>
+</div>
+
+<script>
+    async function adjustCartQuantity(buttonElement, operationalChange) {
+        const card = buttonElement.closest('.cart-card');
+        const productId = card.getAttribute('data-product-id');
+        const size = card.getAttribute('data-size');
+        const color = card.getAttribute('data-color');
+        
+        const qtyDisplaySpan = card.querySelector('.qty-val');
+        const currentQty = parseInt(qtyDisplaySpan.innerText);
+        const targetQuantity = currentQty + operationalChange;
+
+        if (targetQuantity < 1) return;
+        if (targetQuantity > 5) {
+            alert("Maximum allowable limit per singular item is 5 units.");
+            return;
+        }
+
+        try {
+            const response = await fetch('/user/cart/update-quantity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, size, color, targetQuantity })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                qtyDisplaySpan.innerText = targetQuantity;
+                
+                const basePrice = parseInt(card.querySelector('.item-price').getAttribute('data-base-price'));
+                card.querySelector('.subtotal-price').innerText = '₹' + (basePrice * targetQuantity).toLocaleString();
+               
+                document.getElementById('summary-subtotal').innerText = '₹' + data.subtotal.toLocaleString();
+                document.getElementById('summary-tax').innerText = '₹' + data.taxEstimate.toLocaleString();
+                document.getElementById('summary-total').innerText = '₹' + data.totalAmount.toLocaleString();
+            } else {
+                alert(data.message || "Unable to complete inventory scaling modification.");
+                window.location.reload();
+            }
+        } catch (err) {
+            console.error("AJAX quantity synchronization failure:", err);
+        }
+    }
+
+  
+    async function removeCartRow(buttonElement) {
+        if (!confirm("Are you sure you want to remove this variant from your cart?")) return;
+
+        const card = buttonElement.closest('.cart-card');
+        const productId = card.getAttribute('data-product-id');
+        const size = card.getAttribute('data-size');
+        const color = card.getAttribute('data-color');
+
+        try {
+            const response = await fetch('/user/cart/remove', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, size, color })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+
+                window.location.reload();
+            } else {
+                alert(data.message || "An issue was encountered while trying to drop the item.");
+            }
+        } catch (err) {
+            console.error("AJAX product eviction malfunction:", err);
+        }
+    }
+</script>
