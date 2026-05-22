@@ -25,6 +25,12 @@
     background: #eef2ff; /* Your primary-blue */
     color: #4a5568;
     font-weight: 600;
+    width: 100%;
+    padding-right: 120px;
+    border: none;
+   box-shadow: none;
+   border-radius: 12px;
+    
 }
 
 .nav-icon {
