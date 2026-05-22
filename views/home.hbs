@@ -36,7 +36,7 @@
   </div>
 </section>
 
-<section class="popular">
+{{!-- <section class="popular">
   <div class="popular-header">
     <div class="header-text">
         <p class="subtitle">Our Trending Shoes</p>
@@ -67,7 +67,7 @@
       <span class="dot"></span>
       <span class="dot"></span>
   </div>
-</section>
+</section> --}}
 
 <section class="sale-banner-container">
   <div class="sale-gradient-box">
@@ -82,31 +82,44 @@
 <section class="categories">
   <h2 class="section-title">Browse by category</h2>
 
-  <div class="category-grid">
-    {{#each categories}}
-    <div class="category-card">
-      <img src="/public/images/casual.png">
-      <div class="category-info">
-        <h4>{{this.name}}</h4>
-        <p>Power your workouts</p> 
-        <a href="/category/{{this._id}}" class="discover-link">DISCOVER <span>→</span></a>
-      </div>
-    </div>
-    {{/each}}
-  </div>
+     <section class="categories-section">
+        <div class="category-grid">
+            <div class="cat-card-running"><img src="/images/running-shoe.jpg"> <span class="category-label"> Running shoes</span></div>
+            <div class="cat-card-casual"><img src="/images/casual-shoe.jpg"> <span class="category-label"> Casual shoes</span></div>
+            <div class="cat-card-training"><img src="/images/training-shoe.jpg"> <span class="category-label">Training shoes</span></div>
+            <div class="cat-card-limited"><img src="/images/limited-edition.jpg"><span class="category-label">Limited Edition</span></div>
+        </div>
+    </section>
 </section>
 
-<section class="best">
-  <h2>Best Sellers</h2>
+  <section class="best-sellers">
+        <h3>Best Sellers</h3>
+        <div class="category-grid">
+            <div class="product-card">
+                <img src="/images/running-shoe-nike.jpg">
+                <h4>Nike Air Max</h4>
+                <button class="add-btn">Add to Cart</button>
+            </div>
 
-  <div class="product-list">
-    {{#each bestSellers}}
-    <div class="product-card">
-      <img src="{{this.image}}" alt="{{this.name}}">
-      <h4>{{this.name}}</h4>
-      <p>${{this.price}}</p>
-    </div>
-    {{/each}}
-  </div>
-</section>
+             <div class="product-card">
+                <img src="/images/casual-shoe-nike.jpg">
+                <h4>Nike Air Max</h4>
+                <button class="add-btn">Add to Cart</button>
+            </div>
+
+             <div class="product-card">
+                <img src="/images/training-shoe-nike.jpg">
+                
+                      <h4>Nike Air Max</h4>
+          
+                <button class="add-btn">Add to Cart</button>
+            </div>
+               <div class="product-card">
+                <img src="/images/running-shoe-nike.jpg">
+                <h4>Nike Air Max</h4>
+                <button class="add-btn">Add to Cart</button>
+            </div>
+           
+            </div>      
+    </section>
 
