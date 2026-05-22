@@ -1,0 +1,233 @@
+<section class="product-details-container">
+  
+  <nav class="details-breadcrumb">
+    <a href="/">Shop</a> / 
+    
+    <span>{{product.productName}}</span>
+  </nav>
+
+  <div class="main-product-layout">
+    
+    <div class="product-gallery-block">
+      <div class="hero-image-wrapper">
+        <span class="badge-new">NEW ARRIVAL</span>
+        <button class="wishlist-trigger" type="button" aria-label="Add to Wishlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+        
+        {{#if product.productImage}}
+          <img id="mainProductImage" src="/uploads/{{lookup product.productImage 0}}" alt="{{product.productName}}">
+        {{else}}
+          <div class="no-image-fallback">No Product Image Available</div>
+        {{/if}}
+      </div>
+      
+      <div class="thumbnail-strip">
+        {{#each product.productImage}}
+        <div class="thumb-frame {{#if @first}}active-thumb{{/if}}" onclick="changeMainImage('/uploads/{{this}}', this)">
+          <img src="/uploads/{{this}}" alt="Product detail view">
+        </div>
+        {{/each}}
+      </div>
+    </div>
+
+    <div class="product-configurator-block">
+      <h1 class="item-title">
+        {{#if product.productName}}{{product.productName}}{{else}}StepHive Premium Sneaker{{/if}}
+      </h1>
+      <p class="item-tagline">Refined shoes for the modern professional lifestyle.</p>
+      
+      <div class="rating-row">
+        <span class="stars">★★★★★</span>
+        <span class="review-count">(124 Reviews)</span>
+      </div>
+
+      <div class="pricing-row">
+        <h2 class="current-price">
+          ₹{{#if product.salePrice}}{{product.salePrice}}{{else}}{{product.regularPrice}}{{value}}{{/if}}
+        </h2>
+        {{#if product.salePrice}}
+          <span class="slashed-price">₹{{product.regularPrice}}</span>
+          <span class="discount-pill">SAVE {{#if product.discountPercentage}}{{product.discountPercentage}}{{else}}12{{/if}}% OFF</span>
+        {{/if}}
+      </div>
+
+   {{#if product.variants}}
+<div class="config-group">
+  <span class="config-label">COLOR: <strong id="selectedColorLabel">{{lookup (lookup product.variants 0) 'colorName'}}</strong></span>
+  <div class="color-swatch-flex">
+    {{#each product.variants}}
+    <button 
+      type="button" 
+      class="swatch-circle {{#if @first}}active-swatch{{/if}}" 
+      style="background-color: {{this.colorHex}}; background-image: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(0,0,0,0.1));"
+      onclick="updateSelectedColor('{{this.colorName}}', this)">
+    </button>
+    {{#if @first}}
+      {{/if}}
+    {{/each}}
+  </div>
+</div>
+{{/if}}
+
+{{#if product.variants}}
+  {{#each product.variants}}
+    {{#if @first}}
+      {{#if this.sizes}}
+      <div class="config-group">
+        <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
+        <div class="size-chips-grid">
+          {{#each this.sizes}}
+          <button type="button" class="size-chip" onclick="updateSelectedSize('{{this.size}}', this)">
+            {{this.size}}
+          </button>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}}
+    {{/if}}
+  {{/each}}
+{{/if}}
+
+      <div class="purchase-action-matrix">
+        <div class="quantity-stepper">
+          <button type="button" onclick="updateQty(-1)">-</button>
+          <input type="text" id="purchaseQty" value="1" readonly>
+          <button type="button" onclick="updateQty(1)">+</button>
+        </div>
+        
+        <button type="button" class="btn-secondary-cart" onclick="addToCart('{{product._id}}')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          Add to Cart
+        </button>
+        
+        <button type="button" class="btn-primary-buy">Buy Now</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="product-specs-tabs">
+    <div class="tabs-header-strip">
+      <button type="button" class="tab-trigger active-tab">Specifications</button>
+      <button type="button" class="tab-trigger">Description</button>
+      <button type="button" class="tab-trigger">Reviews (124)</button>
+    </div>
+    
+    <div class="tab-viewport-panel">
+      <table class="specs-table">
+        <tr><td>Material</td><td>{{#if product.material}}{{product.material}}{{else}}Premium Leather{{/if}}</td></tr>
+        <tr><td>Sole Type</td><td>{{product.soleType}}</td></tr>
+        <tr><td>Closure Type</td><td>{{product.closureType}}</td></tr>
+        <tr><td>Weight</td><td>{{product.weight}} g</td></tr>
+        <tr><td>Country of Origin</td><td>{{product.countryOfOrigin}}</td></tr>
+      </table>
+    </div>
+  </div>
+
+</section>
+
+<script>
+    let chosenSize = null;
+    let chosenColor = "{{lookup (lookup product.variants 0) 'colorName'}}";
+    let activeVariantId = "{{lookup (lookup product.variants 0) '_id'}}";
+
+    function changeMainImage(imagePath, thumbElement) {
+        document.getElementById("mainProductImage").src = imagePath;
+        document.querySelectorAll('.thumb-frame').forEach(el => el.classList.remove('active-thumb'));
+        thumbElement.classList.add('active-thumb');
+    }
+
+    function updateSelectedColor(colorName, buttonElement) {
+        chosenColor = colorName;
+        document.getElementById("selectedColorLabel").innerText = colorName;
+        document.querySelectorAll('.swatch-circle').forEach(el => el.classList.remove('active-swatch'));
+        buttonElement.classList.add('active-swatch');
+        
+        
+    }
+
+    function updateSelectedSize(sizeValue, buttonElement) {
+        chosenSize = sizeValue;
+        document.getElementById("selectedSizeIndicator").innerText = sizeValue;
+        document.querySelectorAll('.size-chip').forEach(el => el.classList.remove('active-size'));
+        buttonElement.classList.add('active-size');
+    }
+
+    function updateQty(change) {
+        const qtyInput = document.getElementById("purchaseQty");
+        let qty = parseInt(qtyInput.value);
+        qty += change;
+        
+      
+        if (qty < 1) qty = 1;
+        if (qty > 5) {
+            alert("Maximum allowable limit per item is 5 units.");
+            return;
+        }
+        qtyInput.value = qty;
+    }
+
+    async function addToCart(productId) {
+    const qty = parseInt(document.getElementById("purchaseQty").value) || 1;
+
+    if (!chosenSize) {
+        alert("Please select a size before adding to cart.");
+        return;
+    }
+
+    try {
+        console.log("🚀 [DEBUG] Sending data payload to /user/cart/add...");
+        
+        const response = await fetch('/user/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productId: productId,
+                variantId: activeVariantId,
+                size: chosenSize,
+                color: chosenColor,
+                quantity: qty
+            })
+        });
+
+        console.log("📡 [DEBUG] Server HTTP Status Code:", response.status);
+
+        
+        const rawText = await response.text();
+        
+        console.log("=== 🔍 RAW SERVER RESPONSE START ===");
+        console.log(rawText);
+        console.log("=== 🔍 RAW SERVER RESPONSE END ===");
+
+        if (response.status === 401) {
+            alert("🔒 Please log in to manage your shopping cart.");
+            window.location.href = "/user/login"; 
+            return;
+        }
+
+        let data;
+        try {
+            data = JSON.parse(rawText);
+        } catch (jsonErr) {
+            console.error("❌ [PARSER ERROR] The server response above is not valid JSON!");
+            alert(`⚠️ JSON Parse Error!\n\nCheck your F12 Browser Console right now to inspect the raw server response.`);
+            return;
+        }
+
+        if (response.ok && data.success) {
+            if (confirm("Item successfully added to your cart! Open shopping cart layout now?")) {
+                window.location.href = "/user/cart";
+            }
+        } else {
+            alert(data.message || "An error was returned by the server application logic.");
+        }
+
+    } catch (error) {
+        console.error("💥 [FETCH EXCEPTION]:", error);
+        alert(`Network connection error: ${error.message}`);
+    }
+}
+</script>
