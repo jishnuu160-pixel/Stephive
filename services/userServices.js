@@ -60,27 +60,21 @@ export const sendOTP = async (email) => {
     const user = await userRepo.findByEmail(email);
     if (!user) throw new Error("No account found with this email address.");
 
-    
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     await userRepo.saveOTP(email, otp); 
   
-    console.log(`-----------------------------------------`);
-    console.log(`OTP for ${email} is [ ${otp} ]`);
-    console.log(`-----------------------------------------`);
+    // --- THIS IS WHERE YOU ADD THE LOG BACK ---
+    console.log(`\n=========================================`);
+    console.log(`DEBUG: OTP for ${email} is [ ${otp} ]`);
+    console.log(`=========================================\n`);
+    // ------------------------------------------
 
-  
     const mailOptions = {
         from: '"StepHive Support" <stephive3@gmail.com>',
         to: email, 
         subject: 'StepHive - Your Verification Code',
-        html: `<div style="font-family: Arial; text-align: center;">
-                <h2>Verification Code</h2>
-                <p>Your StepHive OTP is:</p>
-                <h1 style="color: #007bff;">${otp}</h1>
-                <p>This code expires in 1 minute.</p>
-                <p><b>Don't share Otp with others.</b></p>
-               </div>`
+        html: `...`
     };
 
     try {
@@ -92,7 +86,6 @@ export const sendOTP = async (email) => {
 
     return otp; 
 };
-
 
 export const verifyOTP = async (email, otp) => {
     const user = await userRepo.findByEmail(email);
