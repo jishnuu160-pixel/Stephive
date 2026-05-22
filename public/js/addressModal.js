@@ -1,19 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('addressModal');
+    
+    if (!modal) {
+        console.log("ℹ️ Address modal layout elements not found. Skipping script safely.");
+        return; 
+    }
+
     const openBtn = document.getElementById('openAddressModal');
     const closeX = document.getElementById('closeX');
     const cancelBtn = document.getElementById('btnCancel');
     const addressForm = document.getElementById('addressForm');
     const modalTitle = modal.querySelector('.modal-header h3');
 
-    
-    if (openBtn && modal) {
+    if (openBtn) {
         openBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            addressForm.reset();
-            addressForm.action = '/user/add-address';
-            modalTitle.innerHTML = 'Add <b>New Address</b>';
+            if (addressForm) addressForm.reset();
+            if (addressForm) addressForm.action = '/user/add-address';
+            if (modalTitle) modalTitle.innerHTML = 'Add <b>New Address</b>';
             
             modal.classList.add('active');
         });
@@ -35,20 +39,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const label = editBtn.dataset.label;
             const isDefault = editBtn.dataset.default === 'true';
   
-            addressForm.action = `/user/edit-address/${id}`;
-            modalTitle.innerHTML = 'Edit <b>Address</b>';
+            if (addressForm) {
+                addressForm.action = `/user/edit-address/${id}`;
+                if (modalTitle) modalTitle.innerHTML = 'Edit <b>Address</b>';
 
-            addressForm.querySelector('[name="fullName"]').value = name;
-            addressForm.querySelector('[name="phone"]').value = phone;
-            addressForm.querySelector('[name="street"]').value = street;
-            addressForm.querySelector('[name="apartment"]').value = apartment || '';
-            addressForm.querySelector('[name="city"]').value = city;
-            addressForm.querySelector('[name="state"]').value = state;
-            addressForm.querySelector('[name="pincode"]').value = pincode;
-            addressForm.querySelector('#isDefault').checked = isDefault;
+                const fieldFullName = addressForm.querySelector('[name="fullName"]');
+                const fieldPhone = addressForm.querySelector('[name="phone"]');
+                const fieldStreet = addressForm.querySelector('[name="street"]');
+                const fieldApartment = addressForm.querySelector('[name="apartment"]');
+                const fieldCity = addressForm.querySelector('[name="city"]');
+                const fieldState = addressForm.querySelector('[name="state"]');
+                const fieldPincode = addressForm.querySelector('[name="pincode"]');
+                const fieldDefault = addressForm.querySelector('#isDefault');
 
-            const typeRadio = addressForm.querySelector(`input[name="label"][value="${label}"]`);
-            if (typeRadio) typeRadio.checked = true;
+                if (fieldFullName) fieldFullName.value = name;
+                if (fieldPhone) fieldPhone.value = phone;
+                if (fieldStreet) fieldStreet.value = street;
+                if (fieldApartment) fieldApartment.value = apartment || '';
+                if (fieldCity) fieldCity.value = city;
+                if (fieldState) fieldState.value = state;
+                if (fieldPincode) fieldPincode.value = pincode;
+                if (fieldDefault) fieldDefault.checked = isDefault;
+
+                const typeRadio = addressForm.querySelector(`input[name="label"][value="${label}"]`);
+                if (typeRadio) typeRadio.checked = true;
+            }
 
             modal.classList.add('active');
         }
@@ -58,8 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('active');
     };
 
-    if(closeX) closeX.addEventListener('click', hideModal);
-    if(cancelBtn) cancelBtn.addEventListener('click', hideModal);
+    if (closeX) closeX.addEventListener('click', hideModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', hideModal);
+    
     window.addEventListener('click', (e) => {
         if (e.target === modal) hideModal();
     });

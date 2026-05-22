@@ -1,6 +1,4 @@
-/* ==========================================================================
-   🧱 MASTER PAGE SKELETON LAYOUTS & CONTAINERS
-   ========================================================================== */
+
 .shop-container {
     max-width: 100%;
     align-items: center;
@@ -15,7 +13,6 @@
     font-family: 'Inter', -apple-system, sans-serif;
 }
 
-/* Two-Column Grid: Sidebar on the left, Catalog items on the right */
 .product-grid {
     display: grid;
     grid-template-columns: 260px 4fr; 
@@ -24,15 +21,11 @@
     margin-top: 30px;
 }
 
-/* 🛠️ FIX: Forces the grid to display as a balanced 4-column row on the main Shop Landing page */
 .shop-container .product-grid {
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 24px !important;
 }
 
-/* ==========================================================================
-   🎯 BRAND ALIGNMENT ENGINE (BREADCRUMB LEFT, TITLES DEAD CENTER)
-   ========================================================================== */
 .top-content {
     display: flex !important;
     flex-direction: column !important;
@@ -43,7 +36,6 @@
     box-sizing: border-box;
 }
 
-/* Forces the breadcrumb path straight to the left margin line */
 .breadcrumb-wrapper {
     width: 100% !important;
     display: flex !important;
@@ -66,7 +58,7 @@
     color: #000000;
 }
 
-/* Centers the main text banners relative to the viewport window */
+
 .header-group {
     display: flex !important;
     flex-direction: column !important;
@@ -95,9 +87,7 @@
     line-height: 1.6 !important;
 }
 
-/* ==========================================================================
-   🧱 PAGINATION SPACING FIX
-   ========================================================================== */
+
 .pagination-container {
     display: flex !important;
     justify-content: center !important;
@@ -109,7 +99,6 @@
     clear: both !important;
 }
 
-/* Legacy Home Shop Headers */
 .shop-header {
     text-align: center;
     margin-bottom: 50px;
@@ -144,9 +133,6 @@
     margin-bottom: 20px;
 }
 
-/* ==========================================================================
-   🎛️ SIDEBAR SELECTION SYSTEM (LEFT COLUMN)
-   ========================================================================== */
 .filter-section {
     background: #ffffff;
     border: 1px solid #e2e8f0;
@@ -206,9 +192,6 @@
     color: #0f172a;
 }
 
-/* ==========================================================================
-   👟 PRODUCT CATALOG GRID & CARDS (RIGHT COLUMN)
-   ========================================================================== */
 .products-wrapper-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 3fr));
