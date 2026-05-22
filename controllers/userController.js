@@ -1,13 +1,15 @@
 import * as userService from '../services/userServices.js';
 import * as userRepo from '../repositories/userRepository.js';
+
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { error, profile } from 'console';
+import { title } from 'process';
 
-const uploadPath=path.join(process.cwd(),'public/uploads/profile_pics');
+const uploadPath = path.join(process.cwd(), 'public/uploads/profile_pics');
 
-if(!fs.existsSync(uploadPath)) {
+if (!fs.existsSync(uploadPath)) {
     fs.mkdirSync(uploadPath, { recursive: true });
 }
 
@@ -20,35 +22,52 @@ const storage = multer.diskStorage({
     }
 });
 
-export const uploadAvatar = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const allowedExtensions = /jpeg|jpg|png|webp/;
 
+    const isMimeValid = allowedMimeTypes.includes(file.mimetype);
+    const isExtValid = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
+
+    if (isMimeValid || (isMimeValid && isExtValid)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.'), false);
+    }
+};
+
+export const uploadAvatar = multer({ 
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 3 * 1024 * 1024 } 
+});
 
 export const updateAvatar = async (req, res) => {
-
-   console.log('File Info:',req.file);
-   console.log('Body Info:',req.body);
+    console.log('File Info Received:', req.file);
+    console.log('Body Info Received:', req.body);
 
     try {
-        
         if (!req.file){
-      console.log('No files was found');
-            return res.status(400).json({ success: false });
+            console.log('❌ Request reached controller but file binary is empty.');
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.' 
+            });
         } 
+        
         const userId = req.session.user.id;
         const imagePath = `/uploads/profile_pics/${req.file.filename}`;
-
-       
 
         await userRepo.updateUserInfo(userId, { profileImage: imagePath });
 
         req.session.user.profileImage = imagePath;
 
         req.session.save(() => {
-            res.json({ success: true, imagePath });
+            return res.json({ success: true, imagePath });
         });
     } catch (error) {
-        console.error("Avatar Error:", error);
-        res.status(500).json({ success: false });
+        console.error("Avatar Controller Error Trace:", error);
+        return res.status(500).json({ success: false, message: 'Server upload internal error.' });
     }
 };
 
@@ -132,7 +151,7 @@ export const postLogin = async (req, res) => {
 
         req.session.save((err) => {
             if (err) return next(err);
-            res.redirect('/'); 
+            res.redirect('/shop'); 
         });
     } catch (err) {
        
@@ -152,6 +171,8 @@ export const postForgot = async (req, res) => {
         }
 
         await userService.sendOTP(email);
+
+        
         req.session.otpExpiryTime=Date.now() + 60000;
 
         res.redirect(`/user/verify-otp?email=${email}`);
@@ -281,6 +302,7 @@ export const userLogout = (req, res) => {
         res.redirect('/user/login');
     });
 };
+
 
 export const getProfile = async (req, res) => {
     try {
@@ -576,4 +598,20 @@ export const googleAuthSuccess = (req, res) => {
         res.redirect('/'); 
     });
 };
+
+
+export const getCart = async (req, res) => {
+    try {
+        res.render('user/cart', { 
+            user: req.session.user
+        });
+    } catch (error) {
+        res.redirect('/');
+    }
+};
+
+
+
+
+
 
