@@ -1,0 +1,599 @@
+<div class="customers-page">
+    <div class="table-card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Products</h2>
+            
+            <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 600px; justify-content: flex-end;">
+                
+                <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
+                    <form action="/admin/products" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" placeholder="Search Products" value="{{searchQuery}}">
+                        {{#if searchQuery}}
+                            <a href="/admin/products" class="search-clear-btn">
+                                <i class="fas fa-times-circle"></i>
+                            </a>
+                        {{/if}}
+                    </form>
+                </div>
+
+               <button type="button" onclick="openProductModal('add')" class="btn-cat">Add Product</button>
+            </div>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th> 
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products}} 
+                <tr>
+                    <td>{{add @root.startIndex @index 1}}</td>
+                    
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            {{#if this.productImage}}
+                                <img src="/uploads/{{lookup this.productImage 0}}" alt="{{this.productName}}" style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">
+                            {{else}}
+                                <div style="width: 40px; height: 40px; border-radius: 5px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #a0aec0;">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            {{/if}}
+                            <strong>{{this.productName}}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start;">
+                            {{#if this.Category}}
+                                {{#if this.Category.parentCategory}}
+                                    <span style="color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        {{this.Category.parentCategory.name}}
+                                    </span>
+                                    <strong style="color: #334155; font-size: 12px;">{{this.Category.name}}</strong>
+                                {{else}}
+                                    <strong style="color: #334155; font-size: 12px;">{{this.Category.name}}</strong>
+                                {{/if}}
+                            {{else if this.category}}
+                                {{#if this.category.parentCategory}}
+                                    <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        {{this.category.parentCategory.name}}
+                                    </span>
+                                    <strong style="color: #334155; font-size: 0.9rem;">{{this.category.name}}</strong>
+                                {{else}}
+                                    <strong style="color: #334155; font-size: 0.9rem;">{{this.category.name}}</strong>
+                                {{/if}}
+                            {{else}}
+                                <span style="color: #cbd5e1; font-style: italic; font-size: 0.9rem;">Uncategorized</span>
+                            {{/if}}
+                        </div>
+                    </td>
+                   
+                    <td>₹{{this.regularPrice}}</td>
+                    <td>{{this.totalQuantity}}</td>
+
+                    <td>
+                        <span class="badge {{#if this.isListed}}bg-success{{else}}bg-danger{{/if}}">
+                            {{#if this.isListed}}Listed{{else}}Unlisted{{/if}}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <button 
+                                type="button" 
+                                class="btn-edit-small" 
+                                data-id="{{this._id}}"
+                                data-name="{{this.productName}}"
+                                data-brand="{{this.brand}}"
+                                data-price="{{this.regularPrice}}"
+                                data-saleprice="{{this.salePrice}}"
+                                data-desc="{{this.description}}"
+                                data-origin="{{this.countryOfOrigin}}"
+                                data-material="{{this.material}}"
+                                data-closure="{{this.closureType}}"
+                                data-sole="{{this.soleType}}"
+                                data-weight="{{this.weight}}"
+                                onclick="openProductModal('edit', this)">
+                                Edit
+                            </button>
+
+                            <form action="/admin/products/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
+                                <button 
+                                    type="button"
+                                    class="btn-unlist-small {{#if this.isListed}}active{{else}}inactive{{/if}}"
+                                    data-listed="{{this.isListed}}"
+                                    data-name="{{this.productName}}"
+                                    onclick="confirmProductToggle(this)">
+                                    {{#if this.isListed}}Unlist{{else}}List{{/if}}
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px; color: #cbd5e1;">No products found in the database.</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        {{#if products.length}}
+        <div class="pagination">
+            {{#if pagination.hasPrevPage}}
+                <a href="/admin/products?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">« Prev</a>
+            {{/if}}
+            
+            <span class="page-info">Page {{pagination.page}} of {{pagination.totalPages}}</span>
+            
+            {{#if pagination.hasNextPage}}
+                <a href="/admin/products?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">Next »</a>
+            {{/if}}
+        </div>
+        {{/if}}
+    </div>
+</div>
+
+
+<div class="admin-toast-container"></div>
+
+<div id="addProductModal" class="custom-modal-overlay" style="display: none;">
+    <div class="custom-modal-content">
+        <div class="modal-header">
+            <h2>Add Product</h2>
+            <button type="button" class="close-modal-btn" onclick="toggleModal(false)">&times;</button>
+        </div>
+        
+        <form id="productModalForm" method="POST" enctype="multipart/form-data" class="modal-form-body">
+            
+            <div class="form-row split-row4">
+                <div class="form-group">
+                    <label>SHOE NAME</label>
+                    <input type="text" name="productName" required placeholder="e.g., Curv Shoe">
+                </div>
+                <div class="form-group">
+                    <label>BRAND</label>
+                    <input type="text" name="brand" required placeholder="e.g., Curv">
+                </div>
+                <div class="form-group">
+                    <label>BASE PRICE</label>
+                    <input type="number" name="regularPrice" required placeholder="₹0.00">
+                </div>
+                <div class="form-group">
+                    <label>SALES PRICE</label>
+                    <input type="number" name="salePrice" placeholder="₹0.00">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>DESCRIPTION</label>
+                <input type="text" name="description" required placeholder="Comfortable everyday sneaker">
+            </div>
+
+            <div class="form-row split-row">
+                <div class="form-group">
+                    <label>PARENT CATEGORY</label>
+                    <select name="parentCategory" id="parentCategorySelect" required>
+                        <option value="">Select Parent Category</option>
+                        {{#each @root.parentCategories}}
+                            <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>CATEGORY NAME</label>
+                    <select name="category" id="subcategorySelect" required>
+                        <option value="">Select Subcategory</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="variants-section">
+                <label class="section-main-label">Variants</label>
+                <div id="variantsContainer" class="variants-grid-wrapper"></div>
+                
+                <button type="button" class="btn-add-variant-group" onclick="addColorVariantBlock()">
+                    <i class="fas fa-plus"></i> + Add another color variant
+                </button>
+            </div>
+
+            <div class="form-row dynamic-spec-grid">
+                <div class="form-group">
+                    <label>COUNTRY OF ORIGIN</label>
+                    <input type="text" name="countryOfOrigin" placeholder="India">
+                </div>
+                <div class="form-group">
+                    <label>MATERIAL</label>
+                    <input type="text" name="material" placeholder="Leather">
+                </div>
+                <div class="form-group">
+                    <label>CLOSURE TYPE</label>
+                    <input type="text" name="closureType" placeholder="Lace up">
+                </div>
+                <div class="form-group">
+                    <label>SOLE TYPE</label>
+                    <input type="text" name="soleType" placeholder="Rubber">
+                </div>
+                <div class="form-group">
+                    <label>WEIGHT</label>
+                    <input type="text" name="weight" placeholder="300g">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>PRODUCT IMAGES (MIN 3, MAX 4)</label>
+                <div class="image-drag-dropzone">
+                    <input type="file" name="productImages" id="productImagesInput" multiple accept="image/*" required class="hidden-file-input" onchange="previewSelectedImages(this)">
+                    <div class="dropzone-inner-ui" id="dropzoneUiWrapper">
+                        <span class="camera-icon">📷</span>
+                        <p class="main-drop-text">Click to upload or drag and drop</p>
+                        <p class="sub-drop-text">JPG, PNG up to 5MB (Upload 3-4 images)</p>
+                    </div>
+                </div>
+                <div id="imagesPreviewGallery" class="images-preview-gallery"></div>
+            </div>
+
+            <div class="modal-action-footer">
+                <button type="button" class="btn-modal-cancel" onclick="toggleModal(false)">Cancel</button>
+                <button type="submit" class="btn-modal-save">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<style>
+.custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 99999 !important; }
+.custom-modal-content { background-color: #ffffff; width: 640px; max-height: 90vh; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); display: flex; flex-direction: column; overflow: hidden; font-family: 'Poppins', sans-serif; }
+.modal-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; background-color: #ffffff; }
+.modal-header h2 { font-size: 18px; font-weight: 700; color: #1a1a1a; margin: 0; text-transform: capitalize; }
+.close-modal-btn { background: none; border: none; font-size: 22px; color: #a0aec0; cursor: pointer; transition: color 0.2s; }
+.close-modal-btn:hover { color: #4a5568; }
+.modal-form-body { padding: 0 24px 24px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+.modal-form-body::-webkit-scrollbar { width: 6px; }
+.modal-form-body::-webkit-scrollbar-track { background: #ffffff; }
+.modal-form-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.form-row { display: flex; gap: 16px; }
+.split-row .form-group { flex: 1; }
+.split-row4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.dynamic-spec-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 11px; font-weight: 700; color: #a0aec0; letter-spacing: 0.5px; text-transform: uppercase; }
+.form-group input, .form-group select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; color: #2d3748; background-color: #ffffff; outline: none; transition: border-color 0.2s; }
+.form-group input:focus, .form-group select:focus { border-color: #e6a800; }
+
+.image-drag-dropzone { position: relative; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 25px 20px; text-align: center; background-color: #ffffff; cursor: pointer; overflow: hidden; transition: background 0.2s; }
+.image-drag-dropzone:hover { background-color: #f8fafc; }
+.hidden-file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 50 !important; }
+.dropzone-inner-ui { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; z-index: 5; pointer-events: none; }
+
+.images-preview-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 10px; }
+.preview-image-container { position: relative; width: 100%; aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.preview-image-container img { width: 100%; height: 100%; object-fit: cover; }
+.preview-remove-badge { position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; font-weight: 700; transition: transform 0.2s; z-index: 60; }
+.preview-remove-badge:hover { transform: scale(1.15); background: rgb(239, 68, 68); }
+
+.camera-icon { font-size: 24px; margin-bottom: 4px; }
+.main-drop-text { font-size: 13px; color: #4a5568; margin: 0; font-weight: 500; }
+.sub-drop-text { font-size: 11px; color: #a0aec0; margin: 0; }
+.modal-action-footer { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-top: 12px; padding-top: 16px; }
+.btn-modal-cancel { background: none; border: none; color: #718096; font-size: 14px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
+.btn-modal-cancel:hover { color: #2d3748; }
+.btn-modal-save { background-color: #e6a800; color: #ffffff; border: none; padding: 12px 36px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 6px rgba(230, 168, 0, 0.15); transition: background-color 0.2s; text-transform: capitalize; }
+.btn-modal-save:hover { background-color: #cc9500; }
+
+.variants-section { display: flex; flex-direction: column; gap: 10px; margin: 8px 0; }
+.section-main-label { font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; }
+.variants-grid-wrapper { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 8px; }
+.variant-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; background: #ffffff; display: flex; flex-direction: column; gap: 12px; position: relative; }
+.variant-card-header { display: flex; justify-content: space-between; align-items: center; }
+.color-input-wrapper { display: flex; align-items: center; gap: 8px; }
+.color-picker-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid #cbd5e1; cursor: pointer; padding: 0; overflow: hidden; background-color: #1a202c; }
+.color-picker-circle::-webkit-color-swatch-wrapper { padding: 0; }
+.color-picker-circle::-webkit-color-swatch { border: none; border-radius: 50%; }
+.color-name-input { border: none !important; font-weight: 700; font-size: 14px; width: 100px; padding: 0 !important; color: #1a1a1a; }
+.color-name-input:focus { border: none !important; outline: none !important; }
+.btn-remove-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 12px; font-size: 12px; color: #4a5568; cursor: pointer; }
+.sizes-stock-container { display: flex; flex-direction: column; gap: 8px; max-height: 120px; overflow-y: auto; padding-right: 4px; }
+.size-row-title { font-size: 11px; font-weight: 600; color: #718096; margin: 0; }
+.size-entry-row { display: flex; align-items: center; gap: 8px; }
+.size-entry-row span { font-size: 12px; color: #718096; min-width: 28px; }
+.size-input-small, .stock-input-small { width: 60px !important; text-align: center; padding: 4px 6px !important; border-radius: 8px !important; font-size: 12px !important; }
+.btn-remove-size-row { background: none; border: 1px solid #cbd5e1; border-radius: 6px; color: #a0aec0; cursor: pointer; width: 28px; height: 26px; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.btn-add-size-row { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 600; color: #4a5568; cursor: pointer; width: max-content; }
+.btn-add-variant-group { background: none; border: 1px dashed #cbd5e1; border-radius: 20px; padding: 8px 16px; font-size: 12px; color: #718096; cursor: pointer; width: max-content; transition: background 0.2s; }
+.btn-add-variant-group:hover { background: #f7fafc; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// 1. Unified Dual-Purpose Modal Controller
+function openProductModal(mode, targetElement = null) {
+    const modal = document.getElementById('addProductModal');
+    const form = document.getElementById('productModalForm');
+    const modalTitle = document.querySelector('.modal-header h2');
+    const saveButton = document.querySelector('.btn-modal-save');
+    const fileInput = document.getElementById('productImagesInput');
+
+    if (!modal || !form) return;
+
+    if (mode === 'edit' && targetElement) {
+        // 🟢 A. CONFIGURING FORM FOR EDIT STATE
+        modalTitle.textContent = "Edit Product Parameters";
+        saveButton.textContent = "Update Product";
+        
+        // Grab values safely via native DOM dataset fields
+        const dataset = targetElement.dataset;
+        form.action = `/admin/products/edit/${dataset.id}`;
+        
+        // Image files are optional during a dashboard patch update
+        fileInput.removeAttribute('required');
+
+        // Distribute attributes directly into corresponding inputs
+        form.querySelector('[name="productName"]').value = dataset.name || '';
+        form.querySelector('[name="brand"]').value = dataset.brand || '';
+        form.querySelector('[name="regularPrice"]').value = dataset.price || '';
+        form.querySelector('[name="salePrice"]').value = dataset.saleprice || '';
+        form.querySelector('[name="description"]').value = dataset.desc || '';
+        form.querySelector('[name="countryOfOrigin"]').value = dataset.origin || '';
+        form.querySelector('[name="material"]').value = dataset.material || '';
+        form.querySelector('[name="closureType"]').value = dataset.closure || '';
+        form.querySelector('[name="soleType"]').value = dataset.sole || '';
+        form.querySelector('[name="weight"]').value = dataset.weight || '';
+
+        // Clear dynamic preview canvas frames to avoid cross-pollution
+        document.getElementById('imagesPreviewGallery').innerHTML = "";
+
+    } else {
+        // 🟢 B. RESETTING BACK TO CLEAR INSERT STATE
+        modalTitle.textContent = "Add Product";
+        saveButton.textContent = "Save";
+        form.action = "/admin/products/add";
+        
+        // Standard structural constraints apply here
+        fileInput.setAttribute('required', 'required');
+        
+        form.reset();
+        document.getElementById('imagesPreviewGallery').innerHTML = "";
+        selectedImagesFileList = []; 
+    }
+
+    modal.style.setProperty('display', 'flex', 'important');
+}
+
+// Map the close button action safely back to modal layout resetting parameters
+function toggleModal(show) {
+    if (!show) {
+        const modal = document.getElementById('addProductModal');
+        if (modal) modal.style.setProperty('display', 'none', 'important');
+    }
+}
+
+// 2. SweetAlert Active Status State Management Pipeline
+function confirmProductToggle(button) {
+    const isListed = button.getAttribute('data-listed') === 'true';
+    const itemName = button.getAttribute('data-name');
+    const actionText = isListed ? 'Unlist' : 'List';
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you really want to ${actionText.toLowerCase()} ${itemName}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: isListed ? '#d33' : '#28a745', 
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: `Yes, ${actionText} it!`,
+        width: '320px',             
+        padding: '1rem',
+        customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.close(); 
+            button.closest('form').submit();
+        }
+    });
+}
+
+// 3. Dynamic Variant Initialization Engines
+let colorIndex = 0;
+
+function addColorVariantBlock() {
+    const container = document.getElementById('variantsContainer');
+    if(!container) return;
+    
+    const variantId = colorIndex++;
+    const card = document.createElement('div');
+    card.className = 'variant-card';
+    card.id = `variantCard-${variantId}`;
+    
+    card.innerHTML = `
+        <div class="variant-card-header">
+            <div class="color-input-wrapper">
+                <input type="color" name="variants[${variantId}][colorHex]" value="#1a202c" class="color-picker-circle" oninput="this.style.backgroundColor = this.value">
+                <input type="text" name="variants[${variantId}][colorName]" placeholder="Color Name" value="Black" class="color-name-input" required>
+            </div>
+            <button type="button" class="btn-remove-card" onclick="removeColorBlock(${variantId})">Remove</button>
+        </div>
+        <p class="size-row-title">Sizes & stock:</p>
+        <div id="sizesContainer-${variantId}" class="sizes-stock-container"></div>
+        <button type="button" class="btn-add-size-row" onclick="addSizeRow(${variantId})">+ Add size</button>
+    `;
+    
+    container.appendChild(card);
+    addSizeRow(variantId);
+}
+
+function removeColorBlock(id) {
+    const card = document.getElementById(`variantCard-${id}`);
+    if (card) card.remove();
+}
+
+function addSizeRow(variantId) {
+    const container = document.getElementById(`sizesContainer-${variantId}`);
+    if(!container) return;
+    
+    const rowCount = container.children.length;
+    const row = document.createElement('div');
+    row.className = 'size-entry-row';
+    
+    row.innerHTML = `
+        <span>Size</span>
+        <input type="number" name="variants[${variantId}][sizes][${rowCount}][size]" class="size-input-small" required placeholder="8" min="1">
+        <span>Stock</span>
+        <input type="number" name="variants[${variantId}][sizes][${rowCount}][stock]" class="stock-input-small" required placeholder="10" min="0">
+        <button type="button" class="btn-remove-size-row" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    container.appendChild(row);
+}
+
+// 4. Dynamic Frontend File Previewer Engine with DataTransfer Sync
+let selectedImagesFileList = []; 
+
+function previewSelectedImages(inputElement) {
+    const previewGallery = document.getElementById('imagesPreviewGallery');
+    if (!previewGallery) return;
+
+    const incomingFiles = Array.from(inputElement.files);
+    
+    if (selectedImagesFileList.length + incomingFiles.length > 4) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Upload Limit Exceeded',
+            text: 'You can upload a maximum of 4 product images.',
+            confirmButtonColor: '#e6a800'
+        });
+        inputElement.value = ""; 
+        return;
+    }
+
+    incomingFiles.forEach(file => {
+        selectedImagesFileList.push(file);
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const containerCard = document.createElement('div');
+            containerCard.className = 'preview-image-container';
+            
+            const trackingIndex = selectedImagesFileList.length - 1;
+            containerCard.setAttribute('data-image-index', trackingIndex);
+
+            containerCard.innerHTML = `
+                <img src="${e.target.result}" alt="Preview item">
+                <button type="button" class="preview-remove-badge" onclick="removePreviewImageElement(${trackingIndex})">&times;</button>
+            `;
+            previewGallery.appendChild(containerCard);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    syncInputFilesDataTransfer(inputElement);
+}
+
+function removePreviewImageElement(indexToRemove) {
+    const inputElement = document.getElementById('productImagesInput');
+    const previewGallery = document.getElementById('imagesPreviewGallery');
+    
+    selectedImagesFileList.splice(indexToRemove, 1);
+    
+    if (previewGallery) {
+        previewGallery.innerHTML = "";
+        
+        selectedImagesFileList.forEach((file, newIndex) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const containerCard = document.createElement('div');
+                containerCard.className = 'preview-image-container';
+                containerCard.setAttribute('data-image-index', newIndex);
+                containerCard.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview item">
+                    <button type="button" class="preview-remove-badge" onclick="removePreviewImageElement(${newIndex})">&times;</button>
+                `;
+                previewGallery.appendChild(containerCard);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    syncInputFilesDataTransfer(inputElement);
+}
+
+function syncInputFilesDataTransfer(inputField) {
+    if (!inputField) return;
+    const dataTransferContext = new DataTransfer();
+    selectedImagesFileList.forEach(file => dataTransferContext.items.add(file));
+    inputField.files = dataTransferContext.files;
+}
+
+// Form Interceptor for Validation Constraints
+document.querySelector('.modal-form-body').addEventListener('submit', function(e) {
+    // Only check image length rules on fresh ADD submissions
+    const actionUrl = this.getAttribute('action') || '';
+    if (actionUrl.includes('/admin/products/add') && selectedImagesFileList.length < 3) {
+        e.preventDefault(); 
+        Swal.fire({
+            icon: 'warning',
+            title: 'Images Required',
+            text: 'Please upload at least 3 images before saving the product.',
+            confirmButtonColor: '#e6a800'
+        });
+    }
+});
+
+// 5. Category Cascading Engine Initialization
+const allSubcategories = [];
+{{#each @root.subcategories}}
+allSubcategories.push({
+    name: "{{this.name}}",
+    parent: "{{this.parentCategory}}"
+});
+{{/each}}
+
+document.addEventListener("DOMContentLoaded", () => {
+    if(document.getElementById('variantsContainer')){
+        addColorVariantBlock(); 
+        addColorVariantBlock(); 
+        
+        const secondColorInput = document.querySelector(`#variantCard-1 .color-picker-circle`);
+        const secondColorName = document.querySelector(`#variantCard-1 .color-name-input`);
+        if(secondColorInput && secondColorName) {
+             secondColorInput.value = "#ffffff";
+             secondColorName.value = "White";
+             secondColorInput.style.backgroundColor = "#ffffff";
+        }
+    }
+
+    toggleModal(false);
+
+    const parentSelect = document.getElementById("parentCategorySelect");
+    const subSelect = document.getElementById("subcategorySelect");
+
+    if (parentSelect && subSelect) {
+        parentSelect.addEventListener("change", function() {
+            const selectedParentId = this.value.trim();
+            subSelect.innerHTML = '<option value="">Select Subcategory</option>';
+            if (!selectedParentId) return;
+
+            const matches = allSubcategories.filter(sub => String(sub.parent).trim() === String(selectedParentId));
+            matches.forEach(sub => {
+                const opt = document.createElement("option");
+                opt.value = sub.name;
+                opt.textContent = sub.name;
+                subSelect.appendChild(opt);
+            });
+        });
+    }
+});
+</script>
