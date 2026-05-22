@@ -5,10 +5,10 @@ function showToast(message, type = "success") {
         gravity: "top",
         position: "right",
         style: {
-            background: type === "success" ? "#28a745" : "#dc3545",
+            background: type === "success" ? "#6badb0" : "#dc3545",
             color: "#ffffff",
             borderRadius: "8px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+            boxShadow: "0 4px 12px rgba(18, 18, 18, 0.1)"
         },
         stopOnFocus: true,
     }).showToast();
