@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StepHive</title>
+    <title>StepHyve</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <link rel="stylesheet" href="/css/layout.css">
-    <link rel="stylesheet" href="/css/userlogin.css">
-     <link rel="stylesheet" href="/css/signup.css" >
-       <link rel="stylesheet" href="/css/home.css?v=3">
-    <link rel="stylesheet" href="/css/admin-style.css">
-    <link rel="stylesheet" href="/css/address.css">
-    <link rel="stylesheet" href="/css/forgot.css">
-     <link rel="stylesheet" href="/css/otp.css">
-     <link rel="stylesheet" href="/css/reset.css">
-    
-     <link rel="stylesheet" href="/css/edit-profile.css" >
-    <link rel="stylesheet" href="/css/profile.css">
-    <link rel="stylesheet" href="/css/userSide.css">
-   
+    <link rel="stylesheet" href="/css/reset.css">
+  
+ 
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    {{#if isAdmin}}
+        <link rel="stylesheet" href="/css/admin-style.css">
+    {{else}}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+        <link rel="stylesheet" href="/css/userlogin.css">
+        <link rel="stylesheet" href="/css/signup.css">
+        <link rel="stylesheet" href="/css/home.css?v=3">
+        <link rel="stylesheet" href="/css/address.css">
+        <link rel="stylesheet" href="/css/forgot.css">
+        <link rel="stylesheet" href="/css/otp.css">
+        <link rel="stylesheet" href="/css/edit-profile.css">
+        <link rel="stylesheet" href="/css/profile.css">
+        <link rel="stylesheet" href="/css/userSide.css">
+        <link rel="stylesheet" href="/css/productPage.css">
+        <link rel="stylesheet" href="/css/shop.css">
+        <link rel="stylesheet" href="/css/cart.css">
+    {{/if}}
 </head>
 
 <body class="{{#if isHome}}home-page{{/if}} {{#if isLogin}}login-page{{/if}} {{#if isSignup}}signup-page{{/if}}">
@@ -68,9 +75,11 @@
     <script src="/js/script.js"></script>
 
     {{#unless isAdmin}}
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
         <script src="/js/validation.js"></script>
         <script src="/js/addressModal.js"></script>
-        <script src="/js/profile.js?v=2"></script>
+        <script src="/js/profile.js?v=3"></script>
+        <script src="/js/category.js"></script>
     {{/unless}}
 
 <script>
