@@ -1,0 +1,671 @@
+/* ==========================================================================
+   🧱 MASTER PAGE SKELETON LAYOUTS & CONTAINERS
+   ========================================================================== */
+.shop-container {
+    max-width: 100%;
+    align-items: center;
+    padding: 30px 60px;
+    background-color: #ffffff;
+}
+
+.shop-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* Two-Column Grid: Sidebar on the left, Catalog items on the right */
+.product-grid {
+    display: grid;
+    grid-template-columns: 260px 4fr; 
+    gap: 10px;
+    align-items: start;
+    margin-top: 30px;
+}
+
+/* 🛠️ FIX: Forces the grid to display as a balanced 4-column row on the main Shop Landing page */
+.shop-container .product-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 24px !important;
+}
+
+/* ==========================================================================
+   🎯 BRAND ALIGNMENT ENGINE (BREADCRUMB LEFT, TITLES DEAD CENTER)
+   ========================================================================== */
+.top-content {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 1400px;
+    margin: 0 auto 40px auto !important;
+    padding: 0 10px; 
+    box-sizing: border-box;
+}
+
+/* Forces the breadcrumb path straight to the left margin line */
+.breadcrumb-wrapper {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    margin-bottom: 20px !important;
+}
+
+.breadcrumb {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #64748b !important;
+    text-transform: capitalize !important;
+    margin: 0 !important;
+    letter-spacing: 0.3px;
+}
+
+.gender{
+    font-weight: 700;
+    color: #000000;
+}
+
+/* Centers the main text banners relative to the viewport window */
+.header-group {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+}
+
+.header-group h1 {
+    font-family: 'Inter', -apple-system, sans-serif !important;
+    font-size: 42px !important; 
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 0 14px 0 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+}
+
+.header-group .description {
+    max-width: 650px !important;
+    margin: 0 auto !important;
+    color: #64748b !important;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+}
+
+/* ==========================================================================
+   🧱 PAGINATION SPACING FIX
+   ========================================================================== */
+.pagination-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px;
+    width: 100% !important;
+    margin: 60px auto 30px auto !important; 
+    padding: 20px 0 !important;
+    clear: both !important;
+}
+
+/* Legacy Home Shop Headers */
+.shop-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.shop-header h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    text-transform: capitalize;
+}
+
+.shop-header p {
+    color: #777;
+    font-size: 1rem;
+}
+
+.hero-section {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.hero-content h1 {
+    font-size: 30px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.hero-content p {
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   🎛️ SIDEBAR SELECTION SYSTEM (LEFT COLUMN)
+   ========================================================================== */
+.filter-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+}
+
+.filter-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.clear-all-btn {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ef4444;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+}
+
+.filter-box {
+    margin-bottom: 24px;
+}
+
+.filter-box h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.filter-box label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.filter-box label:hover {
+    color: #0f172a;
+}
+
+/* ==========================================================================
+   👟 PRODUCT CATALOG GRID & CARDS (RIGHT COLUMN)
+   ========================================================================== */
+.products-wrapper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 3fr));
+    gap: 20px;
+    width: 100%;
+    padding: 30px;
+}
+
+.product-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px -5px rgba(15, 23, 42, 0.08);
+    border-color: #cbd5e1;
+}
+
+.product-image {
+    width: 100%;
+    aspect-ratio: 1 / 1; 
+    background-color: #f8fafc;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; 
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.05); 
+}
+
+.product-info {
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+   -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-card-desc {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-action-block {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.product-action-block h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.rec-discover-btn {
+    text-decoration: none;
+    width: 100%;
+}
+
+.rec-discover-btn button {
+    width: 100%;
+    background: #0f172a; 
+    color: #ffffff;
+    border: none;
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.rec-discover-btn button:hover {
+    background: #1e293b;
+}
+
+/* ==========================================================================
+   🏠 HOME PAGE - BEST SELLERS SECTION (RENAMED TO PREVENT COLLISION)
+   ========================================================================== */
+.best-sellers {
+    padding: 10px;
+    background-color: #ffffff;
+}
+
+.best-sellers .section-title {
+    padding: 0 20px;
+}
+
+/* Target shelf layout explicitly through the parent class container */
+.best-sellers .best-sellers-shelf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.best-sellers .product-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.best-sellers .product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: contain; 
+    background-color: #f8fafc;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 0 0 16px 0;
+    display: block;
+}
+
+.best-sellers .add-btn {
+    width: 100%;
+    background: #0f172a; 
+    color: #ffffff;
+    border: none;
+    padding: 10px 14px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: auto; 
+    transition: background 0.2s ease;
+}
+
+.best-sellers .add-btn:hover {
+    background: #1e293b;
+}
+
+/* ==========================================================================
+   🎛️ PAGINATION STRUCTURAL ENGINE (BREAKOUT PERFECT CENTER)
+   ========================================================================== */
+.pagination-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px;
+    width: 100% !important;
+    margin: 50px auto 20px auto !important;
+    padding: 20px 0;
+    clear: both !important;
+}
+
+.next, 
+.active,
+.pagination-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background-color: #0f172a; 
+    color: #ffffff;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #0f172a;
+    border-radius: 20px; 
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.next {
+    border-style: none !important;
+}
+
+.next:hover {
+    background-color: #1e293b;
+    transform: translateY(-1px);
+}
+
+.active {
+    background-color: #0f172a;
+    color: #ffffff;
+    cursor: default;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+/* ==========================================================================
+   🖼️ MARKETING CARDS, CAROUSELS, AND BANNERS
+   ========================================================================== */
+.collection-row {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.collection-card {
+    flex: 1;
+    position: relative;
+    height: 400px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.collection-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.collection-card:hover img {
+    transform: scale(1.1);
+}
+
+.collection-overlay {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: right;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #111;
+}
+
+.section-container {
+    margin-bottom: 60px;
+}
+
+.category-grid {
+    padding: 30px 40px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.category-grid img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.cat-card-running, .cat-card-casual, .cat-card-training, .cat-card-limited {
+    height: 210px;
+    width: 100%;
+    border-radius: 16px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.cat-card-running  { background-color: #d40f0f; }
+.cat-card-casual   { background-color: #000000; }
+.cat-card-training { background-color: #000000; }
+.cat-card-limited  { background-color: #94d008c0; }
+
+.product-img-box {
+    background-color: #f8f8f8;
+    border-radius: 24px;
+    padding: 30px;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.summer-sale-banner {
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+    border-radius: 24px;
+    padding: 50px 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    margin-bottom: 40px;
+}
+
+.sale-info h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.collection-banners {
+    display: flex;
+    gap: 40px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+.banner {
+    flex: 1;
+    position: relative;
+    height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+.banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.banner:hover img {
+    transform: scale(1.05);
+}
+
+.banner-label {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    color: #fff;
+    font-size: 25px;
+    font-weight: 700;
+    text-align: right;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.categories-section {
+    padding: 0 50px;
+    background-color: #ffffff;
+}
+
+.category-label {
+    position: absolute;
+    padding-left: 12px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.category-label p{
+    font-size: 8px;
+    font-weight: 400;
+}
+
+.no-products {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 0;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+}
+
+.no-products p {
+    color: #64748b;
+    font-size: 15px;
+    margin: 0;
+}
+
+/* ==========================================================================
+   📱 RESPONSIVE SYSTEM MEDIA BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 992px) {
+    .product-grid {
+        grid-template-columns: 1fr; 
+        gap: 30px;
+    }
+    .shop-container .product-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .best-sellers .best-sellers-shelf-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+    }
+    .shop-container .product-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .pagination-container {
+        gap: 6px;
+        margin-top: 30px;
+    }
+    
+    .next, .active {
+        min-width: 36px;
+        height: 36px;
+        font-size: 12px;
+        padding: 0 10px;
+    }
+}
+
+/* Unlocks a clean, independent 4-column row layout explicitly on the main shop view */
+.product-grid-shop.main-layout {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 30px;
+}

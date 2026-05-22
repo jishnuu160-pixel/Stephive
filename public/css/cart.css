@@ -1,0 +1,323 @@
+/* ==========================================================================
+   1. Setup & Background Page Color
+ */
+
+
+/* .cart-container {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 20px;
+} */
+
+/* ==========================================================================
+   2. Header Element Top Styles
+   /* ========================================================================== */
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    padding: 40px;
+}
+
+.breadcrumbs {
+    font-size: 12px;
+    font-weight: 400;
+    color: #a0a0a0;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.breadcrumbs .active {
+    color: #111;
+}
+
+.cart-header h1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #162421;
+}
+
+.cart-header .item-count {
+    font-weight: 400;
+    color: #ffffff;
+    font-size: 12px;
+}
+
+.continue-shopping-btn {
+    background-color: transparent;
+    border: 1px solid #c0cdc6;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 12px;
+    color: #607068;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.continue-shopping-btn:hover {
+    background-color: #162421;
+    color: #fff;
+    border-color: #162421;
+}
+
+/* ==========================================================================
+   3. Main Products Row (Cart Cards List)
+   ========================================================================== */
+.cart-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.cart-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cart-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.item-image-wrapper {
+    width: 90px;
+    height: 90px;
+    background-color: #111;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-details {
+    flex: 1;
+    padding-left: 20px;
+}
+
+.item-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1c2b27;
+    margin-bottom: 4px;
+}
+
+.item-specs {
+    font-size: 0.65rem;
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+}
+
+.item-pricing-row {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.item-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #162421;
+}
+
+/* Rounded Dark Quantity Counter Badge */
+.quantity-selector {
+    background-color: #050b09;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    gap: 14px;
+}
+
+.qty-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.qty-val {
+    color: #ffffff;
+    font-size: 0.8rem;
+    min-width: 10px;
+    text-align: center;
+}
+
+/* Card End Right Elements (Delete & Subtotal layout) */
+.item-actions-subtotal {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 90px;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #a4b3ab;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.2s ease;
+}
+
+.delete-btn:hover {
+    color: #e53e3e;
+}
+
+.subtotal-box {
+    text-align: right;
+}
+
+.subtotal-label {
+    display: block;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: #a4b3ab;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+.subtotal-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #162421;
+}
+
+/* ==========================================================================
+   4. Centered Order Summary Section Card
+   ========================================================================== */
+.summary-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.summary-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px; /* Aligns container sizing centered like capture sample */
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.summary-card h3 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #162421;
+    margin-bottom: 24px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #83948c;
+    margin-bottom: 14px;
+    font-weight: 500;
+}
+
+.summary-row span:last-child {
+    color: #162421;
+    font-weight: 700;
+}
+
+.summary-row .free-text {
+    color: #83948c !important;
+    font-weight: 500 !important;
+}
+
+.summary-divider {
+    border: none;
+    border-top: 1px solid #e2ebd9;
+    margin: 20px 0;
+}
+
+/* Total Price Row */
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.total-label-box {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.total-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #99a6a0;
+}
+
+.total-subtitle {
+    font-size: 12px;
+    font-weight: 800;
+    color: #162421;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.total-price {
+    font-size: 16px;
+    font-weight: 800;
+    color: #162421;
+}
+
+/* Blue Checkout Button */
+.checkout-btn {
+    background-color: #5d72f7;
+    color: #ffffff;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    border-radius: 30px;
+    font-size:13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(93, 114, 247, 0.3);
+    transition: background-color 0.2s ease;
+}
+
+.checkout-btn:hover {
+    background-color: #485be3;
+}
+
+.checkout-btn .arrow {
+    font-size: 1.1rem;
+}
+
+.security-text {
+    text-align: center;
+    font-size: 0.65rem;
+    color: #a4b3ab;
+    margin-top: 18px;
+    font-weight: 500;
+}
