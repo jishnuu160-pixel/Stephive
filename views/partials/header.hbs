@@ -1,19 +1,30 @@
-
 <header class="navbar">
-   <div class="logo">StepHive</div>
+   <div class="logo">StepHyve</div>
     <nav class="nav-links">
         <a href="/">Home</a>
-        <a href="">Shop</a>
+        <a href="/shop">Shop</a>
         <a href="">About</a>
     </nav>
     <div class="icons">
-        <img class="nav-icons" src="/icons/search (2).png" >
-       <img class="nav-icons" src="/icons/wishlist.png">
-      <img class="nav-icons" src="/icons/cart.png" >
+        <form action="/shop" method="GET" class="search-form">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search..." 
+                value="{{currentSearch}}"
+                class="search-input"
+            >
+            <button type="submit" class="search-submit-btn">
+                <img class="nav-icons" src="/icons/search (2).png" alt="Search">
+            </button>
+        </form>
+
+        <img class="nav-icons" src="/icons/wishlist.png">
+        <a href="/user/cart"><img class="nav-icons" src="/icons/cart.png" ></a>
 
       {{#if user}}
       <a href="/user/profile">
-      <img class="nav-icons" src="/icons/user.png">
+          <img class="nav-icons" src="/icons/user.png">
       </a>
       {{/if}}
     </div>
