@@ -14,8 +14,10 @@ import {
     getVerifyPasswordOTP,getResendOTP,
     postChangePassword,postVerifyPasswordOTP,
     updateAvatar,uploadAvatar,
-    sendEmailChangeOTP,googleAuthSuccess
+    sendEmailChangeOTP,googleAuthSuccess,
+    getCart
 } from '../controllers/userController.js';
+import { addToCart } from '../controllers/cartController.js';
 import { isUserAuthenticated, isUserLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
 
 import passport from 'passport';
@@ -33,6 +35,12 @@ router.post('/signup', isUserLoggedOut, postSignup);
 
 router.get('/login', isUserLoggedOut, getLogin);
 router.post('/login', isUserLoggedOut, postLogin); 
+
+
+router.get('/cart',getCart);
+
+
+
 
 
 router.get('/forgot-password', isUserLoggedOut, getForgot);
@@ -73,6 +81,9 @@ router.get('/auth/google/callback',
     googleAuthSuccess
 );
 
+router.post('/cart/add', addToCart);
+router.get('/cart',getCart);
+
 router.use(isUserAuthenticated);
 
 router.get('/profile', isUserAuthenticated, getProfile);
@@ -103,9 +114,27 @@ router.get('/update-password-init', isUserAuthenticated, sendUpdatePasswordOTP);
 router.get('/verify-password-otp', isUserAuthenticated, getVerifyPasswordOTP);
 router.post('/verify-password-otp', isUserAuthenticated, postVerifyPasswordOTP);
 
+router.post('/update-avatar', isUserAuthenticated, (req, res, next) => {
+    uploadAvatar.single('profileImage')(req, res, function (err) {
+        
+        if (err) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.' 
+            });
+        }
+        
+        if (!req.file) {
+            console.error("❌ Request arrived but req.file is undefined.");
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.' 
+            });
+        }
 
-
-router.post('/update-avatar', isUserAuthenticated, uploadAvatar.single('profileImage'),updateAvatar);
-
+        console.log("✅ File passed backend validation successfully:", req.file.filename);
+        next();
+    });
+}, updateAvatar);
 
 export default router;

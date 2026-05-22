@@ -1,18 +1,78 @@
 import express from 'express';
-import { getAdminLogin, postAdminLogin, getDashboard, getCustomers, toggleUserStatus, adminLogout } from '../controllers/adminController.js';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { 
+    getAdminLogin, 
+    postAdminLogin, 
+    getDashboard, 
+    getCustomers, 
+    toggleUserStatus, 
+    adminLogout, 
+    getCategories, 
+    getProducts, 
+    toggleListing, 
+    getAddProduct, 
+    postAddProduct,
+    postAddCategory,
+    toggleProductStatus,
+    updateCategory,
+    postEditProduct
+} from '../controllers/adminController.js';
 import { isAdminAuthenticated, isAdminLoggedOut, preventCache } from '../middleware/adminAuth.js';
 
 const router = express.Router();
 
 router.use(preventCache);
 
+
+const uploadPath = path.join(process.cwd(), 'public/uploads/products');
+
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadPath); 
+    },
+    filename: (req, file, cb) => {
+        cb(null, `product-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`);
+    }
+});
+
+
+const upload = multer({ storage: storage });
+
+
+// --- Admin Login Routes ---
 router.get('/login', isAdminLoggedOut, getAdminLogin);
 router.post('/login', postAdminLogin);
 
+// --- Admin Core Dashboard Routes ---
 router.get('/dashboard', isAdminAuthenticated, getDashboard);
 router.get('/customers', isAdminAuthenticated, getCustomers);
 router.post('/customers/toggle-status/:id', isAdminAuthenticated, toggleUserStatus);
 
-router.get('/logout',  adminLogout);
+// --- Admin Product Management Routes ---
+router.get('/products', isAdminAuthenticated, getProducts);
+router.get('/products/add', isAdminAuthenticated, getAddProduct);
+router.post('/products/edit/:id', isAdminAuthenticated, postEditProduct);
+router.post('/products/toggle-status/:id',toggleProductStatus);
+
+router.post(
+    '/products/add', 
+    isAdminAuthenticated, 
+    upload.array('productImages', 4), 
+    postAddProduct
+);
+
+//--- Admin Categories Routes ---
+router.get('/categories', isAdminAuthenticated, getCategories);
+router.post('/categories/toggle-status/:id', isAdminAuthenticated, toggleListing);
+router.post('/categories/add', isAdminAuthenticated, postAddCategory);
+router.post('/categories/edit/:id',isAdminAuthenticated, updateCategory);
+
+router.get('/logout', adminLogout);
 
 export default router;
