@@ -1,191 +1,211 @@
+document.addEventListener('DOMContentLoaded', function () {
 
-document.addEventListener('DOMContentLoaded', function() {
-    
+    /* =========================
+       GENDER UPDATE
+    ========================= */
     const genderSelect = document.getElementById('genderSelect');
+
     if (genderSelect) {
-        genderSelect.addEventListener('change', async function() {
-            const selectedGender = this.value;
+        genderSelect.addEventListener('change', async function () {
+
             try {
                 const response = await fetch('/user/update-gender', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ gender: selectedGender }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ gender: this.value })
                 });
 
                 const result = await response.json();
-                if (result.success) {
-                    console.log("Gender updated to:", selectedGender);
-                }
-            } catch (error) {
-                console.error("Error saving gender:", error);
+if (result.success) {
+
+ const newUrl = result.profileImage + "?t=" + Date.now();
+
+document.querySelectorAll('.user-avatar')
+    .forEach(img => {
+        img.src = newUrl;
+    });
+
+    modal.style.display = 'none';
+    fileInput.value = "";
+
+    if (cropper) cropper.destroy();
+
+    showToast(result.message || "Profile updated", "success");
+}
+
+            } catch (err) {
+                console.error("Gender update error:", err);
+                showToast("Something went wrong", "error");
             }
         });
     }
 
-    const avatarInput = document.getElementById('avatar-upload');
-    if (avatarInput) {
-        avatarInput.addEventListener('change', async function() {
-            const file = this.files[0]; 
-            
-            if (file) {
-                console.log("File selected:", file.name);
+    /* =========================
+       AVATAR + CROPPER FLOW
+    ========================= */
 
-                if (file.size > 2 * 1024 * 1024) {
-                    return alert("File is too large! Please choose an image under 2MB.");
-                }
+    const fileInput = document.getElementById('avatar-upload');
+    const previewImg = document.getElementById('profile-preview');
 
-                const formData = new FormData();
-               
-                formData.append('profileImage', file);
+    const modal = document.getElementById('cropperModal');
+    const cropImage = document.getElementById('image-to-crop');
+    const cancelBtn = document.getElementById('cancelCropBtn');
+    const saveBtn = document.getElementById('saveCropBtn');
 
-                try {
-                    console.log("Attempting upload to server...");
-                    
-                    const response = await axios.post('/user/update-avatar', formData, {
-                        headers: { 'Content-Type': 'multipart/form-data' }
-                    });
+    let cropper;
 
-                    if (response.data.success) {
-                        console.log("Upload successful!");
-                       
-                        document.getElementById('profile-preview').src = response.data.imagePath;
-                        alert("Profile picture updated successfully!"); 
-                        window.location.reload(); 
-                    }
-                } catch (err) {
-                    console.error("Upload error details:", err.response ? err.response.data : err);
-                    alert("Error uploading image. Please try again.");
-                }
-            }
-        });
-    } else {
-        console.warn("Could not find 'avatar-upload' input on this page.");
-    }
-});
+    if (!fileInput) return;
 
-let cropperInstance;
-const fileInputElement = document.getElementById('avatar-upload');
-const imagePreviewElement = document.getElementById('profile-preview');
-const cropperModal = document.getElementById('cropperModal');
-const imageToCropCanvas = document.getElementById('image-to-crop');
-const cancelCropBtn = document.getElementById('cancelCropBtn');
-const saveCropBtn = document.getElementById('saveCropBtn');
+    fileInput.addEventListener('change', function (e) {
 
-    fileInputElement.addEventListener('change', function(e) {
-       
-        const files = this.files || (e.target && e.target.files);
-        
-        if (!files || files.length === 0) {
-            console.warn("No files selected or file retrieval cancelled.");
-            return;
-        }
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
 
-        const selectedFile = files; 
-
-        if (!selectedFile) {
-            alert("Error reading file properties. Please try re-selecting a different file layout.");
-            fileInputElement.value = '';
-            return;
-        }
-
-        console.log("File selected successfully:", selectedFile.name);
+        const selectedFile = files[0];
 
         if (selectedFile.size > 2 * 1024 * 1024) {
-            alert("File is too large! Please choose an image under 2MB.");
-            fileInputElement.value = '';
+            showToast("File too large (max 2MB)", "error");
+            fileInput.value = "";
             return;
         }
 
-        const fileName = selectedFile.name.toLowerCase();
-        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-        const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
 
-        const validImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        const isMimeValid = selectedFile.type && validImageTypes.includes(selectedFile.type);
-
-        if (!hasValidExtension && !isMimeValid) {
-            alert('Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.');
-            fileInputElement.value = ''; 
-            return; 
+        if (!allowed.includes(selectedFile.type)) {
+            showToast("Only JPG, PNG, WEBP allowed", "error");
+            fileInput.value = "";
+            return;
         }
 
         const reader = new FileReader();
-        reader.onload = function(event) {
-            imageToCropCanvas.src = event.target.result;
-            cropperModal.style.display = 'flex';
 
-            if (cropperInstance) cropperInstance.destroy();
+        reader.onload = function (event) {
 
-            cropperInstance = new Cropper(imageToCropCanvas, {
-                aspectRatio: 1, 
+            cropImage.src = event.target.result;
+            modal.style.display = 'flex';
+
+            if (cropper) cropper.destroy();
+
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1,
                 viewMode: 1,
-                background: false,
-                responsive: true,
-                autoCropArea: 1
+                autoCropArea: 1,
+                background: false
             });
         };
+
         reader.readAsDataURL(selectedFile);
     });
 
-cancelCropBtn.addEventListener('click', function() {
-    cropperModal.style.display = 'none';
-    fileInputElement.value = ''; 
-    if (cropperInstance) cropperInstance.destroy();
-});
+    /* =========================
+       CANCEL CROPPING
+    ========================= */
 
-saveCropBtn.addEventListener('click', function() {
-    if (!cropperInstance) return;
-
-    const canvasDetails = cropperInstance.getCroppedCanvas({
-        width: 250,
-        height: 250
-    });
-
-    if (!canvasDetails) {
-        alert('Could not generate cropped canvas.');
-        return;
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+            modal.style.display = 'none';
+            fileInput.value = "";
+            if (cropper) cropper.destroy();
+        });
     }
 
-    canvasDetails.toBlob(function(imageBlob) {
-        if (!imageBlob) {
-            alert('Error processing image data.');
-            return;
-        }
+    /* =========================
+       SAVE CROPPED IMAGE
+    ========================= */
 
-        const transmissionForm = new FormData();
-        transmissionForm.append('profileImage', imageBlob, 'avatar.png');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function () {
 
-        fetch('/user/update-avatar', { 
-            method: 'POST',
-            body: transmissionForm
-        })
-        .then(async (response) => {
-            const resultData = await response.json();
-            
-            if (response.ok && resultData.success) {
-                imagePreviewElement.src = resultData.imagePath;
-                
-                const companionAvatars = document.querySelectorAll('.admin-photo, .user-sidebar-avatar');
-                companionAvatars.forEach(imgElement => {
-                    imgElement.src = resultData.imagePath;
-                });
+            if (!cropper) return;
 
-                cropperModal.style.display = 'none';
-                if (cropperInstance) cropperInstance.destroy();
-                fileInputElement.value = ''; 
-            } else {
-                alert(resultData.message || 'Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.');
-                cropperModal.style.display = 'none';
-                fileInputElement.value = '';
-                if (cropperInstance) cropperInstance.destroy();
-            }
-        })
-        .catch(err => {
-            console.error('Systemic transmission failure:', err);
-            alert('Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.');
-            cropperModal.style.display = 'none';
-            fileInputElement.value = '';
-            if (cropperInstance) cropperInstance.destroy();
+            const canvas = cropper.getCroppedCanvas({
+                width: 250,
+                height: 250
+            });
+
+            canvas.toBlob(async function (blob) {
+
+                const formData = new FormData();
+                formData.append('profileImage', blob, 'avatar.png');
+
+                try {
+                    const response = await fetch('/user/update-avatar', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+
+                        previewImg.src = result.profileImage + "?t=" + Date.now();
+
+                      document.querySelectorAll('.user-avatar')
+                            .forEach(img => {
+                                img.src = result.profileImage + "?t=" + Date.now();
+                            });
+
+                        modal.style.display = 'none';
+                        fileInput.value = "";
+
+                        if (cropper) cropper.destroy();
+
+                        showToast(result.message || "Profile updated", "success");
+
+                    } else {
+                        showToast(result.message || "Upload failed", "error");
+                    }
+
+                } catch (err) {
+                    console.error("Upload error:", err);
+                    showToast("Something went wrong", "error");
+                }
+
+            }, 'image/png');
         });
-    }, 'image/png'); 
+    }
+
 });
+
+/* =========================
+   TOAST FUNCTION
+========================= */
+
+function showToast(message, type = "success") {
+    const toast = document.createElement("div");
+
+    toast.innerText = message;
+
+    toast.style.position = "fixed";
+    toast.style.top = "20px";
+    toast.style.right = "20px";
+    toast.style.padding = "12px 18px";
+    toast.style.borderRadius = "8px";
+    toast.style.color = "#fff";
+    toast.style.fontSize = "14px";
+    toast.style.zIndex = "9999";
+    toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    toast.style.opacity = "0";
+    toast.style.transition = "all 0.3s ease";
+
+    if (type === "success") {
+        toast.style.background = "#22c55e";
+    } else if (type === "error") {
+        toast.style.background = "#ef4444";
+    } else {
+        toast.style.background = "#3b82f6";
+    }
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "1";
+    }, 100);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
