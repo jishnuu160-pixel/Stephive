@@ -1,3 +1,5 @@
+{{#unless searchValue}}
+
 
 
 <div class="shop-container">
@@ -77,3 +79,67 @@
 </section>
 </div>
 
+{{/unless}}
+
+{{#if searchValue}}
+<section class="shop-products-section">
+
+    {{#if searchValue}}
+        <h2>
+            Search Results For "{{searchValue}}"
+        </h2>
+    {{else}}
+        <h2>All Products</h2>
+    {{/if}}
+
+    <div class="products-wrapper-grid">
+
+        {{#each products}}
+
+        <div class="product-card">
+
+            <div class="product-image">
+
+                {{#if this.productImage}}
+                    <img
+                        src="/uploads/{{lookup this.productImage 0}}"
+                        alt="{{this.productName}}"
+                    >
+                {{else}}
+                    <img
+                        src="/images/default-shoe.png"
+                        alt="Product"
+                    >
+                {{/if}}
+
+            </div>
+
+            <div class="product-info">
+
+                <h3>{{this.productName}}</h3>
+
+                <p>{{this.description}}</p>
+
+                <h4>₹{{this.regularPrice}}</h4>
+                
+
+                <a href="/details/{{this._id}}" class="rec-discover-btn">
+                  <button type="button">DISCOVER MORE</button>
+                </a>
+
+            </div>
+
+        </div>
+
+        {{else}}
+
+        <div class="no-products">
+            <p>No products found</p>
+        </div>
+
+        {{/each}}
+
+    </div>
+
+</section>
+{{/if}}
