@@ -46,13 +46,6 @@ export const saveOTP = async (email, otp) => {
     }
 };
 
-export const findById = async (id) => {
-    try {
-        return await User.findById(id).lean();
-    } catch (error) {
-        throw new Error('Error fetching user by ID');
-    }
-};
 
 
 export const addAddress = async (userId, addressData) => {
@@ -111,5 +104,14 @@ export const updateUserInfo = async (userId, updateData) => {
     } catch (error) {
         console.error("Repository Error (updateUserInfo):", error.message);
         throw new Error("Failed to update user in database");
+    }
+};
+
+
+export const findById = async (userId) => {
+    try {
+        return await User.findById(userId).lean();
+    } catch (error) {
+        throw new Error('Error finding user by ID');
     }
 };
