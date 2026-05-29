@@ -28,10 +28,13 @@ app.engine('hbs', engine({
         path.join(process.cwd(), 'views/admin/partials') 
     ],
     helpers: {
-    eq: (a, b) => a === b,
+   eq: (a, b) => a?.toString() === b?.toString(),
     add: (a, b, c) => a + b + c,
     subtract: (a, b) => (a || 0) - (b || 0),
     multiply: (a, b) => (a || 0) * (b || 0),
+    json: (context) => {
+            return JSON.stringify(context, null, 2);
+        },
     toLowerCase: (str) =>
         (typeof str === 'string' ? str.toLowerCase() : ''),
     firstVariantSizes: (variants) => {
@@ -52,7 +55,12 @@ app.engine('hbs', engine({
             return variants[0];
         }
         return null;
-    }
+    },
+    toString: function(value) {
+    return value.toString();
+},
+  toUpperCase: (str) =>
+    (typeof str === 'string' ? str.toUpperCase() : '')  
 }
 }));
 
@@ -88,6 +96,8 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
 
@@ -112,6 +122,6 @@ app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/', homeRoutes);
 app.use('/',productRoutes);
-app.use('/',cartRoutes);
+app.use('/user/cart', cartRoutes);
 
 export default app;
