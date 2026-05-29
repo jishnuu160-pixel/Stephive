@@ -17,7 +17,7 @@
                     </form>
                 </div>
 
-               <button type="button" onclick="openProductModal('add')" class="btn-cat">Add Product</button>
+              <a href="/admin/products/add" class="btn-cat">Add Product</a>
             </div>
         </div>
 
@@ -86,25 +86,11 @@
                     </td>
                     <td>
                         <div style="display: flex; gap: 8px;">
-                            <button 
-                                type="button" 
-                                class="btn-edit-small" 
-                                data-id="{{this._id}}"
-                                data-name="{{this.productName}}"
-                                data-brand="{{this.brand}}"
-                                data-price="{{this.regularPrice}}"
-                                data-saleprice="{{this.salePrice}}"
-                                data-desc="{{this.description}}"
-                                data-origin="{{this.countryOfOrigin}}"
-                                data-material="{{this.material}}"
-                                data-closure="{{this.closureType}}"
-                                data-sole="{{this.soleType}}"
-                                data-weight="{{this.weight}}"
-                                onclick="openProductModal('edit', this)">
-                                Edit
-                            </button>
+                        <a href="/admin/products/edit/{{this._id}}" class="btn-edit-small">
+                                  Edit
+                         </a>
 
-                            <form action="/admin/products/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
+                             <form action="/admin/products/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
                                 <button 
                                     type="button"
                                     class="btn-unlist-small {{#if this.isListed}}active{{else}}inactive{{/if}}"
@@ -140,115 +126,11 @@
         {{/if}}
     </div>
 </div>
-
-
-<div class="admin-toast-container"></div>
-
-<div id="addProductModal" class="custom-modal-overlay" style="display: none;">
-    <div class="custom-modal-content">
-        <div class="modal-header">
-            <h2>Add Product</h2>
-            <button type="button" class="close-modal-btn" onclick="toggleModal(false)">&times;</button>
-        </div>
         
-        <form id="productModalForm" method="POST" enctype="multipart/form-data" class="modal-form-body">
-            
-            <div class="form-row split-row4">
-                <div class="form-group">
-                    <label>SHOE NAME</label>
-                    <input type="text" name="productName" required placeholder="e.g., Curv Shoe">
-                </div>
-                <div class="form-group">
-                    <label>BRAND</label>
-                    <input type="text" name="brand" required placeholder="e.g., Curv">
-                </div>
-                <div class="form-group">
-                    <label>BASE PRICE</label>
-                    <input type="number" name="regularPrice" required placeholder="₹0.00">
-                </div>
-                <div class="form-group">
-                    <label>SALES PRICE</label>
-                    <input type="number" name="salePrice" placeholder="₹0.00">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>DESCRIPTION</label>
-                <input type="text" name="description" required placeholder="Comfortable everyday sneaker">
-            </div>
-
-            <div class="form-row split-row">
-                <div class="form-group">
-                    <label>PARENT CATEGORY</label>
-                    <select name="parentCategory" id="parentCategorySelect" required>
-                        <option value="">Select Parent Category</option>
-                        {{#each @root.parentCategories}}
-                            <option value="{{this._id}}">{{this.name}}</option>
-                        {{/each}}
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>CATEGORY NAME</label>
-                    <select name="category" id="subcategorySelect" required>
-                        <option value="">Select Subcategory</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="variants-section">
-                <label class="section-main-label">Variants</label>
-                <div id="variantsContainer" class="variants-grid-wrapper"></div>
-                
-                <button type="button" class="btn-add-variant-group" onclick="addColorVariantBlock()">
-                    <i class="fas fa-plus"></i> + Add another color variant
-                </button>
-            </div>
-
-            <div class="form-row dynamic-spec-grid">
-                <div class="form-group">
-                    <label>COUNTRY OF ORIGIN</label>
-                    <input type="text" name="countryOfOrigin" placeholder="India">
-                </div>
-                <div class="form-group">
-                    <label>MATERIAL</label>
-                    <input type="text" name="material" placeholder="Leather">
-                </div>
-                <div class="form-group">
-                    <label>CLOSURE TYPE</label>
-                    <input type="text" name="closureType" placeholder="Lace up">
-                </div>
-                <div class="form-group">
-                    <label>SOLE TYPE</label>
-                    <input type="text" name="soleType" placeholder="Rubber">
-                </div>
-                <div class="form-group">
-                    <label>WEIGHT</label>
-                    <input type="text" name="weight" placeholder="300g">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>PRODUCT IMAGES (MIN 3, MAX 4)</label>
-                <div class="image-drag-dropzone">
-                    <input type="file" name="productImages" id="productImagesInput" multiple accept="image/*" required class="hidden-file-input" onchange="previewSelectedImages(this)">
-                    <div class="dropzone-inner-ui" id="dropzoneUiWrapper">
-                        <span class="camera-icon">📷</span>
-                        <p class="main-drop-text">Click to upload or drag and drop</p>
-                        <p class="sub-drop-text">JPG, PNG up to 5MB (Upload 3-4 images)</p>
-                    </div>
-                </div>
-                <div id="imagesPreviewGallery" class="images-preview-gallery"></div>
-            </div>
-
-            <div class="modal-action-footer">
-                <button type="button" class="btn-modal-cancel" onclick="toggleModal(false)">Cancel</button>
-                <button type="submit" class="btn-modal-save">Save</button>
-            </div>
-        </form>
     </div>
 </div>
 
+<div class="admin-toast-container"></div>
 
 <style>
 .custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 99999 !important; }
@@ -313,71 +195,13 @@
 .btn-add-variant-group:hover { background: #f7fafc; }
 </style>
 
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-// 1. Unified Dual-Purpose Modal Controller
-function openProductModal(mode, targetElement = null) {
-    const modal = document.getElementById('addProductModal');
-    const form = document.getElementById('productModalForm');
-    const modalTitle = document.querySelector('.modal-header h2');
-    const saveButton = document.querySelector('.btn-modal-save');
-    const fileInput = document.getElementById('productImagesInput');
 
-    if (!modal || !form) return;
 
-    if (mode === 'edit' && targetElement) {
-        // 🟢 A. CONFIGURING FORM FOR EDIT STATE
-        modalTitle.textContent = "Edit Product Parameters";
-        saveButton.textContent = "Update Product";
-        
-        // Grab values safely via native DOM dataset fields
-        const dataset = targetElement.dataset;
-        form.action = `/admin/products/edit/${dataset.id}`;
-        
-        // Image files are optional during a dashboard patch update
-        fileInput.removeAttribute('required');
 
-        // Distribute attributes directly into corresponding inputs
-        form.querySelector('[name="productName"]').value = dataset.name || '';
-        form.querySelector('[name="brand"]').value = dataset.brand || '';
-        form.querySelector('[name="regularPrice"]').value = dataset.price || '';
-        form.querySelector('[name="salePrice"]').value = dataset.saleprice || '';
-        form.querySelector('[name="description"]').value = dataset.desc || '';
-        form.querySelector('[name="countryOfOrigin"]').value = dataset.origin || '';
-        form.querySelector('[name="material"]').value = dataset.material || '';
-        form.querySelector('[name="closureType"]').value = dataset.closure || '';
-        form.querySelector('[name="soleType"]').value = dataset.sole || '';
-        form.querySelector('[name="weight"]').value = dataset.weight || '';
-
-        // Clear dynamic preview canvas frames to avoid cross-pollution
-        document.getElementById('imagesPreviewGallery').innerHTML = "";
-
-    } else {
-        // 🟢 B. RESETTING BACK TO CLEAR INSERT STATE
-        modalTitle.textContent = "Add Product";
-        saveButton.textContent = "Save";
-        form.action = "/admin/products/add";
-        
-        // Standard structural constraints apply here
-        fileInput.setAttribute('required', 'required');
-        
-        form.reset();
-        document.getElementById('imagesPreviewGallery').innerHTML = "";
-        selectedImagesFileList = []; 
-    }
-
-    modal.style.setProperty('display', 'flex', 'important');
-}
-
-// Map the close button action safely back to modal layout resetting parameters
-function toggleModal(show) {
-    if (!show) {
-        const modal = document.getElementById('addProductModal');
-        if (modal) modal.style.setProperty('display', 'none', 'important');
-    }
-}
-
-// 2. SweetAlert Active Status State Management Pipeline
 function confirmProductToggle(button) {
     const isListed = button.getAttribute('data-listed') === 'true';
     const itemName = button.getAttribute('data-name');
@@ -422,7 +246,7 @@ function addColorVariantBlock() {
         <div class="variant-card-header">
             <div class="color-input-wrapper">
                 <input type="color" name="variants[${variantId}][colorHex]" value="#1a202c" class="color-picker-circle" oninput="this.style.backgroundColor = this.value">
-                <input type="text" name="variants[${variantId}][colorName]" placeholder="Color Name" value="Black" class="color-name-input" required>
+                <input type="text" name="variants[${variantId}][colorName]" placeholder="Color Name" value="Black" class="color-name-input" >
             </div>
             <button type="button" class="btn-remove-card" onclick="removeColorBlock(${variantId})">Remove</button>
         </div>
@@ -450,9 +274,9 @@ function addSizeRow(variantId) {
     
     row.innerHTML = `
         <span>Size</span>
-        <input type="number" name="variants[${variantId}][sizes][${rowCount}][size]" class="size-input-small" required placeholder="8" min="1">
+        <input type="number" name="variants[${variantId}][sizes][${rowCount}][size]" class="size-input-small"  placeholder="8" min="1">
         <span>Stock</span>
-        <input type="number" name="variants[${variantId}][sizes][${rowCount}][stock]" class="stock-input-small" required placeholder="10" min="0">
+        <input type="number" name="variants[${variantId}][sizes][${rowCount}][stock]" class="stock-input-small"  placeholder="10" min="0">
         <button type="button" class="btn-remove-size-row" onclick="this.parentElement.remove()">&times;</button>
     `;
     
@@ -537,20 +361,7 @@ function syncInputFilesDataTransfer(inputField) {
     inputField.files = dataTransferContext.files;
 }
 
-// Form Interceptor for Validation Constraints
-document.querySelector('.modal-form-body').addEventListener('submit', function(e) {
-    // Only check image length rules on fresh ADD submissions
-    const actionUrl = this.getAttribute('action') || '';
-    if (actionUrl.includes('/admin/products/add') && selectedImagesFileList.length < 3) {
-        e.preventDefault(); 
-        Swal.fire({
-            icon: 'warning',
-            title: 'Images Required',
-            text: 'Please upload at least 3 images before saving the product.',
-            confirmButtonColor: '#e6a800'
-        });
-    }
-});
+
 
 // 5. Category Cascading Engine Initialization
 const allSubcategories = [];
