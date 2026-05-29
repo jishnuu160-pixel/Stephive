@@ -1,0 +1,279 @@
+<div class="customers-page">
+  <div class="table-card">
+
+    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+      <h2>Edit Product</h2>
+      <a href="/admin/products" class="btn-modal-cancel">✕</a>
+    </div>
+
+    <form action="/admin/products/edit/{{product._id}}" 
+          method="POST" 
+          enctype="multipart/form-data" 
+          class="modal-form-body">
+
+      <!-- BASIC INFO -->
+      <div class="form-row split-row4">
+
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" name="productName" value="{{product.productName}}" >
+        </div>
+
+        <div class="form-group">
+          <label>Brand</label>
+          <input type="text" name="brand" value="{{product.brand}}" >
+        </div>
+
+        <div class="form-group">
+          <label>Base Price</label>
+          <input type="number" name="regularPrice" min="1" value="{{product.regularPrice}}" >
+        </div>
+
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" >{{product.description}}</textarea>
+      </div>
+
+      <!-- CATEGORY -->
+      <div class="form-row split-row">
+
+        <div class="form-group">
+          <label>Category</label>
+          <select name="parentCategory" id="parentCategory">
+  {{#each parentCategories}}
+    <option value="{{this._id}}"
+      {{#if (eq this._id ../selectedParentId)}}
+        selected
+      {{/if}}>
+      {{this.name}}
+    </option>
+  {{/each}}
+</select>
+        </div>
+
+      </div>
+
+        {{!-- subcategory --}}
+       <div class="form-row split-row">
+
+        <div class="form-group">
+  <label>Subcategory</label>
+
+  <select name="subCategory" id="subCategory">
+    <option value="">Select Subcategory</option>
+
+    {{#each subcategories}}
+      <option value="{{this._id}}"
+        {{#if (eq this._id ../product.subCategory)}}
+          selected
+        {{/if}}>
+        {{this.name}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+
+      </div>
+
+      <!-- IMAGES -->
+      <div class="form-group">
+        <label>Product Images</label>
+
+        <small style="display:block;margin-bottom:10px;">
+          Existing Images (click × to remove)
+        </small>
+
+        <div class="edit-images-grid" style="display:flex;gap:10px;flex-wrap:wrap;">
+
+          {{#each product.productImage}}
+            <div class="img-box" style="position:relative;">
+              <img src="/uploads/products/{{this}}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;">
+
+              <button type="button" class="remove-img"
+                style="position:absolute;top:-5px;right:-5px;background:red;color:white;border:none;border-radius:50%;width:20px;height:20px;">
+                ×
+              </button>
+            </div>
+          {{/each}}
+
+        </div>
+
+        <input type="file" name="productImages" multiple>
+        <small>Upload new images to replace old ones</small>
+      </div>
+
+<div class="variants-section">
+
+  <label class="section-main-label">Variants</label>
+
+  <div id="variantsContainer" class="variants-grid-wrapper">
+
+    {{#each product.variants}}
+      <div class="variant-card">
+
+        <div class="form-group">
+
+          <input
+            type="text"
+            name="colorNames[]"
+            value="{{this.colorName}}"
+            placeholder="Color Name"
+          >
+
+          <div class="color-picker">
+
+            <input type="color" name="colorHex[]" value="{{this.colorHex}}">
+
+            <span class="label"></span>
+
+            <input
+              type="hidden"
+              name="colorName[]"
+              class="color-name"
+              value="{{this.colorName}}"
+            >
+
+          </div>
+
+        </div>
+
+        <div class="sizes-container">
+          <label>Sizes & Stock</label>
+
+          {{#each this.sizes}}
+          <div class="size-row">
+            <input type="number" name="sizes[]" value="{{this.size}}" placeholder="Size">
+            <input type="number" name="stocks[]" value="{{this.stock}}" placeholder="Stock">
+            <button type="button" class="remove-size">X</button>
+          </div>
+          {{/each}}
+
+          <button type="button" class="add-size">+ Add size</button>
+        </div>
+
+        <button type="button" class="remove-variant">Remove Variant</button>
+
+      </div>
+    {{/each}}
+
+  </div>
+
+  <button type="button" class="btn-add-variant-group" id="addVariantBtn">
+    + Add another color variant
+  </button>
+
+</div>
+
+      <!-- SPECS -->
+      <div class="form-row split-row4">
+
+        <div class="form-group">
+          <label>Material</label>
+          <input type="text" name="material" value="{{product.material}}">
+        </div>
+
+        <div class="form-group">
+          <label>Closure Type</label>
+          <input type="text" name="closureType" value="{{product.closureType}}">
+        </div>
+
+        <div class="form-group">
+          <label>Sole Type</label>
+          <input type="text" name="soleType" value="{{product.soleType}}">
+        </div>
+
+        <div class="form-group">
+          <label>Weight</label>
+          <input type="text" name="weight" value="{{product.weight}}">
+        </div>
+
+         <div class="form-group">
+          <label>Country of Origin</label>
+          <input type="text" name="countryOfOrigin" value="{{product.countryOfOrigin}}">
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="modal-action-footer">
+        <a href="/admin/products" class="btn-modal-cancel">Cancel</a>
+        <button type="submit" class="btn-modal-save">Update</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<script>
+
+// ADD VARIANT (same style as add product)
+document.getElementById("addVariantBtn").addEventListener("click", function () {
+
+  const template = document.getElementById("variantTemplate");
+  const clone = template.querySelector(".variant-card").cloneNode(true);
+
+  document.getElementById("variantsContainer").appendChild(clone);
+
+});
+
+
+// REMOVE VARIANT
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("remove-variant")) {
+    e.target.closest(".variant-card").remove();
+  }
+});
+
+
+// ADD SIZE ROW
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("add-size")) {
+
+    const container = e.target.closest(".sizes-container");
+
+    const row = document.createElement("div");
+    row.classList.add("size-row");
+
+    row.innerHTML = `
+      <input type="number" name="sizes[]" placeholder="Size">
+      <input type="number" name="stocks[]" placeholder="Stock">
+      <button type="button" class="remove-size">X</button>
+    `;
+
+    container.insertBefore(row, e.target);
+
+  }
+});
+
+
+// REMOVE SIZE ROW
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("remove-size")) {
+    e.target.closest(".size-row").remove();
+  }
+});
+
+document.getElementById("parentCategory").addEventListener("change", async function () {
+
+  const parentId = this.value;
+
+  const res = await fetch(`/admin/subcategories/${parentId}`);
+  const data = await res.json();
+
+  const subSelect = document.getElementById("subCategory");
+
+  subSelect.innerHTML = `<option value="">Select Subcategory</option>`;
+
+  data.subcategories.forEach(sc => {
+    subSelect.innerHTML += `
+      <option value="${sc._id}">
+        ${sc.name}
+      </option>
+    `;
+  });
+
+});
+</script>
