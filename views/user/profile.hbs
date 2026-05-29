@@ -12,16 +12,20 @@
                 
                 <section class="profile-card profile-info-summary">
                     <div class="avatar-edit-container">
+                        <form action="/user/update-avatar" method="POST" enctype="multipart/form-data" id="avatarForm">
+
+
                        <div class="avatar-border">
-                            <img src="{{#if user.profileImage}}{{user.profileImage}}{{else}}/icons/user(1).png{{/if}}" 
-                                 alt="Profile Picture" 
-                                 id="profile-preview">
+                         <img src="{{user.profileImage}}?v={{timestamp}}" id="profile-preview"
+  class="user-icon sidebar-avatar" 
+  >
                                  
                             <label for="avatar-upload" class="camera-btn">
                                 <i class="fa-solid fa-camera"></i>
-                                <input type="file" id="avatar-upload" hidden accept="image/*">
+                                <input type="file" id="avatar-upload" name="profileImage" hidden accept="image/*">
                             </label>
                         </div>
+                        </form>
                     </div>
                     <div class="summary-text">
                         <h2>{{user.fullName}}</h2>
@@ -94,6 +98,43 @@
     </div>
 </div>
 
+
+{{#if success}}
+<div class="flash success">{{success}}</div>
+{{/if}}
+
+{{#if error}}
+<div class="flash error">{{error}}</div>
+{{/if}}
+
+
+<script>
+    document.getElementById("avatar-upload").addEventListener("change", async function () {
+
+    const formData = new FormData(document.getElementById("avatarForm"));
+
+    const res = await fetch("/user/update-avatar", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+
+        const img = document.getElementById("profile-preview");
+
+        // 🔥 FORCE REFRESH (cache-bust)
+        img.src = data.profileImage + "?t=" + Date.now();
+
+        showFlash("success", data.message);
+
+    } else {
+        showFlash("error", data.message);
+    }
+});
+</script>
+
 <style>
 /* 🟢 Modal Background Overlay */
 .crop-modal-overlay {
@@ -113,9 +154,10 @@
 .crop-modal-content {
     background: #ffffff !important; /* Strict solid white background card */
     color: #1e293b !important;    /* Dark slate text color for readability */
-    padding: 24px; 
+    padding: 20px; 
     border-radius: 12px;
-    max-width: 480px; 
+    max-width: 400px; 
+    height: 430px;
     width: 90%; 
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
@@ -123,15 +165,15 @@
 .crop-modal-content h3 {
     margin-top: 0;
     margin-bottom: 16px;
-    font-size: 1.25rem;
+    font-size: 18px;
     font-weight: 600;
     color: #0f172a !important;
 }
 
 /* 🟢 The Canvas Frame Container where the photo sits */
 .crop-area { 
-    max-height: 350px; 
-    height: 350px;
+    max-height: 280px; 
+    height: 280px;
     width: 100%; 
     overflow: hidden; 
     background: #f8fafc !important; /* Ultra-light grey inside background mesh */
@@ -161,9 +203,10 @@
     background: #f1f5f9 !important; 
     color: #475569 !important; 
     border: 1px solid #cbd5e1 !important; 
-    padding: 10px 20px; 
+    padding: 8px 10px;
     border-radius: 6px; 
     font-weight: 500;
+    font-size: 12px;
     cursor: pointer; 
     transition: background 0.2s;
 }
@@ -175,8 +218,9 @@
     background: #004d40 !important; /* Premium dark teal branding theme */
     color: #ffffff !important; 
     border: none !important; 
-    padding: 10px 20px; 
-    border-radius: 6px; 
+    padding: 8px 10px; 
+    border-radius: 6px;
+    font-size: 12px; 
     font-weight: 500;
     cursor: pointer; 
     transition: background 0.2s;
@@ -185,3 +229,4 @@
     background: #00332c !important;
 }
 </style>
+
