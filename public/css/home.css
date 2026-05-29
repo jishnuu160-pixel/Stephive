@@ -395,3 +395,7 @@
 .search-form:focus-within .search-submit-btn .nav-icons {
   filter: invert(1); /* Inverts white icon to dark if using standard dark image assets */
 }
+
+.nav-icons:hover{
+  transform: scale(1.08);
+}
