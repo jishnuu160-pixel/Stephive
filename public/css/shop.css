@@ -2,7 +2,7 @@
 .shop-container {
     max-width: 100%;
     align-items: center;
-    padding: 30px 60px;
+    padding: 30px 20px;
     background-color: #ffffff;
 }
 
@@ -249,6 +249,11 @@
     flex-grow: 1;
 }
 
+.product-info p{
+    font-size: 10px;
+    gap: 10px;
+}
+
 .product-info h3 {
     font-size: 16px;
     font-weight: 600;
@@ -261,8 +266,13 @@
     overflow: hidden;
 }
 
+.product-info h4{
+    font-size: 12px;
+    padding: 10px 0px;
+}
+
 .product-card-desc {
-    font-size: 13px;
+    font-size: 10px;
     color: #64748b;
     margin: 0 0 16px 0;
     line-height: 1.5;
@@ -280,7 +290,7 @@
 }
 
 .product-action-block h4 {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     color: #0f172a;
     margin: 0;
@@ -289,14 +299,15 @@
 .rec-discover-btn {
     text-decoration: none;
     width: 100%;
+    padding-left: 30px;
 }
 
 .rec-discover-btn button {
-    width: 100%;
+    width: 80%;
     background: #0f172a; 
     color: #ffffff;
     border: none;
-    padding: 10px 12px;
+    padding: 5px 8px;
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -651,4 +662,12 @@
 .product-grid-shop.main-layout {
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 30px;
+}
+
+.shop-products-section{
+  padding: 20px;
+}
+
+.related-products-section{
+    padding-left: 25px;
 }
