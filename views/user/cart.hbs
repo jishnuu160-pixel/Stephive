@@ -1,3 +1,4 @@
+ 
 <div class="cart-container">
     
     <header class="cart-header">
@@ -29,8 +30,9 @@
                 
                 <div class="item-details">
                     <h2 class="item-title">{{this.productId.productName}}</h2>
-                    <p class="item-specs">MATERIAL: {{#if this.productId.material}}{{toUpperCase this.productId.material}}{{else}}LEATHER{{/if}} | COLOR: {{toUpperCase this.color}} | SIZE: {{this.size}}</p>
+                    <p class="item-specs">MATERIAL: {{#if this.productId.material}} {{toUpperCase this.productId.material}}{{else}}LEATHER{{/if}}| COLOR: {{toUpperCase this.color}} | SIZE: {{this.size}}</p>
                     
+
                     {{#if this.isOutOfStock}}
                         <span class="cart-error-badge">OUT OF STOCK</span>
                     {{else}}
@@ -128,76 +130,166 @@
     </div>
 </div>
 
+<div id="customToast" class="custom-toast"></div>
+
 <script>
-    async function adjustCartQuantity(buttonElement, operationalChange) {
-        const card = buttonElement.closest('.cart-card');
-        const productId = card.getAttribute('data-product-id');
-        const size = card.getAttribute('data-size');
-        const color = card.getAttribute('data-color');
-        
-        const qtyDisplaySpan = card.querySelector('.qty-val');
-        const currentQty = parseInt(qtyDisplaySpan.innerText);
-        const targetQuantity = currentQty + operationalChange;
 
-        if (targetQuantity < 1) return;
-        if (targetQuantity > 5) {
-            alert("Maximum allowable limit per singular item is 5 units.");
-            return;
-        }
+function showToast(message, type = 'success') {
 
-        try {
-            const response = await fetch('/user/cart/update-quantity', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, size, color, targetQuantity })
-            });
+    const toast = document.getElementById('customToast');
 
-            const data = await response.json();
+    toast.innerText = message;
 
-            if (response.ok && data.success) {
-                qtyDisplaySpan.innerText = targetQuantity;
-                
-                const basePrice = parseInt(card.querySelector('.item-price').getAttribute('data-base-price'));
-                card.querySelector('.subtotal-price').innerText = '₹' + (basePrice * targetQuantity).toLocaleString();
-               
-                document.getElementById('summary-subtotal').innerText = '₹' + data.subtotal.toLocaleString();
-                document.getElementById('summary-tax').innerText = '₹' + data.taxEstimate.toLocaleString();
-                document.getElementById('summary-total').innerText = '₹' + data.totalAmount.toLocaleString();
-            } else {
-                alert(data.message || "Unable to complete inventory scaling modification.");
-                window.location.reload();
-            }
-        } catch (err) {
-            console.error("AJAX quantity synchronization failure:", err);
-        }
+    toast.className = 'custom-toast show';
+
+    if (type === 'error') {
+        toast.classList.add('error-toast');
     }
 
-  
-    async function removeCartRow(buttonElement) {
-        if (!confirm("Are you sure you want to remove this variant from your cart?")) return;
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2200);
+}
 
-        const card = buttonElement.closest('.cart-card');
-        const productId = card.getAttribute('data-product-id');
-        const size = card.getAttribute('data-size');
-        const color = card.getAttribute('data-color');
 
-        try {
-            const response = await fetch('/user/cart/remove', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, size, color })
-            });
+async function adjustCartQuantity(buttonElement, operationalChange) {
 
-            const data = await response.json();
+    const card = buttonElement.closest('.cart-card');
 
-            if (response.ok && data.success) {
+    const productId = card.getAttribute('data-product-id');
+    const size = card.getAttribute('data-size');
+    const color = card.getAttribute('data-color');
 
-                window.location.reload();
-            } else {
-                alert(data.message || "An issue was encountered while trying to drop the item.");
-            }
-        } catch (err) {
-            console.error("AJAX product eviction malfunction:", err);
-        }
+    const qtyDisplaySpan = card.querySelector('.qty-val');
+
+    const currentQty = parseInt(qtyDisplaySpan.innerText);
+
+    const targetQuantity = currentQty + operationalChange;
+
+    if (targetQuantity < 1) return;
+
+    if (targetQuantity > 5) {
+
+        showToast("Maximum limit is 5 units", "error");
+
+        return;
     }
+
+    try {
+
+        const response = await fetch('/user/cart/update-quantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId,
+                size,
+                color,
+                targetQuantity
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+
+            qtyDisplaySpan.innerText = targetQuantity;
+
+            const basePrice = parseInt(
+                card.querySelector('.item-price')
+                .getAttribute('data-base-price')
+            );
+
+            card.querySelector('.subtotal-price').innerText =
+                '₹' + (basePrice * targetQuantity).toLocaleString();
+
+            document.getElementById('summary-subtotal').innerText =
+                '₹' + data.subtotal.toLocaleString();
+
+            document.getElementById('summary-tax').innerText =
+                '₹' + data.taxEstimate.toLocaleString();
+
+            document.getElementById('summary-total').innerText =
+                '₹' + data.totalAmount.toLocaleString();
+
+            showToast("Cart updated");
+
+        } else {
+
+            showToast(data.message || "Failed to update quantity", "error");
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        showToast("Something went wrong", "error");
+    }
+}
+
+
+
+async function removeCartRow(buttonElement) {
+
+    const result = await Swal.fire({
+        title: 'Remove Product?',
+        text: "This item will be removed from your cart.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Remove',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        customClass: {
+            popup: 'small-swal'
+        }
+    });
+
+    if (!result.isConfirmed) return;
+
+    const card = buttonElement.closest('.cart-card');
+
+    const productId = card.getAttribute('data-product-id');
+    const size = card.getAttribute('data-size');
+    const color = card.getAttribute('data-color');
+
+    try {
+
+        const response = await fetch('/user/cart/remove', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId,
+                size,
+                color
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+
+            card.remove();
+
+            showToast("Product removed from cart");
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+
+        } else {
+
+            showToast(data.message || "Failed to remove product", "error");
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        showToast("Something went wrong", "error");
+    }
+}
+
 </script>
