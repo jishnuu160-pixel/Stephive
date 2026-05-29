@@ -233,7 +233,7 @@ export const postEditProduct = async (req, res) => {
          req.body,
          req.files
       );
- console.log("adminController:",req.body);
+
       req.flash("success", "Product updated successfully");
       return res.redirect('/admin/products');
      
@@ -274,8 +274,6 @@ export const toggleProductStatus = async (req, res) => {
 
 export const postAddCategory = async (req, res) => {
    try {
-      console.log(req.body);
-
 
       await adminService.createCategory(req.body);
 

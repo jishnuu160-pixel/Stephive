@@ -62,7 +62,7 @@ export const sendOTP = async (email) => {
 
     await userRepo.saveOTP(email, otp); 
   
-    // --- THIS IS WHERE YOU ADD THE LOG BACK ---
+
     console.log(`\n=========================================`);
     console.log(` OTP for ${email} is [ ${otp} ]`);
     console.log(`=========================================\n`);

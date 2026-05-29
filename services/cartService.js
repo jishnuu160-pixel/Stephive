@@ -41,8 +41,6 @@ export const addToCart = async (userId, itemData) => {
     } else {
         cart.items.push(cartItem);
     }
-    console.log("ADDING CART USER ID:", userId);//added
-    console.log("CART ITEMS:", cart.items);
 
     await cartRepo.updateCart(userId, {
     items: cart.items
@@ -55,7 +53,6 @@ export const addToCart = async (userId, itemData) => {
 export const getCartPageData = async (userId) => {
 
     const cart = await cartRepo.findCartByUserId(userId);
-    console.log("FETCHING CART USER ID:", userId);//addede
 
     if (!cart) {
         return {
@@ -121,7 +118,6 @@ export const removeFromCart = async (userId, itemData) => {
             item.color === itemData.color
         )
     );
-    console.log("CART ITEMS:", cart.items);
 
     await cartRepo.updateCart(userId, {
     items: cart.items

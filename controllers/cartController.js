@@ -6,8 +6,6 @@ export const loadCart = async (req, res) => {
 
         const userId = req.session.user.id;
 
-        console.log("Load user:", userId);
-
         const cartData =
             await cartService.getCartPageData(userId);
 

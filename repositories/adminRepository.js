@@ -126,7 +126,7 @@ async createCategory(categoryData) {
 
    } catch (err) {
       console.log("❌ MONGODB CREATE ERROR:", err.message);
-      console.log(err); // VERY IMPORTANT
+      console.log(err); 
 
       throw err;
    }
@@ -182,8 +182,12 @@ async findProductById(productId) {
    return await Product.findById(productId)
       .populate({
          path: 'Category',
-         populate: { path: 'parentCategory' }
+         populate: {
+            path: 'parentCategory',
+            model: 'Category'
+         }
       })
+      .lean();
 }
 
    async createProduct(productData) {

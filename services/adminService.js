@@ -387,7 +387,7 @@ export const createProduct = async (body, files) => {
    const resolvedCategoryId = category;
 
    // ======================
-   // 2. DUPLICATE CHECK (🔥 ADDED HERE)
+   // 2. DUPLICATE CHECK 
    // ======================
    const existingProduct =
       await adminRepo.findProductByNameAndCategory(
@@ -502,7 +502,7 @@ const updateData = {
    salePrice: salePrice ? Number(salePrice) : null,
    description: description?.trim(),
 
-   // 🔥 IMPORTANT FIX
+
    parentCategory: parentCategory || null,
    subCategory: subCategory || null,
 
@@ -513,13 +513,11 @@ const updateData = {
    weight: weight?.trim()
 };
 
-   // images update only if new uploaded
+  
    if (files && files.length > 0) {
       updateData.productImage =
          files.map(file => file.filename);
    }
-console.log("PARENT:", parentCategory);
-console.log("SUB:", subCategory);
 
    await adminRepo.updateProduct(productId, updateData);
 };
