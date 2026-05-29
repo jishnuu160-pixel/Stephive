@@ -17,7 +17,9 @@ import {
     postAddCategory,
     toggleProductStatus,
     updateCategory,
-    postEditProduct
+    postEditProduct,
+    getSubcategoriesByParent,
+    getEditProduct
 } from '../controllers/adminController.js';
 import { isAdminAuthenticated, isAdminLoggedOut, preventCache } from '../middleware/adminAuth.js';
 
@@ -44,6 +46,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+router.use((req,res,next)=>{
+    res.locals.layout='admin-layout';
+    next();
+})
 
 // --- Admin Login Routes ---
 router.get('/login', isAdminLoggedOut, getAdminLogin);
@@ -57,8 +63,12 @@ router.post('/customers/toggle-status/:id', isAdminAuthenticated, toggleUserStat
 // --- Admin Product Management Routes ---
 router.get('/products', isAdminAuthenticated, getProducts);
 router.get('/products/add', isAdminAuthenticated, getAddProduct);
-router.post('/products/edit/:id', isAdminAuthenticated, postEditProduct);
-router.post('/products/toggle-status/:id',toggleProductStatus);
+router.get(
+  '/products/edit/:id',
+  isAdminAuthenticated,
+  getEditProduct
+);
+
 
 router.post(
     '/products/add', 
@@ -67,11 +77,26 @@ router.post(
     postAddProduct
 );
 
+router.post(
+  '/products/edit/:id',
+  isAdminAuthenticated,
+  upload.array('productImages', 4),
+  postEditProduct
+);
+
+
+router.post('/products/toggle-status/:id',toggleProductStatus);
+
 //--- Admin Categories Routes ---
 router.get('/categories', isAdminAuthenticated, getCategories);
 router.post('/categories/toggle-status/:id', isAdminAuthenticated, toggleListing);
 router.post('/categories/add', isAdminAuthenticated, postAddCategory);
 router.post('/categories/edit/:id',isAdminAuthenticated, updateCategory);
+
+router.get(
+   '/categories/:id/subcategories',
+   getSubcategoriesByParent
+);
 
 router.get('/logout', adminLogout);
 

@@ -13,12 +13,14 @@ import {
     sendUpdatePasswordOTP,getChangePassword,
     getVerifyPasswordOTP,getResendOTP,
     postChangePassword,postVerifyPasswordOTP,
-    updateAvatar,uploadAvatar,
-    sendEmailChangeOTP,googleAuthSuccess,
-    getCart
+    sendEmailChangeOTP,googleAuthSuccess
+    ,updateAvatar,
+    getAbout
 } from '../controllers/userController.js';
 import { addToCart } from '../controllers/cartController.js';
 import { isUserAuthenticated, isUserLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
+import {uploadAvatar} from '../middleware/upload.middleware.js';
+import {handleUploadError} from '../middleware/uploadError.middleware.js';
 
 import passport from 'passport';
 
@@ -37,10 +39,9 @@ router.get('/login', isUserLoggedOut, getLogin);
 router.post('/login', isUserLoggedOut, postLogin); 
 
 
-router.get('/cart',getCart);
 
 
-
+router.get('/about',getAbout);
 
 
 router.get('/forgot-password', isUserLoggedOut, getForgot);
@@ -81,8 +82,7 @@ router.get('/auth/google/callback',
     googleAuthSuccess
 );
 
-router.post('/cart/add', addToCart);
-router.get('/cart',getCart);
+
 
 router.use(isUserAuthenticated);
 
@@ -90,13 +90,18 @@ router.get('/profile', isUserAuthenticated, getProfile);
 router.get('/edit-profile', preventCache, isUserAuthenticated, getEditProfile);
 
 
-router.post('/update-profile', uploadAvatar.single('profileImage'), preventCache, isUserAuthenticated, postUpdateProfile);
+router.post(
+   '/update-profile',
+   preventCache,
+   isUserAuthenticated,
+   postUpdateProfile
+);
 
 router.get('/logout', userLogout);
 
 router.get('/address',isUserAuthenticated, getAddress);
 
-router.get('/delete-address/:id', isUserAuthenticated, removeAddress);
+router.get('/delete-address/:id', isUserAuthenticated, removeAddress);//chnage to delete
 
 router.post('/add-address', isUserAuthenticated, postAddAddress);
 router.post('/edit-address/:id', isUserAuthenticated, postEditAddress);
@@ -114,27 +119,28 @@ router.get('/update-password-init', isUserAuthenticated, sendUpdatePasswordOTP);
 router.get('/verify-password-otp', isUserAuthenticated, getVerifyPasswordOTP);
 router.post('/verify-password-otp', isUserAuthenticated, postVerifyPasswordOTP);
 
-router.post('/update-avatar', isUserAuthenticated, (req, res, next) => {
-    uploadAvatar.single('profileImage')(req, res, function (err) {
-        
-        if (err) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.' 
-            });
-        }
-        
-        if (!req.file) {
-            console.error("❌ Request arrived but req.file is undefined.");
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.' 
-            });
-        }
+router.post(
+   '/update-avatar',
 
-        console.log("✅ File passed backend validation successfully:", req.file.filename);
-        next();
-    });
-}, updateAvatar);
+   isUserAuthenticated,
+
+   (req, res, next) => {
+
+      uploadAvatar.single('profileImage')(req, res, (err) => {
+
+         if (err) {
+
+            req.flash('error', err.message);
+
+            return res.redirect('/user/profile');
+         }
+
+         next();
+      });
+
+   },
+
+   updateAvatar
+);
 
 export default router;
