@@ -1,73 +1,39 @@
 import * as userService from '../services/userServices.js';
-import * as userRepo from '../repositories/userRepository.js';
 
-import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
 import { error, profile } from 'console';
 import { title } from 'process';
 
-const uploadPath = path.join(process.cwd(), 'public/uploads/profile_pics');
-
-if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadPath); 
-    },
-    filename: (req, file, cb) => {
-        cb(null, `avatar-${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
-
-const fileFilter = (req, file, cb) => {
-    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    const allowedExtensions = /jpeg|jpg|png|webp/;
-
-    const isMimeValid = allowedMimeTypes.includes(file.mimetype);
-    const isExtValid = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
-
-    if (isMimeValid || (isMimeValid && isExtValid)) {
-        cb(null, true);
-    } else {
-        cb(new Error('Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.'), false);
-    }
-};
-
-export const uploadAvatar = multer({ 
-    storage: storage,
-    fileFilter: fileFilter,
-    limits: { fileSize: 3 * 1024 * 1024 } 
-});
 
 export const updateAvatar = async (req, res) => {
-    console.log('File Info Received:', req.file);
-    console.log('Body Info Received:', req.body);
-
     try {
-        if (!req.file){
-            console.log('❌ Request reached controller but file binary is empty.');
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid file type! Only JPEG, JPG, PNG, and WEBP images are allowed.' 
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "Please upload a valid image file"
             });
-        } 
-        
+        }
+
         const userId = req.session.user.id;
+
         const imagePath = `/uploads/profile_pics/${req.file.filename}`;
 
-        await userRepo.updateUserInfo(userId, { profileImage: imagePath });
+        await userService.updateAvatar(userId, imagePath);
 
         req.session.user.profileImage = imagePath;
 
-        req.session.save(() => {
-            return res.json({ success: true, imagePath });
+        return res.json({
+            success: true,
+            message: "Profile image updated",
+            profileImage: imagePath
         });
-    } catch (error) {
-        console.error("Avatar Controller Error Trace:", error);
-        return res.status(500).json({ success: false, message: 'Server upload internal error.' });
+
+    } catch (err) {
+        console.error(err);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
     }
 };
 
@@ -307,14 +273,18 @@ export const userLogout = (req, res) => {
 export const getProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const user = await userRepo.findById(userId);
+        const user = await userService.getUserById(userId);
 
         if (!user) {
             console.log("User not found in database");
             return res.redirect('/user/login');
         }
 
-        res.render('user/profile', { user, activePage: 'profile' });
+      res.render('user/profile', {
+    user,
+    timestamp: Date.now(),
+    activePage:'profile'
+});
     } catch (error) {
        
         console.error("Profile Error:", error);
@@ -326,7 +296,7 @@ export const getProfile = async (req, res) => {
 export const getAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const user = await userRepo.findById(userId); 
+        const user = await userService.getUserById(userId);
 
         if (user && user.addresses) {
             console.log("Addresses found in DB:", user.addresses.length);
@@ -348,7 +318,7 @@ export const postAddAddress = async (req, res) => {
 
         addressData.isDefault = req.body.isDefault === 'on';
 
-        const updatedUser = await userRepo.addAddress(userId, addressData);
+        const updatedUser = await userService.addAddress(userId, addressData);
 
         if (!updatedUser) {
             console.log("Failed to update user in DB");
@@ -368,7 +338,7 @@ export const removeAddress = async (req, res) => {
         const userId = req.session.user.id;
         const addressId = req.params.id; 
         
-        await userRepo.deleteAddress(userId, addressId);
+        await userService.deleteAddress(userId, addressId);
         
         res.redirect('/user/address');
     } catch (error) {
@@ -384,7 +354,7 @@ export const postEditAddress = async (req, res) => {
 
         updatedData.isDefault = req.body.isDefault === 'on';
 
-        await userRepo.updateAddress(userId, addressId, updatedData);
+        await userService.updateAddress(userId, addressId, updatedData);
         
         res.redirect('/user/address');
     } catch (error) {
@@ -399,7 +369,7 @@ export const postUpdateProfile = async (req, res) => {
         const userId = req.session.user.id;
         const { fullName, phoneNumber, gender } = req.body;
 
-        await userRepo.updateUserInfo(userId, { fullName, phoneNumber, gender });
+        await userService.updateProfile(userId, { fullName, phoneNumber, gender });
 
         req.session.user.fullName = fullName;
         req.session.user.phoneNumber = phoneNumber;
@@ -417,7 +387,7 @@ export const getEditProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
         
-        const user = await userRepo.findById(userId);
+        const user = await userService.getUserById(userId);
 
         if (!user) return res.redirect('/user/login');
 
@@ -501,7 +471,7 @@ export const postChangeEmail = async (req, res) => {
             });
         }
 
-        await userRepo.updateUserInfo(userId, { email: sanitizedEmail });
+        await userService.updateUserInfo(userId, { email: sanitizedEmail });
 
         req.session.user.email = sanitizedEmail;
 
@@ -600,18 +570,17 @@ export const googleAuthSuccess = (req, res) => {
 };
 
 
-export const getCart = async (req, res) => {
-    try {
-        res.render('user/cart', { 
-            user: req.session.user
-        });
-    } catch (error) {
+
+
+export const getAbout = async(req,res)=>{
+    try{
+        res.render('/about',{
+            user:req.session.user
+        })
+    }catch(error){
         res.redirect('/');
     }
-};
-
-
-
+}
 
 
 
