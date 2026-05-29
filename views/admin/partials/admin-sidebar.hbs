@@ -1,0 +1,43 @@
+<aside class="sidebar-admin">
+    
+    
+    <nav class="sidebar-links">
+        <a href="/admin/dashboard" class="nav-link {{#if (eq activePage 'dashboard')}}active{{/if}}">
+            <i class="fas fa-home"></i> <span>Dashboard</span>
+        </a>
+        <a href="/admin/products" class="nav-link {{#if (eq activePage 'products')}}active{{/if}}">
+            <i class="fas fa-box"></i> <span>Product List</span>
+        </a>
+        <a href="/admin/orders" class="nav-link ">
+            <i class="fas fa-shopping-cart"></i> <span>Order Management</span>
+        </a>
+        <a href="/admin/customers" class="nav-link {{#if (eq activePage 'customers')}}active{{/if}}">
+            <i class="fas fa-users"></i> <span>Users</span>
+        </a>
+        <a href="/admin/categories" class="nav-link  {{#if (eq activePage 'categories')}}active{{/if}}">
+            <i class="fas fa-layer-group"></i> <span>Categories</span>
+        </a>
+        <a href="/admin/coupons" class="nav-link">
+            <i class="fas fa-ticket-alt"></i> <span>Coupon</span>
+        </a>
+        <a href="/admin/sales" class="nav-link">
+            <i class="fas fa-chart-line"></i> <span>Sales</span>
+        </a>
+
+        <a href="/admin/banners" class="nav-link">
+            <i class="fas fa-image"></i> <span>Banner</span>
+        </a>
+        <a href="/admin/brands" class="nav-link">
+            <i class="fas fa-tags"></i> <span>Brand</span>
+        </a>
+        <a href="/admin/returns" class="nav-link">
+            <i class="fas fa-undo"></i> <span>Return</span>
+        </a>
+      
+     
+<a href="/admin/logout" class="nav-link logout-link {{#if (eq activePage 'logout')}}active{{/if}}">
+    <i class="fas fa-sign-out-alt" style="color: rgb(255, 81, 81);"></i> <span style="color: rgb(255, 81, 81);">Logout</span>
+</a>
+    </nav>
+</aside> 
+
