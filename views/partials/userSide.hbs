@@ -1,7 +1,9 @@
 <aside class="profile-sidebar">
     <div class="sidebar-user-header">
         <div class="avatar-circle-small">
-             <img src="{{#if user.profileImage}}{{user.profileImage}}{{else}}/icons/user (1).png{{/if}}" class="user-icon" alt="User">
+ <img src="{{user.profileImage}}?v={{timestamp}}" id="profile-preview"
+  class="user-icon sidebar-avatar" 
+  >
         </div>
         <div class="user-meta">
             <h4>{{user.fullName}}</h4>
