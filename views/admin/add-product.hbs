@@ -8,7 +8,6 @@
 
         <form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="modal-form-body">
 
-            <!-- Row 1 -->
             <div class="form-row split-row4">
                 <div class="form-group">
                     <label>Shoe Name</label>
@@ -24,20 +23,16 @@
                     <label>Base Price</label>
                     <input type="number" name="regularPrice" placeholder="5999">
                 </div>
-
-                
             </div>
 
-            <!-- Description -->
             <div class="form-group">
                 <label>Description</label>
                 <input type="text" name="description" placeholder="Comfortable everyday sneaker">
             </div>
 
-            <!-- Categories -->
-            <div class="form-row split-row">
+            <div class="form-row split-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div class="form-group">
-                    <label>Parent Category</label>
+                    <label>Parent Category (e.g. Men, Women)</label>
                    <select id="parentCategorySelect" name="parentCategory">
                      <option value="">Select Parent Category</option>
                        {{#each parentCategories}}
@@ -49,30 +44,24 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Category Name</label>
+                    <label>Category Name (Subcategory)</label>
                     <select id="subcategorySelect" name="category">
                      <option value="">Select Subcategory</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Variants -->
             <div class="variants-section">
                 <label class="section-main-label">Variants</label>
 
                 <div id="variantsContainer" class="variants-grid-wrapper"></div>
-
-
 
                 <button type="button" class="btn-add-variant-group" onclick="addColorVariantBlock()">
                     + Add another color variant
                 </button>
             </div>
 
-            <!-- Product Specs -->
             <div class="form-row split-row4">
-                
-
                 <div class="form-group">
                     <label>Material</label>
                     <input type="text" name="material" placeholder="Leather">
@@ -87,56 +76,20 @@
                     <label>Sole Type</label>
                     <input type="text" name="soleType" placeholder="Rubber">
                 </div>
+                
                 <div class="form-group">
-                <label>Weight</label>
-                <input type="text" name="weight" placeholder="300g">
+                    <label>Weight</label>
+                    <input type="text" name="weight" placeholder="300g">
                 </div>
             </div>
 
-             <div class="form-row split-row4">
-                
+            <div class="form-row split-row4">
                 <div class="form-group">
                     <label>Country of Origin</label>
                     <input type="text" name="countryOfOrigin" placeholder="India">
                 </div>
             </div>
 
-            <!-- Images -->
-            <div class="form-group">
-                <label>Product Images</label>
-
-               <div class="image-drag-dropzone" id="uploadBox">
-
-    <input 
-        type="file" 
-        name="productImages"
-        id="productImagesInput"
-        multiple
-        accept="image/*"
-        style="display:none"
-        onchange="handleFiles(this.files)"
-    >
-
-    <div class="dropzone-inner-ui">
-        <div class="camera-icon">📷</div>
-
-        <p class="main-drop-text">
-            Click to upload images
-        </p>
-
-        <p class="sub-drop-text">
-            JPG, PNG up to 5MB
-        </p>
-    </div>
-
-</div>
-
-<div id="imagesPreviewGallery"></div>
-
-             
-            </div>
-
-            <!-- Footer -->
             <div class="modal-action-footer">
                 <a href="/admin/products" class="btn-modal-cancel">Cancel</a>
                 <button type="submit" class="btn-modal-save">Save</button>
@@ -148,334 +101,527 @@
 </div>
 
 
-{{!-- variant --}}
-     <div id="variantTemplate" style="display:none;">
-     <div class="variant-card">
+<div id="variantTemplate" style="display:none;">
+    <div class="variant-card" data-variant-index="0">
+        <hr style="border: 1px dashed #ccc; margin: 20px 0;">
+        
+        <div class="form-group">
+            <label>Color Name</label>
+            <input type="text" name="colorNames[]" placeholder="Color Name">
 
-     <div class="form-group">
+            <div class="color-picker" style="margin-top: 10px;">
+                <input type="color" name="colorHex[]">
+                <span class="label"></span>
+                <input type="hidden" name="colorName[]" class="color-name">
+            </div>
+        </div>
 
-   <input
-      type="text"
-      name="colorNames[]"
-      placeholder="Color Name"
-   >
+        <div class="sizes-container" style="margin-top: 15px;">
+            <label>Sizes & Stock</label>
+            <div class="size-row">
+                <input type="number" name="sizes_0[]" placeholder="Size">
+                <input type="number" name="stocks_0[]" placeholder="Stock">
+                <button type="button" class="remove-size">X</button>
+            </div>
+            <button type="button" class="add-size" style="margin-top: 5px;">+ Add size</button>
+        </div>
 
-   <div class="color-picker">
+        <div class="form-group variant-images-section" style="margin-top: 20px;">
+            <label>Variant Images (Upload unique photos for this color)</label>
+            
+            <div class="image-drag-dropzone upload-box-variant">
+                <input 
+                    type="file" 
+                    name="variantImages_placeholder" 
+                    class="variant-image-input"
+                    data-index="0"
+                    multiple 
+                    accept="image/*" 
+                    style="display:none"
+                >
+                <div class="dropzone-inner-ui">
+                    <div class="camera-icon">📷</div>
+                    <p class="main-drop-text">Click to upload color specific images</p>
+                    <p class="sub-drop-text">JPG, PNG up to 2MB</p>
+                </div>
+            </div>
+            <div class="cropped-files-container" id="croppedFilesContainer_0"></div>
+            <div class="images-preview-gallery-variant" id="thumbnailsContainer_0" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+        </div>
 
-      <input type="color" name="colorHex[]">
-
-      <span class="label"></span>
-
-      <input
-         type="hidden"
-         name="colorName[]"
-         class="color-name"
-      >
-
-   </div>
-
+        <button type="button" class="remove-variant" style="margin-top: 15px; background-color: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+            Remove Variant
+        </button>
+    </div>
 </div>
 
-      <div class="sizes-container">
-         <label>Sizes & Stock</label>
 
-         <div class="size-row">
-           <input type="number" name="sizes[]" placeholder="Size">
-           <input type="number" name="stocks[]" placeholder="Stock">
-            <button type="button" class="remove-size">X</button>
-         </div>
-
-         <button type="button" class="add-size">+ Add size</button>
-      </div>
-
-      <button type="button" class="remove-variant">Remove Variant</button>
-
-   </div>
+<div id="cropperModal" class="cropper-modal-container" style="display: none;">
+    <div class="cropper-wrapper">
+        <h3>Crop Variant Image</h3>
+        <div class="image-preview-box">
+            <img id="cropperTargetImage" src="" alt="Target Crop" style="max-width: 100%; max-height: 100%; display: block;">
+        </div>
+        <div class="cropper-actions">
+            <button type="button" id="btnCancelCrop" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="btnSaveCrop" class="btn btn-primary">Crop & Save</button>
+        </div>
+    </div>
 </div>
+
+
+<style>
+/* 🌟 PREMIUM, COMPACT CROPPING MODAL SURFACE */
+
+/* 1. Ensure the main image wrapper strictly clips its contents */
+.product-image-main-container, 
+.image-preview-box,
+.main-img-wrapper { 
+    position: relative !important;
+    overflow: hidden !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 2. Lock down the base image inside its frame boundaries */
+.product-image-main-container img,
+.main-img-wrapper img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* 3. Restrain the dynamic lens or zoomed clone image layer */
+.zoom-lens, 
+.img-zoom-lens,
+.zoomWindow,
+.zoomContainer {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    position: absolute !important;
+    pointer-events: none; /* Stops mouse stuttering loops during hover */
+}
+
+.cropper-modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6); 
+    backdrop-filter: blur(4px);        
+    display: none;                     
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+}
+
+.cropper-wrapper {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 500px; /* 🛠️ bumped up slightly to give Cropper.js room to build handlers */
+    width: 90%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e2e8f0;
+}
+
+.cropper-wrapper h3 {
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.image-preview-box {
+    max-height: 350px; /* 🛠️ Increased height capacity to fit high-res photos cleanly */
+    height: 350px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    background: #f8fafc; 
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cropper-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary { 
+    background: #f1f5f9; 
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.btn-primary { 
+    background: #004d40; 
+    color: #ffffff; 
+}
+.btn-primary:hover {
+    background: #00332c;
+    box-shadow: 0 4px 6px -1px rgba(0, 77, 64, 0.2);
+}
+</style>
+
 
 <script>
+let variantCounter = 0;
+let variantFilesMap = {};
 
-let selectedFiles = [];
-
-    document.getElementById("parentCategorySelect")
-.addEventListener("change", async function () {
-
+document.getElementById("parentCategorySelect").addEventListener("change", async function () {
    const parentId = this.value;
-
-   const subSelect =
-      document.getElementById("subcategorySelect");
-
-   subSelect.innerHTML =
-      `<option value="">Loading...</option>`;
+   const subSelect = document.getElementById("subcategorySelect");
+   subSelect.innerHTML = `<option value="">Loading...</option>`;
 
    if (!parentId) {
-      subSelect.innerHTML =
-         `<option value="">Select Subcategory</option>`;
+      subSelect.innerHTML = `<option value="">Select Subcategory</option>`;
       return;
    }
 
-   const res =
-      await fetch(`/admin/categories/${parentId}/subcategories`);
-
+   const res = await fetch(`/admin/categories/${parentId}/subcategories`);
    const data = await res.json();
 
-   subSelect.innerHTML =
-      `<option value="">Select Subcategory</option>`;
-
+   subSelect.innerHTML = `<option value="">Select Subcategory</option>`;
    data.subcategories.forEach(cat => {
       const option = document.createElement("option");
       option.value = cat._id;
       option.textContent = cat.name;
       subSelect.appendChild(option);
    });
-
 });
 
-//add variant
 function addColorVariantBlock() {
+    const template = document.querySelector("#variantTemplate .variant-card");
+    const clone = template.cloneNode(true);
+    
+    const currentIndex = variantCounter;
+    clone.setAttribute("data-variant-index", currentIndex);
+    variantFilesMap[currentIndex] = [];
+    
+    clone.querySelector('input[name="sizes_0[]"]').setAttribute("name", `sizes_${currentIndex}[]`);
+    clone.querySelector('input[name="stocks_0[]"]').setAttribute("name", `stocks_${currentIndex}[]`);
+    
+    const fileInput = clone.querySelector('.variant-image-input');
+    fileInput.setAttribute("name", `variantImages_${currentIndex}`);
+    fileInput.setAttribute("data-index", currentIndex);
 
-   const template =
-      document.querySelector("#variantTemplate .variant-card");
+    clone.querySelector('.cropped-files-container').id = `croppedFilesContainer_${currentIndex}`;
+    clone.querySelector('.images-preview-gallery-variant').id = `thumbnailsContainer_${currentIndex}`;
 
-   const clone =
-      template.cloneNode(true);
-      
-
-   document
-      .getElementById("variantsContainer")
-      .appendChild(clone);
-
-      bindColorPickers(clone);
-
+    document.getElementById("variantsContainer").appendChild(clone);
+    
+    bindColorPickers(clone);
+    bindVariantUploadZone(clone, currentIndex);
+    
+    variantCounter++;
 }
 
-//remove variant
-document.addEventListener("click", function (e) {
+function bindVariantUploadZone(variantCardElement, index) {
+    const uploadBox = variantCardElement.querySelector(".upload-box-variant");
+    uploadBox.addEventListener("click", () => {
+        variantCardElement.querySelector(".variant-image-input").click();
+    });
+}
 
+document.addEventListener("click", function (e) {
    if (e.target.classList.contains("remove-variant")) {
-      e.target.closest(".variant-card").remove();
+      const card = e.target.closest(".variant-card");
+      const index = card.getAttribute("data-variant-index");
+      delete variantFilesMap[index];
+      card.remove();
    }
-
 });
 
-document.querySelector('.modal-form-body')
-.addEventListener('submit', function (e) {
-
-   e.preventDefault();
-
-   const productName =
-      document.querySelector('[name="productName"]').value.trim();
-
-   const brand =
-      document.querySelector('[name="brand"]').value.trim();
-
-   const description =
-      document.querySelector('[name="description"]').value.trim();
-
-   const category =
-      document.querySelector('[name="category"]').value;
-
-   const price =
-      document.querySelector('[name="regularPrice"]').value;
-
-   function showToast(message) {
-
-      Toastify({
-         text: message,
-         duration: 3000,
-         gravity: "top",
-         position: "right",
-         stopOnFocus: true,
-         style: {
-            background: "#ef4444",
-            borderRadius: "8px"
-         }
-      }).showToast();
-
-   }
-
-   if (!productName) {
-      showToast("Product name is required");
-      return;
-   }
-
-   if (!brand) {
-      showToast("Brand is required");
-      return;
-   }
-
-   if (!description) {
-      showToast("Description is required");
-      return;
-   }
-
-   if (!category) {
-      showToast("Please select category");
-      return;
-   }
-
-   if (!price || Number(price) <= 0) {
-      showToast("Enter valid price");
-      return;
-   }
-
-   // ✅ submit only if valid
-   this.submit();
-
-});
-
-//add size row
 document.addEventListener("click", function (e) {
-
    if (e.target.classList.contains("add-size")) {
+      const container = e.target.closest(".sizes-container");
+      const card = e.target.closest(".variant-card");
+      const index = card.getAttribute("data-variant-index");
 
-      const container =
-         e.target.closest(".sizes-container");
-
-      const newRow =
-         document.createElement("div");
-
+      const newRow = document.createElement("div");
       newRow.classList.add("size-row");
+      newRow.style.marginTop = "5px";
 
       newRow.innerHTML = `
-         <input type="number" name="size[]" placeholder="Size">
-         <input type="number" name="stock[]" placeholder="Stock">
-         <button type="button" class="remove-size">X</button>
+          <input type="number" name="sizes_${index}[]" placeholder="Size">
+          <input type="number" name="stocks_${index}[]" placeholder="Stock">
+          <button type="button" class="remove-size">X</button>
       `;
-
       container.insertBefore(newRow, e.target);
-
    }
 
    if (e.target.classList.contains("remove-size")) {
       e.target.parentElement.remove();
    }
-
 });
 
 function bindColorPickers(scope = document) {
-
    scope.querySelectorAll('.color-picker').forEach(wrapper => {
-
-      const input =
-         wrapper.querySelector('input[type="color"]');
-
-      const label =
-         wrapper.querySelector('.label');
-
-      const hiddenInput =
-         wrapper.querySelector('.color-name');
+      const input = wrapper.querySelector('input[type="color"]');
+      const label = wrapper.querySelector('.label');
+      const hiddenInput = wrapper.querySelector('.color-name');
 
       function update() {
-
          const hex = input.value;
-
-         label.textContent =
-            hex.toUpperCase();
-
+         label.textContent = hex.toUpperCase();
          label.style.color = hex;
-
          hiddenInput.value = hex;
       }
-
       input.addEventListener('input', update);
-
       update();
-
    });
-
 }
 
-bindColorPickers();
+let cropper = null;
+let currentFilesQueue = [];
+let currentQueueIndex = 0;
+let currentVariantIndex = null;
 
-addColorVariantBlock();
+const cropperModal = document.getElementById('cropperModal');
+const cropperTargetImage = document.getElementById('cropperTargetImage');
+const btnSaveCrop = document.getElementById('btnSaveCrop');
+const btnCancelCrop = document.getElementById('btnCancelCrop');
 
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.classList.contains('variant-image-input')) {
+        if (!e.target.files || e.target.files.length === 0) return;
 
-document
-.getElementById("uploadBox")
-.addEventListener("click", function () {
+        const files = Array.from(e.target.files);
+        const filteredFiles = [];
 
-   document
-   .getElementById("productImagesInput")
-   .click();
+        for (let i = 0; i < files.length; i++) {
+            if (files[i].size > 2 * 1024 * 1024) {
+                if (typeof Toastify === "function") {
+                    Toastify({
+                        text: `"${files[i].name}" exceeds 2MB limit!`,
+                        duration: 3000,
+                        style: { background: "#ef4444" }
+                    }).showToast();
+                } else {
+                    alert(`"${files[i].name}" exceeds 2MB limit!`);
+                }
+            } else {
+                filteredFiles.push(files[i]);
+            }
+        }
 
+        if (filteredFiles.length === 0) {
+            e.target.value = "";
+            return;
+        }
+
+        currentVariantIndex = e.target.getAttribute('data-index');
+        currentFilesQueue = filteredFiles;
+        currentQueueIndex = 0;
+
+        openCropperForNextInQueue();
+        e.target.value = ""; 
+    }
 });
 
+function openCropperForNextInQueue() {
+    if (currentQueueIndex >= currentFilesQueue.length) {
+        finalizeVariantFilesInput(currentVariantIndex);
+        return;
+    }
 
-function updateFileInput() {
-   const input = document.getElementById("productImagesInput");
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
 
-   const dataTransfer = new DataTransfer();
+    const currentFile = currentFilesQueue[currentQueueIndex];
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        cropperTargetImage.src = event.target.result;
 
-   selectedFiles.forEach(file => dataTransfer.items.add(file));
+        cropperModal.style.display = 'flex';
 
-   input.files = dataTransfer.files;
+        cropperTargetImage.onload = function() {
+            if (cropper) cropper.destroy();
+
+            cropper = new Cropper(cropperTargetImage, {
+                aspectRatio: 1, 
+                viewMode: 1,     
+                autoCropArea: 0.8, 
+                responsive: true,
+                restore: false
+            });
+        };
+    };
+    reader.readAsDataURL(currentFile);
 }
 
+btnSaveCrop.addEventListener('click', () => {
+    if (!cropper) return;
 
-function handleFiles(files) {
+    const canvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
 
-   const newFiles = Array.from(files);
+    canvas.toBlob((blob) => {
+        const originalName = currentFilesQueue[currentQueueIndex].name;
+        const croppedFile = new File([blob], originalName, { type: 'image/jpeg' });
 
-   // append instead of replace (THIS is the key fix)
-   selectedFiles = [...selectedFiles, ...newFiles];
+        variantFilesMap[currentVariantIndex].push(croppedFile);
 
-   updateFileInput();
-   renderImages();
+        cropperModal.style.display = 'none';
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+
+        renderVariantImagesGallery(currentVariantIndex);
+
+        currentQueueIndex++;
+        openCropperForNextInQueue();
+    }, 'image/jpeg', 0.9);
+});
+
+function renderVariantImagesGallery(variantIdx) {
+    const thumbContainer = document.getElementById(`thumbnailsContainer_${variantIdx}`);
+    thumbContainer.innerHTML = ""; 
+
+    variantFilesMap[variantIdx].forEach((file, fileIdx) => {
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+        wrapper.style.display = "inline-block";
+        wrapper.style.margin = "10px";
+
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file); 
+        img.style.width = "90px";
+        img.style.height = "90px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "6px";
+
+        const btn = document.createElement("button");
+        btn.innerText = "×";
+        btn.type = "button";
+        btn.style.position = "absolute";
+        btn.style.top = "0";
+        btn.style.right = "0";
+        btn.style.background = "red";
+        btn.style.color = "white";
+        btn.style.border = "none";
+        btn.style.borderRadius = "50%";
+        btn.style.width = "20px";
+        btn.style.height = "20px";
+        btn.style.cursor = "pointer";
+
+        btn.onclick = () => {
+            variantFilesMap[variantIdx].splice(fileIdx, 1);
+            renderVariantImagesGallery(variantIdx);
+            finalizeVariantFilesInput(variantIdx);
+        };
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(btn);
+        thumbContainer.appendChild(wrapper);
+    });
 }
 
+function finalizeVariantFilesInput(variantIdx) {
+    const hiddenContainer = document.getElementById(`croppedFilesContainer_${variantIdx}`);
+    hiddenContainer.innerHTML = ""; 
 
+    const dataTransfer = new DataTransfer();
+    variantFilesMap[variantIdx].forEach(file => {
+        dataTransfer.items.add(file);
+    });
 
-function renderImages() {
+    const hiddenFileInput = document.createElement('input');
+    hiddenFileInput.type = 'file';
+    hiddenFileInput.name = `variantImages_${variantIdx}`;
+    hiddenFileInput.multiple = true;
+    hiddenFileInput.style.display = 'none';
+    hiddenFileInput.files = dataTransfer.files; 
+    
+    hiddenContainer.appendChild(hiddenFileInput);
+}
 
-   const preview = document.getElementById("imagesPreviewGallery");
-   preview.innerHTML = "";
+btnCancelCrop.addEventListener('click', () => {
+    cropperModal.style.display = 'none';
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+    currentQueueIndex++;
+    openCropperForNextInQueue();
+});
 
-   selectedFiles.forEach((file, index) => {
+document.querySelector('.modal-form-body').addEventListener('submit', function (e) {
+   e.preventDefault();
 
-      const reader = new FileReader();
+   const productName = document.querySelector('[name="productName"]').value.trim();
+   const brand = document.querySelector('[name="brand"]').value.trim();
+   const description = document.querySelector('[name="description"]').value.trim();
+   const parentCategory = document.querySelector('[name="parentCategory"]').value;
+   const category = document.querySelector('[name="category"]').value;
+   const price = document.querySelector('[name="regularPrice"]').value;
 
-      reader.onload = (e) => {
+   function showValidationError(message) {
+      if (typeof Toastify === "function") {
+          Toastify({
+             text: message,
+             duration: 3000,
+             gravity: "top",
+             position: "right",
+             style: { background: "#ef4444", borderRadius: "8px" }
+          }).showToast();
+      } else {
+          alert(message);
+      }
+   }
 
-         const wrapper = document.createElement("div");
-         wrapper.style.position = "relative";
-         wrapper.style.display = "inline-block";
-         wrapper.style.margin = "10px";
+   if (!productName) return showValidationError("Product name is required");
+   if (!brand) return showValidationError("Brand is required");
+   if (!description) return showValidationError("Description is required");
+   if (!parentCategory) return showValidationError("Please select parent category");
+   if (!category) return showValidationError("Please select subcategory");
+   if (!price || Number(price) <= 0) return showValidationError("Enter valid price");
 
-         const img = document.createElement("img");
-         img.src = e.target.result;
-         img.style.width = "100px";
-         img.style.height = "100px";
-         img.style.objectFit = "cover";
-         img.style.borderRadius = "10px";
+   const totalCards = document.querySelectorAll('#variantsContainer .variant-card');
+   if (totalCards.length === 0) {
+       return showValidationError("Please add at least one color variant configuration");
+   }
 
-         const btn = document.createElement("button");
-         btn.innerText = "×";
-         btn.type = "button";
-
-         btn.style.position = "absolute";
-         btn.style.top = "0";
-         btn.style.right = "0";
-         btn.style.background = "red";
-         btn.style.color = "white";
-         btn.style.border = "none";
-         btn.style.borderRadius = "50%";
-         btn.style.width = "20px";
-         btn.style.height = "20px";
-         btn.style.cursor = "pointer";
-
-         btn.onclick = () => {
-            selectedFiles.splice(index, 1);
-            updateFileInput();
-            renderImages();
-         };
-
-         wrapper.appendChild(img);
-         wrapper.appendChild(btn);
-         preview.appendChild(wrapper);
-      };
-
-      reader.readAsDataURL(file);
+   let imagesMissing = false;
+   Object.keys(variantFilesMap).forEach(key => {
+       if (variantFilesMap[key].length === 0) {
+           imagesMissing = true;
+       }
    });
-}
+
+   if (imagesMissing) {
+       return showValidationError("Please upload and crop at least three image variant illustration");
+   }
+
+   this.submit();
+});
+
+bindColorPickers();
+addColorVariantBlock();
 </script>

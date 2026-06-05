@@ -6,11 +6,50 @@
     <section class="hero-section">
         <div class="hero-content">
           <h1>Shop the latest Sneakers</h1>
-        <p>Find the perfect pair for Men & Women</p>
+        <p>Discover Your Next Favorite Pair</p>
         </div>
        
+             <div class="products-wrapper-grid">
+        {{#each products}}
+          <div class="product-card-gender">      
+            <div class="product-image">
+              {{#if this.variants}}
+                <img 
+                  src="/uploads/{{lookup (lookup (lookup this.variants 0) 'images') 0}}" 
+                  alt="{{this.productName}}"
+                >
+              {{else}}
+                <img src="/images/default-shoe.png" alt="Product Image">
+              {{/if}}
+            </div>
+            
+            <div class="product-info">
+              <h3>{{this.productName}}</h3>
+              <p class="product-card">
+                {{#if this.description}}
+                  {{this.description}}
+                {{else if this.Category.name}}
+                  {{this.Category.name}} Fit
+                {{else}}
+                  Premium Collection
+                {{/if}}
+              </p>     
+              <div class="product-action-block">
+                <h4>₹{{this.regularPrice}}</h4>
+                <a href="/details/{{this._id}}" class="rec-discover-btn">
+                  <button type="button">DISCOVER MORE</button>
+                </a>
+              </div>
+            </div>
+          </div>
+        {{else}}
+          <div class="no-products" style="grid-column: 1 / -1; width: 100%; text-align: center; padding: 40px 0;">
+            <p style="font-size: 16px; color: #64748b; font-weight: 500;">No sneakers found matching your criteria.</p>
+          </div>
+        {{/each}}
+      </div>
         
-        <div class="collection-banners">
+        {{!-- <div class="collection-banners">
             <div class="banner">
                 <a href="/shop/men">
                 <img src="/images/men.jpeg" alt="Men's Collection">
@@ -26,7 +65,7 @@
                 </a>
                 </div>
         </div>
-        </div>
+        </div> --}}
     </section>
 
     <section class="categories-section">
@@ -80,27 +119,23 @@
 </div>
 
 {{/unless}}
-
 {{#if searchValue}}
 <section class="shop-products-section">
 
-    {{#if searchValue}}
-        <h2>
-            Search Results For "{{searchValue}}"
-        </h2>
-    {{else}}
-        <h2>All Products</h2>
-    {{/if}}
+    <h2>Search Results For "{{searchValue}}"</h2>
 
     <div class="products-wrapper-grid">
 
         {{#each products}}
-
         <div class="product-card">
 
             <div class="product-image">
-
-                {{#if this.productImage}}
+                {{#if this.variants}}
+                    <img
+                        src="/uploads/{{lookup (lookup (lookup this.variants 0) 'images') 0}}"
+                        alt="{{this.productName}}"
+                    >
+                {{else if this.productImage}}
                     <img
                         src="/uploads/{{lookup this.productImage 0}}"
                         alt="{{this.productName}}"
@@ -111,32 +146,31 @@
                         alt="Product"
                     >
                 {{/if}}
-
             </div>
 
             <div class="product-info">
-
                 <h3>{{this.productName}}</h3>
 
-                <p>{{this.description}}</p>
+                <p>
+                    {{#if this.description}}
+                        {{this.description}}
+                    {{else}}
+                        Premium Collection
+                    {{/if}}
+                </p>
 
                 <h4>₹{{this.regularPrice}}</h4>
-                
 
                 <a href="/details/{{this._id}}" class="rec-discover-btn">
-                  <button type="button">DISCOVER MORE</button>
+                    <button type="button">DISCOVER MORE</button>
                 </a>
-
             </div>
 
         </div>
-
         {{else}}
-
-        <div class="no-products">
-            <p>No products found</p>
+        <div class="no-products" style="grid-column: 1 / -1; width: 100%; text-align: center; padding: 40px 0;">
+            <p style="font-size: 16px; color: #64748b; font-weight: 500;">No products found</p>
         </div>
-
         {{/each}}
 
     </div>

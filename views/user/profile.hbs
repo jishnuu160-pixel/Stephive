@@ -124,7 +124,6 @@
 
         const img = document.getElementById("profile-preview");
 
-        // 🔥 FORCE REFRESH (cache-bust)
         img.src = data.profileImage + "?t=" + Date.now();
 
         showFlash("success", data.message);

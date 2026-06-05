@@ -1,9 +1,10 @@
 <header class="navbar">
    <div class="logo">StepHyve</div>
-    <nav class="nav-links">
-        
-      <a href="/">Home</a>
+    <nav class="nav-links" id="mainNavLinks">
+        <a href="/">Home</a>
         <a href="/shop">Shop</a>
+        <a href="/shop/men">Men</a>
+        <a href="/shop/women">Women</a>
         <a href="/about">About</a>
     </nav>
     <div class="icons">
@@ -21,8 +22,15 @@
         </form>
 
         <img class="nav-icons" src="/icons/wishlist.png">
-        <a href="/user/cart"><img class="nav-icons" src="/icons/cart.png" ></a>
-
+        
+       <a href="/user/cart" class="cart-anchor-wrapper">
+    <img class="nav-icons" src="/icons/cart.png">
+    {{#if user}}
+        {{#if globalCartCount}}
+            <span class="cart-badge-count">{{globalCartCount}}</span>
+        {{/if}}
+    {{/if}}
+</a>
       {{#if user}}
       <a href="/user/profile">
           <img class="nav-icons" src="/icons/user.png">
@@ -30,3 +38,21 @@
       {{/if}}
     </div>
 </header>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll("#mainNavLinks a");
+
+    navLinks.forEach(link => {
+        const hrefAttr = link.getAttribute("href");
+
+        if (currentPath === hrefAttr) {
+            link.classList.add("active-nav-link");
+        } 
+        else if (hrefAttr === "/shop" && currentPath.startsWith("/details")) {
+            link.classList.add("active-nav-link");
+        }
+    });
+});
+</script>

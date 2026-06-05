@@ -1,4 +1,4 @@
-{{!-- views/user/edit-profile.hbs --}}
+
 <div class="edit-profile-container">
     <div class="edit-card">
         <h3>Personal Information</h3>
@@ -17,7 +17,6 @@
                 <label>GENDER</label>
                 <div class="gender-selection">
                     <label class="gender-radio">
-                        {{!-- CHANGE: value="male" to value="Male" --}}
                         <input type="radio" name="gender" value="Male" {{#if (eq user.gender 'Male')}}checked{{/if}}>
                         <span>Male</span>
                     </label>

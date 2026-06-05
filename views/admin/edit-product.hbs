@@ -11,9 +11,7 @@
           enctype="multipart/form-data" 
           class="modal-form-body">
 
-      <!-- BASIC INFO -->
       <div class="form-row split-row4">
-
         <div class="form-group">
           <label>Product Name</label>
           <input type="text" name="productName" value="{{product.productName}}" >
@@ -28,148 +26,124 @@
           <label>Base Price</label>
           <input type="number" name="regularPrice" min="1" value="{{product.regularPrice}}" >
         </div>
-
       </div>
 
-      <!-- DESCRIPTION -->
       <div class="form-group">
         <label>Description</label>
-        <textarea name="description" >{{product.description}}</textarea>
+        <textarea name="description" class="form-control" rows="3">{{product.description}}</textarea>
       </div>
 
-      <!-- CATEGORY -->
-      <div class="form-row split-row">
-
-        <div class="form-group">
-          <label>Category</label>
-          <select name="parentCategory" id="parentCategory">
-  {{#each parentCategories}}
-    <option value="{{this._id}}"
-      {{#if (eq this._id ../selectedParentId)}}
-        selected
-      {{/if}}>
-      {{this.name}}
-    </option>
-  {{/each}}
-</select>
-        </div>
-
-      </div>
-
-        {{!-- subcategory --}}
-       <div class="form-row split-row">
-
-        <div class="form-group">
-  <label>Subcategory</label>
-
-  <select name="subCategory" id="subCategory">
-    <option value="">Select Subcategory</option>
-
-    {{#each subcategories}}
-      <option value="{{this._id}}"
-        {{#if (eq this._id ../product.subCategory)}}
-          selected
-        {{/if}}>
+      <div class="form-row split-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+       <div class="form-group">
+  <label>Category</label>
+  <select name="parentCategory" id="parentCategory">
+    {{#each parentCategories}}
+      <option value="{{this._id}}" {{#if (eq this._id ../selectedParentId)}}selected{{/if}}>
         {{this.name}}
       </option>
     {{/each}}
   </select>
 </div>
 
+<div class="form-group">
+  <label>SUBCATEGORY</label>
+  <select name="category" id="subCategory" class="form-control" required>
+    <option value="">Select Subcategory</option>
+    {{#each subcategories}}
+      <option value="{{this._id}}" {{#if (eq this._id ../product.Category._id)}}selected{{/if}}>
+        {{this.name}}
+      </option>
+    {{/each}}
+  </select>
+</div>
       </div>
 
-      <!-- IMAGES -->
-      <div class="form-group">
-        <label>Product Images</label>
+      <div class="variants-section" style="margin-top:25px;">
+        <label class="section-main-label" style="font-weight:600; font-size:16px;">Variants</label>
 
-        <small style="display:block;margin-bottom:10px;">
-          Existing Images (click × to remove)
-        </small>
+        <div id="variantsContainer" class="variants-grid-wrapper">
+          {{#each product.variants}}
+            <div class="variant-card" data-variant-index="{{@index}}" style="border:1px solid #e2e8f0; padding:15px; border-radius:8px; margin-bottom:15px; background:#f8fafc;">
+              
+              <div class="form-group">
+                <label>Color Name</label>
+                <input type="text" name="colorNames[]" value="{{this.colorName}}" placeholder="Color Name">
 
-        <div class="edit-images-grid" style="display:flex;gap:10px;flex-wrap:wrap;">
+                <div class="color-picker" style="margin-top: 10px; display:flex; align-items:center; gap:10px;">
+                  <input type="color" name="colorHex[]" value="{{this.colorHex}}">
+                  <span class="label">{{this.colorHex}}</span>
+                  <input type="hidden" name="colorName[]" class="color-name" value="{{this.colorName}}">
+                </div>
+              </div>
 
-          {{#each product.productImage}}
-            <div class="img-box" style="position:relative;">
-              <img src="/uploads/products/{{this}}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;">
+              <div class="form-group variant-images-section" style="margin-top: 20px;">
+                <label>Variant Images (Upload unique photos for this color)</label>
+                
+                <small style="display:block; margin-bottom:10px; color:#64748b;">
+                  Existing Images for this color (click × to remove)
+                </small>
 
-              <button type="button" class="remove-img"
-                style="position:absolute;top:-5px;right:-5px;background:red;color:white;border:none;border-radius:50%;width:20px;height:20px;">
-                ×
+                <div class="edit-images-grid" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+                  {{#each this.images}}
+                    <div class="img-box" style="position:relative;" data-img-name="{{this}}" data-variant-index="{{@../index}}">
+                      <img src="/uploads/products/{{this}}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1;">
+                      <button type="button" class="remove-img"
+                        style="position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;">
+                        ✕
+                      </button>
+                    </div>
+                  {{/each}}
+                </div>
+
+                <div class="image-drag-dropzone upload-box-variant" style="border: 2px dashed #cbd5e1; padding: 20px; text-align: center; border-radius: 8px; background: #fff; cursor: pointer;">
+                  <input 
+                      type="file" 
+                      class="variant-image-input"
+                      data-index="{{@index}}"
+                      multiple 
+                      accept="image/*" 
+                      style="display:none"
+                  >
+                  <div class="dropzone-inner-ui">
+                      <div class="camera-icon" style="font-size: 24px; margin-bottom: 5px;">📷</div>
+                      <p class="main-drop-text" style="margin:0; font-weight:500;">Click to upload more color specific images</p>
+                      <p class="sub-drop-text" style="margin:0; color:#64748b; font-size:12px;">JPG, PNG up to 2MB</p>
+                  </div>
+                </div>
+                
+                <div class="cropped-files-container" id="croppedFilesContainer_{{@index}}"></div>
+                <div class="images-preview-gallery-variant" id="thumbnailsContainer_{{@index}}" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+              </div>
+
+              <div class="sizes-container" style="margin-top:15px;">
+                <label style="font-weight:500; display:block; margin-bottom:5px;">Sizes & Stock</label>
+                
+                {{#each this.sizes}}
+                  <div class="size-row" style="display:flex; gap:10px; margin-bottom:5px;">
+                    <input type="number" name="sizes_{{@../index}}[]" value="{{this.size}}" placeholder="Size">
+                    <input type="number" name="stocks_{{@../index}}[]" value="{{this.stock}}" placeholder="Stock">
+                    <button type="button" class="remove-size" style="background:#ef4444; color:white; border:none; border-radius:4px; padding:0 10px; cursor:pointer;">X</button>
+                  </div>
+                {{/each}}
+
+                <button type="button" class="add-size" style="margin-top:5px; background:#e2e8f0; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">+ Add size</button>
+              </div>
+
+              <button type="button" class="remove-variant" style="margin-top:15px; background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px;">
+                Remove Variant
               </button>
             </div>
           {{/each}}
-
         </div>
 
-        <input type="file" name="productImages" multiple>
-        <small>Upload new images to replace old ones</small>
+        <div id="removedImagesContainer"></div>
+
+        <button type="button" class="btn-add-variant-group" id="addVariantBtn" style="margin-top:10px; padding:8px 16px; background:#004d40; color:white; border:none; border-radius:6px; cursor:pointer;">
+          + Add another color variant
+        </button>
       </div>
 
-<div class="variants-section">
-
-  <label class="section-main-label">Variants</label>
-
-  <div id="variantsContainer" class="variants-grid-wrapper">
-
-    {{#each product.variants}}
-      <div class="variant-card">
-
-        <div class="form-group">
-
-          <input
-            type="text"
-            name="colorNames[]"
-            value="{{this.colorName}}"
-            placeholder="Color Name"
-          >
-
-          <div class="color-picker">
-
-            <input type="color" name="colorHex[]" value="{{this.colorHex}}">
-
-            <span class="label"></span>
-
-            <input
-              type="hidden"
-              name="colorName[]"
-              class="color-name"
-              value="{{this.colorName}}"
-            >
-
-          </div>
-
-        </div>
-
-        <div class="sizes-container">
-          <label>Sizes & Stock</label>
-
-          {{#each this.sizes}}
-          <div class="size-row">
-            <input type="number" name="sizes[]" value="{{this.size}}" placeholder="Size">
-            <input type="number" name="stocks[]" value="{{this.stock}}" placeholder="Stock">
-            <button type="button" class="remove-size">X</button>
-          </div>
-          {{/each}}
-
-          <button type="button" class="add-size">+ Add size</button>
-        </div>
-
-        <button type="button" class="remove-variant">Remove Variant</button>
-
-      </div>
-    {{/each}}
-
-  </div>
-
-  <button type="button" class="btn-add-variant-group" id="addVariantBtn">
-    + Add another color variant
-  </button>
-
-</div>
-
-      <!-- SPECS -->
-      <div class="form-row split-row4">
-
+      <div class="form-row split-row4" style="margin-top:25px;">
         <div class="form-group">
           <label>Material</label>
           <input type="text" name="material" value="{{product.material}}">
@@ -190,90 +164,388 @@
           <input type="text" name="weight" value="{{product.weight}}">
         </div>
 
-         <div class="form-group">
+        <div class="form-group">
           <label>Country of Origin</label>
           <input type="text" name="countryOfOrigin" value="{{product.countryOfOrigin}}">
         </div>
       </div>
 
-      <!-- FOOTER -->
-      <div class="modal-action-footer">
+      <div class="modal-action-footer" style="margin-top:30px; display:flex; justify-content:flex-end; gap:10px;">
         <a href="/admin/products" class="btn-modal-cancel">Cancel</a>
-        <button type="submit" class="btn-modal-save">Update</button>
+        <button type="submit" class="btn-modal-save">Update Changes</button>
       </div>
 
     </form>
-
   </div>
 </div>
 
+<div id="variantTemplate" style="display:none;">
+  <div class="variant-card" data-variant-index="TEMPLATE_INDEX" style="border:1px solid #e2e8f0; padding:15px; border-radius:8px; margin-bottom:15px; background:#f8fafc;">
+    <div class="form-group">
+      <label>Color Name</label>
+      <input type="text" name="colorNames[]" placeholder="Color Name">
+
+      <div class="color-picker" style="margin-top: 10px; display:flex; align-items:center; gap:10px;">
+        <input type="color" name="colorHex[]" value="#000000">
+        <span class="label">#000000</span>
+        <input type="hidden" name="colorName[]" class="color-name">
+      </div>
+    </div>
+
+    <div class="form-group variant-images-section" style="margin-top: 20px;">
+        <label>Variant Images (Upload unique photos for this color)</label>
+        
+        <div class="image-drag-dropzone upload-box-variant" style="border: 2px dashed #cbd5e1; padding: 20px; text-align: center; border-radius: 8px; background: #fff; cursor: pointer;">
+            <input 
+                type="file" 
+                class="variant-image-input"
+                data-index="TEMPLATE_INDEX"
+                multiple 
+                accept="image/*" 
+                style="display:none"
+            >
+            <div class="dropzone-inner-ui">
+                <div class="camera-icon" style="font-size: 24px; margin-bottom: 5px;">📷</div>
+                <p class="main-drop-text" style="margin:0; font-weight:500;">Click to upload color specific images</p>
+                <p class="sub-drop-text" style="margin:0; color:#64748b; font-size:12px;">JPG, PNG up to 2MB</p>
+            </div>
+        </div>
+        <div class="cropped-files-container" id="croppedFilesContainer_TEMPLATE_INDEX"></div>
+        <div class="images-preview-gallery-variant" id="thumbnailsContainer_TEMPLATE_INDEX" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+    </div>
+
+    <div class="sizes-container" style="margin-top:15px;">
+      <label style="font-weight:500; display:block; margin-bottom:5px;">Sizes & Stock</label>
+      <div class="size-row" style="display:flex; gap:10px; margin-bottom:5px;">
+        <input type="number" name="sizes_TEMPLATE_INDEX[]" placeholder="Size">
+        <input type="number" name="stocks_TEMPLATE_INDEX[]" placeholder="Stock">
+        <button type="button" class="remove-size" style="background:#ef4444; color:white; border:none; border-radius:4px; padding:0 10px; cursor:pointer;">X</button>
+      </div>
+      <button type="button" class="add-size" style="margin-top:5px; background:#e2e8f0; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:12px;">+ Add size</button>
+    </div>
+
+    <button type="button" class="remove-variant" style="margin-top:15px; background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px;">
+      Remove Variant
+    </button>
+  </div>
+</div>
+
+<div id="cropperModal" class="cropper-modal-container" style="display: none;">
+    <div class="cropper-wrapper">
+        <h3>Crop Variant Image</h3>
+        <div class="image-preview-box">
+            <img id="cropperTargetImage" src="" alt="Target Crop" style="max-width: 100%; max-height: 100%; display: block;">
+        </div>
+        <div class="cropper-actions">
+            <button type="button" id="btnCancelCrop" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="btnSaveCrop" class="btn btn-primary">Crop & Save</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.cropper-modal-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 999999;
+}
+.cropper-wrapper {
+    background: #ffffff; padding: 20px; border-radius: 12px;
+    max-width: 500px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+.cropper-wrapper h3 { margin-top: 0; margin-bottom: 14px; font-size: 16px; font-weight: 600; color: #0f172a; }
+.image-preview-box {
+    max-height: 350px; height: 350px; margin-bottom: 18px; overflow: hidden;
+    background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;
+    display: flex; justify-content: center; align-items: center;
+}
+.cropper-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.btn { padding: 8px 14px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+.btn-primary { background: #004d40; color: #ffffff; }
+</style>
+
 <script>
+let variantCounter = document.querySelectorAll('#variantsContainer .variant-card').length;
+let variantFilesMap = {};
 
-// ADD VARIANT (same style as add product)
+for (let i = 0; i < variantCounter; i++) {
+    variantFilesMap[i] = [];
+}
+
+function initColorPickers(scope = document) {
+  scope.querySelectorAll('.color-picker').forEach(wrapper => {
+    const input = wrapper.querySelector('input[type="color"]');
+    const label = wrapper.querySelector('.label');
+    const hidden = wrapper.querySelector('.color-name');
+
+    function update() {
+      label.textContent = input.value.toUpperCase();
+      if(hidden) hidden.value = input.value;
+    }
+    input.removeEventListener('input', update);
+    input.addEventListener('input', update);
+  });
+}
+
 document.getElementById("addVariantBtn").addEventListener("click", function () {
-
   const template = document.getElementById("variantTemplate");
   const clone = template.querySelector(".variant-card").cloneNode(true);
+  
+  const targetIndex = variantCounter;
+  clone.setAttribute("data-variant-index", targetIndex);
+  variantFilesMap[targetIndex] = []; 
+  
+  let innerHTMLContent = clone.innerHTML;
+  innerHTMLContent = innerHTMLContent.replace(/TEMPLATE_INDEX/g, targetIndex);
+  clone.innerHTML = innerHTMLContent;
 
   document.getElementById("variantsContainer").appendChild(clone);
-
+  initColorPickers(clone);
+  
+  variantCounter++;
 });
 
+document.addEventListener("click", function(e) {
+    const dropzone = e.target.closest('.upload-box-variant');
+    if (dropzone && e.target.tagName !== 'INPUT') {
+        dropzone.querySelector('.variant-image-input').click();
+    }
+});
 
-// REMOVE VARIANT
 document.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove-variant")) {
-    e.target.closest(".variant-card").remove();
+    const card = e.target.closest(".variant-card");
+    const index = card.getAttribute("data-variant-index");
+    delete variantFilesMap[index];
+    card.remove();
   }
 });
 
-
-// ADD SIZE ROW
 document.addEventListener("click", function (e) {
   if (e.target.classList.contains("add-size")) {
-
     const container = e.target.closest(".sizes-container");
+    const parentCard = e.target.closest(".variant-card");
+    const currentIndex = parentCard.getAttribute("data-variant-index");
 
     const row = document.createElement("div");
     row.classList.add("size-row");
+    row.style.display = "flex"; row.style.gap = "10px"; row.style.marginBottom = "5px";
 
     row.innerHTML = `
-      <input type="number" name="sizes[]" placeholder="Size">
-      <input type="number" name="stocks[]" placeholder="Stock">
-      <button type="button" class="remove-size">X</button>
+      <input type="number" name="sizes_${currentIndex}[]" placeholder="Size">
+      <input type="number" name="stocks_${currentIndex}[]" placeholder="Stock">
+      <button type="button" class="remove-size" style="background:#ef4444; color:white; border:none; border-radius:4px; padding:0 10px; cursor:pointer;">X</button>
     `;
-
     container.insertBefore(row, e.target);
-
   }
 });
 
-
-// REMOVE SIZE ROW
 document.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove-size")) {
     e.target.closest(".size-row").remove();
   }
 });
 
-document.getElementById("parentCategory").addEventListener("change", async function () {
+document.getElementById('parentCategory').addEventListener('change', async function() {
+    const parentId = this.value;
+    const subCategorySelect = document.getElementById('subCategory');
+    
+    subCategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+    
+    if (!parentId) return;
 
-  const parentId = this.value;
-
-  const res = await fetch(`/admin/subcategories/${parentId}`);
-  const data = await res.json();
-
-  const subSelect = document.getElementById("subCategory");
-
-  subSelect.innerHTML = `<option value="">Select Subcategory</option>`;
-
-  data.subcategories.forEach(sc => {
-    subSelect.innerHTML += `
-      <option value="${sc._id}">
-        ${sc.name}
-      </option>
-    `;
-  });
-
+    try {
+        const response = await fetch(`/admin/categories/api/subcategories/${parentId}`);
+        const result = await response.json();
+        
+        if (result.success && result.subcategories) {
+            result.subcategories.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub._id;
+                option.textContent = sub.name;
+                subCategorySelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching subcategories dynamically:', error);
+    }
 });
+
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('remove-img')) {
+    const box = e.target.closest('.img-box');
+    const imageName = box.getAttribute('data-img-name');
+    const variantIndex = box.getAttribute('data-variant-index');
+    
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = `removedImages_${variantIndex}[]`;
+    hiddenInput.value = imageName;
+    
+    document.getElementById('removedImagesContainer').appendChild(hiddenInput);
+    box.remove();
+  }
+});
+
+
+let cropper = null;
+let currentFilesQueue = [];
+let currentQueueIndex = 0;
+let currentVariantIndex = null;
+
+const cropperModal = document.getElementById('cropperModal');
+const cropperTargetImage = document.getElementById('cropperTargetImage');
+const btnSaveCrop = document.getElementById('btnSaveCrop');
+const btnCancelCrop = document.getElementById('btnCancelCrop');
+
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.classList.contains('variant-image-input')) {
+        if (!e.target.files || e.target.files.length === 0) return;
+
+        const files = Array.from(e.target.files);
+        const filteredFiles = [];
+
+        for (let i = 0; i < files.length; i++) {
+            if (files[i].size > 2 * 1024 * 1024) {
+                alert(`"${files[i].name}" exceeds 2MB limit!`);
+            } else {
+                filteredFiles.push(files[i]);
+            }
+        }
+
+        if (filteredFiles.length === 0) { e.target.value = ""; return; }
+
+        currentVariantIndex = e.target.getAttribute('data-index');
+        currentFilesQueue = filteredFiles;
+        currentQueueIndex = 0;
+
+        openCropperForNextInQueue();
+        e.target.value = ""; 
+    }
+});
+
+function openCropperForNextInQueue() {
+    if (currentQueueIndex >= currentFilesQueue.length) {
+        finalizeVariantFilesInput(currentVariantIndex);
+        return;
+    }
+
+    if (cropper) { cropper.destroy(); cropper = null; }
+
+    const currentFile = currentFilesQueue[currentQueueIndex];
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        cropperTargetImage.src = event.target.result;
+        cropperModal.style.display = 'flex';
+
+        cropperTargetImage.onload = function() {
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(cropperTargetImage, {
+                aspectRatio: 1, 
+                viewMode: 1,
+                autoCropArea: 0.8,
+                responsive: true,
+                restore: false
+            });
+        };
+    };
+    reader.readAsDataURL(currentFile);
+}
+
+btnSaveCrop.addEventListener('click', () => {
+    if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
+
+    canvas.toBlob((blob) => {
+        const originalName = currentFilesQueue[currentQueueIndex].name;
+        const croppedFile = new File([blob], originalName, { type: 'image/jpeg' });
+
+        if (!variantFilesMap[currentVariantIndex]) {
+            variantFilesMap[currentVariantIndex] = [];
+        }
+        variantFilesMap[currentVariantIndex].push(croppedFile);
+
+        cropperModal.style.display = 'none';
+        if (cropper) { cropper.destroy(); cropper = null; }
+
+        renderVariantImagesGallery(currentVariantIndex);
+        currentQueueIndex++;
+        openCropperForNextInQueue();
+    }, 'image/jpeg', 0.9);
+});
+
+function renderVariantImagesGallery(variantIdx) {
+    const thumbContainer = document.getElementById(`thumbnailsContainer_${variantIdx}`);
+    if (!thumbContainer) return;
+    thumbContainer.innerHTML = ""; 
+
+    variantFilesMap[variantIdx].forEach((file, fileIdx) => {
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative"; wrapper.style.display = "inline-block"; wrapper.style.margin = "10px";
+
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file); 
+        img.style.width = "80px"; img.style.height = "80px"; img.style.objectFit = "cover"; img.style.borderRadius = "6px";
+
+        const btn = document.createElement("button");
+        btn.innerText = "×"; btn.type = "button";
+        btn.style.position = "absolute"; btn.style.top = "0"; btn.style.right = "0"; btn.style.background = "red";
+        btn.style.color = "white"; btn.style.border = "none"; btn.style.borderRadius = "50%";
+        btn.style.width = "20px"; btn.style.height = "20px"; btn.style.cursor = "pointer";
+
+        btn.onclick = () => {
+            variantFilesMap[variantIdx].splice(fileIdx, 1);
+            renderVariantImagesGallery(variantIdx);
+            finalizeVariantFilesInput(variantIdx);
+        };
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(btn);
+        thumbContainer.appendChild(wrapper);
+    });
+}
+
+function finalizeVariantFilesInput(variantIdx) {
+    const hiddenContainer = document.getElementById(`croppedFilesContainer_${variantIdx}`);
+    if (!hiddenContainer) return; 
+    
+    if (!variantFilesMap[variantIdx] || variantFilesMap[variantIdx].length === 0) {
+        hiddenContainer.innerHTML = "";
+        return; 
+    }
+
+    hiddenContainer.innerHTML = ""; 
+
+    const dataTransfer = new DataTransfer();
+    variantFilesMap[variantIdx].forEach(file => {
+        dataTransfer.items.add(file);
+    });
+
+    const hiddenFileInput = document.createElement('input');
+    hiddenFileInput.type = 'file';
+    hiddenFileInput.name = `variantImages_${variantIdx}`; 
+    hiddenFileInput.multiple = true;
+    hiddenFileInput.style.display = 'none';
+    hiddenFileInput.files = dataTransfer.files; 
+    
+    hiddenContainer.appendChild(hiddenFileInput);
+}
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    Object.keys(variantFilesMap).forEach(variantIdx => {
+        finalizeVariantFilesInput(variantIdx);
+    });
+});
+
+btnCancelCrop.addEventListener('click', () => {
+    cropperModal.style.display = 'none';
+    if (cropper) { cropper.destroy(); cropper = null; }
+    currentQueueIndex++;
+    openCropperForNextInQueue();
+});
+
+initColorPickers();
 </script>

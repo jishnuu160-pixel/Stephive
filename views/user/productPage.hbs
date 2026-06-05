@@ -1,45 +1,55 @@
 <section class="product-details-container">
   
   <nav class="details-breadcrumb">
-    <a href="/">Shop</a> / 
-    
+    <a href="/shop">Shop</a> / 
     <span>{{product.productName}}</span>
   </nav>
 
   <div class="main-product-layout">
-    
-    <div class="product-gallery-block">
-      <div class="hero-image-wrapper">
-        {{!-- <span class="badge-new">NEW ARRIVAL</span> --}}
-        <button class="wishlist-trigger" type="button" aria-label="Add to Wishlist">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-        </button>
-        
-        {{#if product.productImage}}
-         <div class="image-zoom-container">
 
-    <img 
-        id="mainProductImage"
-        class="zoom-image"
-        src="/uploads/{{lookup product.productImage 0}}"
-        alt="{{product.productName}}"
-    >
+    <div class="product-gallery-block" style="display: flex; gap: 20px; align-items: flex-start; flex: 1; max-width: 620px;">
 
-</div>
-        {{else}}
-          <div class="no-image-fallback">No Product Image Available</div>
-        {{/if}}
-      </div>
-      
-      <div class="thumbnail-strip">
-        {{#each product.productImage}}
-        <div class="thumb-frame {{#if @first}}active-thumb{{/if}}" onclick="changeMainImage('/uploads/{{this}}', this)">
-          <img src="/uploads/{{this}}" alt="Product detail view">
+        <div class="thumbnail-strip" id="thumbnailStrip">
+            {{#each (lookup (lookup product.variants 0) 'images')}}
+            <div
+                class="thumb-frame {{#if @first}}active-thumb{{/if}}"
+                onclick="changeMainImage('/uploads/{{this}}', this)"
+            >
+                <img
+                    src="/uploads/{{this}}"
+                    alt="{{../product.productName}}"
+                >
+            </div>
+            {{/each}}
         </div>
-        {{/each}}
-      </div>
+
+        <div class="hero-image-wrapper" style="flex: 1; position: relative;">
+
+            <button class="wishlist-trigger" type="button" aria-label="Add to Wishlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </button>
+
+            <div class="product-card">
+                {{#if (lookup (lookup product.variants 0) 'images')}}
+                <div class="image-zoom-container" style="cursor: pointer;" onclick="openZoomModal()">
+                    <img
+                        id="mainProductImage"
+                        class="zoom-image"
+                        src="/uploads/{{lookup (lookup (lookup product.variants 0) 'images') 0}}"
+                        alt="{{product.productName}}"
+                    >
+                </div>
+                {{else}}
+                <div class="no-image-fallback">
+                    No Product Image Available
+                </div>
+                {{/if}}
+            </div>
+
+        </div>
+
     </div>
 
     <div class="product-configurator-block">
@@ -55,7 +65,7 @@
 
       <div class="pricing-row">
         <h2 class="current-price">
-          ₹{{#if product.salePrice}}{{product.salePrice}}{{else}}{{product.regularPrice}}{{value}}{{/if}}
+          ₹{{#if product.salePrice}}{{product.salePrice}}{{else}}{{product.regularPrice}}{{/if}}
         </h2>
         {{#if product.salePrice}}
           <span class="slashed-price">₹{{product.regularPrice}}</span>
@@ -63,42 +73,34 @@
         {{/if}}
       </div>
 
-   {{#if product.variants}}
-<div class="config-group">
-  <span class="config-label">COLOR: <strong id="selectedColorLabel">{{lookup (lookup product.variants 0) 'colorName'}}</strong></span>
-  <div class="color-swatch-flex">
-    {{#each product.variants}}
-    <button 
-      type="button" 
-      class="swatch-circle {{#if @first}}active-swatch{{/if}}" 
-      style="background-color: {{this.colorHex}}; background-image: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(0,0,0,0.1));"
-      onclick="updateSelectedColor('{{this.colorName}}', this)">
-    </button>
-    {{#if @first}}
-      {{/if}}
-    {{/each}}
-  </div>
-</div>
-{{/if}}
-
-{{#if product.variants}}
-  {{#each product.variants}}
-    {{#if @first}}
-      {{#if this.sizes}}
+      {{#if product.variants}}
       <div class="config-group">
-        <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
-        <div class="size-chips-grid">
-          {{#each this.sizes}}
-          <button type="button" class="size-chip" onclick="updateSelectedSize('{{this.size}}', this)">
-            {{this.size}}
+        <span class="config-label">COLOR: <strong id="selectedColorLabel">{{lookup (lookup product.variants 0) 'colorName'}}</strong></span>
+        <div class="color-swatch-flex">
+          {{#each product.variants}}
+          <button 
+            type="button" 
+            class="swatch-circle {{#if @first}}active-swatch{{/if}}" 
+            style="background-color: {{this.colorHex}}; background-image: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(0,0,0,0.1));"
+            onclick="updateSelectedColor('{{this.colorName}}', '{{this._id}}', {{@index}}, this)">
           </button>
           {{/each}}
         </div>
       </div>
       {{/if}}
-    {{/if}}
-  {{/each}}
-{{/if}}
+
+      <div class="config-group">
+        <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
+        <div class="size-chips-grid" id="sizeChipsGrid">
+          {{#if (lookup (lookup product.variants 0) 'sizes')}}
+            {{#each (lookup (lookup product.variants 0) 'sizes')}}
+            <button type="button" class="size-chip" onclick="updateSelectedSize('{{this.size}}', this)">
+              {{this.size}}
+            </button>
+            {{/each}}
+          {{/if}}
+        </div>
+      </div>
 
       <div class="purchase-action-matrix">
         <div class="quantity-stepper">
@@ -107,8 +109,8 @@
           <button type="button" onclick="updateQty(1)">+</button>
         </div>
         
-       <button type="button" class="btn-secondary-cart" onclick="addToCart('{{product._id}}')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <button type="button" class="btn-secondary-cart" onclick="addToCart('{{product._id}}')">
+          <img class="nav-icons" src="/icons/cart.png">
           Add to Cart
         </button>
         
@@ -120,144 +122,296 @@
 
   <div class="product-specs-tabs">
     <div class="tabs-header-strip">
-      <button type="button" class="tab-trigger active-tab">Specifications</button>
-      <button type="button" class="tab-trigger">Description</button>
-      <button type="button" class="tab-trigger">Reviews (124)</button>
+      <button type="button" class="tab-trigger active-tab" onclick="switchProductTab(event, 'tab-specs')">Specifications</button>
+      <button type="button" class="tab-trigger" onclick="switchProductTab(event, 'tab-description')">Description</button>
+      <button type="button" class="tab-trigger" onclick="switchProductTab(event, 'tab-reviews')">Reviews (124)</button>
     </div>
     
-    <div class="tab-viewport-panel">
+    <div id="tab-specs" class="tab-viewport-panel main-tab-content-panel" style="display: block;">
       <table class="specs-table">
         <tr><td>Material</td><td>{{#if product.material}}{{product.material}}{{else}}Premium Leather{{/if}}</td></tr>
         <tr><td>Sole Type</td><td>{{product.soleType}}</td></tr>
         <tr><td>Closure Type</td><td>{{product.closureType}}</td></tr>
-        <tr><td>Weight</td><td>{{product.weight}} g</td></tr>
+        <tr><td>Weight</td><td>{{product.weight}}g</td></tr>
         <tr><td>Country of Origin</td><td>{{product.countryOfOrigin}}</td></tr>
       </table>
+    </div>
+
+    <div id="tab-description" class="tab-viewport-panel main-tab-content-panel" style="display: none;">
+      <div class="product-raw-description" style="line-height: 1.7; color: #475569; font-size: 15px; padding: 5px 0;">
+         <p>{{#if product.description}}{{product.description}}{{else}}No description breakdown available for this model variant.{{/if}}</p>
+      </div>
+    </div>
+
+    <div id="tab-reviews" class="tab-viewport-panel main-tab-content-panel" style="display: none;">
+      <div class="product-reviews-box" style="color: #475569; font-size: 14px;">
+         <p>Customer review listings and platform evaluation logs will load asynchronously inside this container pane.</p>
+      </div>
     </div>
   </div>
 
 </section>
 
-<section class="related-products-section">
+<div id="customZoomModal" class="custom-zoom-modal" onclick="closeZoomModal()">
+    <span class="custom-zoom-close" onclick="closeZoomModal()">&times;</span>
+    <div class="modal-image-wrapper" onclick="event.stopPropagation()">
+        <img class="custom-zoom-content" id="modalTargetImg" src="" alt="Zoomed view">
+    </div>
+</div>
 
+<style>
+    .custom-zoom-modal {
+        display: none; 
+        position: fixed; 
+        z-index: 99999; 
+        padding-top: 40px; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%; 
+        overflow: auto; 
+        background-color: rgba(15, 23, 42, 0.85); /* Modern Slate Backdrop Blur look */
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+    .custom-zoom-modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+    }
+    .modal-image-wrapper {
+        position: relative;
+        max-width: 85%;
+        max-height: 85vh;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .custom-zoom-content {
+        display: block;
+        max-width: 100%;
+        max-height: 85vh;
+        object-fit: contain;
+        transform: scale(1);
+        transition: transform 0.3s ease;
+        cursor: zoom-in;
+    }
+    /* Click image to toggle direct high-definition zoom scale inside modal */
+    .custom-zoom-content.zoomed {
+        transform: scale(1.8);
+        cursor: zoom-out;
+    }
+    .custom-zoom-close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.2s;
+        cursor: pointer;
+        z-index: 100000;
+    }
+    .custom-zoom-close:hover {
+        color: #ef4444;
+        transform: scale(1.1);
+    }
+</style>
+
+<section class="related-products-section">
     <div class="related-header">
         <h2 class="related-title">Related Products</h2>
         <a href="/shop" class="view-all-related">View All</a>
     </div>
 
     <div class="related-products-grid">
-
         {{#each relatedProducts}}
-
         <a href="/details/{{this._id}}" class="related-product-card">
-
             <div class="related-image-wrapper">
-
-                {{#if this.productImage}}
-                    <img 
-                        src="/uploads/{{lookup this.productImage 0}}" 
-                        alt="{{this.productName}}"
-                    >
+                {{#if this.variants}}
+                    <img src="/uploads/{{lookup (lookup (lookup this.variants 0) 'images') 0}}" alt="{{this.productName}}">
                 {{else}}
-                    <div class="related-no-image">
-                        No Image
-                    </div>
+                    <div class="related-no-image">No Image</div>
                 {{/if}}
-
                 {{#if this.salePrice}}
-                    <span class="related-discount-badge">
-                        SALE
-                    </span>
+                    <span class="related-discount-badge">SALE</span>
                 {{/if}}
-
             </div>
 
             <div class="related-card-content">
-
-                <h3 class="related-product-name">
-                    {{this.productName}}
-                </h3>
-
-                <p class="related-product-description">
-                    {{this.description}}
-                </p>
-
+                <h3 class="related-product-name">{{this.productName}}</h3>
+                <p class="related-product-description">{{this.description}}</p>
+                
                 <div class="related-price-row">
-
                     {{#if this.salePrice}}
-
-                        <span class="related-sale-price">
-                            ₹{{this.salePrice}}
-                        </span>
-
-                        <span class="related-original-price">
-                            ₹{{this.regularPrice}}
-                        </span>
-
+                        <span class="related-sale-price">₹{{this.salePrice}}</span>
+                        <span class="related-original-price">₹{{this.regularPrice}}</span>
+                       
                     {{else}}
-
-                        <span class="related-sale-price">
-                            ₹{{this.regularPrice}}
-                        </span>
-
+                        <span class="related-sale-price">₹{{this.regularPrice}}</span>
                     {{/if}}
-
+                    
                 </div>
-
             </div>
-
         </a>
-
         {{/each}}
-
     </div>
-
 </section>
 
 <script>
+    function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+        document.body.appendChild(toast);
 
-  function showToast(message, type = "success") {
-    const toast = document.createElement("div");
-
-    toast.className = `toast ${type}`;
-    toast.innerText = message;
-
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add("show");
-    }, 100);
-
-    setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
-} 
+        setTimeout(() => toast.classList.add("show"), 100);
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    } 
 
     let chosenSize = null;
     let chosenColor = "{{lookup (lookup product.variants 0) 'colorName'}}";
     let activeVariantId = "{{lookup (lookup product.variants 0) '_id'}}";
 
+    const globalVariants = [];
+    {{#each product.variants}}
+    globalVariants.push({
+        _id: "{{this._id}}",
+        colorName: "{{this.colorName}}",
+        images: [
+            {{#each this.images}}
+            "{{this}}"{{#unless @last}},{{/unless}}
+            {{/each}}
+        ],
+        sizes: [
+            {{#each this.sizes}}
+            { size: "{{this.size}}" }{{#unless @last}},{{/unless}}
+            {{/each}}
+        ]
+    });
+    {{/each}}
 
-function changeMainImage(src, element){
-    const mainImage = document.getElementById('mainProductImage');
 
-    mainImage.src = src;
+    function openZoomModal() {
+        const mainImg = document.getElementById('mainProductImage');
+        const modal = document.getElementById('customZoomModal');
+        const modalImg = document.getElementById('modalTargetImg');
+        
+        if (!mainImg || !modal || !modalImg) return;
 
-    document.querySelectorAll('.thumb-frame')
-        .forEach(item => item.classList.remove('active-thumb'));
+        modalImg.src = mainImg.src;
+        modalImg.classList.remove('zoomed');
+        
+        modal.style.display = "flex";
+        setTimeout(() => {
+            modal.classList.add('show');
+            document.body.style.overflow = "hidden"; 
+        }, 10);
+    }
 
-    element.classList.add('active-thumb');
-}
+    function closeZoomModal() {
+        const modal = document.getElementById('customZoomModal');
+        if (!modal) return;
 
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto"; 
+        }, 250);
+    }
 
-    function updateSelectedColor(colorName, buttonElement) {
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalImg = document.getElementById('modalTargetImg');
+        if (!modalImg) return;
+
+        modalImg.addEventListener('click', function() {
+            this.classList.toggle('zoomed');
+            if (!this.classList.contains('zoomed')) {
+                this.style.transformOrigin = 'center center';
+            }
+        });
+
+        modalImg.addEventListener('mousemove', function(e) {
+            if (!this.classList.contains('zoomed')) return;
+            const rect = this.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            this.style.transformOrigin = `${x}% ${y}%`;
+        });
+    });
+
+    function changeMainImage(src, element) {
+        const mainImage = document.getElementById('mainProductImage');
+        if (mainImage) {
+            mainImage.src = src;
+        }
+
+        document.querySelectorAll('.thumb-frame')
+            .forEach(item => item.classList.remove('active-thumb'));
+
+        if (element) {
+            element.classList.add('active-thumb');
+        }
+    }
+
+    function updateSelectedColor(colorName, variantId, variantIndex, buttonElement) {
         chosenColor = colorName;
+        activeVariantId = variantId;
+        chosenSize = null;
+        
+        document.getElementById("selectedSizeIndicator").innerText = "SELECT A SIZE";
         document.getElementById("selectedColorLabel").innerText = colorName;
+        
         document.querySelectorAll('.swatch-circle').forEach(el => el.classList.remove('active-swatch'));
         buttonElement.classList.add('active-swatch');
-        
-        
+
+        const activeVariant = globalVariants[variantIndex];
+        if (!activeVariant) return;
+
+        if (activeVariant.images && activeVariant.images.length > 0) {
+            const mainImg = document.getElementById('mainProductImage');
+            if (mainImg) {
+                mainImg.src = `/uploads/${activeVariant.images[0]}`;
+            }
+
+            const thumbStrip = document.getElementById('thumbnailStrip');
+            if (thumbStrip) {
+                thumbStrip.innerHTML = '';
+                activeVariant.images.forEach((imgName, index) => {
+                    const fullPath = `/uploads/${imgName}`;
+                    const thumbFrame = document.createElement('div');
+                    thumbFrame.className = `thumb-frame ${index === 0 ? 'active-thumb' : ''}`;
+                    thumbFrame.onclick = function() { changeMainImage(fullPath, this); };
+
+                    const imgTag = document.createElement('img');
+                    imgTag.src = fullPath;
+                    imgTag.alt = colorName;
+
+                    thumbFrame.appendChild(imgTag);
+                    thumbStrip.appendChild(thumbFrame);
+                });
+            }
+        }
+
+        const sizeChipsGrid = document.getElementById('sizeChipsGrid');
+        if (sizeChipsGrid) {
+            sizeChipsGrid.innerHTML = ''; 
+            if (activeVariant.sizes && activeVariant.sizes.length > 0) {
+                activeVariant.sizes.forEach(sizeObj => {
+                    const sizeButton = document.createElement('button');
+                    sizeButton.type = "button";
+                    sizeButton.className = "size-chip";
+                    sizeButton.innerText = sizeObj.size;
+                    sizeButton.onclick = function() { updateSelectedSize(sizeObj.size, this); };
+                    sizeChipsGrid.appendChild(sizeButton);
+                });
+            }
+        }
     }
 
     function updateSelectedSize(sizeValue, buttonElement) {
@@ -269,126 +423,57 @@ function changeMainImage(src, element){
 
     function updateQty(change) {
         const qtyInput = document.getElementById("purchaseQty");
-        let qty = parseInt(qtyInput.value);
+        let qty = parseInt(qtyInput.value) || 1;
         qty += change;
         
-      
         if (qty < 1) qty = 1;
         if (qty > 5) {
-            alert("Maximum allowable limit per item is 5 units.");
+            showToast("Maximum allowable limit per item is 5 units.", "error");
             return;
         }
         qtyInput.value = qty;
     }
 
+    async function addToCart(productId) {
+        const qtyInput = document.getElementById("purchaseQty");
+        const qty = parseInt(qtyInput.value) || 1;
 
-async function addToCart(productId) {
-
-    const qty = parseInt(document.getElementById("purchaseQty").value) || 1;
-
-    if (!chosenSize) {
-        showToast("Please select a size", "error");
-        return;
-    }
-
-    try {
-
-        const response = await fetch('/user/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                productId,
-                variantId: activeVariantId,
-                size: chosenSize,
-                color: chosenColor,
-                quantity: qty
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            showToast(data.message || "Something went wrong", "error");
+        if (!chosenSize) {
+            showToast("Please select a size", "error");
             return;
         }
 
-        showToast("Added to cart successfully", "success");
+        try {
+            const response = await fetch('/user/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productId,
+                    variantId: activeVariantId,
+                    size: chosenSize,
+                    color: chosenColor,
+                    quantity: qty
+                })
+            });
 
-    } catch (error) {
+            const data = await response.json();
+            if (!response.ok) {
+                showToast(data.message || "Something went wrong", "error");
+                return;
+            }
 
-        console.error("ADD TO CART ERROR:", error);
-
-        showToast("Server connection failed", "error");
-    }
-}
-
-const zoomImage = document.querySelector('.zoom-image');
-
-let isZoomed = false;
-let isDragging = false;
-
-let startX = 0;
-let translateX = 0;
-
-const scale = 2;
-
-if (zoomImage) {
-
-    // CLICK TOGGLE ZOOM
-    zoomImage.addEventListener('click', function (e) {
-
-        if (!isZoomed) {
-
-            const rect = zoomImage.getBoundingClientRect();
-
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-
-            zoomImage.style.transformOrigin = `${x}% center`;
-
-            zoomImage.style.transform = `scale(${scale}) translateX(0px)`;
-
-            isZoomed = true;
-
-        } else {
-            resetZoom();
+            showToast("Added to cart successfully", "success");
+            qtyInput.value = 1; 
+        } catch (error) {
+            console.error("ADD TO CART ERROR:", error);
+            showToast("Server connection failed", "error");
         }
-
-    });
-
-    // START DRAG (X ONLY)
-    zoomImage.addEventListener('mousedown', function (e) {
-        if (!isZoomed) return;
-
-        isDragging = true;
-        startX = e.clientX - translateX;
-
-        zoomImage.style.cursor = "grabbing";
-    });
-
-    // MOVE LEFT / RIGHT ONLY
-    window.addEventListener('mousemove', function (e) {
-        if (!isDragging || !isZoomed) return;
-
-        translateX = e.clientX - startX;
-
-        zoomImage.style.transform = `scale(${scale}) translateX(${translateX}px)`;
-    });
-
-    // STOP DRAG
-    window.addEventListener('mouseup', function () {
-        isDragging = false;
-        zoomImage.style.cursor = isZoomed ? "zoom-out" : "zoom-in";
-    });
-
-    function resetZoom() {
-        isZoomed = false;
-        translateX = 0;
-
-        zoomImage.style.transform = 'scale(1) translateX(0px)';
-        zoomImage.style.transformOrigin = 'center center';
-        zoomImage.style.cursor = "zoom-in";
     }
-}
+
+    function switchProductTab(event, targetTabId) {
+        document.querySelectorAll('.main-tab-content-panel').forEach(panel => panel.style.display = 'none');
+        document.querySelectorAll('.tab-trigger').forEach(trigger => trigger.classList.remove('active-tab'));
+        document.getElementById(targetTabId).style.display = 'block';
+        event.currentTarget.classList.add('active-tab');
+    }
 </script>

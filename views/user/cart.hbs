@@ -1,10 +1,8 @@
- 
 <div class="cart-container">
-    
     <header class="cart-header">
         <div class="header-left">
-            <nav class="breadcrumbs">HOME / SHOP / <span style="font-weight: 600;color:black">CART</span></nav>
-            <h1>Your Cart <span class="item-count">({{totalUnitsCount}} Items)</span></h1>
+            <nav class="breadcrumbs"><a class="cart-link" href="/">HOME</a> / <a class="cart-link" href="/shop">SHOP</a>/ <span style="font-weight: 600;color:black">CART</span></nav>
+          <h1> Your Cart <span class="item-count" id="cart-item-count">({{totalUnitsCount}} Items)</span></h1>
         </div>
         <a class="continue-shopping-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
     </header>
@@ -21,8 +19,11 @@
                  data-color="{{this.color}}">
                 
                 <div class="item-image-wrapper">
-                    {{#if this.productId.productImage}}
-                        <img src="/uploads/{{lookup this.productId.productImage 0}}" alt="{{this.productId.productName}}">
+                    {{#if this.productId.variants}}
+                        <img 
+                            src="/uploads/{{lookup (lookup (lookup this.productId.variants 0) 'images') 0}}" 
+                            alt="{{this.productId.productName}}"
+                        >
                     {{else}}
                         <div class="no-image-placeholder">No Image</div>
                     {{/if}}
@@ -68,7 +69,7 @@
             </div>
             {{/each}}
             {{else}}
-            <div class="empty-cart-state" style="text-align: center; padding: 60px 20px; color: #64748b;">
+            <div class="empty-cart-state">
                 <i class="fa-solid fa-bag-shopping" style="font-size: 48px; margin-bottom: 15px; color: #cbd5e1;"></i>
                 <p style="font-size: 18px; margin-bottom: 20px; font-weight: 500;">Your StepHyve cart is empty.</p>
                 <a href="/shop" class="continue-shopping-btn" style="float: none; display: inline-block; padding: 12px 30px; background: #0f172a; color: #fff; border-radius: 6px; text-decoration: none;">Explore Products</a>
@@ -135,11 +136,8 @@
 <script>
 
 function showToast(message, type = 'success') {
-
     const toast = document.getElementById('customToast');
-
     toast.innerText = message;
-
     toast.className = 'custom-toast show';
 
     if (type === 'error') {
@@ -153,30 +151,23 @@ function showToast(message, type = 'success') {
 
 
 async function adjustCartQuantity(buttonElement, operationalChange) {
-
     const card = buttonElement.closest('.cart-card');
 
     const productId = card.getAttribute('data-product-id');
     const size = card.getAttribute('data-size');
     const color = card.getAttribute('data-color');
-
     const qtyDisplaySpan = card.querySelector('.qty-val');
-
     const currentQty = parseInt(qtyDisplaySpan.innerText);
-
     const targetQuantity = currentQty + operationalChange;
 
     if (targetQuantity < 1) return;
 
     if (targetQuantity > 5) {
-
         showToast("Maximum limit is 5 units", "error");
-
         return;
     }
 
     try {
-
         const response = await fetch('/user/cart/update-quantity', {
             method: 'POST',
             headers: {
@@ -193,7 +184,7 @@ async function adjustCartQuantity(buttonElement, operationalChange) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-
+            document.getElementById('cart-item-count').innerText = `(${data.totalUnitsCount} Items)`;
             qtyDisplaySpan.innerText = targetQuantity;
 
             const basePrice = parseInt(
@@ -214,24 +205,17 @@ async function adjustCartQuantity(buttonElement, operationalChange) {
                 '₹' + data.totalAmount.toLocaleString();
 
             showToast("Cart updated");
-
         } else {
-
             showToast(data.message || "Failed to update quantity", "error");
         }
-
     } catch (err) {
-
         console.error(err);
-
         showToast("Something went wrong", "error");
     }
 }
 
 
-
 async function removeCartRow(buttonElement) {
-
     const result = await Swal.fire({
         title: 'Remove Product?',
         text: "This item will be removed from your cart.",
@@ -248,13 +232,11 @@ async function removeCartRow(buttonElement) {
     if (!result.isConfirmed) return;
 
     const card = buttonElement.closest('.cart-card');
-
     const productId = card.getAttribute('data-product-id');
     const size = card.getAttribute('data-size');
     const color = card.getAttribute('data-color');
 
     try {
-
         const response = await fetch('/user/cart/remove', {
             method: 'DELETE',
             headers: {
@@ -270,26 +252,18 @@ async function removeCartRow(buttonElement) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-
             card.remove();
-
             showToast("Product removed from cart");
 
             setTimeout(() => {
                 window.location.reload();
             }, 800);
-
         } else {
-
             showToast(data.message || "Failed to remove product", "error");
         }
-
     } catch (err) {
-
         console.error(err);
-
         showToast("Something went wrong", "error");
     }
 }
-
 </script>
