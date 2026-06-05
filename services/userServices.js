@@ -140,7 +140,6 @@ export const resetPassword = async (email, newPassword) => {
     if (!updatedUser) {
         throw new Error("User not found during password reset");
     }
-
     return updatedUser;
 };
 
