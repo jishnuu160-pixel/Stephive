@@ -5,34 +5,18 @@ export const loadCart = async (req, res) => {
     try {
 
         const userId = req.session.user.id;
+        const cartData =  await cartService.getCartPageData(userId);
 
-        const cartData =
-            await cartService.getCartPageData(userId);
-
-        
-        res.render('user/cart', cartData);
+         res.render('user/cart', cartData);
 
     } catch (error) {
-
-        console.log(error);
-
-        res.send(error.message);
+         res.send(error.message);
     }
 };
 
 export const addToCart = async (req, res) => {
     try {
-
-        const userId = req.session.user?.id;
-        console.log("user",userId);
-
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Please login first"
-            });
-        }
-
+         const userId= req.session.user.id;
         const result = await cartService.addToCart(userId, req.body);
 
         return res.json({
