@@ -121,25 +121,16 @@ router.post('/verify-password-otp', isUserAuthenticated, postVerifyPasswordOTP);
 
 router.post(
    '/update-avatar',
-
    isUserAuthenticated,
-
    (req, res, next) => {
-
-      uploadAvatar.single('profileImage')(req, res, (err) => {
-
+  uploadAvatar.single('profileImage')(req, res, (err) => {
          if (err) {
-
             req.flash('error', err.message);
-
             return res.redirect('/user/profile');
          }
-
          next();
       });
-
    },
-
    updateAvatar
 );
 
