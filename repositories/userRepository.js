@@ -50,8 +50,7 @@ export const saveOTP = async (email, otp) => {
 
 export const addAddress = async (userId, addressData) => {
     try {
-    
-        
+      
         const result = await User.findByIdAndUpdate(
             userId,
             { $push: { addresses: addressData } }, 
@@ -114,4 +113,9 @@ export const findById = async (userId) => {
     } catch (error) {
         throw new Error('Error finding user by ID');
     }
+};
+
+
+export const saveUser= async(user)=>{
+      return await user.save();
 };
