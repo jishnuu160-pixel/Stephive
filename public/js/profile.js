@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    /* =========================
-       GENDER UPDATE
-    ========================= */
     const genderSelect = document.getElementById('genderSelect');
 
     if (genderSelect) {
@@ -42,9 +39,6 @@ document.querySelectorAll('.user-avatar')
         });
     }
 
-    /* =========================
-       AVATAR + CROPPER FLOW
-    ========================= */
 
     const fileInput = document.getElementById('avatar-upload');
     const previewImg = document.getElementById('profile-preview');
@@ -111,9 +105,6 @@ document.querySelectorAll('.user-avatar')
         });
     }
 
-    /* =========================
-       SAVE CROPPED IMAGE
-    ========================= */
 
     if (saveBtn) {
         saveBtn.addEventListener('click', function () {
@@ -169,9 +160,7 @@ document.querySelectorAll('.user-avatar')
 
 });
 
-/* =========================
-   TOAST FUNCTION
-========================= */
+
 
 function showToast(message, type = "success") {
     const toast = document.createElement("div");
