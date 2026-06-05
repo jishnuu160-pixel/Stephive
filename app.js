@@ -13,6 +13,7 @@ import homeRoutes from './routes/homeRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import passport  from './config/passport.js';
+import * as cartService from './services/cartService.js';
 import { type } from 'os';
 
 
@@ -115,6 +116,24 @@ app.use((req, res, next) => {
 
     res.locals.admin = req.session.admin || null; 
     
+    next();
+});
+
+app.use(async (req, res, next) => {
+    try {
+        if (req.session && req.session.user && req.session.user.id) {
+            const userId = req.session.user.id;
+            
+            const { totalUnitsCount } = await cartService.getCartPageData(userId);
+            
+            res.locals.globalCartCount = totalUnitsCount;
+        } else {
+            res.locals.globalCartCount = 0;
+        }
+    } catch (error) {
+        console.error("Error updating global header badge count:", error);
+        res.locals.globalCartCount = 0;
+    }
     next();
 });
 
