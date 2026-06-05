@@ -444,6 +444,7 @@ body.login-page {
 
 .btn-cat {
     background-color: rgb(255, 208, 0);
+    text-decoration: none;
     margin: 10px;
     font-size: 8px;
     color: #ffffff;

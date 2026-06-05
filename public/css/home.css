@@ -399,3 +399,82 @@
 .nav-icons:hover{
   transform: scale(1.08);
 }
+
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 4%;
+    background-color: #ffffff;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #64748b; 
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 0; 
+    position: relative;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+    display: inline-block;
+}
+
+.nav-links a:hover {
+    color: #0f172a; 
+}
+
+
+.nav-links a.active-nav-link {
+    color: #0f172a !important;  
+    font-weight: 600 !important; 
+}
+
+.nav-links a.active-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #47484b;  
+    border-radius: 2px;
+}
+
+/* Container framework to isolate the badge position metrics */
+.cart-anchor-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* 🟥 The notification badge design block */
+.cart-badge-count {
+    position: absolute;
+    top: -6px;       /* Shifts badge slightly above the image boundaries */
+    right: -6px;     /* Shifts badge slightly outside right image boundaries */
+    background-color: #fbef04; /* Vibrant notification red color */
+    color: #040404;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    pointer-events: none; /* Keeps clicks focused directly through to the link anchor */
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Smooth zoom entry animation when items append */
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}

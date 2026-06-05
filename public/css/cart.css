@@ -17,11 +17,11 @@
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 30px;
-    padding: 40px;
+    padding: 10px;
 }
 
 .breadcrumbs {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 400;
     color: #a0a0a0;
     letter-spacing: 1px;
@@ -40,14 +40,14 @@
 
 .cart-header .item-count {
     font-weight: 400;
-    color: #ffffff;
+    color: #2c2b2b;
     font-size: 12px;
 }
 
 .continue-shopping-btn {
     background-color: transparent;
     border: 1px solid #c0cdc6;
-    padding: 8px 18px;
+    padding: 5px 14px;
     border-radius: 30px;
     font-size: 12px;
     color: #607068;
@@ -292,11 +292,12 @@
     background-color: #5d72f7;
     color: #ffffff;
     border: none;
-    width: 100%;
-    padding: 10px;
+    width: 90%;
+    padding: 8px;
+    margin-left: 20px;
     border-radius: 30px;
-    font-size:13px;
-    font-weight: 700;
+    font-size:12px;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -413,4 +414,21 @@
 
 .small-swal .swal2-html-container{
     font-size: 15px !important;
+}
+
+
+.empty-cart-state{
+  text-align: center; 
+  padding-bottom: 190px;
+   color: #64748b;
+}  
+
+
+.cart-link{
+    text-decoration: none;
+    color: rgb(140, 140, 140);
+}
+
+.cart-link :hover{
+    font-color: black;
 }

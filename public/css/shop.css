@@ -21,10 +21,7 @@
     margin-top: 30px;
 }
 
-.shop-container .product-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 24px !important;
-}
+
 
 .top-content {
     display: flex !important;
@@ -194,23 +191,23 @@
 
 .products-wrapper-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 3fr));
-    gap: 20px;
-    width: 100%;
-    padding: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
 }
 
-.product-card {
+.product-card-gender {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 16px;
-    padding: 14px;
+    padding: 16px; /* Slightly adjusted padding for symmetry */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start; /* 🟢 Changed to flex-start to let info blocks push naturally */
+    height: auto; /* Ensures cards in the same row always share identical bounding box heights */
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .product-card:hover {
@@ -246,7 +243,7 @@
     padding-top: 16px;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    flex-grow: 1; /* 🟢 Takes up all remaining space to anchor the actions block directly to bottom */
 }
 
 .product-info p{
@@ -283,7 +280,7 @@
 }
 
 .product-action-block {
-    margin-top: auto;
+    margin-top: auto; /* 🟢 CRITICAL: Drives this component block straight to the bottom floor of the card */
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -298,17 +295,18 @@
 
 .rec-discover-btn {
     text-decoration: none;
-    width: 100%;
-    padding-left: 30px;
+    width: 100%; /* 🟢 Occupies full baseline width */
+    padding-left: 0 !important; /* 🟢 Removed the 30px left bias causing asymmetry */
+    display: block;
 }
 
 .rec-discover-btn button {
-    width: 80%;
+    width: 100%; /* 🟢 Stretches button gracefully to match input container edges */
     background: #0f172a; 
     color: #ffffff;
     border: none;
-    padding: 5px 8px;
-    font-size: 10px;
+    padding: 10px 12px; /* Uniformly distributed touch-target padding */
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -611,7 +609,7 @@
 .no-products {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 80px 0;
+    padding: 80px 120px;
     background: #f8fafc;
     border-radius: 8px;
     border: 1px dashed #cbd5e1;
