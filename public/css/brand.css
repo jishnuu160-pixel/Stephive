@@ -1,0 +1,295 @@
+/* ==========================================================================
+   Brand Management Page Layout
+   ========================================================================== */
+
+.customers-page {
+    padding: 24px;
+}
+
+.table-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+/* --- Header Actions & Structured Search --- */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.search-input {
+    width: 260px;
+    padding: 10px 40px 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: #111827;
+}
+
+.search-icon {
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    right: 12px;
+    color: #6b7280;
+    pointer-events: none;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 40px;
+    text-decoration: none;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.search-clear-btn:hover {
+    color: #111827;
+}
+
+/* --- Action Buttons --- */
+.btn-primary {
+    border: none;
+    background: #111827;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* ==========================================================================
+   Table & Content Styling
+   ========================================================================== */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.admin-table th {
+    background: #f9fafb;
+    padding: 14px 24px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+/* --- Brand Information Cells --- */
+.brand-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f5f5f5;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.brand-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.brand-logo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #e5e7eb;
+}
+
+.brand-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: 15px;
+}
+
+.brand-desc {
+    display: block;
+    max-width: 350px;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* --- Status Badges --- */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-listed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-unlisted {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ==========================================================================
+   Action States & Form Utilities
+   ========================================================================== */
+
+.inline-form {
+    display: inline-block;
+}
+
+.btn-edit {
+    border: none;
+    outline: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    background: #111827;
+    color: white;
+    transition: 0.2s ease;
+}
+
+.btn-edit:hover {
+    opacity: 0.9;
+}
+
+/* 🌟 Dynamic Context Modifiers for List/Unlist Actions */
+.btn-status-unlist {
+    background-color: #e53e3e !important; /* Soft Crimson Red */
+    color: #ffffff !important;
+}
+
+.btn-status-unlist:hover {
+    background-color: #c53030 !important;
+}
+
+.btn-status-list {
+    background-color: #319795 !important; /* Deep Teal Green */
+    color: #ffffff !important;
+}
+
+.btn-status-list:hover {
+    background-color: #234e52 !important;
+}
+
+/* ==========================================================================
+   Empty States & Pagination
+   ========================================================================== */
+
+.table-empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+    font-size: 15px;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.page-link-nav,
+.page-next {
+    text-decoration: none;
+    color: #111827;
+    padding: 8px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    background: #ffffff;
+    transition: background 0.2s ease;
+}
+
+.page-link-nav:hover,
+.page-next:hover {
+    background: #f3f4f6;
+}
+
+.page-num {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    background: #111827;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: default;
+}
