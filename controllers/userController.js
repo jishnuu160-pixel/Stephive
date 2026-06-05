@@ -1,8 +1,6 @@
 import * as userService from '../services/userServices.js';
-
 import { error, profile } from 'console';
 import { title } from 'process';
-
 
 export const updateAvatar = async (req, res) => {
     try {
