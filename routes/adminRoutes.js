@@ -8,25 +8,34 @@ import {
     getDashboard, 
     getCustomers, 
     toggleUserStatus, 
-    adminLogout, 
-    getCategories, 
-    getProducts, 
-    toggleListing, 
-    getAddProduct, 
-    postAddProduct,
-    postAddCategory,
-    toggleProductStatus,
-    updateCategory,
-    postEditProduct,
-    getSubcategoriesByParent,
-    getEditProduct
+    adminLogout 
 } from '../controllers/adminController.js';
-import { isAdminAuthenticated, isAdminLoggedOut, preventCache } from '../middleware/adminAuth.js';
+
+import { getProducts,
+        getAddProduct,
+        getEditProduct,
+        postAddProduct,
+        postEditProduct,
+        toggleProductStatus
+} from '../controllers/productController.js';
+
+import {getCategories,
+    postAddCategory,
+    updateCategory,
+    getSubcategoriesByParent,
+    toggleListing
+} from '../controllers/categoryController.js';
+
+import brandRoutes from './brandRoutes.js'
+
+import { isAdminAuthenticated, 
+    isAdminLoggedOut,
+     preventCache
+} from '../middleware/adminAuth.js';
 
 const router = express.Router();
 
 router.use(preventCache);
-
 
 const uploadPath = path.join(process.cwd(), 'public/uploads/products');
 
@@ -42,7 +51,6 @@ const storage = multer.diskStorage({
         cb(null, `product-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`);
     }
 });
-
 
 const upload = multer({ storage: storage });
 
@@ -69,29 +77,22 @@ router.get(
   getEditProduct
 );
 
-
-router.post(
-    '/products/add', 
-    isAdminAuthenticated, 
-    upload.array('productImages', 4), 
-    postAddProduct
-);
+router.post('/products/add', isAdminAuthenticated, upload.any(), postAddProduct);
 
 router.post(
   '/products/edit/:id',
   isAdminAuthenticated,
-  upload.array('productImages', 4),
+  upload.any(),
   postEditProduct
 );
 
-
-router.post('/products/toggle-status/:id',toggleProductStatus);
+router.post('/products/toggle-status/:id', isAdminAuthenticated, toggleProductStatus);
 
 //--- Admin Categories Routes ---
 router.get('/categories', isAdminAuthenticated, getCategories);
 router.post('/categories/toggle-status/:id', isAdminAuthenticated, toggleListing);
 router.post('/categories/add', isAdminAuthenticated, postAddCategory);
-router.post('/categories/edit/:id',isAdminAuthenticated, updateCategory);
+router.post('/categories/edit/:id', isAdminAuthenticated, updateCategory);
 
 router.get(
    '/categories/:id/subcategories',
@@ -99,5 +100,11 @@ router.get(
 );
 
 router.get('/logout', adminLogout);
+
+router.use(
+    '/brands',
+    isAdminAuthenticated,
+    brandRoutes
+);
 
 export default router;
