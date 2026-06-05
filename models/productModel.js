@@ -15,6 +15,12 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    parentCategory: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true
+    },
+  
     Category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
@@ -26,11 +32,8 @@ const productSchema = new mongoose.Schema({
     },
     salePrice: {
         type: Number,
-        required: false
-    },
-    productImage: {
-        type: [String],
-        required: true
+        required: false,
+        default: null
     },
     variants: [{
         colorName: {
@@ -42,6 +45,11 @@ const productSchema = new mongoose.Schema({
             type: String,
             required: true,
             default: '#1a202c'
+        },
+        images: {
+            type: [String],
+            required: true,
+            validate: [arrayMinSize, 'Each color variant must have at least one image']
         },
         sizes: [{
             size: {
@@ -73,33 +81,35 @@ const productSchema = new mongoose.Schema({
         default: 'In Stock'
     },
     countryOfOrigin:{
-        type:String,
-        default:'India',
-        trim:true
+        type: String,
+        default: 'India',
+        trim: true
     },
     material:{
-        type:String,
-        default:'Leather',
-        trim:true
+        type: String,
+        default: 'Leather',
+        trim: true
     },
     closureType:{
-        type:String,
-        default:'Lace Up',
-        trim:true
+        type: String,
+        default: 'Lace Up',
+        trim: true
     },
     soleType:{
-        type:String,
-        default:'Rubber',
-        trim:true
+        type: String,
+        default: 'Rubber',
+        trim: true
     },
     weight:{
-        type:String,
-        default:'',
-        trim:true
+        type: String,
+        default: '',
+        trim: true
     }
 }, { timestamps: true });
 
-
+function arrayMinSize(val) {
+    return val.length > 0;
+}
 
 const Product = mongoose.model('Product', productSchema);
 export default Product;
