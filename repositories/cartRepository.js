@@ -22,5 +22,10 @@ export const updateCart = async (userId, updatedData) => {
         { userId },
         updatedData,
         { new: true }
-    );
+    )
+    .populate({
+        path: 'items.productId',
+        model: 'Product'
+    })
+    .lean(); 
 };
