@@ -84,19 +84,13 @@ export const updateCategory = async (req, res) => {
 };
 
 export const getSubcategoriesByParent = async (req, res) => {
-   try {
-      const subcategories = await categoryService.getSubcategoriesByParent(req.params.id);
-
-      res.json({
-         success: true,
-         subcategories
-      });
-
-   } catch (error) {
-      res.status(500).json({
-         success: false,
-         message: "Failed to load subcategories"
-      });
-   }
+    try {
+        const { id } = req.params;
+        const subcategories = await categoryService.getSubcategoriesByParent(id);
+        
+        res.json({ success: true, subcategories });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
 
