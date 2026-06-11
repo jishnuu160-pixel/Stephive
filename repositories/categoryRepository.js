@@ -114,10 +114,7 @@ export const findCategoriesWithPagination= async( query,skip, limit)=>{
          .lean();
 };
 
-export const findSubCategoriesByParent=async(parentId)=>{
-   return await Category.find({
-      parentCategory: parentId,
-      isListed: true
-   }).lean();
-};
 
+export const findSubCategoriesByParent = async (parentId) => {
+    return await Category.find({ parentCategory: parentId, isListed: true }).lean();
+};
