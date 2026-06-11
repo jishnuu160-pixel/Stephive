@@ -34,28 +34,28 @@
       </div>
 
       <div class="form-row split-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-       <div class="form-group">
-  <label>Category</label>
-  <select name="parentCategory" id="parentCategory">
-    {{#each parentCategories}}
-      <option value="{{this._id}}" {{#if (eq this._id ../selectedParentId)}}selected{{/if}}>
-        {{this.name}}
-      </option>
-    {{/each}}
-  </select>
-</div>
+        <div class="form-group">
+          <label>Category</label>
+          <select name="parentCategory" id="parentCategory">
+            {{#each parentCategories}}
+              <option value="{{this._id}}" {{#if (eq this._id ../selectedParentId)}}selected{{/if}}>
+                {{this.name}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
 
-<div class="form-group">
-  <label>SUBCATEGORY</label>
-  <select name="category" id="subCategory" class="form-control" required>
-    <option value="">Select Subcategory</option>
-    {{#each subcategories}}
-      <option value="{{this._id}}" {{#if (eq this._id ../product.Category._id)}}selected{{/if}}>
-        {{this.name}}
-      </option>
-    {{/each}}
-  </select>
-</div>
+        <div class="form-group">
+          <label>SUBCATEGORY</label>
+          <select name="category" id="subCategory" class="form-control">
+            <option value="">Select Subcategory</option>
+            {{#each subcategories}}
+              <option value="{{this._id}}" {{#if (eq this._id ../product.Category._id)}}selected{{/if}}>
+                {{this.name}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
       </div>
 
       <div class="variants-section" style="margin-top:25px;">
@@ -65,6 +65,8 @@
           {{#each product.variants}}
             <div class="variant-card" data-variant-index="{{@index}}" style="border:1px solid #e2e8f0; padding:15px; border-radius:8px; margin-bottom:15px; background:#f8fafc;">
               
+              <input type="hidden" name="variantId_{{@index}}" value="{{this._id}}">
+
               <div class="form-group">
                 <label>Color Name</label>
                 <input type="text" name="colorNames[]" value="{{this.colorName}}" placeholder="Color Name">
@@ -85,8 +87,8 @@
 
                 <div class="edit-images-grid" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
                   {{#each this.images}}
-                    <div class="img-box" style="position:relative;" data-img-name="{{this}}" data-variant-index="{{@../index}}">
-                      <img src="/uploads/products/{{this}}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1;">
+                    <div class="img-box" style="position:relative;" data-img-url="{{this}}" data-img-name="{{this}}" data-variant-index="{{@../index}}">
+                      <img src="{{this}}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1;">
                       <button type="button" class="remove-img"
                         style="position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;">
                         ✕
@@ -348,29 +350,54 @@ document.addEventListener("click", function (e) {
   }
 });
 
-document.getElementById('parentCategory').addEventListener('change', async function() {
-    const parentId = this.value;
-    const subCategorySelect = document.getElementById('subCategory');
-    
-    subCategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
-    
-    if (!parentId) return;
 
-    try {
-        const response = await fetch(`/admin/categories/api/subcategories/${parentId}`);
-        const result = await response.json();
-        
-        if (result.success && result.subcategories) {
-            result.subcategories.forEach(sub => {
-                const option = document.createElement('option');
-                option.value = sub._id;
-                option.textContent = sub.name;
-                subCategorySelect.appendChild(option);
-            });
-        }
-    } catch (error) {
-        console.error('Error fetching subcategories dynamically:', error);
+document.addEventListener("DOMContentLoaded", function() {
+    const parentSelect = document.getElementById('parentCategory');
+    const subSelect = document.getElementById('subCategory');
+
+    if (!parentSelect) {
+        console.error("DEBUG: parentCategory select element not found!");
+        return;
     }
+
+    parentSelect.addEventListener('change', async function() {
+        const parentId = this.value;
+        console.log("DEBUG: Selection changed to ID:", parentId);
+
+        subSelect.innerHTML = '<option value="">Loading...</option>';
+        
+        if (!parentId) {
+            subSelect.innerHTML = '<option value="">Select Subcategory</option>';
+            return;
+        }
+
+        try {
+            console.log("DEBUG: Fetching URL:", `/admin/categories/${parentId}/subcategories`);
+            
+            const response = await fetch(`/admin/categories/${parentId}/subcategories`);
+            const data = await response.json();
+            
+            console.log("DEBUG: Data received:", data);
+
+            subSelect.innerHTML = '<option value="">Select Subcategory</option>';
+
+            if (data.success && data.subcategories && data.subcategories.length > 0) {
+                console.log(`DEBUG: Populating ${data.subcategories.length} subcategories.`);
+                data.subcategories.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub._id;
+                    option.textContent = sub.name;
+                    subSelect.appendChild(option);
+                });
+            } else {
+                console.warn("DEBUG: Server returned success but no subcategories array found or array is empty.");
+                subSelect.innerHTML = '<option value="">No subcategories found</option>';
+            }
+        } catch (error) {
+            console.error("DEBUG: Critical error in fetch:", error);
+            subSelect.innerHTML = '<option value="">Error!</option>';
+        }
+    });
 });
 
 document.addEventListener('click', function(e) {
@@ -407,22 +434,63 @@ document.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
         const filteredFiles = [];
 
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+
         for (let i = 0; i < files.length; i++) {
-            if (files[i].size > 2 * 1024 * 1024) {
-                alert(`"${files[i].name}" exceeds 2MB limit!`);
-            } else {
-                filteredFiles.push(files[i]);
+            const file = files[i];
+
+            if (!file.type.startsWith('image/') || !allowedExtensions.exec(file.name)) {
+                const oldToast = document.querySelector('.custom-validation-toast');
+                if (oldToast) oldToast.remove();
+
+                const toast = document.createElement('div');
+                toast.className = 'custom-validation-toast';
+                toast.innerText = "Invalid file format Only JPG, JPEG, PNG, and WebP formats are allowed.";
+
+                document.body.appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 10);
+              
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+
+                continue; 
             }
+
+            if (file.size > 2 * 1024 * 1024) {
+                const oldToast = document.querySelector('.custom-validation-toast');
+                if (oldToast) oldToast.remove();
+
+                const toast = document.createElement('div');
+                toast.className = 'custom-validation-toast';
+                toast.innerText = `"${file.name}" exceeds the maximum 2MB size limit!`;
+
+                document.body.appendChild(toast);
+                setTimeout(() => toast.classList.add('show'), 10);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+                
+                continue; 
+            }
+
+            filteredFiles.push(file);
         }
 
-        if (filteredFiles.length === 0) { e.target.value = ""; return; }
+        e.target.value = ""; 
+
+        if (filteredFiles.length === 0) { 
+            return; 
+        }
 
         currentVariantIndex = e.target.getAttribute('data-index');
         currentFilesQueue = filteredFiles;
         currentQueueIndex = 0;
 
         openCropperForNextInQueue();
-        e.target.value = ""; 
     }
 });
 
@@ -535,10 +603,91 @@ function finalizeVariantFilesInput(variantIdx) {
 }
 
 document.querySelector('form').addEventListener('submit', function(e) {
+    let formIsValid = true;
+    let textBody = "";
+
+    const cards = document.querySelectorAll('#variantsContainer .variant-card');
+    
+    for (const card of cards) {
+        const variantIdx = card.getAttribute('data-variant-index');
+        const colorNameInput = card.querySelector('input[name="colorNames[]"]');
+        const colorTitle = colorNameInput ? colorNameInput.value.trim() : `Variant #${parseInt(variantIdx) + 1}`;
+
+        const remainingExistingImages = card.querySelectorAll('.edit-images-grid .img-box').length;
+        const newUploadedImages = variantFilesMap[variantIdx] ? variantFilesMap[variantIdx].length : 0;
+        const totalImagesCount = remainingExistingImages + newUploadedImages;
+
+        if (totalImagesCount < 3) {
+            formIsValid = false;
+            textBody = `The color variant "${colorTitle}" must have at least 3 images.`;
+            break; 
+        }
+
+        const sizeRows = card.querySelectorAll('.sizes-container .size-row');
+        
+        if (sizeRows.length === 0) {
+            formIsValid = false;
+            textBody = `The color variant "${colorTitle}" must have at least one size row added.`;
+            break;
+        }
+
+        for (const row of sizeRows) {
+            const sizeInput = row.querySelector(`input[name^="sizes_"]`);
+            const stockInput = row.querySelector(`input[name^="stocks_"]`);
+
+            const sizeValue = sizeInput ? sizeInput.value.trim() : "";
+            const stockValue = stockInput ? stockInput.value.trim() : "";
+
+            if (sizeValue === "" || stockValue === "") {
+                formIsValid = false;
+                textBody = `Please fill out all Size and Stock fields for "${colorTitle}".`;
+                
+                if (sizeValue === "" && sizeInput) sizeInput.style.borderColor = "#ef4444";
+                if (stockValue === "" && stockInput) stockInput.style.borderColor = "#ef4444";
+                
+                break;
+            }
+
+            if (parseFloat(sizeValue) < 0 || parseInt(stockValue) < 0) {
+                formIsValid = false;
+                textBody = `Size and Stock values cannot be negative numbers in "${colorTitle}".`;
+                break;
+            }
+            
+            if (sizeInput) sizeInput.style.borderColor = "";
+            if (stockInput) stockInput.style.borderColor = "";
+        }
+
+        if (!formIsValid) break; 
+    }
+
+    if (!formIsValid) {
+        e.preventDefault(); 
+        
+        const oldToast = document.querySelector('.custom-validation-toast');
+        if (oldToast) oldToast.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'custom-validation-toast';
+        toast.innerText = textBody;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.classList.add('show'), 10);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+
+        return false;
+    }
+
     Object.keys(variantFilesMap).forEach(variantIdx => {
         finalizeVariantFilesInput(variantIdx);
     });
 });
+
 
 btnCancelCrop.addEventListener('click', () => {
     cropperModal.style.display = 'none';
