@@ -19,15 +19,13 @@
                  data-color="{{this.color}}">
                 
                 <div class="item-image-wrapper">
-                    {{#if this.productId.variants}}
-                        <img 
-                            src="/uploads/{{lookup (lookup (lookup this.productId.variants 0) 'images') 0}}" 
-                            alt="{{this.productId.productName}}"
-                        >
-                    {{else}}
-                        <div class="no-image-placeholder">No Image</div>
-                    {{/if}}
-                </div>
+            {{#if this.productId.variants.[0].images.[0]}}
+                <img src="{{this.productId.variants.[0].images.[0]}}" 
+                     alt="{{this.productId.productName}}">
+            {{else}}
+                <div class="no-image-placeholder">No Image</div>
+            {{/if}}
+        </div>
                 
                 <div class="item-details">
                     <h2 class="item-title">{{this.productId.productName}}</h2>
@@ -131,7 +129,6 @@
     </div>
 </div>
 
-<div id="customToast" class="custom-toast"></div>
 
 <script>
 
@@ -152,16 +149,19 @@ function showToast(message, type = 'success') {
 
 async function adjustCartQuantity(buttonElement, operationalChange) {
     const card = buttonElement.closest('.cart-card');
-
+    
     const productId = card.getAttribute('data-product-id');
     const size = card.getAttribute('data-size');
     const color = card.getAttribute('data-color');
     const qtyDisplaySpan = card.querySelector('.qty-val');
+    
+    const priceElement = card.querySelector('.item-price');
+    const basePrice = parseInt(priceElement.getAttribute('data-base-price'));
+    
     const currentQty = parseInt(qtyDisplaySpan.innerText);
     const targetQuantity = currentQty + operationalChange;
 
     if (targetQuantity < 1) return;
-
     if (targetQuantity > 5) {
         showToast("Maximum limit is 5 units", "error");
         return;
@@ -170,46 +170,44 @@ async function adjustCartQuantity(buttonElement, operationalChange) {
     try {
         const response = await fetch('/user/cart/update-quantity', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                productId,
-                size,
-                color,
-                targetQuantity
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, size, color, targetQuantity })
         });
 
         const data = await response.json();
 
         if (response.ok && data.success) {
-            document.getElementById('cart-item-count').innerText = `(${data.totalUnitsCount} Items)`;
+        
             qtyDisplaySpan.innerText = targetQuantity;
+            
+            const countEl = document.getElementById('cart-item-count');
+            if (countEl) countEl.innerText = `(${data.totalUnitsCount} Items)`;
 
-            const basePrice = parseInt(
-                card.querySelector('.item-price')
-                .getAttribute('data-base-price')
-            );
+       
+            const subtotalEl = card.querySelector('.subtotal-price');
+            if (subtotalEl) subtotalEl.innerText = '₹' + (basePrice * targetQuantity).toLocaleString();
 
-            card.querySelector('.subtotal-price').innerText =
-                '₹' + (basePrice * targetQuantity).toLocaleString();
+       
+            const updateSummary = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = '₹' + (val ? val.toLocaleString() : '0');
+            };
+            
+            updateSummary('summary-subtotal', data.subtotal);
+            updateSummary('summary-tax', data.taxEstimate);
+            updateSummary('summary-total', data.totalAmount);
 
-            document.getElementById('summary-subtotal').innerText =
-                '₹' + data.subtotal.toLocaleString();
-
-            document.getElementById('summary-tax').innerText =
-                '₹' + data.taxEstimate.toLocaleString();
-
-            document.getElementById('summary-total').innerText =
-                '₹' + data.totalAmount.toLocaleString();
+   
+            if (window.updateGlobalCartCount) {
+                window.updateGlobalCartCount(data.totalUnitsCount);
+            }
 
             showToast("Cart updated");
         } else {
             showToast(data.message || "Failed to update quantity", "error");
         }
     } catch (err) {
-        console.error(err);
+        console.error("Cart Error:", err);
         showToast("Something went wrong", "error");
     }
 }
