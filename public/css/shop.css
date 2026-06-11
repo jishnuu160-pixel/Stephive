@@ -189,6 +189,13 @@
     color: #0f172a;
 }
 
+.products-wrapper-grid-shop{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding: 20px;
+}
+
 .products-wrapper-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -669,3 +676,5 @@
 .related-products-section{
     padding-left: 25px;
 }
+
+

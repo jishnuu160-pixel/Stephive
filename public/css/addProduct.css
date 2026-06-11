@@ -502,3 +502,27 @@ button {
   line-height: 20px;
 }
 
+/* Custom Toast Notification Styling matching Screenshot 2026-06-10 235337.png */
+.custom-validation-toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background-color: #e72727; /* Soft coral/red for error, or use #6ba8a8 for the exact teal in the screenshot */
+    color: #ffffff;
+    padding: 14px 28px;
+    border-radius: 12px; /* Smooth rounded pill cornering */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    z-index: 999999;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.custom-validation-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}

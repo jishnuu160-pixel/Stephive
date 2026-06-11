@@ -378,9 +378,9 @@
 
 .custom-toast{
     position: fixed;
-    top: 30px;
+    top: 50px;
     right: 30px;
-    background: #79b8b9;
+    background: #41e019;
     color: white;
     padding: 16px 28px;
     border-radius: 14px;
@@ -431,4 +431,11 @@
 
 .cart-link :hover{
     font-color: black;
+}
+
+.cart-error-badge{
+
+  font-weight: 1000;
+  font-size: 12px;
+  color: red;
 }

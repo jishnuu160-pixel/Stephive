@@ -1,7 +1,7 @@
 function showToast(message, type = "success") {
     Toastify({
         text: message,
-        duration: 3000,
+        duration: 2000,
         gravity: "top",
         position: "right",
         style: {

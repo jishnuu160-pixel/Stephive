@@ -168,7 +168,7 @@ function showToast(message, type = "success") {
     toast.innerText = message;
 
     toast.style.position = "fixed";
-    toast.style.top = "20px";
+    toast.style.top = "60px";
     toast.style.right = "20px";
     toast.style.padding = "12px 18px";
     toast.style.borderRadius = "8px";
