@@ -23,14 +23,14 @@
 
         <img class="nav-icons" src="/icons/wishlist.png">
         
-       <a href="/user/cart" class="cart-anchor-wrapper">
-    <img class="nav-icons" src="/icons/cart.png">
-    {{#if user}}
-        {{#if globalCartCount}}
-            <span class="cart-badge-count">{{globalCartCount}}</span>
-        {{/if}}
-    {{/if}}
-</a>
+       <a href="/user/cart" class="cart-anchor-wrapper" style="position: relative; display: inline-block;">
+        <img class="nav-icons" src="/icons/cart.png">
+        
+        <span id="globalCartBadge" class="cart-badge-count" 
+              style="display: {{#if user}}{{#if globalCartCount}}flex{{else}}none{{/if}}{{else}}none{{/if}};">
+            {{globalCartCount}}
+        </span>
+    </a>
       {{#if user}}
       <a href="/user/profile">
           <img class="nav-icons" src="/icons/user.png">
@@ -55,4 +55,30 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+async function updateQuantity(productId, newQty) {
+    const response = await fetch('/user/cart/update-quantity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, quantity: newQty })
+    });
+    const result = await response.json();
+
+    if (result.success) {
+        document.getElementById(`total-${productId}`).innerText = result.newProductTotal;
+        
+        if (window.updateGlobalCartCount) {
+            window.updateGlobalCartCount(result.newGlobalCartCount);
+        }
+    }
+}
+
+    window.updateGlobalCartCount = function(newCount) {
+        const badge = document.getElementById('globalCartBadge');
+        if (badge) {
+            badge.innerText = newCount;
+            badge.style.display = newCount > 0 ? 'flex' : 'none';
+        }
+    };
+
 </script>
