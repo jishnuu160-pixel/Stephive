@@ -10,13 +10,13 @@
     <div class="product-gallery-block" style="display: flex; gap: 20px; align-items: flex-start; flex: 1; max-width: 620px;">
 
         <div class="thumbnail-strip" id="thumbnailStrip">
-            {{#each (lookup (lookup product.variants 0) 'images')}}
+            {{#each product.variants.[0].images}}
             <div
                 class="thumb-frame {{#if @first}}active-thumb{{/if}}"
-                onclick="changeMainImage('/uploads/{{this}}', this)"
+                onclick="changeMainImage('{{this}}', this)"
             >
                 <img
-                    src="/uploads/{{this}}"
+                    src="{{this}}"
                     alt="{{../product.productName}}"
                 >
             </div>
@@ -32,21 +32,20 @@
             </button>
 
             <div class="product-card">
-                {{#if (lookup (lookup product.variants 0) 'images')}}
-                <div class="image-zoom-container" style="cursor: pointer;" onclick="openZoomModal()">
-                    <img
-                        id="mainProductImage"
-                        class="zoom-image"
-                        src="/uploads/{{lookup (lookup (lookup product.variants 0) 'images') 0}}"
-                        alt="{{product.productName}}"
-                    >
-                </div>
-                {{else}}
-                <div class="no-image-fallback">
-                    No Product Image Available
-                </div>
-                {{/if}}
-            </div>
+    {{#if product.variants.[0].images.[0]}}
+    <div class="zoom-container">
+        <img id="mainProductImage" 
+             class="zoom-image" 
+             src="{{product.variants.[0].images.[0]}}" 
+             data-zoom="{{product.variants.[0].images.[0]}}" 
+             crossorigin="anonymous" 
+             alt="{{product.productName}}">
+    </div>
+    <div class="detail-zoom-pane"></div>
+    {{else}}
+    <div class="no-image-fallback">No Product Image Available</div>
+    {{/if}}
+</div>
 
         </div>
 
@@ -75,7 +74,7 @@
 
       {{#if product.variants}}
       <div class="config-group">
-        <span class="config-label">COLOR: <strong id="selectedColorLabel">{{lookup (lookup product.variants 0) 'colorName'}}</strong></span>
+        <span class="config-label">COLOR: <strong id="selectedColorLabel">{{product.variants.[0].colorName}}</strong></span>
         <div class="color-swatch-flex">
           {{#each product.variants}}
           <button 
@@ -92,8 +91,8 @@
       <div class="config-group">
         <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
         <div class="size-chips-grid" id="sizeChipsGrid">
-          {{#if (lookup (lookup product.variants 0) 'sizes')}}
-            {{#each (lookup (lookup product.variants 0) 'sizes')}}
+          {{#if product.variants.[0].sizes}}
+            {{#each product.variants.[0].sizes}}
             <button type="button" class="size-chip" onclick="updateSelectedSize('{{this.size}}', this)">
               {{this.size}}
             </button>
@@ -152,29 +151,11 @@
 
 </section>
 
-<div id="customZoomModal" class="custom-zoom-modal" onclick="closeZoomModal()">
-    <span class="custom-zoom-close" onclick="closeZoomModal()">&times;</span>
-    <div class="modal-image-wrapper" onclick="event.stopPropagation()">
-        <img class="custom-zoom-content" id="modalTargetImg" src="" alt="Zoomed view">
-    </div>
-</div>
+
 
 <style>
-    .custom-zoom-modal {
-        display: none; 
-        position: fixed; 
-        z-index: 99999; 
-        padding-top: 40px; 
-        left: 0;
-        top: 0;
-        width: 100%; 
-        height: 100%; 
-        overflow: auto; 
-        background-color: rgba(15, 23, 42, 0.85); /* Modern Slate Backdrop Blur look */
-        backdrop-filter: blur(8px);
-        opacity: 0;
-        transition: opacity 0.25s ease;
-    }
+
+   
     .custom-zoom-modal.show {
         display: flex;
         align-items: center;
@@ -218,12 +199,14 @@
         color: #ef4444;
         transform: scale(1.1);
     }
+
+    
 </style>
 
 <section class="related-products-section">
     <div class="related-header">
         <h2 class="related-title">Related Products</h2>
-        <a href="/shop" class="view-all-related">View All</a>
+        <a href="/shop" class="view-all-related">View All ></a>
     </div>
 
     <div class="related-products-grid">
@@ -260,103 +243,53 @@
     </div>
 </section>
 
+
 <script>
-    function showToast(message, type = "success") {
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
-        toast.innerText = message;
-        document.body.appendChild(toast);
-
-        setTimeout(() => toast.classList.add("show"), 100);
-        setTimeout(() => {
-            toast.classList.remove("show");
-            setTimeout(() => toast.remove(), 300);
-        }, 2500);
-    } 
-
+    let drift;
     let chosenSize = null;
     let chosenColor = "{{lookup (lookup product.variants 0) 'colorName'}}";
     let activeVariantId = "{{lookup (lookup product.variants 0) '_id'}}";
 
-    const globalVariants = [];
-    {{#each product.variants}}
-    globalVariants.push({
-        _id: "{{this._id}}",
-        colorName: "{{this.colorName}}",
-        images: [
-            {{#each this.images}}
-            "{{this}}"{{#unless @last}},{{/unless}}
-            {{/each}}
-        ],
-        sizes: [
-            {{#each this.sizes}}
-            { size: "{{this.size}}" }{{#unless @last}},{{/unless}}
-            {{/each}}
-        ]
-    });
-    {{/each}}
+    const globalVariants = [
+        {{#each product.variants}}
+        {
+            _id: "{{this._id}}",
+            colorName: "{{this.colorName}}",
+            images: [{{#each this.images}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}],
+            sizes: [{{#each this.sizes}}{ size: "{{this.size}}" }{{#unless @last}},{{/unless}}{{/each}}]
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+    ];
 
-
-    function openZoomModal() {
-        const mainImg = document.getElementById('mainProductImage');
-        const modal = document.getElementById('customZoomModal');
-        const modalImg = document.getElementById('modalTargetImg');
+    function initDrift() {
+        const mainImg = document.querySelector('.zoom-image');
+        const paneContainer = document.querySelector('.detail-zoom-pane');
         
-        if (!mainImg || !modal || !modalImg) return;
+        if (drift) drift.destroy(); 
 
-        modalImg.src = mainImg.src;
-        modalImg.classList.remove('zoomed');
-        
-        modal.style.display = "flex";
-        setTimeout(() => {
-            modal.classList.add('show');
-            document.body.style.overflow = "hidden"; 
-        }, 10);
+        if (mainImg && paneContainer) {
+            drift = new Drift(mainImg, {
+                paneContainer: paneContainer,
+                inlinePane: false,
+                zoomFactor: 3,
+                hoverBoundingBox: true
+            });
+        }
     }
 
-    function closeZoomModal() {
-        const modal = document.getElementById('customZoomModal');
-        if (!modal) return;
-
-        modal.classList.remove('show');
-        setTimeout(() => {
-            modal.style.display = "none";
-            document.body.style.overflow = "auto"; 
-        }, 250);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const modalImg = document.getElementById('modalTargetImg');
-        if (!modalImg) return;
-
-        modalImg.addEventListener('click', function() {
-            this.classList.toggle('zoomed');
-            if (!this.classList.contains('zoomed')) {
-                this.style.transformOrigin = 'center center';
-            }
-        });
-
-        modalImg.addEventListener('mousemove', function(e) {
-            if (!this.classList.contains('zoomed')) return;
-            const rect = this.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            this.style.transformOrigin = `${x}% ${y}%`;
-        });
-    });
+    document.addEventListener('DOMContentLoaded', initDrift);
 
     function changeMainImage(src, element) {
         const mainImage = document.getElementById('mainProductImage');
         if (mainImage) {
             mainImage.src = src;
+            mainImage.setAttribute('data-zoom', src);
+            
+            setTimeout(initDrift, 100); 
         }
 
-        document.querySelectorAll('.thumb-frame')
-            .forEach(item => item.classList.remove('active-thumb'));
-
-        if (element) {
-            element.classList.add('active-thumb');
-        }
+        document.querySelectorAll('.thumb-frame').forEach(item => item.classList.remove('active-thumb'));
+        if (element) element.classList.add('active-thumb');
     }
 
     function updateSelectedColor(colorName, variantId, variantIndex, buttonElement) {
@@ -373,45 +306,35 @@
         const activeVariant = globalVariants[variantIndex];
         if (!activeVariant) return;
 
-        if (activeVariant.images && activeVariant.images.length > 0) {
-            const mainImg = document.getElementById('mainProductImage');
-            if (mainImg) {
-                mainImg.src = `/uploads/${activeVariant.images[0]}`;
-            }
-
-            const thumbStrip = document.getElementById('thumbnailStrip');
-            if (thumbStrip) {
-                thumbStrip.innerHTML = '';
-                activeVariant.images.forEach((imgName, index) => {
-                    const fullPath = `/uploads/${imgName}`;
-                    const thumbFrame = document.createElement('div');
-                    thumbFrame.className = `thumb-frame ${index === 0 ? 'active-thumb' : ''}`;
-                    thumbFrame.onclick = function() { changeMainImage(fullPath, this); };
-
-                    const imgTag = document.createElement('img');
-                    imgTag.src = fullPath;
-                    imgTag.alt = colorName;
-
-                    thumbFrame.appendChild(imgTag);
-                    thumbStrip.appendChild(thumbFrame);
-                });
-            }
+        const mainImg = document.getElementById('mainProductImage');
+        if (mainImg && activeVariant.images.length > 0) {
+            const newSrc = activeVariant.images[0];
+            mainImg.src = newSrc;
+            mainImg.setAttribute('data-zoom', newSrc);
+            
+            setTimeout(initDrift, 100); 
         }
+
+        const thumbStrip = document.getElementById('thumbnailStrip');
+        thumbStrip.innerHTML = '';
+        activeVariant.images.forEach((imgName, index) => {
+            const thumbFrame = document.createElement('div');
+            thumbFrame.className = `thumb-frame ${index === 0 ? 'active-thumb' : ''}`;
+            thumbFrame.onclick = () => changeMainImage(imgName, thumbFrame);
+            thumbFrame.innerHTML = `<img src="${imgName}" alt="${colorName}">`;
+            thumbStrip.appendChild(thumbFrame);
+        });
 
         const sizeChipsGrid = document.getElementById('sizeChipsGrid');
-        if (sizeChipsGrid) {
-            sizeChipsGrid.innerHTML = ''; 
-            if (activeVariant.sizes && activeVariant.sizes.length > 0) {
-                activeVariant.sizes.forEach(sizeObj => {
-                    const sizeButton = document.createElement('button');
-                    sizeButton.type = "button";
-                    sizeButton.className = "size-chip";
-                    sizeButton.innerText = sizeObj.size;
-                    sizeButton.onclick = function() { updateSelectedSize(sizeObj.size, this); };
-                    sizeChipsGrid.appendChild(sizeButton);
-                });
-            }
-        }
+        sizeChipsGrid.innerHTML = ''; 
+        activeVariant.sizes.forEach(sizeObj => {
+            const sizeButton = document.createElement('button');
+            sizeButton.type = "button";
+            sizeButton.className = "size-chip";
+            sizeButton.innerText = sizeObj.size;
+            sizeButton.onclick = () => updateSelectedSize(sizeObj.size, sizeButton);
+            sizeChipsGrid.appendChild(sizeButton);
+        });
     }
 
     function updateSelectedSize(sizeValue, buttonElement) {
@@ -425,55 +348,41 @@
         const qtyInput = document.getElementById("purchaseQty");
         let qty = parseInt(qtyInput.value) || 1;
         qty += change;
-        
         if (qty < 1) qty = 1;
-        if (qty > 5) {
-            showToast("Maximum allowable limit per item is 5 units.", "error");
-            return;
-        }
+        if (qty > 5) return showToast("Max 5 units allowed.", "error");
         qtyInput.value = qty;
     }
 
     async function addToCart(productId) {
-        const qtyInput = document.getElementById("purchaseQty");
-        const qty = parseInt(qtyInput.value) || 1;
-
-        if (!chosenSize) {
-            showToast("Please select a size", "error");
-            return;
-        }
-
+        if (!chosenSize) return showToast("Please select a size", "error");
         try {
             const response = await fetch('/user/cart/add', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productId,
-                    variantId: activeVariantId,
-                    size: chosenSize,
-                    color: chosenColor,
-                    quantity: qty
-                })
+                body: JSON.stringify({ productId, variantId: activeVariantId, size: chosenSize, color: chosenColor, quantity: document.getElementById("purchaseQty").value })
             });
-
             const data = await response.json();
-            if (!response.ok) {
-                showToast(data.message || "Something went wrong", "error");
-                return;
-            }
-
-            showToast("Added to cart successfully", "success");
-            qtyInput.value = 1; 
+            if (!response.ok) throw new Error(data.message);
+            showToast("Added to cart successfully");
+            if (window.updateGlobalCartCount) window.updateGlobalCartCount(data.globalCartCount);
         } catch (error) {
-            console.error("ADD TO CART ERROR:", error);
-            showToast("Server connection failed", "error");
+            showToast(error.message || "Connection failed", "error");
         }
     }
 
     function switchProductTab(event, targetTabId) {
-        document.querySelectorAll('.main-tab-content-panel').forEach(panel => panel.style.display = 'none');
-        document.querySelectorAll('.tab-trigger').forEach(trigger => trigger.classList.remove('active-tab'));
+        document.querySelectorAll('.main-tab-content-panel').forEach(p => p.style.display = 'none');
+        document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active-tab'));
         document.getElementById(targetTabId).style.display = 'block';
         event.currentTarget.classList.add('active-tab');
+    }
+
+    function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add("show"), 100);
+        setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 2500);
     }
 </script>
