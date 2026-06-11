@@ -31,16 +31,17 @@
             <a href="/shop/{{toLowerCase genderTitle}}" class="clear-all-btn">CLEAR ALL</a>
           </div>
           
-          <div class="filter-box">
+       <div class="filter-box">
             <h4>Categories</h4>
 
             {{#each subcategories}}
             <label>
               <input
-                type="radio"
+                type="checkbox"
                 name="category"
                 value="{{this._id}}"
-                {{#if (eq ../activeCategory (toString this._id))}}checked{{/if}}
+                class="filter-checkbox"
+                {{#if (includes ../activeCategory (toString this._id))}}checked{{/if}}
                 onchange="document.getElementById('filterForm').submit()"
               >
               {{this.name}}
@@ -168,46 +169,46 @@
         </form>
       </aside>
 
-      <div class="products-wrapper-grid">
-        {{#each products}}
-          <div class="product-card-gender">      
-            <div class="product-image">
-              {{#if this.variants}}
-                <img 
-                  src="/uploads/{{lookup (lookup (lookup this.variants 0) 'images') 0}}" 
-                  alt="{{this.productName}}"
-                >
-              {{else}}
-                <img src="/images/default-shoe.png" alt="Product Image">
-              {{/if}}
-            </div>
-            
-            <div class="product-info">
-              <h3>{{this.productName}}</h3>
-              <p class="product-card-desc">
-                {{#if this.description}}
-                  {{this.description}}
-                {{else if this.Category.name}}
-                  {{this.Category.name}} Fit
-                {{else}}
-                  Premium Collection
-                {{/if}}
-              </p>     
-              <div class="product-action-block">
-                <h4>₹{{this.regularPrice}}</h4>
-                <a href="/details/{{this._id}}" class="rec-discover-btn">
-                  <button type="button">DISCOVER MORE</button>
-                </a>
-              </div>
-            </div>
-          </div>
+     <div class="products-wrapper-grid">
+  {{#each products}}
+    <div class="product-card-gender">      
+      <div class="product-image">
+        {{#if this.variants.[0].images.[0]}}
+          <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
+        {{else if this.productImage.[0]}}
+          <img src="{{this.productImage.[0]}}" alt="{{this.productName}}">
+        {{else if this.image}}
+          <img src="{{this.image}}" alt="{{this.productName}}">
         {{else}}
-          <div class="no-products" style="grid-column: 1 / -1; width: 100%; text-align: center; padding: 40px 0;">
-            <p style="font-size: 16px; color: #64748b; font-weight: 500;">No sneakers found matching your criteria.</p>
-          </div>
-        {{/each}}
+          <img src="/images/default-shoe.png" alt="Product Image">
+        {{/if}}
+      </div>
+      
+      <div class="product-info">
+        <h3>{{this.productName}}</h3>
+        <p class="product-card-desc">
+          {{#if this.description}}
+            {{this.description}}
+          {{else if this.Category.name}}
+            {{this.Category.name}} Fit
+          {{else}}
+            Premium Collection
+          {{/if}}
+        </p>     
+        <div class="product-action-block">
+          <h4>₹{{this.regularPrice}}</h4>
+          <a href="/details/{{this._id}}" class="rec-discover-btn">
+            <button type="button">DISCOVER MORE</button>
+          </a>
+        </div>
       </div>
     </div>
+  {{else}}
+    <div class="no-products" style="grid-column: 1 / -1; width: 100%; text-align: center; padding: 40px 0;">
+      <p style="font-size: 16px; color: #64748b; font-weight: 500;">No sneakers found matching your criteria.</p>
+    </div>
+  {{/each}}
+</div>
 
     {{#if totalPages}}
     <div class="pagination-container">
