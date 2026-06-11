@@ -171,9 +171,7 @@
 
 
 <style>
-/* 🌟 PREMIUM, COMPACT CROPPING MODAL SURFACE */
 
-/* 1. Ensure the main image wrapper strictly clips its contents */
 .product-image-main-container, 
 .image-preview-box,
 .main-img-wrapper { 
@@ -285,7 +283,6 @@
     box-shadow: 0 4px 6px -1px rgba(0, 77, 64, 0.2);
 }
 </style>
-
 
 <script>
 let variantCounter = 0;
@@ -411,34 +408,47 @@ document.addEventListener('change', (e) => {
 
         const files = Array.from(e.target.files);
         const filteredFiles = [];
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
 
-        for (let i = 0; i < files.length; i++) {
-            if (files[i].size > 2 * 1024 * 1024) {
-                if (typeof Toastify === "function") {
-                    Toastify({
-                        text: `"${files[i].name}" exceeds 2MB limit!`,
-                        duration: 3000,
-                        style: { background: "#ef4444" }
-                    }).showToast();
-                } else {
-                    alert(`"${files[i].name}" exceeds 2MB limit!`);
-                }
+        function showToastError(msg) {
+            if (typeof Toastify === "function") {
+                Toastify({
+                    text: msg,
+                    duration: 4000,
+                    gravity: "top",
+                    position: "right",
+                    style: { background: "#ef4444", borderRadius: "8px" }
+                }).showToast();
             } else {
-                filteredFiles.push(files[i]);
+                alert(msg);
             }
         }
 
-        if (filteredFiles.length === 0) {
-            e.target.value = "";
-            return;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            if (!file.type.startsWith('image/') || !allowedExtensions.exec(file.name)) {
+                showToastError("Only image formats (JPG, JPEG, PNG, WebP) are allowed.");
+                continue; 
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                showToastError(`"${file.name}" exceeds the maximum 2MB size limit!`);
+                continue;
+            }
+
+            filteredFiles.push(file);
         }
+
+        e.target.value = "";
+
+        if (filteredFiles.length === 0) return;
 
         currentVariantIndex = e.target.getAttribute('data-index');
         currentFilesQueue = filteredFiles;
         currentQueueIndex = 0;
 
         openCropperForNextInQueue();
-        e.target.value = ""; 
     }
 });
 
@@ -458,7 +468,6 @@ function openCropperForNextInQueue() {
     
     reader.onload = function(event) {
         cropperTargetImage.src = event.target.result;
-
         cropperModal.style.display = 'flex';
 
         cropperTargetImage.onload = function() {
@@ -586,7 +595,7 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
       if (typeof Toastify === "function") {
           Toastify({
              text: message,
-             duration: 3000,
+             duration: 4000,
              gravity: "top",
              position: "right",
              style: { background: "#ef4444", borderRadius: "8px" }
@@ -595,6 +604,7 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
           alert(message);
       }
    }
+
 
    if (!productName) return showValidationError("Product name is required");
    if (!brand) return showValidationError("Brand is required");
@@ -608,16 +618,63 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
        return showValidationError("Please add at least one color variant configuration");
    }
 
-   let imagesMissing = false;
-   Object.keys(variantFilesMap).forEach(key => {
-       if (variantFilesMap[key].length === 0) {
-           imagesMissing = true;
-       }
-   });
+   let validationPassed = true;
+   let errorMessage = "";
 
-   if (imagesMissing) {
-       return showValidationError("Please upload and crop at least three image variant illustration");
+   for (let card of totalCards) {
+       const variantIdx = card.getAttribute('data-variant-index');
+       const colorNameInput = card.querySelector('input[name="colorNames[]"]');
+       const colorTitle = colorNameInput && colorNameInput.value.trim() ? colorNameInput.value.trim() : `Variant #${parseInt(variantIdx) + 1}`;
+
+       const imagesUploaded = variantFilesMap[variantIdx] ? variantFilesMap[variantIdx].length : 0;
+       if (imagesUploaded < 3) {
+           validationPassed = false;
+           errorMessage = `The variant "${colorTitle}" must have at least 3 cropped images uploaded.`;
+           break;
+       }
+
+       const sizeRows = card.querySelectorAll('.sizes-container .size-row');
+       if (sizeRows.length === 0) {
+           validationPassed = false;
+           errorMessage = `Please add at least one Size & Stock option line for "${colorTitle}".`;
+           break;
+       }
+
+       for (let row of sizeRows) {
+           const sizeInput = row.querySelector(`input[name^="sizes_"]`);
+           const stockInput = row.querySelector(`input[name^="stocks_"]`);
+
+           const sizeVal = sizeInput ? sizeInput.value.trim() : "";
+           const stockVal = stockInput ? stockInput.value.trim() : "";
+
+           if (sizeVal === "" || stockVal === "") {
+               validationPassed = false;
+               errorMessage = `All Size and Stock boxes must be completely filled out for "${colorTitle}".`;
+               if (sizeInput && sizeVal === "") sizeInput.style.borderColor = "#ef4444";
+               if (stockInput && stockVal === "") stockInput.style.borderColor = "#ef4444";
+               break;
+           }
+
+           if (Number(sizeVal) < 0 || Number(stockVal) < 0) {
+               validationPassed = false;
+               errorMessage = `Size and Stock amounts cannot register as negative inside "${colorTitle}".`;
+               break;
+           }
+           
+           if (sizeInput) sizeInput.style.borderColor = "";
+           if (stockInput) stockInput.style.borderColor = "";
+       }
+
+       if (!validationPassed) break;
    }
+
+   if (!validationPassed) {
+       return showValidationError(errorMessage);
+   }
+
+   Object.keys(variantFilesMap).forEach(variantIdx => {
+       finalizeVariantFilesInput(variantIdx);
+   });
 
    this.submit();
 });
