@@ -15,6 +15,10 @@ export const getShop = async (req, res) => {
             return res.redirect(result.redirectTo);
         }
 
+        if (result.products && Array.isArray(result.products)) {
+            result.products = result.products.filter(p => p.isListed !== false && p.isBlocked !== true);
+        }
+
         return res.render('user/shop', result);
 
     } catch (error) {
@@ -32,6 +36,10 @@ export const getWomenShopPage = async (req, res) => {
         if (result.noProductsFound) {
             req.flash('error', 'No products found in Women\'s section');
             return res.redirect('/shop');
+        }
+
+        if (result.products && Array.isArray(result.products)) {
+            result.products = result.products.filter(p => p.isListed !== false && p.isBlocked !== true);
         }
         
         return res.render('user/gender', result);
@@ -52,6 +60,10 @@ export const getMenShopPage = async (req, res) => {
             req.flash('error', 'No products found in Men\'s section');
             return res.redirect('/shop');
         }
+
+        if (result.products && Array.isArray(result.products)) {
+            result.products = result.products.filter(p => p.isListed !== false && p.isBlocked !== true);
+        }
         
         return res.render('user/gender', result);
 
@@ -67,8 +79,15 @@ export const getProductId = async (req, res) => {
     try {
         const result = await productService.getProductDetails(req.params.id);
 
-        if (!result) {
-            return res.status(404).render('user/404');
+        if (!result || !result.product || result.product.isListed === false || result.product.isBlocked === true) {
+            req.flash('error', 'The product you are looking for is no longer available.');
+            return req.session.save(() => {
+                res.redirect('/shop');
+            });
+        }
+
+        if (result.relatedProducts && Array.isArray(result.relatedProducts)) {
+            result.relatedProducts = result.relatedProducts.filter(p => p.isListed !== false && p.isBlocked !== true);
         }
 
         return res.render('user/productPage', {
@@ -77,10 +96,13 @@ export const getProductId = async (req, res) => {
         });
 
     } catch (error) {
+        console.error("Product Details routing error:", error);
         return res.status(500).send("Internal Server Error");
     }
 };
 
+
+/* ---------------- ADMIN CONTROLLERS (Unchanged) ---------------- */
 
 export const getAddProduct = async (req, res) => {
    try {
@@ -133,14 +155,14 @@ export const postAddProduct = async (req, res) => {
       });
 
    } catch (error) {
-
-    req.flash('error', 'Product already exists');
-
-
-    req.session.save(() => {
-        res.redirect('/admin/products');
-    });
-}
+      console.error("ADD PRODUCT VALIDATION ERROR:", error.message);
+      
+      req.flash('error', error.message || 'Failed to save product');
+      
+      req.session.save(() => {
+          res.redirect('/admin/products'); 
+      });
+   }
 };
 
 export const postEditProduct = async (req, res) => {
@@ -162,12 +184,19 @@ export const postEditProduct = async (req, res) => {
       );
 
       req.flash("success", "Product updated successfully");
-      return res.redirect('/admin/products');
+      
+      req.session.save(() => {
+          return res.redirect('/admin/products');
+      });
 
    } catch (error) {
-      console.error("EDIT PRODUCT ERROR:", error.message);
+      console.error("EDIT PRODUCT VALIDATION ERROR:", error.message);
+      
       req.flash("error", error.message || "Something went wrong");
-      return res.redirect(`/admin/products/edit/${req.params.id}`);
+      
+      req.session.save(() => {
+          return res.redirect(`/admin/products/edit/${req.params.id}`);
+      });
    }
 };
 
@@ -199,3 +228,4 @@ export const toggleProductStatus = async (req, res) => {
       });
    }
 };
+
