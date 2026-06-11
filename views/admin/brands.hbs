@@ -28,9 +28,11 @@
                     </form>
                 </div>
 
-                <button class="btn btn-primary">
-                    Add Brand
-                </button>
+                <a href="/admin/brands/add" class="add-brand-link">
+                    <button class="btn btn-primary" type="button">
+                        Add Brand
+                    </button>
+                </a>
             </div>
         </header>
 
@@ -38,9 +40,8 @@
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>BRAND</th>
+                        <th>BRAND NAME</th>
                         <th>DESCRIPTION</th>
-                        <th class="text-center">PRODUCTS</th> 
                         <th class="text-center">STATUS</th>
                         <th class="text-center">ACTION</th>
                     </tr>
@@ -55,7 +56,7 @@
                                     <div class="brand-logo-container">
                                         {{#if this.logo}}
                                             <img
-                                                src="/uploads/brands/{{this.logo}}"
+                                                src="{{this.logo}}"
                                                 alt="{{this.name}}"
                                                 class="brand-logo-img"
                                             >
@@ -63,7 +64,7 @@
                                             <div class="brand-logo-placeholder"></div>
                                         {{/if}}
                                     </div>
-                                    <span class="brand-name">
+                                    <span class="brand-name" style="font-weight: 600; color: #0f172a;">
                                         {{this.name}}
                                     </span>
                                 </div>
@@ -76,43 +77,38 @@
                             </td>
 
                             <td class="text-center">
-                                <div style="display: inline-flex; flex-direction: column; gap: 4px; align-items: center;">
-                                    <span class="badge-count" style="background: #e6fffa; color: #234e52; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 0.85em; width: 85px; display: inline-block;">
-                                        {{this.listedProductCount}} Listed
-                                    </span>
-                                    <span class="badge-count" style="background: #fff5f5; color: #9b2c2c; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 0.85em; width: 85px; display: inline-block;">
-                                        {{this.unlistedProductCount}} Unlisted
-                                    </span>
-                                </div>
-                            </td>
-
-                            <td class="text-center">
                                 {{#if this.isListed}}
-                                    <span class="status-badge status-listed">Listed</span>
+                                    <span class="status-badge status-listed" style="background: #10b981; color: #ffffff; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600;">Listed</span>
                                 {{else}}
-                                    <span class="status-badge status-unlisted">Unlisted</span>
+                                    <span class="status-badge status-unlisted" style="background: #ef4444; color: #ffffff; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600;">Unlisted</span>
                                 {{/if}}
                             </td>
 
-                            <td class="text-center">
-                                <form
-                                    action="/admin/brands/toggle-status/{{this._id}}"
-                                    method="POST"
-                                    class="inline-form status-toggle-form" 
-                                >
-                                    {{#if this.isListed}}
-                                        <button type="submit" class="btn-edit btn-status-unlist">Unlist</button>
-                                    {{else}}
-                                        <button type="submit" class="btn-edit btn-status-list">List</button>
-                                    {{/if}}
-                                </form>
-                            </td>
+                           <td class="text-center" style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+    <!-- Edit Button -->
+    <a href="/admin/brands/edit/{{this._id}}" 
+       class="btn-edit" 
+       style="background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s;">
+       Edit
+    </a>
+
+    <!-- Status Toggle Form -->
+    <form action="/admin/brands/toggle-status/{{this._id}}?page={{../currentPage}}&search={{../searchQuery}}" 
+          method="POST" 
+          class="inline-form status-toggle-form">
+        {{#if this.isListed}}
+            <button type="submit" class="btn-edit btn-status-unlist" style="background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; padding: 6px 14px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s;">Unlist</button>
+        {{else}}
+            <button type="submit" class="btn-edit btn-status-list" style="background: #ccfbf1; color: #0d9488; border: 1px solid #99f6e4; padding: 6px 14px; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s;">List</button>
+        {{/if}}
+    </form>
+</td>
                         </tr>
                         {{/each}}
                     {{else}}
                         <tr>
-                            <td colspan="5" class="table-empty-state">
-                                No brands found.
+                            <td colspan="4" class="table-empty-state" style="text-align: center; padding: 50px 0; color: #64748b; font-size: 15px;">
+                                No brand records discovered matching your search context.
                             </td>
                         </tr>
                     {{/if}}
@@ -121,17 +117,18 @@
         </main>
 
         {{#if brands.length}}
-        <footer class="pagination-container">
+        <footer class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 10px; padding: 20px 0;">
             {{#if hasPrevPage}}
                 <a
                     href="/admin/brands?page={{prevPage}}&search={{searchQuery}}"
                     class="page-link-nav"
+                    style="text-decoration: none; color: #0f172a; font-weight: 600;"
                 >
                     « Prev
                 </a>
             {{/if}}
 
-            <button class="page-num active">
+            <button class="page-num active" type="button" style="background: #0f172a; color: #ffffff; border: none; width: 36px; height: 36px; border-radius: 6px; font-weight: 600;">
                 {{currentPage}}
             </button>
 
@@ -139,6 +136,7 @@
                 <a
                     href="/admin/brands?page={{nextPage}}&search={{searchQuery}}"
                     class="page-next"
+                    style="text-decoration: none; color: #0f172a; font-weight: 600;"
                 >
                     Next »
                 </a>
@@ -159,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = this.querySelector('button');
             const actionText = button.textContent.trim().toLowerCase(); 
             const isUnlisting = (actionText === 'unlist');
-            const targetColor = isUnlisting ? '#e53e3e' : '#319795';
+            const targetColor = isUnlisting ? '#ef4444' : '#0d9488';
 
             Swal.fire({
                 title: 'Are you sure?',
@@ -167,9 +165,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: targetColor,
-                cancelButtonColor: '#a0aec0',
+                cancelButtonColor: '#94a3b8',
                 confirmButtonText: `Yes, ${actionText} it!`,
-                cancelButtonText: 'Cancel'
+                cancelButtonText: 'Cancel',
+                customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
+        }
             }).then((result) => {
                 if (result.isConfirmed) {
                     form.submit(); 
