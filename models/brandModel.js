@@ -15,13 +15,9 @@ const brandSchema = new mongoose.Schema(
       trim: true,
       maxlength: [300, 'Description cannot exceed 300 characters']
     },
-    isActive: {
-      type: String,
-      enum: {
-        values: ['listed', 'unlisted'],
-        message: '{VALUE} is not a valid status. Choose either "listed" or "unlisted"'
-      },
-      default: 'listed'
+    isListed: {
+      type: Boolean,
+      default: true
     },
     logo: {
       type: String,
@@ -29,13 +25,10 @@ const brandSchema = new mongoose.Schema(
       trim: true
     }
   },
-  {
-    timestamps: true 
-  }
+  { timestamps: true }
 );
 
 brandSchema.index({ name: 'text' });
-
 const Brand = mongoose.model('Brand', brandSchema);
 
 export default Brand;
