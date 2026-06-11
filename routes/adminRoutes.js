@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
+
 import { 
     getAdminLogin, 
     postAdminLogin, 
@@ -11,53 +11,44 @@ import {
     adminLogout 
 } from '../controllers/adminController.js';
 
-import { getProducts,
-        getAddProduct,
-        getEditProduct,
-        postAddProduct,
-        postEditProduct,
-        toggleProductStatus
+import { 
+    getProducts,
+    getAddProduct,
+    getEditProduct,
+    postAddProduct,
+    postEditProduct,
+    toggleProductStatus
 } from '../controllers/productController.js';
 
-import {getCategories,
+import {
+    getCategories,
     postAddCategory,
     updateCategory,
     getSubcategoriesByParent,
     toggleListing
 } from '../controllers/categoryController.js';
 
+import {getEditBrandPage,updateBrand,getAddBrandPage,postAddBrand} from '../controllers/brandController.js';
+
 import brandRoutes from './brandRoutes.js'
 
-import { isAdminAuthenticated, 
+import { 
+    isAdminAuthenticated, 
     isAdminLoggedOut,
-     preventCache
+    preventCache
 } from '../middleware/adminAuth.js';
 
 const router = express.Router();
 
 router.use(preventCache);
 
-const uploadPath = path.join(process.cwd(), 'public/uploads/products');
-
-if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadPath); 
-    },
-    filename: (req, file, cb) => {
-        cb(null, `product-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`);
-    }
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.use((req,res,next)=>{
-    res.locals.layout='admin-layout';
+router.use((req, res, next) => {
+    res.locals.layout = 'admin-layout';
     next();
-})
+});
 
 // --- Admin Login Routes ---
 router.get('/login', isAdminLoggedOut, getAdminLogin);
@@ -88,16 +79,12 @@ router.post(
 
 router.post('/products/toggle-status/:id', isAdminAuthenticated, toggleProductStatus);
 
-//--- Admin Categories Routes ---
 router.get('/categories', isAdminAuthenticated, getCategories);
 router.post('/categories/toggle-status/:id', isAdminAuthenticated, toggleListing);
 router.post('/categories/add', isAdminAuthenticated, postAddCategory);
 router.post('/categories/edit/:id', isAdminAuthenticated, updateCategory);
+router.get('/categories/:id/subcategories', getSubcategoriesByParent);
 
-router.get(
-   '/categories/:id/subcategories',
-   getSubcategoriesByParent
-);
 
 router.get('/logout', adminLogout);
 
