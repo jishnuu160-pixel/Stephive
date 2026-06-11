@@ -128,6 +128,6 @@ export const toggleCategoryListing = async (categoryId) => {
 };
 
 export const getSubcategoriesByParent = async (parentId) => {
-   if (!parentId) return [];
-   return await categoryRepo.findSubCategoriesByParent(parentId);
+    if (!parentId) return [];
+    return await categoryRepo.findSubCategoriesByParent(parentId);
 };

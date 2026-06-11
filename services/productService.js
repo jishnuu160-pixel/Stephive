@@ -1,19 +1,61 @@
 import * as productRepo from '../repositories/productRepository.js';
-
+import * as brandRepo from '../repositories/brandRepository.js';
 import {
     findParentCategory,
-    findSubcategories,
     findAllCategories,
     findParentCategories,
     findSubCategoriesByParent
 } from '../repositories/categoryRepository.js';
 import mongoose from 'mongoose';
+import cloudinary from '../config/cloudinary.js'; 
+
+/**
+ * @param {Buffer} fileBuffer 
+ * @returns {Promise<string>} 
+ */
+const uploadToCloudinary = (fileBuffer) => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { 
+                folder: 'stephive_products',
+                allowed_formats: ['jpg', 'png', 'jpeg', 'webp'] 
+            },
+            (error, result) => {
+                if (error) {
+                    console.error("Cloudinary upload failed:", error);
+                    return reject(new Error("Image upload transformation failed"));
+                }
+                resolve(result.secure_url); 
+            }
+        );
+        uploadStream.end(fileBuffer);
+    });
+};
+
+/**
+ * 
+ * 
+ * @param {Object} file 
+ */
+const validateUploadedFile = (file) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+    const maxSizeBytes = 2 * 1024 * 1024; 
+
+  
+    if (!allowedMimeTypes.includes(file.mimetype) || !allowedExtensions.exec(file.originalname)) {
+        throw new Error(`Security Alert: "${file.originalname}" is not an accepted image format (JPG, PNG, WebP only).`);
+    }
+
+    if (file.size > maxSizeBytes) {
+        throw new Error(`Validation Error: "${file.originalname}" exceeds the maximum allowed size of 2MB.`);
+    }
+};
 
 /* ---------------- SHOP PAGE ---------------- */
 
 export const getShopProducts = async (req, genderFilter = null) => {
     try {
-        
         const allCategories = await findAllCategories();
         
         const activeCategoryObjectIds = allCategories
@@ -90,7 +132,6 @@ const buildGenderQuery = (subIds, filters) => {
 
     if (category && mongoose.Types.ObjectId.isValid(category)) {
         const selectedId = new mongoose.Types.ObjectId(category);
-        
         const isAuthorized = authorizedObjectIds.some(activeId => activeId.equals(selectedId));
         
         if (isAuthorized) {
@@ -119,9 +160,7 @@ export const getGenderPage = async (gender, req) => {
     const allCategories = await findAllCategories();
 
     const unlistedParentIds = allCategories
-        .filter(cat => {
-            return cat.isListed === false || cat.isListed === 'false';
-        })
+        .filter(cat => cat.isListed === false || cat.isListed === 'false')
         .map(cat => cat._id.toString());
 
     const activeCategories = allCategories.filter(cat => {
@@ -155,29 +194,12 @@ export const getGenderPage = async (gender, req) => {
 
     const subIds = filteredSubcategories.map(c => c._id);
 
-    const productQuery = buildGenderQuery(subIds, {
-        category,
-        price,
-        brand,
-        material,
-        search
-    });
-
-    const filterQuery = buildGenderQuery(subIds, {
-        category,
-        price,
-        material,
-        search
-    });
+    const productQuery = buildGenderQuery(subIds, { category, price, brand, material, search });
+    const filterQuery = buildGenderQuery(subIds, { category, price, material, search });
 
     const sortQuery = getSort(sort);
     const totalProducts = await productRepo.countProducts(productQuery);
-    const products = await productRepo.findProducts(
-        productQuery,
-        sortQuery,
-        (page - 1) * limit,
-        limit
-    );
+    const products = await productRepo.findProducts(productQuery, sortQuery, (page - 1) * limit, limit);
     
     const brands = await productRepo.distinctBrandsByQuery(filterQuery);
     const materials = await productRepo.distinctMaterials(filterQuery);
@@ -233,9 +255,7 @@ export const getProductsPage = async (queryParams) => {
 
     let searchFilter = {};
     if (searchQuery) {
-        searchFilter = {
-            productName: { $regex: searchQuery, $options: 'i' }
-        };
+        searchFilter = { productName: { $regex: searchQuery, $options: 'i' } };
     }
 
     const sortQuery = { createdAt: -1 };
@@ -282,7 +302,6 @@ export const getEditProductPage = async (productId) => {
     if (!product) throw new Error("Product not found");
 
     const parentCategories = await findParentCategories();
-    
     const selectedParentId = product.Category?.parentCategory?._id || product.Category?.parentCategory;
 
     const subcategories = selectedParentId
@@ -299,7 +318,6 @@ export const getEditProductPage = async (productId) => {
 
 /* ---------------- MUTATIONS & MANAGEMENTS ---------------- */
 
-
 export const createProduct = async (body, files) => {
     const {
         productName, brand, regularPrice, salePrice, description,
@@ -313,18 +331,7 @@ export const createProduct = async (body, files) => {
     if (!category) throw new Error("Please select a subcategory");
     if (!regularPrice || Number(regularPrice) <= 0) throw new Error("Enter a valid price");
 
-    console.log({
-    productName,
-    brand,
-    parentCategory,
-    category
-});
-
-    const existingProduct = await productRepo.findDuplicateProduct(
-    productName,
-    category
-     );
-
+    const existingProduct = await productRepo.findDuplicateProduct(productName, category);
     if (existingProduct) {
         throw new Error(`A product named "${productName.trim()}" by ${brand.trim()} already exists in this category!`);
     }
@@ -335,7 +342,8 @@ export const createProduct = async (body, files) => {
     const colorNames = Array.isArray(body.colorNames) ? body.colorNames : [body.colorNames];
     const colorsHex = Array.isArray(body.colorHex) ? body.colorHex : [body.colorHex];
 
-    colorNames.forEach((colorName, index) => {
+    for (let index = 0; index < colorNames.length; index++) {
+        const colorName = colorNames[index];
         const hex = colorsHex[index] || '#000000';
         
         const variantSizes = body[`sizes_${index}`] || [];
@@ -357,20 +365,29 @@ export const createProduct = async (body, files) => {
 
         let variantImagePaths = [];
         if (files && files[`variantImages_${index}`]) {
-            variantImagePaths = files[`variantImages_${index}`].map(f => f.filename);
+            const fieldFiles = files[`variantImages_${index}`];
+            for (const file of fieldFiles) {
+                
+                validateUploadedFile(file);
+
+                const cloudUrl = await uploadToCloudinary(file.buffer);
+                variantImagePaths.push(cloudUrl);
+            }
         }
 
         if (variantImagePaths.length === 0) {
-            throw new Error(`Please upload at least three image file for a variant: ${colorName || 'Index ' + index}`);
+            throw new Error(`Please upload at least one image file for variant: ${colorName || 'Index ' + index}`);
         }
 
         finalVariantsArray.push({
             colorName: colorName || 'Default',
             colorHex: hex,
-            images: variantImagePaths,
+            images: variantImagePaths, 
             sizes: nestedSizesArray
         });
-    });
+    }
+
+    await brandRepo.ensureBrandExists(brand.trim());
 
     const productData = {
         productName: productName.trim(),
@@ -393,8 +410,6 @@ export const createProduct = async (body, files) => {
     await productRepo.createProduct(productData);
 };
 
-
-
 export const updateProduct = async (productId, bodyData, structuredFiles) => {
     const existingProduct = await productRepo.findProductById(productId);
     if (!existingProduct) throw new Error("Product not found");
@@ -411,10 +426,12 @@ export const updateProduct = async (productId, bodyData, structuredFiles) => {
     const colorNamesArr = Array.isArray(colorNames) ? colorNames : [colorNames];
     const colorHexArr = Array.isArray(colorHex) ? colorHex : [colorHex];
 
-    const existingVariantsMap = {};
+    const dbVariantsMap = {};
     if (existingProduct.variants && Array.isArray(existingProduct.variants)) {
         existingProduct.variants.forEach(v => {
-            if (v.colorName) existingVariantsMap[v.colorName.trim().toLowerCase()] = v;
+            if (v._id) {
+                dbVariantsMap[v._id.toString()] = v;
+            }
         });
     }
 
@@ -425,17 +442,35 @@ export const updateProduct = async (productId, bodyData, structuredFiles) => {
         let activeImages = [];
 
         if (structuredFiles && structuredFiles[`variantImages_${i}`]) {
-            activeImages = structuredFiles[`variantImages_${i}`].map(file => file.filename);
+            const fieldFiles = structuredFiles[`variantImages_${i}`];
+            for (const file of fieldFiles) {
+                
+                validateUploadedFile(file);
+
+                const cloudUrl = await uploadToCloudinary(file.buffer);
+                activeImages.push(cloudUrl);
+            }
         }
 
-        const existingVariant = existingVariantsMap[colorName.toLowerCase()];
+        const incomingVariantId = bodyData[`variantId_${i}`]; 
+        let existingVariant = null;
+
+        if (incomingVariantId && dbVariantsMap[incomingVariantId]) {
+            existingVariant = dbVariantsMap[incomingVariantId];
+        } else if (existingProduct.variants && existingProduct.variants[i]) {
+            existingVariant = existingProduct.variants[i];
+        }
         
         if (existingVariant) {
             const removedField = bodyData[`removedImages_${i}`];
             const removedImages = Array.isArray(removedField) ? removedField : (removedField ? [removedField] : []);
-            const remainingImages = existingVariant.images.filter(img => !removedImages.includes(img));
             
+            const remainingImages = existingVariant.images.filter(img => !removedImages.includes(img));
             activeImages = [...remainingImages, ...activeImages];
+        }
+
+        if (activeImages.length < 3) {
+            throw new Error(`The color variant "${colorName}" must have at least 3 images. Add more files or remove fewer existing images.`);
         }
 
         const sizesInput = bodyData[`sizes_${i}`] || [];
@@ -453,12 +488,18 @@ export const updateProduct = async (productId, bodyData, structuredFiles) => {
             };
         }).filter(s => s.size > 0);
 
-        updatedVariants.push({
+        const variantPayload = {
             colorName,
             colorHex: colorHexArr[i] || '#000000',
-            images: activeImages,
+            images: activeImages, 
             sizes: sizesObj
-        });
+        };
+
+        if (existingVariant && existingVariant._id) {
+            variantPayload._id = existingVariant._id;
+        }
+
+        updatedVariants.push(variantPayload);
     }
 
     const updateData = {
@@ -480,7 +521,6 @@ export const updateProduct = async (productId, bodyData, structuredFiles) => {
     return await productRepo.updateProduct(productId, updateData);
 };
 
-
 export const toggleProductStatus = async (productId) => {
     const product = await productRepo.findProductById(productId);
     if (!product) throw new Error('Product not found.');
@@ -492,4 +532,3 @@ export const toggleProductStatus = async (productId) => {
         message: `${product.productName} has been ${nextVisibilityState ? 'listed' : 'unlisted'}.`
     };
 };
-
