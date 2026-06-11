@@ -28,8 +28,19 @@ app.engine('hbs', engine({
         path.join(process.cwd(), 'views/partials'),      
         path.join(process.cwd(), 'views/admin/partials') 
     ],
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    },
     helpers: {
    eq: (a, b) => a?.toString() === b?.toString(),
+   includes: (array, value) => {
+            if (!array) return false;
+            if (Array.isArray(array)) {
+                return array.map(item => item.toString()).includes(value?.toString());
+            }
+            return array.toString() === value?.toString();
+       },
     add: (a, b, c) => a + b + c,
     subtract: (a, b) => (a || 0) - (b || 0),
     multiply: (a, b) => (a || 0) * (b || 0),
