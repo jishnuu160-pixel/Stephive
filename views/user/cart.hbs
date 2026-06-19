@@ -65,16 +65,32 @@
                     </div>
                 </div>
             </div>
-            {{/each}}
-            {{else}}
-            <div class="empty-cart-state">
-                <i class="fa-solid fa-bag-shopping" style="font-size: 48px; margin-bottom: 15px; color: #cbd5e1;"></i>
-                <p style="font-size: 18px; margin-bottom: 20px; font-weight: 500;">Your StepHyve cart is empty.</p>
-                <a href="/shop" class="continue-shopping-btn" style="float: none; display: inline-block; padding: 12px 30px; background: #0f172a; color: #fff; border-radius: 6px; text-decoration: none;">Explore Products</a>
-            </div>
-            {{/if}}
-        </section>
 
+
+{{/each}}
+{{#if totalPages}}
+            <div class="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 30px 0;">
+                
+                {{#if hasPrevPage}}
+                    <a href="/user/cart?page={{subtract currentPage 1}}" class="pagination-btn">« Previous</a>
+                {{/if}}
+
+                <span class="page-info" style="font-weight: 600; color: #475569;">
+                    Page {{currentPage}} of {{totalPages}}
+                </span>
+
+                {{#if hasNextPage}}
+                   <a href="/user/cart?page={{add currentPage 1}}" class="pagination-btn">Next></a>
+                {{/if}}
+            </div>
+        {{/if}}
+
+    {{else}}
+        <div class="empty-cart-state">
+            <p>Your StepHyve cart is empty.</p>
+        </div>
+    {{/if}}
+</section>
         {{#if cart.items.length}}
         <section class="summary-wrapper">
             <div class="summary-card">
