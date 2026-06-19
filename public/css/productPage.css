@@ -36,8 +36,11 @@
 
 /* --- DISPLAY SIDE (LEFT) --- */
 .product-gallery-block{
-    flex:1;
-    max-width:620px;
+  display: flex; 
+  gap: 50px; 
+  align-items: flex-start;
+   flex: 1; 
+   max-width: 820px;
 }
 
 /* 🟢 HERO WRAPPER - Force visible so the zoom box can overflow out to the right */
@@ -142,7 +145,7 @@
 /* --- SYSTEM INTERACTIVE SELECTIONS (RIGHT) --- */
 .product-configurator-block{
     width:460px;
-    padding-top:40px;
+    padding-left:80px;
 }
 
 .item-title{
@@ -669,8 +672,8 @@
     position: absolute !important;
     top: 0 !important;
     left: 106% !important; /* 🛠️ Positions panel perfectly to the right side of the main shoe frame */
-    width: 460px !important;
-    height: 460px !important;
+    width: 560px !important;
+    height: 560px !important;
     background: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 12px !important;
@@ -688,8 +691,56 @@
 
 /* 4. Style the tracking glass lens indicator block on the shoe thumbnail */
 .drift-bounding-box {
-    background-color: rgba(15, 23, 42, 0.25) !important; /* Translucent Slate */
-    border: 1px dashed #0f172a !important;
+    background-color: rgba(187, 192, 203, 0.25) !important; 
+    border: 1px dashed #a6a6a6 !important;
     cursor: zoom-in !important;
     z-index: 99 !important;
 }
+
+
+
+   
+    .custom-zoom-modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+    }
+    .modal-image-wrapper {
+        position: relative;
+        max-width: 100%;
+        max-height: 100%;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .custom-zoom-content {
+        display: block;
+        max-width: 100%;
+        max-height: 85vh;
+        object-fit: contain;
+        transform: scale(1);
+        transition: transform 0.3s ease;
+        cursor: zoom-in;
+    }
+    /* Click image to toggle direct high-definition zoom scale inside modal */
+    .custom-zoom-content.zoomed {
+        transform: scale(1.8);
+        cursor: zoom-out;
+    }
+    .custom-zoom-close {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.2s;
+        cursor: pointer;
+        z-index: 100000;
+    }
+    .custom-zoom-close:hover {
+        color: #ef4444;
+        transform: scale(1.1);
+    }
+
