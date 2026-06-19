@@ -133,41 +133,43 @@
 <section class="shop-products-section">
     <h2>Search Results For "{{searchValue}}"</h2>
 
-    <div class="products-wrapper-grid">
-        {{#each products}}
-        <div class="product-card">
-            <div class="product-image">
-                {{#if this.variants.[0].images.[0]}}
-                    <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
-                {{else if this.productImage.[0]}}
-                    <img src="{{this.productImage.[0]}}" alt="{{this.productName}}">
-                {{else}}
-                    <img src="/images/default-shoe.png" alt="Product Image">
-                {{/if}}
-            </div>
-
-            <div class="product-info">
-                <h3>{{this.productName}}</h3>
-                <p class="product-card-desc">
-                    {{#if this.description}}
-                        {{this.description}}
+   <div class="products-wrapper-grid-shop">
+            {{#each products}}
+            <div class="product-card-gender">      
+                <div class="product-image">
+                    {{#if this.variants.[0].images.[0]}}
+                        <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
+                    {{else if this.productImage.[0]}}
+                        <img src="{{this.productImage.[0]}}" alt="{{this.productName}}">
                     {{else}}
-                        Premium Collection
+                        <img src="/images/default-shoe.png" alt="Product Image">
                     {{/if}}
-                </p>
-                <div class="product-action-block">
-                    <h4>₹{{this.regularPrice}}</h4>
-                    <a href="/details/{{this._id}}" class="rec-discover-btn">
-                        <button type="button">DISCOVER MORE</button>
-                    </a>
+                </div>
+                
+                <div class="product-info">
+                    <h3>{{this.productName}}</h3>
+                    <p class="product-card-desc">
+                        {{#if this.description}}
+                            {{this.description}}
+                        {{else if this.Category.name}}
+                            {{this.Category.name}} Fit
+                        {{else}}
+                            Premium Collection
+                        {{/if}}
+                    </p>     
+                    <div class="product-action-block">
+                        <h4>₹{{this.regularPrice}}</h4>
+                        <a href="/details/{{this._id}}" class="rec-discover-btn">
+                            <button type="button">DISCOVER MORE</button>
+                        </a>
+                    </div>
                 </div>
             </div>
+            {{else}}
+            <div class="no-products">
+                <p>No sneakers found matching your criteria.</p>
+            </div>
+            {{/each}}
         </div>
-        {{else}}
-        <div class="no-products">
-            <p>No products found matching "{{searchValue}}"</p>
-        </div>
-        {{/each}}
-    </div>
 </section>
 {{/if}}
