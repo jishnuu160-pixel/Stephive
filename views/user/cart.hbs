@@ -32,13 +32,13 @@
                     <p class="item-specs">MATERIAL: {{#if this.productId.material}} {{toUpperCase this.productId.material}}{{else}}LEATHER{{/if}}| COLOR: {{toUpperCase this.color}} | SIZE: {{this.size}}</p>
                     
 
-                    {{#if this.isOutOfStock}}
-                        <span class="cart-error-badge">OUT OF STOCK</span>
-                    {{else}}
-                        {{#if this.hasInsufficientStock}}
-                            <span class="cart-error-badge">EXCEEDS STOCK (Only {{this.maxStockLimit}} left)</span>
-                        {{/if}}
-                    {{/if}}
+                   {{#if this.isOutOfStock}}
+    <span class="cart-error-badge">OUT OF STOCK</span>
+{{else if this.hasInsufficientStock}}
+    <span class="cart-error-badge">
+        EXCEEDS STOCK (Only {{this.availableStock}} left)
+    </span>
+{{/if}}
                     
                     {{#if this.isUnlisted}}
                         <span class="cart-error-badge">PRODUCT UNAVAILABLE</span>
@@ -47,11 +47,11 @@
                     <div class="item-pricing-row">
                         <span class="item-price" data-base-price="{{this.price}}">₹{{this.price}}</span>
                         
-                        <div class="quantity-selector">
-                            <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
-                            <span class="qty-val">{{this.quantity}}</span>
-                            <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
-                        </div>
+<div class="quantity-selector">
+    <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
+    <span class="qty-val" data-max="{{this.availableStock}}">{{this.quantity}}</span>
+    <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
+</div>
                     </div>
                 </div>
                 
@@ -156,77 +156,107 @@ function showToast(message, type = 'success') {
     if (type === 'error') {
         toast.classList.add('error-toast');
     }
-
     setTimeout(() => {
         toast.classList.remove('show');
     }, 2200);
 }
 
-
 async function adjustCartQuantity(buttonElement, operationalChange) {
+
     const card = buttonElement.closest('.cart-card');
-    
-    const productId = card.getAttribute('data-product-id');
-    const size = card.getAttribute('data-size');
-    const color = card.getAttribute('data-color');
     const qtyDisplaySpan = card.querySelector('.qty-val');
-    
-    const priceElement = card.querySelector('.item-price');
-    const basePrice = parseInt(priceElement.getAttribute('data-base-price'));
-    
+
+    const maxStock = parseInt(qtyDisplaySpan.getAttribute('data-max'));
     const currentQty = parseInt(qtyDisplaySpan.innerText);
     const targetQuantity = currentQty + operationalChange;
 
-    if (targetQuantity < 1) return;
     if (targetQuantity > 5) {
         showToast("Maximum limit is 5 units", "error");
         return;
     }
 
+if (operationalChange > 0 && targetQuantity > maxStock) {
+    showToast(`Only ${maxStock} items available`, "error");
+    return;
+}
+
+    if (targetQuantity < 1) {
+        return;
+    }
+
+    const productId = card.getAttribute('data-product-id');
+    const size = card.getAttribute('data-size');
+    const color = card.getAttribute('data-color');
+
     try {
+
         const response = await fetch('/user/cart/update-quantity', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, size, color, targetQuantity })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId,
+                size,
+                color,
+                targetQuantity
+            })
         });
 
         const data = await response.json();
 
-        if (response.ok && data.success) {
-        
-            qtyDisplaySpan.innerText = targetQuantity;
-            
-            const countEl = document.getElementById('cart-item-count');
-            if (countEl) countEl.innerText = `(${data.totalUnitsCount} Items)`;
-
-       
-            const subtotalEl = card.querySelector('.subtotal-price');
-            if (subtotalEl) subtotalEl.innerText = '₹' + (basePrice * targetQuantity).toLocaleString();
-
-       
-            const updateSummary = (id, val) => {
-                const el = document.getElementById(id);
-                if (el) el.innerText = '₹' + (val ? val.toLocaleString() : '0');
-            };
-            
-            updateSummary('summary-subtotal', data.subtotal);
-            updateSummary('summary-tax', data.taxEstimate);
-            updateSummary('summary-total', data.totalAmount);
-
+       if (response.ok && data.success) {
    
-            if (window.updateGlobalCartCount) {
-                window.updateGlobalCartCount(data.totalUnitsCount);
-            }
+    qtyDisplaySpan.innerText = targetQuantity;
+
+    const pricePerUnit = parseFloat(card.querySelector('.item-price').getAttribute('data-base-price'));
+    const newRowSubtotal = targetQuantity * pricePerUnit;
+    card.querySelector('.subtotal-price').innerText = `₹${newRowSubtotal.toFixed(2)}`;
+
+    if (data.subtotal !== undefined) {
+        document.getElementById('summary-subtotal').innerText = `₹${data.subtotal}`;
+        document.getElementById('summary-tax').innerText = `₹${data.taxEstimate}`;
+        document.getElementById('summary-total').innerText = `₹${data.totalAmount}`;
+    }
+
+    if (window.updateGlobalCartCount) {
+        window.updateGlobalCartCount(data.totalUnitsCount);
+    }
+
+            const badge = card.querySelector('.cart-error-badge');
+
+if (badge && targetQuantity <= maxStock) {
+    badge.remove();
+
+    card.classList.remove('stock-error-border');
+}
+
+            const buttons = card.querySelectorAll('.qty-btn');
+
+            buttons[0].disabled = (targetQuantity <= 1);
+
+           if (card.classList.contains('stock-error-border')) {
+                  buttons[1].disabled = false;
+          } else {
+                  buttons[1].disabled = (currentQty >= 5 || currentQty >= maxStock);
+          }
 
             showToast("Cart updated");
+
         } else {
-            showToast(data.message || "Failed to update quantity", "error");
+
+            showToast(data.message || "Failed to update", "error");
+
         }
-    } catch (err) {
-        console.error("Cart Error:", err);
+
+    } catch (error) {
+
+        console.error(error);
         showToast("Something went wrong", "error");
+
     }
 }
+
 
 
 async function removeCartRow(buttonElement) {
@@ -280,4 +310,28 @@ async function removeCartRow(buttonElement) {
         showToast("Something went wrong", "error");
     }
 }
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('.cart-card').forEach(card => {
+
+        if (card.classList.contains('disabled-item-opacity')) {
+            card.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+            return;
+        }
+
+        const qtySpan = card.querySelector('.qty-val');
+        const currentQty = parseInt(qtySpan.innerText);
+
+        const buttons = card.querySelectorAll('.qty-btn');
+
+        buttons[0].disabled = (currentQty <= 1);
+
+        buttons[1].disabled = false;
+
+    });
+
+});
+
 </script>
