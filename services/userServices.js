@@ -1,5 +1,5 @@
 import * as userRepo from '../repositories/userRepository.js';
-import User from '../models/userModel.js'; 
+import { uploadToCloudinary } from '../utils/cloudinaryUtils.js'; 
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 
@@ -143,14 +143,12 @@ export const resetPassword = async (email, newPassword) => {
     return updatedUser;
 };
 
-
-
-export const updateAvatar = async (userId, imagePath) => {
-
+export const updateAvatar = async (userId, fileBuffer) => {
+    const imageUrl = await uploadToCloudinary(fileBuffer);
+    
     return await userRepo.updateUserInfo(userId, {
-        profileImage: imagePath
+        profileImage: imageUrl
     });
-
 };
 
 export const getUserById = async (userId) => {
@@ -162,7 +160,75 @@ export const updateProfile = async (userId, data) => {
 };
 
 export const addAddress = async (userId, addressData) => {
-   return await userRepo.addAddress(userId, addressData);
+
+    const {
+        fullName,
+        phone,
+        street,
+        city,
+        state,
+        pincode
+    } = addressData;
+
+    const errors = {};
+
+    if (!fullName?.trim()) errors.fullName = "*Full Name is required";
+    if (!phone?.trim()) errors.phone = "*Mobile Number is required";
+    if (!street?.trim()) errors.street = "*Address Line 1 is required";
+    if (!city?.trim()) errors.city = "*City is required";
+    if (!state?.trim()) errors.state = "*State is required";
+    if (!pincode?.trim()) errors.pincode = "*Pincode is required";
+
+    if (phone?.trim() && !/^\d{10}$/.test(phone.trim())) {
+        errors.phone = "Phone number must be 10 digits";
+    }
+
+    if (pincode?.trim() && !/^\d{6}$/.test(pincode.trim())) {
+        errors.pincode = "Pincode must be 6 digits";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        throw { validationErrors: errors };
+    }
+
+    const user = await userRepo.findById(userId);
+
+    const duplicateAddress = user.addresses.find(addr =>
+        addr.fullName?.trim().toLowerCase() === fullName.trim().toLowerCase() &&
+        addr.phone === phone.trim() &&
+        addr.street?.trim().toLowerCase() === street.trim().toLowerCase() &&
+        addr.city?.trim().toLowerCase() === city.trim().toLowerCase() &&
+        addr.state?.trim().toLowerCase() === state.trim().toLowerCase() &&
+        addr.pincode === pincode.trim()
+    );
+
+    if (duplicateAddress) {
+        throw {
+            validationErrors: {
+                street: "This address already exists"
+            }
+        };
+    }
+
+    if (user.addresses.length === 0) {
+        addressData.isDefault = true;
+    }
+
+   
+
+if (addressData.isDefault) {
+    await userRepo.clearDefaultAddresses(userId);
+}
+
+    return await userRepo.addAddress(userId, {
+        ...addressData,
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        street: street.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim()
+    });
 };
 
 export const deleteAddress = async (userId, addressId) => {
@@ -170,17 +236,92 @@ export const deleteAddress = async (userId, addressId) => {
 };
 
 export const editAddress = async (
-   userId,
-   addressId,
-   updatedData
+    userId,
+    addressId,
+    updatedData
 ) => {
-   return await userRepo.updateAddress(
-      userId,
-      addressId,
-      updatedData
-   );
+
+    const {
+        fullName,
+        phone,
+        street,
+        city,
+        state,
+        pincode
+    } = updatedData;
+
+    const errors = {};
+
+    if (!fullName?.trim()) {
+        errors.fullName = "Full Name is required";
+    }
+
+    if (!phone?.trim()) {
+        errors.phone = "Mobile Number is required";
+    } else if (!/^\d{10}$/.test(phone.trim())) {
+        errors.phone = "Phone number must be 10 digits";
+    }
+
+    if (!street?.trim()) {
+        errors.street = "Address Line 1 is required";
+    }
+
+    if (!city?.trim()) {
+        errors.city = "City is required";
+    }
+
+    if (!state?.trim()) {
+        errors.state = "State is required";
+    }
+
+    if (!pincode?.trim()) {
+        errors.pincode = "Pincode is required";
+    } else if (!/^\d{6}$/.test(pincode.trim())) {
+        errors.pincode = "Pincode must be 6 digits";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        throw {
+            validationErrors: errors
+        };
+    }
+
+    const user = await userRepo.findById(userId);
+
+    const duplicateAddress = user.addresses.find(addr =>
+        addr._id.toString() !== addressId &&
+        addr.fullName?.trim().toLowerCase() === fullName.trim().toLowerCase() &&
+        addr.phone === phone.trim() &&
+        addr.street?.trim().toLowerCase() === street.trim().toLowerCase() &&
+        addr.city?.trim().toLowerCase() === city.trim().toLowerCase() &&
+        addr.state?.trim().toLowerCase() === state.trim().toLowerCase() &&
+        addr.pincode === pincode.trim()
+    );
+
+    if (duplicateAddress) {
+        throw {
+            validationErrors: {
+                street: "This address already exists"
+            }
+        };
+    }
+
+    if (updatedData.isDefault) {
+        await userRepo.clearDefaultAddresses(userId);
+    }
+
+    return await userRepo.updateAddress(
+        userId,
+        addressId,
+        {
+            ...updatedData,
+            fullName: fullName.trim(),
+            phone: phone.trim(),
+            street: street.trim(),
+            city: city.trim(),
+            state: state.trim(),
+            pincode: pincode.trim()
+        }
+    );
 };
 
-export const findUserByEmail = async (email) => {
-   return await userRepo.findByEmail(email);
-};
