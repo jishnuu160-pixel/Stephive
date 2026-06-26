@@ -12,22 +12,26 @@
                 <div class="form-group">
                     <label>Shoe Name</label>
                     <input type="text" name="productName" placeholder="Curv Shoe" >
+                    <small class="field-error"></small>
                 </div>
 
                 <div class="form-group">
                     <label>Brand</label>
                     <input type="text" name="brand" placeholder="Curv">
+                    <small class="field-error"></small>
                 </div>
 
                 <div class="form-group">
                     <label>Base Price</label>
                     <input type="number" name="regularPrice" placeholder="5999">
+                    <small class="field-error"></small>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Description</label>
                 <input type="text" name="description" placeholder="Comfortable everyday sneaker">
+                <small class="field-error"></small>
             </div>
 
             <div class="form-row split-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -41,6 +45,7 @@
                      </option>
                         {{/each}}
                    </select>
+                   <small class="field-error"></small>
                 </div>
 
                 <div class="form-group">
@@ -48,6 +53,7 @@
                     <select id="subcategorySelect" name="category">
                      <option value="">Select Subcategory</option>
                     </select>
+                    <small class="field-error"></small>
                 </div>
             </div>
 
@@ -65,21 +71,25 @@
                 <div class="form-group">
                     <label>Material</label>
                     <input type="text" name="material" placeholder="Leather">
+                    <small class="field-error"></small>
                 </div>
 
                 <div class="form-group">
                     <label>Closure Type</label>
                     <input type="text" name="closureType" placeholder="Lace up">
+                    <small class="field-error"></small>
                 </div>
 
                 <div class="form-group">
                     <label>Sole Type</label>
                     <input type="text" name="soleType" placeholder="Rubber">
+                    <small class="field-error"></small>
                 </div>
                 
                 <div class="form-group">
                     <label>Weight</label>
                     <input type="text" name="weight" placeholder="300g">
+                    <small class="field-error"></small>
                 </div>
             </div>
 
@@ -87,6 +97,7 @@
                 <div class="form-group">
                     <label>Country of Origin</label>
                     <input type="text" name="countryOfOrigin" placeholder="India">
+                    <small class="field-error"></small>
                 </div>
             </div>
 
@@ -118,11 +129,19 @@
 
         <div class="sizes-container" style="margin-top: 15px;">
             <label>Sizes & Stock</label>
-            <div class="size-row">
-                <input type="number" name="sizes_0[]" placeholder="Size">
-                <input type="number" name="stocks_0[]" placeholder="Stock">
-                <button type="button" class="remove-size">X</button>
-            </div>
+           <div class="size-row">
+    <div>
+        <input type="number" name="sizes_0[]" placeholder="Size">
+        <small class="field-error"></small>
+    </div>
+
+    <div>
+        <input type="number" name="stocks_0[]" placeholder="Stock">
+        <small class="field-error"></small>
+    </div>
+
+    <button type="button" class="remove-size">X</button>
+</div>
             <button type="button" class="add-size" style="margin-top: 5px;">+ Add size</button>
         </div>
 
@@ -147,6 +166,7 @@
             </div>
             <div class="cropped-files-container" id="croppedFilesContainer_0"></div>
             <div class="images-preview-gallery-variant" id="thumbnailsContainer_0" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+             <small class="field-error image-error"></small>
         </div>
 
         <button type="button" class="remove-variant" style="margin-top: 15px; background-color: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
@@ -169,120 +189,6 @@
     </div>
 </div>
 
-
-<style>
-
-.product-image-main-container, 
-.image-preview-box,
-.main-img-wrapper { 
-    position: relative !important;
-    overflow: hidden !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* 2. Lock down the base image inside its frame boundaries */
-.product-image-main-container img,
-.main-img-wrapper img {
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
-    display: block;
-}
-
-/* 3. Restrain the dynamic lens or zoomed clone image layer */
-.zoom-lens, 
-.img-zoom-lens,
-.zoomWindow,
-.zoomContainer {
-    max-width: 100% !important;
-    max-height: 100% !important;
-    position: absolute !important;
-    pointer-events: none; /* Stops mouse stuttering loops during hover */
-}
-
-.cropper-modal-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 23, 42, 0.6); 
-    backdrop-filter: blur(4px);        
-    display: none;                     
-    align-items: center;
-    justify-content: center;
-    z-index: 999999;
-}
-
-.cropper-wrapper {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    max-width: 500px; /* 🛠️ bumped up slightly to give Cropper.js room to build handlers */
-    width: 90%;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border: 1px solid #e2e8f0;
-}
-
-.cropper-wrapper h3 {
-    margin-top: 0;
-    margin-bottom: 14px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #0f172a;
-    letter-spacing: -0.01em;
-}
-
-.image-preview-box {
-    max-height: 350px; /* 🛠️ Increased height capacity to fit high-res photos cleanly */
-    height: 350px;
-    margin-bottom: 18px;
-    overflow: hidden;
-    background: #f8fafc; 
-    border: 1px dashed #cbd5e1;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.cropper-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-.btn {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-secondary { 
-    background: #f1f5f9; 
-    color: #475569;
-    border: 1px solid #cbd5e1;
-}
-.btn-secondary:hover {
-    background: #e2e8f0;
-    color: #1e293b;
-}
-
-.btn-primary { 
-    background: #004d40; 
-    color: #ffffff; 
-}
-.btn-primary:hover {
-    background: #00332c;
-    box-shadow: 0 4px 6px -1px rgba(0, 77, 64, 0.2);
-}
-</style>
 
 <script>
 let variantCounter = 0;
@@ -363,10 +269,18 @@ document.addEventListener("click", function (e) {
       newRow.style.marginTop = "5px";
 
       newRow.innerHTML = `
-          <input type="number" name="sizes_${index}[]" placeholder="Size">
-          <input type="number" name="stocks_${index}[]" placeholder="Stock">
-          <button type="button" class="remove-size">X</button>
-      `;
+    <div>
+        <input type="number" name="sizes_${index}[]" placeholder="Size">
+        <small class="field-error"></small>
+    </div>
+
+    <div>
+        <input type="number" name="stocks_${index}[]" placeholder="Stock">
+        <small class="field-error"></small>
+    </div>
+
+    <button type="button" class="remove-size">X</button>
+`;
       container.insertBefore(newRow, e.target);
    }
 
@@ -552,6 +466,26 @@ function renderVariantImagesGallery(variantIdx) {
     });
 }
 
+
+function showFieldError(input, message) {
+    input.classList.add("input-error");
+
+    const errorBox = input.parentElement.querySelector(".field-error");
+    if (errorBox) {
+        errorBox.textContent = message;
+    }
+}
+
+function clearFieldError(input) {
+    input.classList.remove("input-error");
+
+    const errorBox = input.parentElement.querySelector(".field-error");
+    if (errorBox) {
+        errorBox.textContent = "";
+    }
+}
+
+
 function finalizeVariantFilesInput(variantIdx) {
     const hiddenContainer = document.getElementById(`croppedFilesContainer_${variantIdx}`);
     hiddenContainer.innerHTML = ""; 
@@ -591,28 +525,100 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
    const category = document.querySelector('[name="category"]').value;
    const price = document.querySelector('[name="regularPrice"]').value;
 
-   function showValidationError(message) {
-      if (typeof Toastify === "function") {
-          Toastify({
-             text: message,
-             duration: 4000,
-             gravity: "top",
-             position: "right",
-             style: { background: "#ef4444", borderRadius: "8px" }
-          }).showToast();
-      } else {
-          alert(message);
-      }
-   }
+   let hasError = false;
+
+const productNameInput = document.querySelector('[name="productName"]');
+const brandInput = document.querySelector('[name="brand"]');
+const descriptionInput = document.querySelector('[name="description"]');
+const parentCategoryInput = document.querySelector('[name="parentCategory"]');
+const categoryInput = document.querySelector('[name="category"]');
+const priceInput = document.querySelector('[name="regularPrice"]');
+const materialInput = document.querySelector('[name="material"]');
+const closureTypeInput = document.querySelector('[name="closureType"]');
+const soleTypeInput = document.querySelector('[name="soleType"]');
+const weightInput = document.querySelector('[name="weight"]');
+const countryInput = document.querySelector('[name="countryOfOrigin"]');
+
+if (!productName) {
+    showFieldError(productNameInput, "Product name is required");
+    hasError = true;
+} else {
+    clearFieldError(productNameInput);
+}
+
+if (!brand) {
+    showFieldError(brandInput, "Brand is required");
+    hasError = true;
+} else {
+    clearFieldError(brandInput);
+}
+
+if (!description) {
+    showFieldError(descriptionInput, "Description is required");
+    hasError = true;
+} else {
+    clearFieldError(descriptionInput);
+}
+
+if (!parentCategory) {
+    showFieldError(parentCategoryInput, "Please select parent category");
+    hasError = true;
+} else {
+    clearFieldError(parentCategoryInput);
+}
+
+if (!category) {
+    showFieldError(categoryInput, "Please select subcategory");
+    hasError = true;
+} else {
+    clearFieldError(categoryInput);
+}
+
+if (!price || Number(price) <= 0) {
+    showFieldError(priceInput, "Enter valid price");
+    hasError = true;
+} else {
+    clearFieldError(priceInput);
+}
 
 
-   if (!productName) return showValidationError("Product name is required");
-   if (!brand) return showValidationError("Brand is required");
-   if (!description) return showValidationError("Description is required");
-   if (!parentCategory) return showValidationError("Please select parent category");
-   if (!category) return showValidationError("Please select subcategory");
-   if (!price || Number(price) <= 0) return showValidationError("Enter valid price");
+if (!materialInput.value.trim()) {
+    showFieldError(materialInput, "Material is required");
+    hasError = true;
+} else {
+    clearFieldError(materialInput);
+}
 
+if (!closureTypeInput.value.trim()) {
+    showFieldError(closureTypeInput, "Closure type is required");
+    hasError = true;
+} else {
+    clearFieldError(closureTypeInput);
+}
+
+if (!soleTypeInput.value.trim()) {
+    showFieldError(soleTypeInput, "Sole type is required");
+    hasError = true;
+} else {
+    clearFieldError(soleTypeInput);
+}
+
+if (!weightInput.value.trim()) {
+    showFieldError(weightInput, "Weight is required");
+    hasError = true;
+} else {
+    clearFieldError(weightInput);
+}
+
+if (!countryInput.value.trim()) {
+    showFieldError(countryInput, "Country of origin is required");
+    hasError = true;
+} else {
+    clearFieldError(countryInput);
+}
+
+if (hasError) return;
+   
    const totalCards = document.querySelectorAll('#variantsContainer .variant-card');
    if (totalCards.length === 0) {
        return showValidationError("Please add at least one color variant configuration");
@@ -627,11 +633,19 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
        const colorTitle = colorNameInput && colorNameInput.value.trim() ? colorNameInput.value.trim() : `Variant #${parseInt(variantIdx) + 1}`;
 
        const imagesUploaded = variantFilesMap[variantIdx] ? variantFilesMap[variantIdx].length : 0;
-       if (imagesUploaded < 3) {
-           validationPassed = false;
-           errorMessage = `The variant "${colorTitle}" must have at least 3 cropped images uploaded.`;
-           break;
-       }
+       const imageSection = card.querySelector('.variant-images-section');
+      const imageError = card.querySelector('.image-error');
+
+if (imageError) {
+    imageError.textContent = '';
+
+    if (imagesUploaded < 3) {
+        console.log("IMAGE ERROR TRIGGERED");
+        imageError.textContent = 'Minimum 3 images are required';
+        validationPassed = false;
+    }
+}
+
 
        const sizeRows = card.querySelectorAll('.sizes-container .size-row');
        if (sizeRows.length === 0) {
@@ -641,19 +655,39 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
        }
 
        for (let row of sizeRows) {
-           const sizeInput = row.querySelector(`input[name^="sizes_"]`);
-           const stockInput = row.querySelector(`input[name^="stocks_"]`);
+   
+const sizeInput = row.querySelector(`input[name^="sizes_"]`);
+const stockInput = row.querySelector(`input[name^="stocks_"]`);
+
+
+const sizeError =
+    sizeInput.parentElement.querySelector(".field-error");
+
+const stockError =
+    stockInput.parentElement.querySelector(".field-error");
+
 
            const sizeVal = sizeInput ? sizeInput.value.trim() : "";
            const stockVal = stockInput ? stockInput.value.trim() : "";
 
-           if (sizeVal === "" || stockVal === "") {
-               validationPassed = false;
-               errorMessage = `All Size and Stock boxes must be completely filled out for "${colorTitle}".`;
-               if (sizeInput && sizeVal === "") sizeInput.style.borderColor = "#ef4444";
-               if (stockInput && stockVal === "") stockInput.style.borderColor = "#ef4444";
-               break;
-           }
+
+if (sizeError) sizeError.textContent = "";
+if (stockError) stockError.textContent = "";
+
+sizeInput.classList.remove("input-error");
+stockInput.classList.remove("input-error");
+
+if (sizeVal === "") {
+    showFieldError(sizeInput, "Size is required");
+    validationPassed = false;
+}
+
+if (stockVal === "") {
+    showFieldError(stockInput, "Stock is required");
+    validationPassed = false;
+}
+
+
 
            if (Number(sizeVal) < 0 || Number(stockVal) < 0) {
                validationPassed = false;
@@ -669,8 +703,8 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
    }
 
    if (!validationPassed) {
-       return showValidationError(errorMessage);
-   }
+    return;
+}
 
    Object.keys(variantFilesMap).forEach(variantIdx => {
        finalizeVariantFilesInput(variantIdx);
