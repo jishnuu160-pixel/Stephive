@@ -19,67 +19,77 @@ export const getCategories = async (req, res) => {
 
 export const toggleListing = async (req, res) => {
    try {
-
-      const result =
-         await categoryService.toggleCategoryListing(
-            req.params.id
-         );
-
-      req.flash('success', result.message);
-
-      res.redirect('/admin/categories');
+      const result = await categoryService.toggleCategoryListing(req.params.id);
+      
+      return res.status(200).json({ 
+          success: true, 
+          message: result.message || 'Status updated successfully!' 
+      });
 
    } catch (error) {
-
-      req.flash('error', error.message);
-
-      res.redirect('/admin/categories');
-
+      return res.status(400).json({ 
+          success: false, 
+          message: error.message 
+      });
    }
 };
 
 
 export const postAddCategory = async (req, res) => {
-   try {
+    try {
+        const sanitizedBody = {
+            ...req.body,
+            parentCategory: (!req.body.parentCategory || 
+                             req.body.parentCategory === "undefined" || 
+                             req.body.parentCategory === "null" || 
+                             req.body.parentCategory === "") 
+                            ? null 
+                            : req.body.parentCategory
+        };
 
-      await categoryService.createCategory(req.body);
+        await categoryService.createCategory(sanitizedBody);
 
-      req.flash('success', 'New Category added successfully!');
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Category added successfully!' 
+        });
 
-      res.redirect('/admin/categories');
-
-   } catch (error) {
-
-      req.flash('error', error.message);
-
-      res.redirect('/admin/categories');
-
-   }
+    } catch (error) {
+        console.error("Error adding category:", error.message);
+        return res.status(400).json({ 
+            success: false, 
+            message: error.message 
+        });
+    }
 };
 
 
 export const updateCategory = async (req, res) => {
    try {
+      const sanitizedBody = {
+          ...req.body,
+          parentCategory: (!req.body.parentCategory || 
+                           req.body.parentCategory === "undefined" || 
+                           req.body.parentCategory === "null" || 
+                           req.body.parentCategory === "") 
+                          ? null 
+                          : req.body.parentCategory
+      };
 
-      const result = await categoryService.updateCategory(
-            req.params.id,
-            req.body
-         );
-
-       req.flash('success', 'Category updated successfully!');
-
-      req.session.save(() => {
-         res.redirect('/admin/categories');
+      await categoryService.updateCategory(req.params.id, sanitizedBody);
+      
+      return res.status(200).json({ 
+          success: true, 
+          message: 'Category updated successfully!' 
       });
 
    } catch (error) {
-
-      req.flash('error', error.message);
-
-      req.session.save(() => {
-         res.redirect('/admin/categories');
+      console.error(`Error updating category ${req.params.id}:`, error.message);
+      
+      return res.status(400).json({ 
+          success: false, 
+          message: error.message || 'An unexpected error occurred.' 
       });
-
    }
 };
 
