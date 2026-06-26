@@ -15,23 +15,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 const result = await response.json();
+                
 if (result.success) {
 
- const newUrl = result.profileImage + "?t=" + Date.now();
-
-document.querySelectorAll('.user-avatar')
-    .forEach(img => {
-        img.src = newUrl;
-    });
+    showToast(result.message || "Profile updated", "success");
 
     modal.style.display = 'none';
     fileInput.value = "";
 
     if (cropper) cropper.destroy();
 
-    showToast(result.message || "Profile updated", "success");
+    setTimeout(() => {
+        location.reload();
+    }, 800);
 }
-
             } catch (err) {
                 console.error("Gender update error:", err);
                 showToast("Something went wrong", "error");
@@ -106,57 +103,45 @@ document.querySelectorAll('.user-avatar')
     }
 
 
-    if (saveBtn) {
-        saveBtn.addEventListener('click', function () {
+if (saveBtn) {
+   saveBtn.addEventListener('click', function () {
+    if (!cropper) return;
 
-            if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({
+        width: 250,
+        height: 250
+    });
 
-            const canvas = cropper.getCroppedCanvas({
-                width: 250,
-                height: 250
+    canvas.toBlob(async function (blob) {
+        const formData = new FormData();
+        formData.append('profileImage', blob, 'avatar.png');
+
+        try {
+            modal.style.display = 'none';
+            
+            const response = await fetch('/user/update-avatar', {
+                method: 'POST',
+                body: formData
             });
 
-            canvas.toBlob(async function (blob) {
+            const result = await response.json();
 
-                const formData = new FormData();
-                formData.append('profileImage', blob, 'avatar.png');
+            if (result.success) {
+                showToast(result.message || "Profile updated successfully!", "success");
 
-                try {
-                    const response = await fetch('/user/update-avatar', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-
-                        previewImg.src = result.profileImage + "?t=" + Date.now();
-
-                      document.querySelectorAll('.user-avatar')
-                            .forEach(img => {
-                                img.src = result.profileImage + "?t=" + Date.now();
-                            });
-
-                        modal.style.display = 'none';
-                        fileInput.value = "";
-
-                        if (cropper) cropper.destroy();
-
-                        showToast(result.message || "Profile updated", "success");
-
-                    } else {
-                        showToast(result.message || "Upload failed", "error");
-                    }
-
-                } catch (err) {
-                    console.error("Upload error:", err);
-                    showToast("Something went wrong", "error");
-                }
-
-            }, 'image/png');
-        });
-    }
+                setTimeout(() => {
+                    window.location.href = '/user/profile';
+                }, 1500);
+            } else {
+                showToast(result.message || "Upload failed", "error");
+            }
+        } catch (err) {
+            console.error("Upload error:", err);
+            showToast("Something went wrong", "error");
+        }
+    }, 'image/png');
+});
+}
 
 });
 
