@@ -16,9 +16,10 @@
 
 
                        <div class="avatar-border">
-                         <img src="{{user.profileImage}}?v={{timestamp}}" id="profile-preview"
-  class="user-icon sidebar-avatar" 
-  >
+                         <img
+    class="profile-avatar"
+    src="{{user.profileImage}}?t={{timestamp}}"
+ id="profile-preview" class="user-icon sidebar-avatar">
                                  
                             <label for="avatar-upload" class="camera-btn">
                                 <i class="fa-solid fa-camera"></i>
@@ -108,31 +109,6 @@
 {{/if}}
 
 
-<script>
-    document.getElementById("avatar-upload").addEventListener("change", async function () {
-
-    const formData = new FormData(document.getElementById("avatarForm"));
-
-    const res = await fetch("/user/update-avatar", {
-        method: "POST",
-        body: formData
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-
-        const img = document.getElementById("profile-preview");
-
-        img.src = data.profileImage + "?t=" + Date.now();
-
-        showFlash("success", data.message);
-
-    } else {
-        showFlash("error", data.message);
-    }
-});
-</script>
 
 <style>
 /* 🟢 Modal Background Overlay */
@@ -228,4 +204,5 @@
     background: #00332c !important;
 }
 </style>
+
 
