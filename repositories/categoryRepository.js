@@ -44,16 +44,17 @@ export const findSubCategories= async()=>{
 };
 
 
-export const findCategoryByNameAndParent= async( name, parentCategory)=>{
-   return await Category.findOne({
-      name: {
-         $regex: new RegExp(
-            `^${name}$`,
-            'i'
-         )
-      },
-      parentCategory: parentCategory || null
-   });
+export const findCategoryByNameAndParent = async (name, parentCategory, excludeId = null) => {
+   const query = {
+      name: { $regex: new RegExp(`^${name}$`, 'i') },
+      parentCategory: parentCategory
+   };
+
+   if (excludeId) {
+      query._id = { $ne: excludeId };
+   }
+
+   return await Category.findOne(query);
 };
 
 

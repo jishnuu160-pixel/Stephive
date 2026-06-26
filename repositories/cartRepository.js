@@ -12,9 +12,8 @@ export const findCartByUserId = async (userId) => {
 };
 
 
-export const createCart = async (cartData) => {
-    return await Cart.create(cartData);
-
+export const createCart = async (cartData) => {  
+    return await Cart.create(cartData); 
 };
 
 export const updateCart = async (userId, updatedData) => {
