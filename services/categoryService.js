@@ -82,6 +82,16 @@ export const updateCategory = async (categoryId, body) => {
       throw new Error('Category name and description fields are required.');
    }
 
+   const duplicate = await categoryRepo.findCategoryByNameAndParent(
+       categoryName.trim(), 
+       parentCategory || null,
+       categoryId 
+   );
+
+   if (duplicate) {
+       throw new Error('Another category with this name already exists.');
+   }
+
    const updatedCategory = await categoryRepo.updateCategory(
          categoryId,
          {
