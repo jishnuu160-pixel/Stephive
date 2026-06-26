@@ -5,7 +5,8 @@ export const loadCart = async (req, res) => {
         const userId = req.session.user.id;
         const cartData = await cartService.getCartPageData(userId);
 
-        res.render('user/cart', cartData);
+        res.render('user/cart', {...cartData});  
+
     } catch (error) {
         res.status(500).send(error.message);
     }
@@ -17,6 +18,9 @@ export const addToCart = async (req, res) => {
         const result = await cartService.addToCart(userId, req.body);
 
         const { totalUnitsCount } = await cartService.getCartPageData(userId);
+
+   
+     
 
         return res.json({
             success: true,
@@ -48,7 +52,6 @@ export const updateQuantity = async (req, res) => {
 
         res.json({
             success: true,
-            totalUnitsCount: cartMetrics.totalUnitsCount,
             ...cartMetrics 
         });
 
