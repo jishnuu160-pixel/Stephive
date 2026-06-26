@@ -7,18 +7,12 @@
 
   <div class="main-product-layout">
 
-    <div class="product-gallery-block" style="display: flex; gap: 20px; align-items: flex-start; flex: 1; max-width: 620px;">
+    <div class="product-gallery-block" >
 
         <div class="thumbnail-strip" id="thumbnailStrip">
             {{#each product.variants.[0].images}}
-            <div
-                class="thumb-frame {{#if @first}}active-thumb{{/if}}"
-                onclick="changeMainImage('{{this}}', this)"
-            >
-                <img
-                    src="{{this}}"
-                    alt="{{../product.productName}}"
-                >
+            <div class="thumb-frame {{#if @first}}active-thumb{{/if}}"onclick="changeMainImage('{{this}}', this)" >
+                <img src="{{this}}" alt="{{../product.productName}}">
             </div>
             {{/each}}
         </div>
@@ -84,22 +78,38 @@
             onclick="updateSelectedColor('{{this.colorName}}', '{{this._id}}', {{@index}}, this)">
           </button>
           {{/each}}
+          
         </div>
       </div>
       {{/if}}
 
-      <div class="config-group">
-        <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
-        <div class="size-chips-grid" id="sizeChipsGrid">
-          {{#if product.variants.[0].sizes}}
-            {{#each product.variants.[0].sizes}}
-            <button type="button" class="size-chip" onclick="updateSelectedSize('{{this.size}}', this)">
-              {{this.size}}
-            </button>
-            {{/each}}
-          {{/if}}
-        </div>
+    <div class="config-group">
+  <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
+  <div class="size-chips-grid" id="sizeChipsGrid">
+  {{#each product.variants.[0].sizes}}
+    <div class="size-container" style="display: flex; flex-direction: column; align-items: center;">
+      
+      <button 
+        type="button" 
+        class="size-chip {{#if (eq this.stock 0)}}out-of-stock{{/if}}" 
+        {{#if (eq this.stock 0)}}disabled{{/if}}
+        onclick="updateSelectedSize('{{this.size}}', this)">
+        {{this.size}}
+      </button>
+
+     
+
+    </div>
+     <div class="stock-status">
+        {{#if (eq this.stock 0)}}
+          <small class="sold-out">(Sold Out)</small>
+        {{else if (lt this.stock 5)}}
+          <small class="low-stock">(Only {{this.stock}} left)</small>
+        {{/if}}
       </div>
+  {{/each}}
+</div>
+</div>
 
       <div class="purchase-action-matrix">
         <div class="quantity-stepper">
@@ -153,56 +163,6 @@
 
 
 
-<style>
-
-   
-    .custom-zoom-modal.show {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 1;
-    }
-    .modal-image-wrapper {
-        position: relative;
-        max-width: 85%;
-        max-height: 85vh;
-        overflow: hidden;
-        border-radius: 12px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-    .custom-zoom-content {
-        display: block;
-        max-width: 100%;
-        max-height: 85vh;
-        object-fit: contain;
-        transform: scale(1);
-        transition: transform 0.3s ease;
-        cursor: zoom-in;
-    }
-    /* Click image to toggle direct high-definition zoom scale inside modal */
-    .custom-zoom-content.zoomed {
-        transform: scale(1.8);
-        cursor: zoom-out;
-    }
-    .custom-zoom-close {
-        position: absolute;
-        top: 20px;
-        right: 35px;
-        color: #f1f1f1;
-        font-size: 40px;
-        font-weight: bold;
-        transition: 0.2s;
-        cursor: pointer;
-        z-index: 100000;
-    }
-    .custom-zoom-close:hover {
-        color: #ef4444;
-        transform: scale(1.1);
-    }
-
-    
-</style>
-
 <section class="related-products-section">
     <div class="related-header">
         <h2 class="related-title">Related Products</h2>
@@ -214,7 +174,7 @@
         <a href="/details/{{this._id}}" class="related-product-card">
             <div class="related-image-wrapper">
                 {{#if this.variants}}
-                    <img src="/uploads/{{lookup (lookup (lookup this.variants 0) 'images') 0}}" alt="{{this.productName}}">
+                   <img src="{{lookup (lookup (lookup this.variants 0) 'images') 0}}" alt="{{this.productName}}">
                 {{else}}
                     <div class="related-no-image">No Image</div>
                 {{/if}}
@@ -325,16 +285,38 @@
             thumbStrip.appendChild(thumbFrame);
         });
 
-        const sizeChipsGrid = document.getElementById('sizeChipsGrid');
-        sizeChipsGrid.innerHTML = ''; 
-        activeVariant.sizes.forEach(sizeObj => {
-            const sizeButton = document.createElement('button');
-            sizeButton.type = "button";
-            sizeButton.className = "size-chip";
-            sizeButton.innerText = sizeObj.size;
-            sizeButton.onclick = () => updateSelectedSize(sizeObj.size, sizeButton);
-            sizeChipsGrid.appendChild(sizeButton);
-        });
+const sizeChipsGrid = document.getElementById('sizeChipsGrid');
+sizeChipsGrid.innerHTML = ''; 
+activeVariant.sizes.forEach(sizeObj => {
+    const isOutOfStock = sizeObj.stock === 0;
+    const isLowStock = sizeObj.stock > 0 && sizeObj.stock < 5;
+
+    const container = document.createElement('div');
+    container.className = 'size-container';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+
+    const sizeButton = document.createElement('button');
+    sizeButton.type = "button";
+    sizeButton.className = `size-chip ${isOutOfStock ? 'out-of-stock' : ''}`;
+    sizeButton.disabled = isOutOfStock;
+    sizeButton.innerText = sizeObj.size;
+    sizeButton.onclick = () => updateSelectedSize(sizeObj.size, sizeButton);
+
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'stock-status';
+    if (isOutOfStock) {
+        statusDiv.innerHTML = '<small>(Sold Out)</small>';
+    } else if (isLowStock) {
+        statusDiv.innerHTML = `<small>(Only ${sizeObj.stock} left)</small>`;
+    }
+
+    container.appendChild(sizeButton);
+    container.appendChild(statusDiv);
+    
+    sizeChipsGrid.appendChild(container);
+});
     }
 
     function updateSelectedSize(sizeValue, buttonElement) {
@@ -361,10 +343,14 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ productId, variantId: activeVariantId, size: chosenSize, color: chosenColor, quantity: document.getElementById("purchaseQty").value })
             });
+
+
+
             const data = await response.json();
             if (!response.ok) throw new Error(data.message);
             showToast("Added to cart successfully");
             if (window.updateGlobalCartCount) window.updateGlobalCartCount(data.globalCartCount);
+            
         } catch (error) {
             showToast(error.message || "Connection failed", "error");
         }
