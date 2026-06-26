@@ -5,36 +5,22 @@ import { title } from 'process';
 export const updateAvatar = async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({
-                success: false,
-                message: "Please upload a valid image file"
-            });
+            return res.status(400).json({ success: false, message: "No file uploaded" });
         }
 
-        const userId = req.session.user.id;
+        const cloudinaryUrl = await userService.updateAvatar(req.session.user.id, req.file.buffer);
+        req.session.user.profileImage = cloudinaryUrl;
 
-        const imagePath = `/uploads/profile_pics/${req.file.filename}`;
-
-        await userService.updateAvatar(userId, imagePath);
-
-        req.session.user.profileImage = imagePath;
-
-        return res.json({
+        return res.status(200).json({
             success: true,
-            message: "Profile image updated",
-            profileImage: imagePath
+            message: "Profile image updated successfully"
         });
 
     } catch (err) {
-        console.error(err);
-
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error"
-        });
+        console.error("Avatar Update Error:", err);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
-
 
 export const getLogin = (req, res) => {
     res.render('user/login', {
@@ -55,7 +41,6 @@ export const postSignup = async (req, res, next) => {
             return res.redirect('/user/signup?error=' + encodeURIComponent("Passwords do not match!"));
         }
 
-        
         const existingEmail= await userRepo.findByEmail(email);
 
         if(existingEmail){
@@ -68,7 +53,6 @@ export const postSignup = async (req, res, next) => {
             return res.redirect('/user/signup?error=' + encodeURIComponent("Phone already registered"));
         }
       
-
         const user = await userService.signup({...req.body,phoneNumber});
 
         req.session.user = {
@@ -259,6 +243,8 @@ export const userLogout = (req, res) => {
 
     req.user = null;
 
+    req.flash("success","Logout successfully");
+
     req.session.save((err) => {
         if (err) console.error("Session save error:", err);
         
@@ -308,26 +294,70 @@ export const getAddress = async (req, res) => {
     }
 };
 
+export const getAddAddress = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+        const user = await userService.getUserById(userId);
+
+        res.render('user/add-address', {
+            user,
+            timestamp: Date.now(),
+            activePage: 'address'
+        });
+    } catch (error) {
+        res.redirect('/user/address');
+    }
+};
 
 export const postAddAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const addressData = req.body;
 
-        addressData.isDefault = req.body.isDefault === 'on';
+        await userService.addAddress(userId, {
+            ...req.body,
+            isDefault: req.body.isDefault === 'on'
+        });
+        req.flash('success', 'Address added successfully');
+        
+        res.redirect('/user/address');
 
-        const updatedUser = await userService.addAddress(userId, addressData);
+    } catch (error) {
 
-        if (!updatedUser) {
-            console.log("Failed to update user in DB");
+        const user = await userService.getUserById(
+            req.session.user.id
+        );
+
+        if (error.validationErrors) {
+
+            const allFieldsEmpty =
+                !req.body.fullName?.trim() &&
+                !req.body.phone?.trim() &&
+                !req.body.street?.trim() &&
+                !req.body.city?.trim() &&
+                !req.body.state?.trim() &&
+                !req.body.pincode?.trim();
+
+            return res.render('user/add-address', {
+                user,
+                activePage: 'address',
+                timestamp: Date.now(),
+                formData: req.body,
+                errors: allFieldsEmpty ? {} : error.validationErrors,
+                error: allFieldsEmpty
+                    ? "All fields are required"
+                    : null
+            });
         }
 
-        req.session.save(() => {
-            res.redirect('/user/address');
+        console.error(error);
+
+        res.render('user/add-address', {
+            user,
+            activePage: 'address',
+            timestamp: Date.now(),
+            formData: req.body,
+            error: error.message || "Something went wrong"
         });
-    } catch (error) {
-        console.error("Post Address Error:", error);
-        res.redirect('/user/address');
     }
 };
 
@@ -337,6 +367,7 @@ export const removeAddress = async (req, res) => {
         const addressId = req.params.id; 
         
         await userService.deleteAddress(userId, addressId);
+        req.flash('success',"Address deleted successfully");
         
         res.redirect('/user/address');
     } catch (error) {
@@ -348,19 +379,76 @@ export const postEditAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
         const addressId = req.params.id;
-        const updatedData = { ...req.body };
 
-        updatedData.isDefault = req.body.isDefault === 'on';
+        const updatedData = {
+            ...req.body,
+            isDefault: req.body.isDefault === 'on'
+        };
 
-        await userService.updateAddress(userId, addressId, updatedData);
-        
+        await userService.editAddress(
+            userId,
+            addressId,
+            updatedData
+        );
+        req.flash("success","Address updated Successfully");
+
         res.redirect('/user/address');
+
     } catch (error) {
+        const user = await userService.getUserById(
+            req.session.user.id
+        );
+
+        const address = user.addresses.find(
+            addr => addr._id.toString() === req.params.id
+        );
+
+        if (error.validationErrors) {
+            return res.render('user/edit-address', {
+                address,
+                formData: req.body,
+                errors: error.validationErrors,
+                activePage: 'address'
+            });
+        }
+
         console.error("Edit Error:", error);
-        res.redirect('/user/address');
+
+        res.render('user/edit-address', {
+            address,
+            formData: req.body,
+            error: "Something went wrong",
+            activePage: 'address'
+        });
     }
 };
 
+export const getEditAddress = async (req, res) => {
+    try {
+        const user = await userService.getUserById(
+            req.session.user.id
+        );
+
+        const address = user.addresses.find(
+            addr => addr._id.toString() === req.params.id
+        );
+
+        if (!address) {
+            return res.redirect('/user/address');
+        }
+
+        res.render('user/edit-address', {
+             user, 
+            address,
+            activePage: 'address',
+            timestamp: Date.now()
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.redirect('/user/address');
+    }
+};
 
 export const postUpdateProfile = async (req, res) => {
     try {
