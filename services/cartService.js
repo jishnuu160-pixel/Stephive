@@ -2,7 +2,7 @@ import * as cartRepo from '../repositories/cartRepository.js';
 import * as productRepo from '../repositories/productRepository.js';
 
 const calculateCartTotals = (items) => {
-    const totalUnitsCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalUnitsCount =items.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const taxEstimate = Math.floor(subtotal * 0.1);
     const totalAmount = subtotal + taxEstimate;
@@ -15,7 +15,7 @@ const getProductIdString = (item) => {
     return item.productId._id ? item.productId._id.toString() : item.productId.toString();
 };
 
-export const getCartPageData = async (userId,page) => {
+export const getCartPageData = async (userId, page) => {
     const cart = await cartRepo.findCartByUserId(userId);
     if (!cart) return { cart: { items: [] }, totalUnitsCount: 0, subtotal: 0, totalAmount: 0, hasCheckoutRestrictions: false };
 
@@ -23,44 +23,51 @@ export const getCartPageData = async (userId,page) => {
 
     cart.items = cart.items.map(item => {
         let isOutOfStock = false;
-        let hasInsufficientStock = item.quantity > 5;
+        let hasInsufficientStock = false;
         let isUnlisted = false;
+        let availableStock = 0; 
+        let sizeDetails = null; 
 
         const productDoc = item.productId; 
         if (productDoc) {
             isUnlisted = productDoc.isListed === false;
             const targetVariant = productDoc.variants?.find(v => v._id.toString() === item.variantId?.toString());
-            const sizeDetails = targetVariant?.sizes?.find(s => s.size.toString() === item.size.toString());
+            
+            sizeDetails = targetVariant?.sizes?.find(s => s.size.toString() === item.size.toString());
 
             if (sizeDetails) {
-                isOutOfStock = sizeDetails.stock <= 0;
-                if (item.quantity > sizeDetails.stock) hasInsufficientStock = true;
+                availableStock = sizeDetails.stock;
+                isOutOfStock = availableStock <= 0;
+                hasInsufficientStock = item.quantity > availableStock;
             } else {
-                isOutOfStock = true;
+                isOutOfStock = true; 
             }
+        } else {
+            isUnlisted = true; 
         }
 
         if (hasInsufficientStock || isOutOfStock || isUnlisted) hasCheckoutRestrictions = true;
         
         const itemSubtotal = item.quantity * item.price;
-
-        return { ...item, itemSubtotal, isOutOfStock,hasInsufficientStock, isUnlisted };
+      
+        
+        return { 
+            ...item, 
+           
+            itemSubtotal, 
+            isOutOfStock, 
+            hasInsufficientStock, 
+            isUnlisted, 
+            availableStock 
+        };
     });
 
     const totals = calculateCartTotals(cart.items);
-   
     
-
-    cart.subtotal = totals.subtotal;
-    cart.taxEstimate = totals.taxEstimate;
-    cart.totalAmount = totals.totalAmount;
-
-   return { 
-        cart: { ...cart, subtotal: totals.subtotal, taxEstimate: totals.taxEstimate},
-        totalUnitsCount:totals.totalUnitsCount,
-        hasCheckoutRestrictions,
-      
-        
+    return { 
+        cart: { ...cart, subtotal: totals.subtotal, totalAmount:totals.totalAmount, taxEstimate: totals.taxEstimate },
+        totalUnitsCount: totals.totalUnitsCount,
+        hasCheckoutRestrictions
     };
 };
 
@@ -101,10 +108,26 @@ export const updateQuantity = async (userId, data) => {
     const variant = product?.variants.find(v => v._id.toString() === item.variantId.toString());
     const sizeDetails = variant?.sizes.find(s => s.size.toString() === item.size.toString());
 
-    const quantity = Number(data.targetQuantity);
-    if (quantity > (sizeDetails?.stock || 0)) throw new Error(`Only ${sizeDetails?.stock || 0} items available.`);
+    if (!sizeDetails) throw new Error("Product variant is no longer available.");
 
-    item.quantity = quantity;
+   const requestedQty = Number(data.targetQuantity);
+const currentQty = item.quantity;
+
+if (requestedQty < 1) {
+    throw new Error("Quantity must be at least 1.");
+}
+
+if (requestedQty > 5) {
+    throw new Error("Maximum limit is 5 units per item.");
+}
+
+if (
+    requestedQty > currentQty &&
+    requestedQty > sizeDetails.stock
+) {
+    throw new Error(`Only ${sizeDetails.stock} items available.`);
+}
+    item.quantity = requestedQty;
     await cartRepo.updateCart(userId, { items: cart.items });
 
     return calculateCartTotals(cart.items);
