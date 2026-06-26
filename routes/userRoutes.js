@@ -7,8 +7,9 @@ import {
     getVerifyOTP, postVerifyOTP,
     getResetPassword, postResetPassword,
     getAddress,postAddAddress,
-    removeAddress,postEditAddress,
-    postUpdateProfile,getEditProfile,
+    removeAddress,getEditAddress,
+    postEditAddress,
+    postUpdateProfile,getAddAddress,getEditProfile,
     getChangeEmail, postChangeEmail,
     sendUpdatePasswordOTP,getChangePassword,
     getVerifyPasswordOTP,getResendOTP,
@@ -21,6 +22,9 @@ import { addToCart } from '../controllers/cartController.js';
 import { isUserAuthenticated, isUserLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
 import {uploadAvatar} from '../middleware/upload.middleware.js';
 import {handleUploadError} from '../middleware/uploadError.middleware.js';
+import multer from 'multer';
+const upload = multer({ storage: multer.memoryStorage() });
+
 
 import passport from 'passport';
 
@@ -102,8 +106,9 @@ router.get('/logout', userLogout);
 router.get('/address',isUserAuthenticated, getAddress);
 
 router.get('/delete-address/:id', isUserAuthenticated, removeAddress);//chnage to delete
-
+router.get('/add-address', isUserAuthenticated, getAddAddress);
 router.post('/add-address', isUserAuthenticated, postAddAddress);
+router.get('/edit-address/:id', isUserAuthenticated, getEditAddress);
 router.post('/edit-address/:id', isUserAuthenticated, postEditAddress);
 
 router.get('/send-email-change-otp', isUserAuthenticated, sendEmailChangeOTP);
@@ -119,19 +124,13 @@ router.get('/update-password-init', isUserAuthenticated, sendUpdatePasswordOTP);
 router.get('/verify-password-otp', isUserAuthenticated, getVerifyPasswordOTP);
 router.post('/verify-password-otp', isUserAuthenticated, postVerifyPasswordOTP);
 
-router.post(
-   '/update-avatar',
-   isUserAuthenticated,
-   (req, res, next) => {
-  uploadAvatar.single('profileImage')(req, res, (err) => {
-         if (err) {
-            req.flash('error', err.message);
-            return res.redirect('/user/profile');
-         }
-         next();
-      });
-   },
-   updateAvatar
-);
 
+
+// routes/userRoutes.js
+router.post(
+    '/update-avatar',
+    isUserAuthenticated,
+    uploadAvatar.single('profileImage'), // 'profileImage' MUST match the <input name="...">
+    updateAvatar
+);
 export default router;
