@@ -57,7 +57,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const authPaths = ['/user/login', '/user/signup', '/user/forgot-password', '/user/verify-otp'];
+            const authPaths = ['/user/login', '/user/signup', '/user/forgot-password', '/user/verify-otp','/user/add-address'];
             const isAuthPage = authPaths.some(path => window.location.pathname.includes(path));
 
             let successMsg = "{{{success}}}".toString().trim();
