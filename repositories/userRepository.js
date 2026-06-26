@@ -119,3 +119,14 @@ export const findById = async (userId) => {
 export const saveUser= async(user)=>{
       return await user.save();
 };
+
+export const clearDefaultAddresses = async (userId) => {
+    return await User.updateOne(
+        { _id: userId },
+        {
+            $set: {
+                "addresses.$[].isDefault": false
+            }
+        }
+    );
+};
