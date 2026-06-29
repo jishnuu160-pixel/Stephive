@@ -2,6 +2,7 @@ import * as cartRepo from '../repositories/cartRepository.js';
 import * as productRepo from '../repositories/productRepository.js';
 
 const calculateCartTotals = (items) => {
+    
     const totalUnitsCount =items.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const taxEstimate = Math.floor(subtotal * 0.1);
@@ -49,7 +50,6 @@ export const getCartPageData = async (userId, page) => {
         if (hasInsufficientStock || isOutOfStock || isUnlisted) hasCheckoutRestrictions = true;
         
         const itemSubtotal = item.quantity * item.price;
-      
         
         return { 
             ...item, 
@@ -60,14 +60,22 @@ export const getCartPageData = async (userId, page) => {
             isUnlisted, 
             availableStock 
         };
-    });
+    }).reverse();
 
     const totals = calculateCartTotals(cart.items);
-    
+    const limit = 4;
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(cart.items.length / limit);
+    const paginatedItems = cart.items.slice(skip, skip + limit);
+
     return { 
-        cart: { ...cart, subtotal: totals.subtotal, totalAmount:totals.totalAmount, taxEstimate: totals.taxEstimate },
+        cart: { ...cart, subtotal: totals.subtotal, totalAmount:totals.totalAmount, taxEstimate: totals.taxEstimate,items:paginatedItems},
         totalUnitsCount: totals.totalUnitsCount,
-        hasCheckoutRestrictions
+        hasCheckoutRestrictions,
+        currentPage:page,
+        totalPages,
+        hasPrevPage:page>1,
+        hasNextPage:page<totalPages
     };
 };
 
