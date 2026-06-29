@@ -45,7 +45,7 @@ app.engine('hbs', engine({
             }
             return array.toString() === value?.toString();
        },
-    add: (a, b, c) => a + b + c,
+    add: (a, b) => a + b,
     subtract: (a, b) => (a || 0) - (b || 0),
     multiply: (a, b) => (a || 0) * (b || 0),
     json: (context) => {
