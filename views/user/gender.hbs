@@ -171,38 +171,7 @@
 
      <div class="products-wrapper-grid">
   {{#each products}}
-    <div class="product-card-gender">      
-      <div class="product-image">
-        {{#if this.variants.[0].images.[0]}}
-          <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
-        {{else if this.productImage.[0]}}
-          <img src="{{this.productImage.[0]}}" alt="{{this.productName}}">
-        {{else if this.image}}
-          <img src="{{this.image}}" alt="{{this.productName}}">
-        {{else}}
-          <img src="/images/default-shoe.png" alt="Product Image">
-        {{/if}}
-      </div>
-      
-      <div class="product-info">
-        <h3>{{this.productName}}</h3>
-        <p class="product-card-desc">
-          {{#if this.description}}
-            {{this.description}}
-          {{else if this.Category.name}}
-            {{this.Category.name}} Fit
-          {{else}}
-            Premium Collection
-          {{/if}}
-        </p>     
-        <div class="product-action-block">
-          <h4>₹{{this.regularPrice}}</h4>
-          <a href="/details/{{this._id}}" class="rec-discover-btn">
-            <button type="button">DISCOVER MORE</button>
-          </a>
-        </div>
-      </div>
-    </div>
+       {{> product-card}}
   {{else}}
     <div class="no-products" style="grid-column: 1 / -1; width: 100%; text-align: center; padding: 40px 0;">
       <p style="font-size: 16px; color: #64748b; font-weight: 500;">No sneakers found matching your criteria.</p>
@@ -211,25 +180,15 @@
 
  
 
+
+
 </div>
 
    
   </div>
     {{#if totalPages}}
     <div class="pagination-container">
-      {{#if hasPrevPage}}
-      <a href="?page={{prevPage}}&category={{activeCategory}}&price={{activePrice}}&sort={{activeSort}}&material={{activeMaterial}}&brand={{activeBrand}}&search={{searchValue}}">
-        <button class="next" type="button">‹</button>
-      </a>
-      {{/if}}
-
-      <span class="active">{{currentPage}}</span>
-
-      {{#if hasNextPage}}
-      <a href="?page={{nextPage}}&category={{activeCategory}}&price={{activePrice}}&sort={{activeSort}}&material={{activeMaterial}}&brand={{activeBrand}}&search={{searchValue}}">
-        <button class="next" type="button">›</button>
-      </a>
-      {{/if}}
+      {{> pagination}}
     </div>
     {{/if}}
 </section>
