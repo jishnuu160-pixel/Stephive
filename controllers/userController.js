@@ -148,8 +148,7 @@ export const postVerifyOTP = async (req, res) => {
             res.redirect(`/user/reset-password?email=${email}`);
         }
     } catch (err) {
-        res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${req.body.email}&target=${req.body.target}`);
-    }
+res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${req.body.email}&target=${req.body.target}`);    }
 };
 
 
@@ -385,38 +384,30 @@ export const postEditAddress = async (req, res) => {
             isDefault: req.body.isDefault === 'on'
         };
 
-        await userService.editAddress(
-            userId,
-            addressId,
-            updatedData
-        );
-        req.flash("success","Address updated Successfully");
-
+        await userService.editAddress(userId, addressId, updatedData);
+        req.flash("success", "Address updated Successfully");
         res.redirect('/user/address');
 
     } catch (error) {
-        const user = await userService.getUserById(
-            req.session.user.id
-        );
+        const user = await userService.getUserById(req.session.user.id);
 
-        const address = user.addresses.find(
-            addr => addr._id.toString() === req.params.id
-        );
+        const dbAddress = user.addresses.find(addr => addr._id.toString() === req.params.id);
+        
+        const mergedAddress = { ...dbAddress, ...req.body };
 
         if (error.validationErrors) {
             return res.render('user/edit-address', {
-                address,
-                formData: req.body,
+                user, 
+                address: mergedAddress, 
                 errors: error.validationErrors,
                 activePage: 'address'
             });
         }
 
         console.error("Edit Error:", error);
-
         res.render('user/edit-address', {
-            address,
-            formData: req.body,
+            user,
+            address: mergedAddress,
             error: "Something went wrong",
             activePage: 'address'
         });
@@ -453,19 +444,18 @@ export const getEditAddress = async (req, res) => {
 export const postUpdateProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const { fullName, phoneNumber, gender } = req.body;
+        await userService.updateProfile(userId, req.body);
 
-        await userService.updateProfile(userId, { fullName, phoneNumber, gender });
-
-        req.session.user.fullName = fullName;
-        req.session.user.phoneNumber = phoneNumber;
-        req.session.user.gender = gender;
-
-        req.session.save(() => {
-            res.redirect('/user/profile?success=Profile updated');
-        });
+        req.session.user = { ...req.session.user, ...req.body };
+        req.session.save(() => res.redirect('/user/profile?success=Updated'));
     } catch (error) {
-        res.redirect('/user/profile?error=Update failed');
+        const user = await userService.getUserById(req.session.user.id);
+        
+        res.render('user/edit-profile', { 
+            user: { ...user, ...req.body }, 
+            errors: error.validationErrors,
+            activePage: 'profile'
+        });
     }
 };
 
@@ -479,6 +469,7 @@ export const getEditProfile = async (req, res) => {
 
         res.render('user/edit-profile', { 
             user,
+            errors:{},
             title: "Edit Profile",
             activePage: 'profile' 
         });
