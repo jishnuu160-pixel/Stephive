@@ -1,175 +1,58 @@
 {{#unless searchValue}}
-<div class="shop-container">
-    <section class="hero-section">
-        <div class="hero-content">
-            <h1>Shop the latest Sneakers</h1>
-            <p>Discover Your Next Favorite Pair</p>
-        </div>
-        
-        <div class="products-wrapper-grid-shop">
-            {{#each products}}
-            <div class="product-card-gender">      
-                <div class="product-image">
-                    {{#if this.variants.[0].images.[0]}}
-                        <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
-                    {{else if this.productImage.[0]}}
-                        <img src="{{this.productImage.[0]}}" alt="{{this.productName}}">
-                    {{else}}
-                        <img src="/images/default-shoe.png" alt="Product Image">
-                    {{/if}}
-                </div>
-                
-                <div class="product-info">
-                    <h3>{{this.productName}}</h3>
-                    <p class="product-card-desc">
-                        {{#if this.description}}
-                            {{this.description}}
-                        {{else if this.Category.name}}
-                            {{this.Category.name}} Fit
-                        {{else}}
-                            Premium Collection
-                        {{/if}}
-                    </p>     
-                    <div class="product-action-block">
-                        <h4>₹{{this.regularPrice}}</h4>
-                        <a href="/details/{{this._id}}" class="rec-discover-btn">
-                            <button type="button">DISCOVER MORE</button>
-                        </a>
-                    </div>
-                </div>
+    <div class="shop-container">
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Shop the latest Sneakers</h1>
+                <p>Discover Your Next Favorite Pair</p>
             </div>
-            {{else}}
-            <div class="no-products">
-                <p>No sneakers found matching your criteria.</p>
+            
+            <div class="products-wrapper-grid-shop">
+                {{#each products}}
+                    {{> product-card}}
+                {{else}}
+                    <div class="no-products"><p>No sneakers found.</p></div>
+                {{/each}}
             </div>
-            {{/each}}
-        </div>
-    </section>
+            
+            {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage}}
+        </section>
+    </div>
 
     <section class="categories-section">
         <h3>Browse by category</h3>
-        <div class="category-grid">
+          <div class="category-grid">
             <div class="cat-card-running"><img src="/images/running-shoe.jpg" alt="Running"><span class="category-label">Running shoes<p>move faster run longer</p></span></div>
             <div class="cat-card-casual"><img src="/images/casual-shoe.jpg" alt="Casual"><span class="category-label">Casual shoes<p>Street style daily comfort</p></span></div>
             <div class="cat-card-training"><img src="/images/training-shoe.jpg" alt="Training"><span class="category-label">Training shoes<p>Power your workouts</p></span></div>
             <div class="cat-card-limited"><img src="/images/limited-edition.jpg" alt="Limited"><span class="category-label">Limited Edition<p>Rare drops limited stock</p></span></div>
         </div>
-    </section>
+
+        </section>
 
     <section class="best-sellers">
         <h3>Best Sellers</h3>
         <div class="best-sellers-shelf-grid">
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="/images/running-shoe-nike.jpg" alt="Nike Air">
-                </div>
-                <div class="product-info">
-                    <h3>Nike Air</h3>
-                    <p class="product-card-desc">Premium Running Collection</p>
-                    <div class="product-action-block">
-                        <h4>₹4,999</h4>
-                        <button class="add-btn">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="/images/casual-shoe-nike.jpg" alt="Nike Max">
-                </div>
-                <div class="product-info">
-                    <h3>Nike Max</h3>
-                    <p class="product-card-desc">Street Style Daily Comfort</p>
-                    <div class="product-action-block">
-                        <h4>₹5,599</h4>
-                        <button class="add-btn">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="/images/training-shoe-nike.jpg" alt="Nike Pro">
-                </div>
-                <div class="product-info">
-                    <h3>Nike Pro</h3>
-                    <p class="product-card-desc">Power Your Workouts</p>
-                    <div class="product-action-block">
-                        <h4>₹6,299</h4>
-                        <button class="add-btn">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="/images/running-shoe-nike.jpg" alt="Nike Max">
-                </div>
-                <div class="product-info">
-                    <h3>Nike Max</h3>
-                    <p class="product-card-desc">Limited Edition Style</p>
-                    <div class="product-action-block">
-                        <h4>₹7,999</h4>
-                        <button class="add-btn">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
+            {{#each bestSellers}}
+               {{> product-card}}
+            {{else}}
+                <p>No products available right now.</p>
+            {{/each}}
         </div>      
     </section>
-
-    <section class="sale-banner-container">
-        <div class="sale-gradient-box">
-            <div class="banner-content">
-                <h2>Summer Sale</h2>
-                <p>up to 40% Off Selected Styles</p>
-            </div>
-            <button class="redeem-btn">REDEEM OFFER</button>
-        </div>
-    </section>
-</div>
 {{/unless}}
 
 {{#if searchValue}}
-<section class="shop-products-section">
-    <h2>Search Results For "{{searchValue}}"</h2>
+    <section class="shop-products-section">
+        <h2>Search Results For "{{searchValue}}"</h2>
 
-   <div class="products-wrapper-grid-shop">
+        <div class="products-wrapper-grid-shop">
             {{#each products}}
-            <div class="product-card-gender">      
-                <div class="product-image">
-                    {{#if this.variants.[0].images.[0]}}
-                        <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
-                    {{else if this.productImage.[0]}}
-                        <img src="{{this.productImage.[0]}}" alt="{{this.productName}}">
-                    {{else}}
-                        <img src="/images/default-shoe.png" alt="Product Image">
-                    {{/if}}
-                </div>
-                
-                <div class="product-info">
-                    <h3>{{this.productName}}</h3>
-                    <p class="product-card-desc">
-                        {{#if this.description}}
-                            {{this.description}}
-                        {{else if this.Category.name}}
-                            {{this.Category.name}} Fit
-                        {{else}}
-                            Premium Collection
-                        {{/if}}
-                    </p>     
-                    <div class="product-action-block">
-                        <h4>₹{{this.regularPrice}}</h4>
-                        <a href="/details/{{this._id}}" class="rec-discover-btn">
-                            <button type="button">DISCOVER MORE</button>
-                        </a>
-                    </div>
-                </div>
-            </div>
+                {{> product-card}}
             {{else}}
-            <div class="no-products">
-                <p>No sneakers found matching your criteria.</p>
-            </div>
+                <div class="no-products"><p>No sneakers found matching "{{searchValue}}".</p></div>
             {{/each}}
         </div>
-</section>
+
+        {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage}}
+    </section>
 {{/if}}
