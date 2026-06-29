@@ -3,8 +3,10 @@ import * as cartService from '../services/cartService.js';
 export const loadCart = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const cartData = await cartService.getCartPageData(userId);
+        const page=parseInt(req.query.page)||1;
+        const cartData = await cartService.getCartPageData(userId,page);
 
+       
         res.render('user/cart', {...cartData});  
 
     } catch (error) {
