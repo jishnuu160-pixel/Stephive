@@ -8,7 +8,7 @@ export const isAdminAuthenticated = (req, res, next) => {
 
 export const isAdminLoggedOut = (req, res, next) => {
     if (req.session && req.session.admin) {
-       
+   
         return res.redirect('/admin/dashboard'); 
     }
    

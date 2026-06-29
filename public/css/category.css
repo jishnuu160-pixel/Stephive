@@ -1,0 +1,16 @@
+.colored-toast.swal2-icon-success {
+    background-color: #10b981 !important; /* Tailwind Emerald-500 */
+    color: white !important;
+}
+
+.header-actions {display: flex; align-items: center; gap: 15px; width: 100%; max-width: 600px; justify-content: flex-end;}
+.search-wrapper {flex-grow: 1; margin: 0;};
+
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.4); z-index: 99999; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; }
+.modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; position: relative; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem 0.25rem 1.5rem; }
+.modal-body { padding: 0.75rem 1.5rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.25rem; }
+.form-input { width: 100%; padding: 0.55rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 0.8rem; color: #334155; outline: none; }
+.error-msg { display: none; background: #fee2e2; color: #b91c1c; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; margin-bottom: 1rem; border: 1px solid #fecaca; text-align: center; }
+

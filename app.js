@@ -10,7 +10,11 @@ dotenv.config();
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import homeRoutes from './routes/homeRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 import passport  from './config/passport.js';
+import * as cartService from './services/cartService.js';
+import { type } from 'os';
 
 
 const app = express();
@@ -24,18 +28,70 @@ app.engine('hbs', engine({
         path.join(process.cwd(), 'views/partials'),      
         path.join(process.cwd(), 'views/admin/partials') 
     ],
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    },
     helpers: {
-        eq: (a, b) => a === b,
-        add: (a,b,c) =>  a+b+c
-    }
+   lt: ((a, b) => a < b),
+   le: ((a, b) => a <= b),
+   ge: ((a, b) => a >= b),
+   eq: (a, b) => a?.toString() === b?.toString(),
+   or: ((a, b) => a || b),
+   includes: (array, value) => {
+            if (!array) return false;
+            if (Array.isArray(array)) {
+                return array.map(item => item.toString()).includes(value?.toString());
+            }
+            return array.toString() === value?.toString();
+       },
+    add: (a, b) => a + b,
+    subtract: (a, b) => (a || 0) - (b || 0),
+    multiply: (a, b) => (a || 0) * (b || 0),
+    json: (context) => {
+            return JSON.stringify(context, null, 2);
+        },
+    toLowerCase: (str) =>
+        (typeof str === 'string' ? str.toLowerCase() : ''),
+    firstVariantSizes: (variants) => {
+        if (
+            Array.isArray(variants) &&
+            variants.length > 0 &&
+            Array.isArray(variants[0].sizes)
+        ) {
+            return variants[0].sizes;
+        }
+        return [];
+    },
+    firstVariant: (variants) => {
+        if (
+            Array.isArray(variants) &&
+            variants.length > 0
+        ) {
+            return variants[0];
+        }
+        return null;
+    },
+    toString: function(value) {
+    return value.toString();
+},
+  toUpperCase: (str) =>
+    (typeof str === 'string' ? str.toUpperCase() : '')  
+}
 }));
+
+
 
 app.set('view engine', 'hbs');
 app.set('views', path.join(process.cwd(), 'views'));
 
 app.use(express.static(path.join(process.cwd(), 'public')));
 
-app.use('/uploads',express.static(path.join(process.cwd(), 'public/uploads')));
+app.use('/uploads/profile_pics', express.static(path.join(process.cwd(),'public', 'uploads', 'profile_pics')));
+
+app.use('/uploads', express.static(path.join(process.cwd(),'public', 'uploads', 'products')));
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
@@ -55,6 +111,8 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+
 
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -76,8 +134,28 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(async (req, res, next) => {
+    try {
+        if (req.session && req.session.user && req.session.user.id) {
+            const userId = req.session.user.id;
+            
+            const { totalUnitsCount } = await cartService.getCartPageData(userId);
+            
+            res.locals.globalCartCount = totalUnitsCount;
+        } else {
+            res.locals.globalCartCount = 0;
+        }
+    } catch (error) {
+        console.error("Error updating global header badge count:", error);
+        res.locals.globalCartCount = 0;
+    }
+    next();
+});
+
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/', homeRoutes);
+app.use('/',productRoutes);
+app.use('/user/cart', cartRoutes);
 
 export default app;

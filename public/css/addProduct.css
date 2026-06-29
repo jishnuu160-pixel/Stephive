@@ -1,0 +1,651 @@
+/* =========================
+   PAGE LAYOUT
+========================= */
+.customers-page {
+    padding: 30px;
+    background: #f4f6f9;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+}
+
+.table-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* =========================
+   HEADER
+========================= */
+.card-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #eee;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* =========================
+   FORM LAYOUT
+========================= */
+.modal-form-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.split-row4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+/* =========================
+   INPUT GROUPS
+========================= */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    transition: 0.2s;
+    background: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #f4b400;
+    box-shadow: 0 0 0 3px rgba(244, 180, 0, 0.15);
+}
+
+/* =========================
+   VARIANTS SECTION
+========================= */
+.variants-section {
+    margin-top: 10px;
+}
+
+.section-main-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.variants-grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.variant-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 10px;
+    background: #fff;
+}
+
+.variant-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.color-input-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.color-picker-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+.color-name-input {
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    outline: none;
+}
+
+.btn-remove-card {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* =========================
+   SIZE ROWS
+========================= */
+.sizes-stock-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.size-entry-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.size-input-small,
+.stock-input-small {
+    width: 60px;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.btn-remove-size-row {
+    border: none;
+    background: #ff4d4f;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn-add-size-row {
+    margin-top: 8px;
+    background: #fff;
+    border: 1px dashed #aaa;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-add-variant-group {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px dashed #aaa;
+    background: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* =========================
+   IMAGE UPLOAD
+========================= */
+.image-drag-dropzone {
+    border: 2px dashed #d1d5db;
+    padding: 30px;
+    text-align: center;
+    border-radius: 14px;
+    cursor: pointer;
+    background: #fafafa;
+    transition: 0.2s;
+}
+
+.image-drag-dropzone:hover {
+    background: #f3f4f6;
+}
+
+.hidden-file-input {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.images-preview-gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.preview-image-container {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.preview-image-container img {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.preview-remove-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.modal-action-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-modal-cancel {
+    padding: 10px 18px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.btn-modal-save {
+    padding: 10px 22px;
+    background: #f4b400;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-modal-save:hover {
+    background: #d99c00;
+}
+
+/* ===== Variant Template Wrapper ===== */
+#variantTemplate {
+    display: none;
+}
+
+/* ===== Variant Card ===== */
+.variant-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease-in-out;
+}
+
+.variant-card:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Form Group ===== */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.form-group input {
+    padding: 6px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+.form-group input:focus {
+    border-color: #3b82f6;
+}
+
+/* ===== Sizes Container ===== */
+.sizes-container {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.sizes-container > label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+}
+
+/* ===== Size Row ===== */
+.size-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.size-row input {
+    flex: 1;
+    padding: 2px 4px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 10px;
+}
+
+.size-row input:focus {
+    border-color: #3b82f6;
+}
+
+/* ===== Buttons (smaller) ===== */
+button {
+    cursor: pointer;
+    font-size: 12px;
+    border: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+/* Add size button */
+.add-size {
+    background: #10b981;
+    color: white;
+    font-size: 10px;
+    padding: 5px 8px;
+    margin-top: 4px;
+}
+
+.add-size:hover {
+    background: #059669;
+}
+
+/* Remove size button */
+.remove-size {
+    background: #ef4444;
+    color: white;
+    padding: 5px 7px;
+    font-weight: bold;
+}
+
+.remove-size:hover {
+    background: #dc2626;
+}
+
+/* Remove variant button */
+.remove-variant {
+    background: #111827;
+    color: white;
+    padding: 6px 10px;
+    width: 50%;
+    margin-top: 8px;
+}
+
+.remove-variant:hover {
+    background: #000000;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+    .size-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .remove-size {
+        width: 100%;
+    }
+}
+
+.color-picker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.color-picker input[type="color"] {
+    width: 38px;
+    height: 38px;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+/* remove ugly box/line in Chrome */
+.color-picker input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-picker input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+.color-label {
+    font-size: 13px;
+    font-family: monospace;
+    color: #374151;
+}
+
+
+/* edit */
+
+
+.edit-images-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.img-box {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.remove-img {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: red;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Custom Toast Notification Styling matching Screenshot 2026-06-10 235337.png */
+.custom-validation-toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background-color: #e72727; /* Soft coral/red for error, or use #6ba8a8 for the exact teal in the screenshot */
+    color: #ffffff;
+    padding: 14px 28px;
+    border-radius: 12px; /* Smooth rounded pill cornering */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    z-index: 999999;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.custom-validation-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.product-image-main-container, 
+.image-preview-box,
+.main-img-wrapper { 
+    position: relative !important;
+    overflow: hidden !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 2. Lock down the base image inside its frame boundaries */
+.product-image-main-container img,
+.main-img-wrapper img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* 3. Restrain the dynamic lens or zoomed clone image layer */
+.zoom-lens, 
+.img-zoom-lens,
+.zoomWindow,
+.zoomContainer {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    position: absolute !important;
+    pointer-events: none; /* Stops mouse stuttering loops during hover */
+}
+
+.cropper-modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6); 
+    backdrop-filter: blur(4px);        
+    display: none;                     
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+}
+
+.cropper-wrapper {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 500px; /* 🛠️ bumped up slightly to give Cropper.js room to build handlers */
+    width: 90%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e2e8f0;
+}
+
+.cropper-wrapper h3 {
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+.image-preview-box {
+    max-height: 350px; /* 🛠️ Increased height capacity to fit high-res photos cleanly */
+    height: 350px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    background: #f8fafc; 
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cropper-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary { 
+    background: #f1f5f9; 
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.btn-primary { 
+    background: #004d40; 
+    color: #ffffff; 
+}
+.btn-primary:hover {
+    background: #00332c;
+    box-shadow: 0 4px 6px -1px rgba(0, 77, 64, 0.2);
+}
+
+.field-error{
+    display:block;
+    color:#ef4444;
+    font-size:13px;
+    margin-top:4px;
+    min-height:18px;
+}
+
+.input-error{
+    border:1px solid #ef4444 !important;
+}

@@ -1,20 +1,84 @@
-
 <header class="navbar">
-   <div class="logo">StepHive</div>
-    <nav class="nav-links">
+   <div class="logo">StepHyve</div>
+    <nav class="nav-links" id="mainNavLinks">
         <a href="/">Home</a>
-        <a href="">Shop</a>
-        <a href="">About</a>
+        <a href="/shop">Shop</a>
+        <a href="/shop/men">Men</a>
+        <a href="/shop/women">Women</a>
+        <a href="/about">About</a>
     </nav>
     <div class="icons">
-        <img class="nav-icons" src="/icons/search (2).png" >
-       <img class="nav-icons" src="/icons/wishlist.png">
-      <img class="nav-icons" src="/icons/cart.png" >
+        <form action="/shop" method="GET" class="search-form">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search..." 
+                value="{{searchValue}}"
+                class="search-input"
+            >
+            <button type="submit" class="search-submit-btn">
+                <img class="nav-icons" src="/icons/search (2).png" alt="Search">
+            </button>
+        </form>
 
+        <img class="nav-icons" src="/icons/wishlist.png">
+        
+       <a href="/user/cart" class="cart-anchor-wrapper" style="position: relative; display: inline-block;">
+        <img class="nav-icons" src="/icons/cart.png">
+        
+        <span id="globalCartBadge" class="cart-badge-count" 
+              style="display: {{#if user}}{{#if globalCartCount}}flex{{else}}none{{/if}}{{else}}none{{/if}};">
+            {{globalCartCount}}
+        </span>
+    </a>
       {{#if user}}
       <a href="/user/profile">
-      <img class="nav-icons" src="/icons/user.png">
+          <img class="nav-icons" src="/icons/user.png">
       </a>
       {{/if}}
     </div>
 </header>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll("#mainNavLinks a");
+
+    navLinks.forEach(link => {
+        const hrefAttr = link.getAttribute("href");
+
+        if (currentPath === hrefAttr) {
+            link.classList.add("active-nav-link");
+        } 
+        else if (hrefAttr === "/shop" && currentPath.startsWith("/details")) {
+            link.classList.add("active-nav-link");
+        }
+    });
+});
+
+async function updateQuantity(productId, newQty) {
+    const response = await fetch('/user/cart/update-quantity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, quantity: newQty })
+    });
+    const result = await response.json();
+
+    if (result.success) {
+        document.getElementById(`total-${productId}`).innerText = result.newProductTotal;
+        
+        if (window.updateGlobalCartCount) {
+            window.updateGlobalCartCount(result.newGlobalCartCount);
+        }
+    }
+}
+
+    window.updateGlobalCartCount = function(newCount) {
+        const badge = document.getElementById('globalCartBadge');
+        if (badge) {
+            badge.innerText = newCount;
+            badge.style.display = newCount > 0 ? 'flex' : 'none';
+        }
+    };
+
+</script>

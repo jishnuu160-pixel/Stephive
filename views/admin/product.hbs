@@ -1,0 +1,333 @@
+<div class="customers-page">
+    <div class="table-card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Products</h2>
+            
+            <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 600px; justify-content: flex-end;">
+                
+                <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
+                    <form action="/admin/products" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" placeholder="Search Products" value="{{searchQuery}}">
+                        {{#if searchQuery}}
+                            <a href="/admin/products" class="search-clear-btn">
+                                <i class="fas fa-times-circle"></i>
+                            </a>
+                        {{/if}}
+                    </form>
+                </div>
+
+              <a href="/admin/products/add" class="btn-cat">Add Product</a>
+            </div>
+        </div>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th> 
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products}} 
+                <tr>
+                    <td>{{add @root.startIndex @index 1}}</td>
+                    
+                   <td>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        {{#if this.variants.[0].images.[0]}}
+            <img src="{{this.variants.[0].images.[0]}}" 
+                 alt="{{this.productName}}" 
+                 style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">
+        {{else}}
+            <div style="width: 40px; height: 40px; border-radius: 5px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #a0aec0;">
+                <i class="fas fa-image"></i>
+            </div>
+        {{/if}}
+        <strong>{{this.productName}}</strong>
+    </div>
+</td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start;">
+                            {{#if this.Category}}
+                                {{#if this.Category.parentCategory}}
+                                    <span style="color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        {{this.Category.parentCategory.name}}
+                                    </span>
+                                    <strong style="color: #334155; font-size: 12px;">{{this.Category.name}}</strong>
+                                {{else}}
+                                    <strong style="color: #334155; font-size: 12px;">{{this.Category.name}}</strong>
+                                {{/if}}
+                            {{else if this.category}}
+                                {{#if this.category.parentCategory}}
+                                    <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                        {{this.category.parentCategory.name}}
+                                    </span>
+                                    <strong style="color: #334155; font-size: 0.9rem;">{{this.category.name}}</strong>
+                                {{else}}
+                                    <strong style="color: #334155; font-size: 0.9rem;">{{this.category.name}}</strong>
+                                {{/if}}
+                            {{else}}
+                                <span style="color: #cbd5e1; font-style: italic; font-size: 0.9rem;">Uncategorized</span>
+                            {{/if}}
+                        </div>
+                    </td>
+                    
+                    <td>₹{{this.regularPrice}}</td>
+                    <td>{{this.totalQuantity}}</td>
+
+                    <td>
+                        <span class="badge {{#if this.isListed}}bg-success{{else}}bg-danger{{/if}}">
+                            {{#if this.isListed}}Listed{{else}}Unlisted{{/if}}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                        <a href="/admin/products/edit/{{this._id}}" class="btn-edit-small">
+                                  Edit
+                         </a>
+
+                             <form action="/admin/products/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
+                                <button 
+                                    type="button"
+                                    class="btn-unlist-small {{#if this.isListed}}active{{else}}inactive{{/if}}"
+                                    data-listed="{{this.isListed}}"
+                                    data-name="{{this.productName}}"
+                                    onclick="confirmProductToggle(this)">
+                                    {{#if this.isListed}}Unlist{{else}}List{{/if}}
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px; color: #cbd5e1;">No products found in the database.</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        {{#if products.length}}
+        <div class="pagination">
+            {{#if pagination.hasPrevPage}}
+                <a href="/admin/products?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">« Prev</a>
+            {{/if}}
+            
+            <span class="page-info">Page {{pagination.page}} of {{pagination.totalPages}}</span>
+            
+            {{#if pagination.hasNextPage}}
+                <a href="/admin/products?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">Next »</a>
+            {{/if}}
+        </div>
+        {{/if}}
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmProductToggle(button) {
+    const isListed = button.getAttribute('data-listed') === 'true';
+    const itemName = button.getAttribute('data-name');
+    const actionText = isListed ? 'Unlist' : 'List';
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you really want to ${actionText.toLowerCase()} ${itemName}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: isListed ? '#d33' : '#28a745', 
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: `Yes, ${actionText} it!`,
+        width: '320px',             
+        padding: '1rem',
+        customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.close(); 
+            button.closest('form').submit();
+        }
+    });
+}
+
+let colorIndex = 0;
+
+function addColorVariantBlock() {
+    const container = document.getElementById('variantsContainer');
+    if(!container) return;
+    
+    const variantId = colorIndex++;
+    const card = document.createElement('div');
+    card.className = 'variant-card';
+    card.id = `variantCard-${variantId}`;
+    
+    card.innerHTML = `
+        <div class="variant-card-header">
+            <div class="color-input-wrapper">
+                <input type="color" name="variants[${variantId}][colorHex]" value="#1a202c" class="color-picker-circle" oninput="this.style.backgroundColor = this.value">
+                <input type="text" name="variants[${variantId}][colorName]" placeholder="Color Name" value="Black" class="color-name-input" >
+            </div>
+            <button type="button" class="btn-remove-card" onclick="removeColorBlock(${variantId})">Remove</button>
+        </div>
+        <p class="size-row-title">Sizes & stock:</p>
+        <div id="sizesContainer-${variantId}" class="sizes-stock-container"></div>
+        <button type="button" class="btn-add-size-row" onclick="addSizeRow(${variantId})">+ Add size</button>
+    `;
+    
+    container.appendChild(card);
+    addSizeRow(variantId);
+}
+
+function removeColorBlock(id) {
+    const card = document.getElementById(`variantCard-${id}`);
+    if (card) card.remove();
+}
+
+function addSizeRow(variantId) {
+    const container = document.getElementById(`sizesContainer-${variantId}`);
+    if(!container) return;
+    
+    const rowCount = container.children.length;
+    const row = document.createElement('div');
+    row.className = 'size-entry-row';
+    
+    row.innerHTML = `
+        <span>Size</span>
+        <input type="number" name="variants[${variantId}][sizes][${rowCount}][size]" class="size-input-small"  placeholder="8" min="1">
+        <span>Stock</span>
+        <input type="number" name="variants[${variantId}][sizes][${rowCount}][stock]" class="stock-input-small"  placeholder="10" min="0">
+        <button type="button" class="btn-remove-size-row" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    container.appendChild(row);
+}
+
+let selectedImagesFileList = []; 
+
+function previewSelectedImages(inputElement) {
+    const previewGallery = document.getElementById('imagesPreviewGallery');
+    if (!previewGallery) return;
+
+    const incomingFiles = Array.from(inputElement.files);
+    
+    if (selectedImagesFileList.length + incomingFiles.length > 4) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Upload Limit Exceeded',
+            text: 'You can upload a maximum of 4 product images.',
+            confirmButtonColor: '#e6a800'
+        });
+        inputElement.value = ""; 
+        return;
+    }
+
+    incomingFiles.forEach(file => {
+        selectedImagesFileList.push(file);
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const containerCard = document.createElement('div');
+            containerCard.className = 'preview-image-container';
+            
+            const trackingIndex = selectedImagesFileList.length - 1;
+            containerCard.setAttribute('data-image-index', trackingIndex);
+
+            containerCard.innerHTML = `
+                <img src="${e.target.result}" alt="Preview item">
+                <button type="button" class="preview-remove-badge" onclick="removePreviewImageElement(${trackingIndex})">&times;</button>
+            `;
+            previewGallery.appendChild(containerCard);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    syncInputFilesDataTransfer(inputElement);
+}
+
+function removePreviewImageElement(indexToRemove) {
+    const inputElement = document.getElementById('productImagesInput');
+    const previewGallery = document.getElementById('imagesPreviewGallery');
+    
+    selectedImagesFileList.splice(indexToRemove, 1);
+    
+    if (previewGallery) {
+        previewGallery.innerHTML = "";
+        
+        selectedImagesFileList.forEach((file, newIndex) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const containerCard = document.createElement('div');
+                containerCard.className = 'preview-image-container';
+                containerCard.setAttribute('data-image-index', newIndex);
+                containerCard.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview item">
+                    <button type="button" class="preview-remove-badge" onclick="removePreviewImageElement(${newIndex})">&times;</button>
+                `;
+                previewGallery.appendChild(containerCard);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    syncInputFilesDataTransfer(inputElement);
+}
+
+function syncInputFilesDataTransfer(inputField) {
+    if (!inputField) return;
+    const dataTransferContext = new DataTransfer();
+    selectedImagesFileList.forEach(file => dataTransferContext.items.add(file));
+    inputField.files = dataTransferContext.files;
+}
+
+const allSubcategories = [];
+{{#each @root.subcategories}}
+allSubcategories.push({
+    name: "{{this.name}}",
+    parent: "{{this.parentCategory}}"
+});
+{{/each}}
+
+document.addEventListener("DOMContentLoaded", () => {
+    if(document.getElementById('variantsContainer')){
+        addColorVariantBlock(); 
+        addColorVariantBlock(); 
+        
+        const secondColorInput = document.querySelector(`#variantCard-1 .color-picker-circle`);
+        const secondColorName = document.querySelector(`#variantCard-1 .color-name-input`);
+        if(secondColorInput && secondColorName) {
+             secondColorInput.value = "#ffffff";
+             secondColorName.value = "White";
+             secondColorInput.style.backgroundColor = "#ffffff";
+        }
+    }
+
+    const parentSelect = document.getElementById("parentCategorySelect");
+    const subSelect = document.getElementById("subcategorySelect");
+
+    if (parentSelect && subSelect) {
+        parentSelect.addEventListener("change", function() {
+            const selectedParentId = this.value.trim();
+            subSelect.innerHTML = '<option value="">Select Subcategory</option>';
+            if (!selectedParentId) return;
+
+            const matches = allSubcategories.filter(sub => String(sub.parent).trim() === String(selectedParentId));
+            matches.forEach(sub => {
+                const opt = document.createElement("option");
+                opt.value = sub.name;
+                opt.textContent = sub.name;
+                subSelect.appendChild(opt);
+            });
+        });
+    }
+});
+</script>

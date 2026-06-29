@@ -1,64 +1,185 @@
+document.addEventListener('DOMContentLoaded', function () {
 
-document.addEventListener('DOMContentLoaded', function() {
-    
     const genderSelect = document.getElementById('genderSelect');
+
     if (genderSelect) {
-        genderSelect.addEventListener('change', async function() {
-            const selectedGender = this.value;
+        genderSelect.addEventListener('change', async function () {
+
             try {
                 const response = await fetch('/user/update-gender', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ gender: selectedGender }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ gender: this.value })
                 });
 
                 const result = await response.json();
-                if (result.success) {
-                    console.log("Gender updated to:", selectedGender);
-                }
-            } catch (error) {
-                console.error("Error saving gender:", error);
+                
+if (result.success) {
+
+    showToast(result.message || "Profile updated", "success");
+
+    modal.style.display = 'none';
+    fileInput.value = "";
+
+    if (cropper) cropper.destroy();
+
+    setTimeout(() => {
+        location.reload();
+    }, 800);
+}
+            } catch (err) {
+                console.error("Gender update error:", err);
+                showToast("Something went wrong", "error");
             }
         });
     }
 
-    const avatarInput = document.getElementById('avatar-upload');
-    if (avatarInput) {
-        avatarInput.addEventListener('change', async function() {
-            const file = this.files[0]; 
+
+    const fileInput = document.getElementById('avatar-upload');
+    const previewImg = document.getElementById('profile-preview');
+
+    const modal = document.getElementById('cropperModal');
+    const cropImage = document.getElementById('image-to-crop');
+    const cancelBtn = document.getElementById('cancelCropBtn');
+    const saveBtn = document.getElementById('saveCropBtn');
+
+    let cropper;
+
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', function (e) {
+
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        const selectedFile = files[0];
+
+        if (selectedFile.size > 2 * 1024 * 1024) {
+            showToast("File too large (max 2MB)", "error");
+            fileInput.value = "";
+            return;
+        }
+
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+
+        if (!allowed.includes(selectedFile.type)) {
+            showToast("Only JPG, PNG, WEBP allowed", "error");
+            fileInput.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            cropImage.src = event.target.result;
+            modal.style.display = 'flex';
+
+            if (cropper) cropper.destroy();
+
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 1,
+                background: false
+            });
+        };
+
+        reader.readAsDataURL(selectedFile);
+    });
+
+    /* =========================
+       CANCEL CROPPING
+    ========================= */
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+            modal.style.display = 'none';
+            fileInput.value = "";
+            if (cropper) cropper.destroy();
+        });
+    }
+
+
+if (saveBtn) {
+   saveBtn.addEventListener('click', function () {
+    if (!cropper) return;
+
+    const canvas = cropper.getCroppedCanvas({
+        width: 250,
+        height: 250
+    });
+
+    canvas.toBlob(async function (blob) {
+        const formData = new FormData();
+        formData.append('profileImage', blob, 'avatar.png');
+
+        try {
+            modal.style.display = 'none';
             
-            if (file) {
-                console.log("File selected:", file.name);
+            const response = await fetch('/user/update-avatar', {
+                method: 'POST',
+                body: formData
+            });
 
-                if (file.size > 2 * 1024 * 1024) {
-                    return alert("File is too large! Please choose an image under 2MB.");
-                }
+            const result = await response.json();
 
-                const formData = new FormData();
-               
-                formData.append('profileImage', file);
+            if (result.success) {
+                showToast(result.message || "Profile updated successfully!", "success");
 
-                try {
-                    console.log("Attempting upload to server...");
-                    
-                    const response = await axios.post('/user/update-avatar', formData, {
-                        headers: { 'Content-Type': 'multipart/form-data' }
-                    });
-
-                    if (response.data.success) {
-                        console.log("Upload successful!");
-                       
-                        document.getElementById('profile-preview').src = response.data.imagePath;
-                        alert("Profile picture updated successfully!"); 
-                        window.location.reload(); 
-                    }
-                } catch (err) {
-                    console.error("Upload error details:", err.response ? err.response.data : err);
-                    alert("Error uploading image. Please try again.");
-                }
+                setTimeout(() => {
+                    window.location.href = '/user/profile';
+                }, 1500);
+            } else {
+                showToast(result.message || "Upload failed", "error");
             }
-        });
-    } else {
-        console.warn("Could not find 'avatar-upload' input on this page.");
-    }
+        } catch (err) {
+            console.error("Upload error:", err);
+            showToast("Something went wrong", "error");
+        }
+    }, 'image/png');
 });
+}
+
+});
+
+
+
+function showToast(message, type = "success") {
+    const toast = document.createElement("div");
+
+    toast.innerText = message;
+
+    toast.style.position = "fixed";
+    toast.style.top = "60px";
+    toast.style.right = "20px";
+    toast.style.padding = "12px 18px";
+    toast.style.borderRadius = "8px";
+    toast.style.color = "#fff";
+    toast.style.fontSize = "14px";
+    toast.style.zIndex = "9999";
+    toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+    toast.style.opacity = "0";
+    toast.style.transition = "all 0.3s ease";
+
+    if (type === "success") {
+        toast.style.background = "#22c55e";
+    } else if (type === "error") {
+        toast.style.background = "#ef4444";
+    } else {
+        toast.style.background = "#3b82f6";
+    }
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "1";
+    }, 100);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}

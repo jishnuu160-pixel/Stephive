@@ -1,24 +1,25 @@
 <div class="customers-page">
-    
-
     <div class="table-card">
-        <div class="card-header">
-        <h2>Users</h2>
-           
-        <div class="search-wrapper">
-            <form action="/admin/customers" method="GET" style="display: flex; align-items: center; width: 100%;">
-            <i class="fas fa-search"></i>
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Users</h2>
+            
+            <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 600px; justify-content: flex-end;">
+                
+                <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
+                    <form action="/admin/customers" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" placeholder="Search Users" value="{{searchQuery}}">
+                        {{#if searchQuery}}
+                            <a href="/admin/customers" class="search-clear-btn">
+                                <i class="fas fa-times-circle"></i>
+                            </a>
+                        {{/if}}
+                    </form>
+                </div>
 
-            <input type="text" name="search" placeholder="Search users" value="{{searchQuery}}">
-
-            {{#if searchQuery}}
-                <a href="/admin/customers" class="search-clear-btn">
-                    <i class="fas fa-times-circle"></i>
-                </a>
-            {{/if}}
-            </form>
+            </div>
         </div>
-    </div>
+
         <table class="admin-table">
             <thead>
                 <tr>
@@ -93,8 +94,7 @@
         confirmButtonColor: isBlocked ? '#28a745' : '#d33',
         cancelButtonColor: '#6c757d',
         confirmButtonText: `Yes, ${action}!`,
-        
-        // 🟢 THE SHRINK FIXES:
+ 
         width: '320px',             
         padding: '1rem',           
         customClass: {

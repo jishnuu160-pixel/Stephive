@@ -1,0 +1,365 @@
+<div class="cart-container">
+    <header class="cart-header">
+        <div class="header-left">
+            <nav class="breadcrumbs"><a class="cart-link" href="/">HOME</a> / <a class="cart-link" href="/shop">SHOP</a>/ <span style="font-weight: 600;color:black">CART</span></nav>
+          <h1> Your Cart <span class="item-count" id="cart-item-count">({{totalUnitsCount}} Items)</span></h1>
+        </div>
+        <a class="continue-shopping-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
+    </header>
+
+    <div class="cart-content">
+        
+        <section class="cart-items-list">
+            {{#if cart.items.length}}
+
+            {{#each cart.items}}
+            <div class="cart-card 
+    {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} 
+    {{#if this.hasInsufficientStock}}stock-error-border{{/if}} 
+    {{#if this.isUnlisted}}disabled-item-opacity{{/if}}" 
+    data-product-id="{{this.productId._id}}" 
+    data-size="{{this.size}}" 
+    data-color="{{this.color}}">
+    
+
+                <div class="item-image-wrapper">
+            {{#if this.productId.variants.[0].images.[0]}}
+                <img src="{{this.productId.variants.[0].images.[0]}}" 
+                     alt="{{this.productId.productName}}">
+            {{else}}
+                <div class="no-image-placeholder">No Image</div>
+            {{/if}}
+        </div>
+                
+                <div class="item-details">
+                    <h2 class="item-title">{{this.productId.productName}}</h2>
+                    <p class="item-specs">MATERIAL: {{#if this.productId.material}} {{toUpperCase this.productId.material}}{{else}}LEATHER{{/if}}| COLOR: {{toUpperCase this.color}} | SIZE: {{this.size}}</p>
+                    
+
+                   {{#if this.isOutOfStock}}
+                         <span class="cart-error-badge">OUT OF STOCK</span>
+                   {{else if this.hasInsufficientStock}}
+                         <span class="cart-error-badge"> EXCEEDS STOCK (Only {{this.availableStock}} left)</span>
+                   {{/if}}
+                    
+                    {{#if this.isUnlisted}}
+                        <span class="cart-error-badge">PRODUCT UNAVAILABLE</span>
+                    {{/if}}
+
+                    <div class="item-pricing-row">
+                        <span class="item-price" data-base-price="{{this.price}}">₹{{this.price}}</span>
+                        
+                    <div class="quantity-selector">
+                    <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
+                    <span class="qty-val" data-max="{{this.availableStock}}">{{this.quantity}}</span>
+                    <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
+                   </div>
+                 </div>
+                </div>
+                
+                <div class="item-actions-subtotal">
+                    <button class="delete-btn" onclick="removeCartRow(this)" aria-label="Delete item">
+                        <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                    <div class="subtotal-box">
+                        <span class="subtotal-label">SUBTOTAL</span>
+                        <span class="subtotal-price">₹{{this.itemSubtotal}}</span>
+                    </div>
+                </div>
+            </div>
+
+
+{{/each}}
+{{#if totalPages}}
+            <div class="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 30px 0;">
+                
+                {{#if hasPrevPage}}
+                    <a href="/user/cart?page={{subtract currentPage 1}}" class="page-btn">« Previous</a>
+                {{/if}}
+
+                <span class="page-info" style="font-weight: 600; color: #475569;">
+                    Page {{currentPage}} of {{totalPages}}
+                </span>
+
+                {{#if hasNextPage}}
+                   <a href="/user/cart?page={{add currentPage 1}}" class="page-btn"> Next »</a>
+                {{/if}}
+            </div>
+        {{/if}}
+
+    {{else}}
+        <div class="empty-cart-state">
+            <p>Your StepHyve cart is empty.</p>
+        </div>
+    {{/if}}
+</section>
+        {{#if cart.items.length}}
+        <section class="summary-wrapper">
+            <div class="summary-card">
+                <h3>Order Summary</h3>
+                
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">₹{{cart.subtotal}}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping estimate</span>
+                    <span class="free-text">Free</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax estimate (10%)</span>
+                    <span id="summary-tax">₹{{cart.taxEstimate}}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Discount</span>
+                    <span id="summary-discount">-₹0.00</span>
+                </div>
+
+                <hr class="summary-divider">
+
+                <div class="total-row">
+                    <div class="total-label-box">
+                        <span class="total-title">Total Amount</span>
+                        <span class="total-subtitle">INCLUDING ALL TAXES</span>
+                    </div>
+                    <span class="total-price" id="summary-total">₹{{cart.totalAmount}}</span>
+                </div>
+
+                {{#if hasCheckoutRestrictions}}
+                    <div class="checkout-restriction-notice" style="background: #fef2f2; border: 1px solid #fca5a5; padding: 15px; border-radius: 6px; margin-bottom: 15px; color: #991b1b; font-size: 13px; font-weight: 500;">
+                        ⚠️ Checkout is unavailable because items in your cart are out of stock or no longer available. Please resolve these issues to proceed.
+                    </div>
+                    <button class="checkout-btn" style="background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none;" disabled>
+                        Checkout Disabled
+                    </button>
+                {{else}}
+                    <a href="/checkout" class="checkout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                        <span>Proceed to Checkout</span>
+                        <span class="arrow">→</span>
+                    </a>
+                {{/if}}
+                
+                <p class="security-text">Secure SSL Encryption & 2-Year Warranty</p>
+            </div>
+        </section>
+        {{/if}}
+
+    </div>
+</div>
+
+
+<script>
+
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('customToast');
+    toast.innerText = message;
+    toast.className = 'custom-toast show';
+
+    if (type === 'error') {
+        toast.classList.add('error-toast');
+    }
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2200);
+}
+
+
+    function enforceLock() {
+        // Target all cart cards
+        const cards = document.querySelectorAll('.cart-card');
+        
+        cards.forEach(card => {
+            // Check if the card has the 'disabled-item-opacity' class
+            // which we applied via HBS for Out of Stock or Unlisted
+            const isUnavailable = card.classList.contains('disabled-item-opacity') || 
+                                  card.classList.contains('stock-error-border');
+            
+            if (isUnavailable) {
+                const buttons = card.querySelectorAll('.qty-btn');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.pointerEvents = 'none'; // CSS lock
+                });
+            }
+        });
+    }
+
+   
+    document.addEventListener('DOMContentLoaded', enforceLock);
+
+
+
+async function adjustCartQuantity(buttonElement, operationalChange) {
+
+    const card = buttonElement.closest('.cart-card');
+    const qtyDisplaySpan = card.querySelector('.qty-val');
+
+    const maxStock = parseInt(qtyDisplaySpan.getAttribute('data-max'));
+    const currentQty = parseInt(qtyDisplaySpan.innerText);
+    const targetQuantity = currentQty + operationalChange;
+
+    if (targetQuantity > 5) {
+        showToast("Maximum limit is 5 units", "error");
+        return;
+    }
+
+if (operationalChange > 0 && targetQuantity > maxStock) {
+    showToast(`Only ${maxStock} items available`, "error");
+    return;
+}
+
+    if (targetQuantity < 1) {
+        return;
+    }
+
+    const productId = card.getAttribute('data-product-id');
+    const size = card.getAttribute('data-size');
+    const color = card.getAttribute('data-color');
+
+    try {
+
+        const response = await fetch('/user/cart/update-quantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId,
+                size,
+                color,
+                targetQuantity
+            })
+        });
+
+        const data = await response.json();
+
+       if (response.ok && data.success) {
+   
+    qtyDisplaySpan.innerText = targetQuantity;
+
+    const pricePerUnit = parseFloat(card.querySelector('.item-price').getAttribute('data-base-price'));
+    const newRowSubtotal = targetQuantity * pricePerUnit;
+    card.querySelector('.subtotal-price').innerText = `₹${newRowSubtotal.toFixed(2)}`;
+
+    if (data.subtotal !== undefined) {
+        document.getElementById('summary-subtotal').innerText = `₹${data.subtotal}`;
+        document.getElementById('summary-tax').innerText = `₹${data.taxEstimate}`;
+        document.getElementById('summary-total').innerText = `₹${data.totalAmount}`;
+    }
+
+    if (window.updateGlobalCartCount) {
+        window.updateGlobalCartCount(data.totalUnitsCount);
+    }
+
+            const badge = card.querySelector('.cart-error-badge');
+
+if (badge && targetQuantity <= maxStock) {
+    badge.remove();
+
+    card.classList.remove('stock-error-border');
+}
+
+            const buttons = card.querySelectorAll('.qty-btn');
+
+            buttons[0].disabled = (targetQuantity <= 1);
+
+           if (card.classList.contains('stock-error-border')) {
+                  buttons[1].disabled = false;
+          } else {
+                  buttons[1].disabled = (currentQty >= 5 || currentQty >= maxStock);
+          }
+
+            showToast("Cart updated");
+
+        } else {
+
+            showToast(data.message || "Failed to update", "error");
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+        showToast("Something went wrong", "error");
+
+    }
+}
+
+
+
+async function removeCartRow(buttonElement) {
+    const result = await Swal.fire({
+        title: 'Remove Product?',
+        text: "This item will be removed from your cart.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Remove',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        customClass: {
+            popup: 'small-swal'
+        }
+    });
+
+    if (!result.isConfirmed) return;
+
+    const card = buttonElement.closest('.cart-card');
+    const productId = card.getAttribute('data-product-id');
+    const size = card.getAttribute('data-size');
+    const color = card.getAttribute('data-color');
+
+    try {
+        const response = await fetch('/user/cart/remove', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId,
+                size,
+                color
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            card.remove();
+            showToast("Product removed from cart");
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+        } else {
+            showToast(data.message || "Failed to remove product", "error");
+        }
+    } catch (err) {
+        console.error(err);
+        showToast("Something went wrong", "error");
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('.cart-card').forEach(card => {
+
+        if (card.classList.contains('disabled-item-opacity')) {
+            card.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+            return;
+        }
+
+        const qtySpan = card.querySelector('.qty-val');
+        const currentQty = parseInt(qtySpan.innerText);
+
+        const buttons = card.querySelectorAll('.qty-btn');
+
+        buttons[0].disabled = (currentQty <= 1);
+
+        buttons[1].disabled = false;
+
+    });
+});
+
+</script>

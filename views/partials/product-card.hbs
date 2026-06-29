@@ -1,0 +1,26 @@
+<div class="product-card-gender">      
+    <div class="product-image">
+        {{#if this.variants.[0].images.[0]}}
+            <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
+        {{else if this.productImage.[0]}}
+            <img src="{{this.productImage.[0]}}" alt="{{this.productName}}">
+        {{else}}
+            <img src="/images/default-shoe.png" alt="Product Image">
+        {{/if}}
+    </div>
+    
+    <div class="product-info">
+        <h3>{{this.productName}}</h3>
+        <p class="product-card-desc">
+            {{#if this.description}} {{this.description}}
+            {{else if this.Category.name}} {{this.Category.name}} Fit
+            {{else}} Premium Collection {{/if}}
+        </p>    
+        <div class="product-action-block">
+            <h4>₹{{this.regularPrice}}</h4>
+            <a href="/details/{{this._id}}" class="rec-discover-btn">
+                <button type="button">DISCOVER MORE</button>
+            </a>
+        </div>
+    </div>
+</div>

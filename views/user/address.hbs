@@ -14,7 +14,11 @@
                         <h1>My Addresses</h1>
                         <p>Manage your saved delivery addresses</p>
                     </div>
-                    <button class="btn-add-address" id="openAddressModal">+ Add New Address</button>
+
+                    
+                    <a href="/user/add-address" class="btn-add-address">
+                      + Add New Address
+                    </a>
                 </div>
 
                 <div class="address-container">
@@ -24,22 +28,16 @@
                                 <span class="badge-label">{{this.label}}</span>
                                 
                                 <div class="action-icons">
-                                    <img src="/icons/edit.png" alt="edit" class="edit-btn icon-small"
-                                        data-id="{{this._id}}"
-                                        data-name="{{this.fullName}}"
-                                        data-phone="{{this.phone}}"
-                                        data-street="{{this.street}}"
-                                        data-apartment="{{this.apartment}}"
-                                        data-city="{{this.city}}"
-                                        data-state="{{this.state}}"
-                                        data-pincode="{{this.pincode}}"
-                                        data-label="{{this.label}}"
-                                        data-default="{{this.isDefault}}"
-                                        style="cursor:pointer;">
+                                    <a href="/user/edit-address/{{this._id}}">
+    <img src="/icons/edit.png"
+         alt="edit"
+         class="icon-small">
+</a>
+                                        
                                     
-                                    <a href="/user/delete-address/{{this._id}}" onclick="return confirm('Delete this address?')">
-                                        <img src="/icons/delete.png" alt="delete" class="icon-small">
-                                    </a>
+                                    <a href="/user/delete-address/{{this._id}}" class="delete-address">
+                                      <img src="/icons/delete.png" alt="delete" class="icon-small">
+                                  </a>
                                 </div>
                             </div>
 
@@ -71,77 +69,32 @@
     </div>
 </div>
 
-<div id="addressModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add <b>New Address</b></h3>
-            <span class="close-x" id="closeX">&times;</span>
-        </div>
-        
-        <form action="/user/add-address" method="POST" id="addressForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" name="fullName" required>
-                </div>
-                <div class="form-group">
-                    <label>Mobile Number</label>
-                    <input type="text" name="phone" required>
-                </div>
-            </div>
+<script>
+document.querySelectorAll('.delete-address').forEach(link => {
 
-            <div class="form-group">
-                <label>Address Line 1</label>
-                <input type="text" name="street" required>
-            </div>
+    link.addEventListener('click', function(e) {
 
-            <div class="form-group">
-                <label>Address Line 2 (Optional)</label>
-                <input type="text" name="apartment">
-            </div>
+        e.preventDefault();
 
-            <div class="form-row three-col">
-                <div class="form-group">
-                    <label>City</label>
-                    <input type="text" name="city" required>
-                </div>
-                <div class="form-group">
-                    <label>State</label>
-                    <input type="text" name="state" required>
-                </div>
-                <div class="form-group">
-                    <label>Pincode</label>
-                    <input type="text" name="pincode" required>
-                </div>
-            </div>
+        const url = this.href;
 
-            <div class="form-group">
-                <label>Address Type</label>
-                <div class="type-selection">
-                    <label class="type-chip">
-                        <input type="radio" name="label" value="Home" checked>
-                        <span>Home</span>
-                    </label>
-                    <label class="type-chip">
-                        <input type="radio" name="label" value="Office">
-                        <span>Office</span>
-                    </label>
-                    <label class="type-chip">
-                        <input type="radio" name="label" value="Other">
-                        <span>Other</span>
-                    </label>
-                </div>
-            </div>
+        Swal.fire({
+            title: 'Delete Address?',
+            text: 'Are you sure you want to delete this address?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#dc2626'
+        }).then((result) => {
 
-            <div class="default-check">
-                <input type="checkbox" id="isDefault" name="isDefault">
-                <label for="isDefault">Make this my default address</label>
-            </div>
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
 
-            <div class="modal-actions">
-                <button type="button" class="btn-cancel" id="btnCancel">Cancel</button>
-                <button type="submit" class="btn-save">Save Address</button>
-            </div>
-        </form>
-    </div>
-</div>
+        });
+
+    });
+
+});
+</script>

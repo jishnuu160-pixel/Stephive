@@ -1,0 +1,110 @@
+
+<div class="customers-page">
+    <div class="table-card">
+        <header class="card-header">
+            <h1 class="page-title">Add New Brand</h1>
+        </header>
+
+        <main class="form-wrapper" style="padding: 20px;">
+            <form action="/admin/brands/add" method="POST" id="brandForm">
+  
+                <div class="form-group">
+                    <label>Brand Name</label>
+                    <input type="text" name="name" class="form-control" >
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" class="form-control"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Brand Logo</label>
+                    <div class="image-preview-container" id="previewContainer" style="margin-bottom: 10px;">
+                        <img id="imagePreview" src="" style="max-width: 200px; border: 1px solid #ddd; display: none;">
+                        <button type="button" id="removeImageBtn" class="btn btn-danger" 
+                                style="margin-top: 5px; color: red; background: none; border: none; cursor: pointer; display: none;">
+                            Remove Image
+                        </button>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*" class="form-control">
+                    <input type="hidden" name="croppedImage" id="croppedImageData">
+                </div>
+
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="background: #0f172a; color: white; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer;">
+                        Add Brand
+                    </button>
+                    <a href="/admin/brands" class="btn btn-secondary" style="margin-left: 10px; color: #64748b; text-decoration: none;">Cancel</a>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<div id="cropperModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; overflow-y:auto;">
+    <div style="background: white; width: 90%; max-width: 600px; margin: 50px auto; padding: 20px; border-radius: 8px;">
+        <img id="cropperImage" style="max-width: 100%;">
+        <button type="button" id="cropSaveBtn" class="btn btn-primary" style="width: 100%; padding: 10px; margin-top: 15px; background: #0f172a; color: white; border: none; cursor: pointer;">Crop & Save</button>
+    </div>
+</div>
+
+<div id="toastMessage" style="display:none; position:fixed; bottom: 20px; right: 20px; background: #ef4444; color: white; padding: 12px 24px; border-radius: 6px; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <span id="toastText"></span>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const cropperImage = document.getElementById('cropperImage');
+    const modal = document.getElementById('cropperModal');
+    const imagePreview = document.getElementById('imagePreview');
+    const croppedImageData = document.getElementById('croppedImageData');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+    let cropper;
+
+    function showToast(message, isError = true) {
+        const toast = document.getElementById('toastMessage');
+        const toastText = document.getElementById('toastText');
+        toastText.innerText = message;
+        toast.style.backgroundColor = isError ? '#ef4444' : '#22c55e';
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+            showToast("Please select a valid image (JPEG, PNG, or WEBP)");
+            imageInput.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            cropperImage.src = event.target.result;
+            modal.style.display = 'block';
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(cropperImage, { aspectRatio: 1, viewMode: 1 });
+        };
+        reader.readAsDataURL(file);
+    });
+
+    document.getElementById('cropSaveBtn').addEventListener('click', () => {
+        const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+        const dataURL = canvas.toDataURL('image/jpeg');
+        imagePreview.src = dataURL;
+        imagePreview.style.display = 'block';
+        croppedImageData.value = dataURL;
+        removeImageBtn.style.display = 'block';
+        modal.style.display = 'none';
+        cropper.destroy();
+    });
+
+    removeImageBtn.addEventListener('click', () => {
+        imagePreview.src = '';
+        imagePreview.style.display = 'none';
+        removeImageBtn.style.display = 'none';
+        imageInput.value = '';
+        croppedImageData.value = '';
+    });
+</script>

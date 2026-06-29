@@ -1,0 +1,382 @@
+<section class="product-details-container">
+  
+  <nav class="details-breadcrumb">
+    <a href="/shop">Shop</a> / 
+    <span>{{product.productName}}</span>
+  </nav>
+
+  <div class="main-product-layout">
+
+    <div class="product-gallery-block" >
+
+        <div class="thumbnail-strip" id="thumbnailStrip">
+            {{#each product.variants.[0].images}}
+            <div class="thumb-frame {{#if @first}}active-thumb{{/if}}"onclick="changeMainImage('{{this}}', this)" >
+                <img src="{{this}}" alt="{{../product.productName}}">
+            </div>
+            {{/each}}
+        </div>
+
+        <div class="hero-image-wrapper" style="flex: 1; position: relative;">
+
+            <button class="wishlist-trigger" type="button" aria-label="Add to Wishlist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </button>
+
+            <div class="product-card">
+    {{#if product.variants.[0].images.[0]}}
+    <div class="zoom-container">
+        <img id="mainProductImage" 
+             class="zoom-image" 
+             src="{{product.variants.[0].images.[0]}}" 
+             data-zoom="{{product.variants.[0].images.[0]}}" 
+             crossorigin="anonymous" 
+             alt="{{product.productName}}">
+    </div>
+    <div class="detail-zoom-pane"></div>
+    {{else}}
+    <div class="no-image-fallback">No Product Image Available</div>
+    {{/if}}
+</div>
+
+        </div>
+
+    </div>
+
+    <div class="product-configurator-block">
+      <h1 class="item-title">
+        {{#if product.productName}}{{product.productName}}{{else}}StepHive Premium Sneaker{{/if}}
+      </h1>
+      <p class="item-tagline">• Brand: {{product.brand}}</p>
+      
+      <div class="rating-row">
+        <span class="stars">★★★★★</span>
+        <span class="review-count">(124 Reviews)</span>
+      </div>
+
+      <div class="pricing-row">
+        <h2 class="current-price">
+          ₹{{#if product.salePrice}}{{product.salePrice}}{{else}}{{product.regularPrice}}{{/if}}
+        </h2>
+        {{#if product.salePrice}}
+          <span class="slashed-price">₹{{product.regularPrice}}</span>
+          <span class="discount-pill">SAVE {{#if product.discountPercentage}}{{product.discountPercentage}}{{else}}12{{/if}}% OFF</span>
+        {{/if}}
+      </div>
+
+      {{#if product.variants}}
+      <div class="config-group">
+        <span class="config-label">COLOR: <strong id="selectedColorLabel">{{product.variants.[0].colorName}}</strong></span>
+        <div class="color-swatch-flex">
+          {{#each product.variants}}
+          <button 
+            type="button" 
+            class="swatch-circle {{#if @first}}active-swatch{{/if}}" 
+            style="background-color: {{this.colorHex}}; background-image: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(0,0,0,0.1));"
+            onclick="updateSelectedColor('{{this.colorName}}', '{{this._id}}', {{@index}}, this)">
+          </button>
+          {{/each}}
+          
+        </div>
+      </div>
+      {{/if}}
+
+    <div class="config-group">
+  <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
+  <div class="size-chips-grid" id="sizeChipsGrid">
+  {{#each product.variants.[0].sizes}}
+    <div class="size-container" style="display: flex; flex-direction: column; align-items: center;">
+      
+      <button 
+        type="button" 
+        class="size-chip {{#if (eq this.stock 0)}}out-of-stock{{/if}}" 
+        {{#if (eq this.stock 0)}}disabled{{/if}}
+        onclick="updateSelectedSize('{{this.size}}', this)">
+        {{this.size}}
+      </button>
+
+     
+
+    </div>
+     <div class="stock-status">
+        {{#if (eq this.stock 0)}}
+          <small class="sold-out">(Sold Out)</small>
+        {{else if (lt this.stock 5)}}
+          <small class="low-stock">(Only {{this.stock}} left)</small>
+        {{/if}}
+      </div>
+  {{/each}}
+</div>
+</div>
+
+      <div class="purchase-action-matrix">
+        <div class="quantity-stepper">
+          <button type="button" onclick="updateQty(-1)">-</button>
+          <input type="text" id="purchaseQty" value="1" readonly>
+          <button type="button" onclick="updateQty(1)">+</button>
+        </div>
+        
+        <button type="button" class="btn-secondary-cart" onclick="addToCart('{{product._id}}')">
+          <img class="nav-icons" src="/icons/cart.png">
+          Add to Cart
+        </button>
+        
+        <button type="button" class="btn-primary-buy">
+          <img class="nav-icons" src="/icons/shopping-bag.png">
+          Buy Now
+          </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="product-specs-tabs">
+    <div class="tabs-header-strip">
+      <button type="button" class="tab-trigger active-tab" onclick="switchProductTab(event, 'tab-specs')">Specifications</button>
+      <button type="button" class="tab-trigger" onclick="switchProductTab(event, 'tab-description')">Description</button>
+      <button type="button" class="tab-trigger" onclick="switchProductTab(event, 'tab-reviews')">Reviews (124)</button>
+    </div>
+    
+    <div id="tab-specs" class="tab-viewport-panel main-tab-content-panel" style="display: block;">
+      <table class="specs-table">
+        <tr><td>Material</td><td>{{#if product.material}}{{product.material}}{{else}}Premium Leather{{/if}}</td></tr>
+        <tr><td>Sole Type</td><td>{{product.soleType}}</td></tr>
+        <tr><td>Closure Type</td><td>{{product.closureType}}</td></tr>
+        <tr><td>Weight</td><td>{{product.weight}}g</td></tr>
+        <tr><td>Country of Origin</td><td>{{product.countryOfOrigin}}</td></tr>
+      </table>
+    </div>
+
+    <div id="tab-description" class="tab-viewport-panel main-tab-content-panel" style="display: none;">
+      <div class="product-raw-description" style="line-height: 1.7; color: #475569; font-size: 15px; padding: 5px 0;">
+         <p>{{#if product.description}}{{product.description}}{{else}}No description breakdown available for this model variant.{{/if}}</p>
+      </div>
+    </div>
+
+    <div id="tab-reviews" class="tab-viewport-panel main-tab-content-panel" style="display: none;">
+      <div class="product-reviews-box" style="color: #475569; font-size: 14px;">
+         <p>Customer review listings and platform evaluation logs will load asynchronously inside this container pane.</p>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+
+<section class="related-products-section">
+    <div class="related-header">
+        <h2 class="related-title">Related Products</h2>
+        <a href="/shop" class="view-all-related">View All ></a>
+    </div>
+
+    <div class="related-products-grid">
+        {{#if relatedProducts.length}}
+            {{#each relatedProducts}}
+            <a href="/details/{{this._id}}" class="related-product-card">
+                <div class="related-image-wrapper">
+                    {{#if this.variants.[0].images.[0]}}
+                        <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
+                    {{else}}
+                        <div class="related-no-image">No Image</div>
+                    {{/if}}
+                    
+                    {{#if this.salePrice}}
+                        <span class="related-discount-badge">SALE</span>
+                    {{/if}}
+                </div>
+
+                <div class="related-card-content">
+                    <h3 class="related-product-name">{{this.productName}}</h3>
+                    <p class="related-product-description">{{this.description}}</p>
+                    
+                    <div class="related-price-row">
+                        {{#if this.salePrice}}
+                            <span class="related-sale-price">₹{{this.salePrice}}</span>
+                            <span class="related-original-price">₹{{this.regularPrice}}</span>
+                        {{else}}
+                            <span class="related-sale-price">₹{{this.regularPrice}}</span>
+                        {{/if}}
+                    </div>
+                </div>
+            </a>
+            {{/each}}
+        {{else}}
+            <p style="padding: 20px; text-align: center; color: #64748b;">
+                No related products available right now.
+            </p>
+        {{/if}}
+    </div>
+</section>
+
+
+<script>
+    let drift;
+    let chosenSize = null;
+    let chosenColor = "{{lookup (lookup product.variants 0) 'colorName'}}";
+    let activeVariantId = "{{lookup (lookup product.variants 0) '_id'}}";
+
+    const globalVariants = [
+        {{#each product.variants}}
+        {
+            _id: "{{this._id}}",
+            colorName: "{{this.colorName}}",
+            images: [{{#each this.images}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}],
+            sizes: [{{#each this.sizes}}{ size: "{{this.size}}" }{{#unless @last}},{{/unless}}{{/each}}]
+        }{{#unless @last}},{{/unless}}
+        {{/each}}
+    ];
+
+    function initDrift() {
+        const mainImg = document.querySelector('.zoom-image');
+        const paneContainer = document.querySelector('.detail-zoom-pane');
+        
+        if (drift) drift.destroy(); 
+
+        if (mainImg && paneContainer) {
+            drift = new Drift(mainImg, {
+                paneContainer: paneContainer,
+                inlinePane: false,
+                zoomFactor: 3,
+                hoverBoundingBox: true
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initDrift);
+
+    function changeMainImage(src, element) {
+        const mainImage = document.getElementById('mainProductImage');
+        if (mainImage) {
+            mainImage.src = src;
+            mainImage.setAttribute('data-zoom', src);
+            
+            setTimeout(initDrift, 100); 
+        }
+
+        document.querySelectorAll('.thumb-frame').forEach(item => item.classList.remove('active-thumb'));
+        if (element) element.classList.add('active-thumb');
+    }
+
+    function updateSelectedColor(colorName, variantId, variantIndex, buttonElement) {
+        chosenColor = colorName;
+        activeVariantId = variantId;
+        chosenSize = null;
+        
+        document.getElementById("selectedSizeIndicator").innerText = "SELECT A SIZE";
+        document.getElementById("selectedColorLabel").innerText = colorName;
+        
+        document.querySelectorAll('.swatch-circle').forEach(el => el.classList.remove('active-swatch'));
+        buttonElement.classList.add('active-swatch');
+
+        const activeVariant = globalVariants[variantIndex];
+        if (!activeVariant) return;
+
+        const mainImg = document.getElementById('mainProductImage');
+        if (mainImg && activeVariant.images.length > 0) {
+            const newSrc = activeVariant.images[0];
+            mainImg.src = newSrc;
+            mainImg.setAttribute('data-zoom', newSrc);
+            
+            setTimeout(initDrift, 100); 
+        }
+
+        const thumbStrip = document.getElementById('thumbnailStrip');
+        thumbStrip.innerHTML = '';
+        activeVariant.images.forEach((imgName, index) => {
+            const thumbFrame = document.createElement('div');
+            thumbFrame.className = `thumb-frame ${index === 0 ? 'active-thumb' : ''}`;
+            thumbFrame.onclick = () => changeMainImage(imgName, thumbFrame);
+            thumbFrame.innerHTML = `<img src="${imgName}" alt="${colorName}">`;
+            thumbStrip.appendChild(thumbFrame);
+        });
+
+const sizeChipsGrid = document.getElementById('sizeChipsGrid');
+sizeChipsGrid.innerHTML = ''; 
+activeVariant.sizes.forEach(sizeObj => {
+    const isOutOfStock = sizeObj.stock === 0;
+    const isLowStock = sizeObj.stock > 0 && sizeObj.stock < 5;
+
+    const container = document.createElement('div');
+    container.className = 'size-container';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+
+    const sizeButton = document.createElement('button');
+    sizeButton.type = "button";
+    sizeButton.className = `size-chip ${isOutOfStock ? 'out-of-stock' : ''}`;
+    sizeButton.disabled = isOutOfStock;
+    sizeButton.innerText = sizeObj.size;
+    sizeButton.onclick = () => updateSelectedSize(sizeObj.size, sizeButton);
+
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'stock-status';
+    if (isOutOfStock) {
+        statusDiv.innerHTML = '<small>(Sold Out)</small>';
+    } else if (isLowStock) {
+        statusDiv.innerHTML = `<small>(Only ${sizeObj.stock} left)</small>`;
+    }
+
+    container.appendChild(sizeButton);
+    container.appendChild(statusDiv);
+    
+    sizeChipsGrid.appendChild(container);
+});
+    }
+
+    function updateSelectedSize(sizeValue, buttonElement) {
+        chosenSize = sizeValue;
+        document.getElementById("selectedSizeIndicator").innerText = sizeValue;
+        document.querySelectorAll('.size-chip').forEach(el => el.classList.remove('active-size'));
+        buttonElement.classList.add('active-size');
+    }
+
+    function updateQty(change) {
+        const qtyInput = document.getElementById("purchaseQty");
+        let qty = parseInt(qtyInput.value) || 1;
+        qty += change;
+        if (qty < 1) qty = 1;
+        if (qty > 5) return showToast("Max 5 units allowed.", "error");
+        qtyInput.value = qty;
+    }
+
+    async function addToCart(productId) {
+        if (!chosenSize) return showToast("Please select a size", "error");
+        try {
+            const response = await fetch('/user/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, variantId: activeVariantId, size: chosenSize, color: chosenColor, quantity: document.getElementById("purchaseQty").value })
+            });
+
+
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+            showToast("Added to cart successfully");
+            if (window.updateGlobalCartCount) window.updateGlobalCartCount(data.globalCartCount);
+            
+        } catch (error) {
+            showToast(error.message || "Connection failed", "error");
+        }
+    }
+
+    function switchProductTab(event, targetTabId) {
+        document.querySelectorAll('.main-tab-content-panel').forEach(p => p.style.display = 'none');
+        document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active-tab'));
+        document.getElementById(targetTabId).style.display = 'block';
+        event.currentTarget.classList.add('active-tab');
+    }
+
+    function showToast(message, type = "success") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add("show"), 100);
+        setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 2500);
+    }
+</script>

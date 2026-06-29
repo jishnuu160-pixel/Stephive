@@ -240,3 +240,10 @@
      width: 12px;
      
 }
+
+.crop-modal-overlay{
+    width: 300px;
+    height: 200px;
+}
+
+

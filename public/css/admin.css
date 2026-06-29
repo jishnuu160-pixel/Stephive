@@ -1,55 +1,133 @@
-/* --- Root Layout for the Green Frame --- */
-body.login-page {
+/* ==========================================================================
+   🧱 GLOBAL RESETS & NATURAL PAGE FLOW SKELETON
+   ========================================================================== */
+html, body {
     margin: 0;
-    
-    height: 100vh;
+    padding: 0;
+    min-height: 100vh; /* Keeps page at least full height, but allows endless growing */
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: auto;   /* 🚀 UNLOCKS THE MAIN WINDOW SCROLLBAR */
+    background-color: #f8fafc;
+    font-family: 'Poppins', sans-serif;
     display: flex;
+    flex-direction: column; /* Stacks Header -> Content Wrapper -> Footer */
+}
+
+/* ==========================================================================
+   🧭 100% FULL-WIDTH TOP HEADER BAR
+   ========================================================================== */
+.admin-top-bar {
+    width: 100%;
+    height: 65px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    padding: 0 20px;
+    border-bottom: 1px solid #eef2f6;
+    flex-shrink: 0;
     box-sizing: border-box;
 }
 
+/* ==========================================================================
+   🧱 MASTER MID-SECTION WORKSPACE WRAPPER
+   ========================================================================== */
+.admin-wrapper {
+    display: flex;
+    width: 100%;
+    flex-grow: 1;      /* Naturally stretches down based on inner content size */
+    position: relative;
+}
+
+/* ==========================================================================
+   🧭 ANCHORED NAVIGATION SIDEBAR PANEL
+   ========================================================================== */
+.sidebar-admin {
+    width: 220px;
+    min-height: 100%; 
+    background: #fff;
+    border-right: 1px solid #eef2f6;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px; 
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   💻 INTERFACE CONTENT AREA COLUMN TRACK
+   ========================================================================== */
+.main-content-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   📥 THE MAIN CORE ENVIRONMENT DYNAMIC CANVAS
+   ========================================================================== */
+.customers-page, 
+.admin-main-content, 
+.page-content {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    margin: 0 !important;
+    /* 🚀 NO LONGER HAS INTERNAL SCROLLING! It grows naturally to display all table rows */
+    overflow: visible !important; 
+}
+
+/* ==========================================================================
+   ⚓ NATURAL FULL-WIDTH DOCUMENT FOOTER PANEL
+   ========================================================================== */
+.admin-footer {
+    width: 100%;
+    padding: 18px 30px;
+    text-align: center;
+    background: #0b1220;
+    border-top: 1px solid #eef2f6;
+    color: #94a3b8;
+    font-size: 13px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    margin-top: auto; /* 🚀 Pushes the footer to the bottom if the content is short */
+}
+
+
+/* ==========================================================================
+   🔑 ADMIN LOG-IN PORTAL LAYER (Only active on login views)
+   ========================================================================== */
+body.login-page {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    box-sizing: border-box;
+    overflow: auto; 
+}
 
 .login-section {
-    /* 🟢 Take up the full width and height of the browser window */
     width: 100%;
     height: 100vh; 
     margin: 0;
-    
-    /* 🟢 The Centering Magic */
     display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center;     /* Centers vertically */
-
-    /* 🟢 Ensure the background covers everything */
+    justify-content: center; 
+    align-items: center;     
     background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%),
                 url('/images/admin-bg.jpg') no-repeat center center;
     background-size: cover;
 }
 
-/* Ensure the body doesn't have default spacing that pushes the section */
-body {
-    margin: 0;
-    padding: 0;
-}
-
-/* --- The Dark Background Area --- */
-.admin-wrapper {
-   width: 100%;
-   height: 100%;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px; /* Slight rounding where green meets dark */
-    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%),
-                url('/images/admin-bg.jpg') no-repeat center center/cover;
-    overflow: hidden;
-}
-
-/* --- The Login Card --- */
 .login-card {
     width: 100%;
     max-width: 300px;
-    background-color: #e5e5e5; /* The light gray card */
+    background-color: #e5e5e5; 
     padding: 55px 30px;
-    border-radius: 25px; /* Very high radius for that smooth look */
+    border-radius: 25px; 
     box-shadow: 0 15px 40px rgba(0,0,0,0.4);
     text-align: center;
 }
@@ -67,7 +145,6 @@ body {
     margin-bottom: 10px;
 }
 
-/* --- Gray-on-Gray Inputs --- */
 .form-group {
     text-align: left;
     margin-bottom: 18px;
@@ -87,21 +164,19 @@ body {
     width: 100%;
     box-sizing: border-box;
     height: 35px;
-    padding:0px 25px 0 18px;
+    padding: 0 25px 0 18px;
     border-radius: 14px;
     border: none;
-    background-color: #bcbcbc; /* Darker gray inside light gray card */
+    background-color: #bcbcbc; 
     font-size: 13px;
-    margin-bottom: 20px;
     color: #000;
     outline: none;
 }
 
-.form-group input::placeholder {
-    color: #666;
+.form-group input::placeholder { 
+    color: #666; 
 }
 
-/* --- Password Eye Container --- */
 .password-box {
     position: relative;
     width: 100%;
@@ -112,13 +187,13 @@ body {
 .eye {
     position: absolute;
     right: 15px;
-    top: 20%;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
     color: rgba(0,0,0,0.3);
     font-size: 12px;
 }
 
-/* --- The Sign In Button --- */
 .login-btn {
     width: 100%;
     padding: 13px;
@@ -132,15 +207,357 @@ body {
     margin-top: 10px;
     transition: opacity 0.2s;
 }
-
-.login-btn:hover {
-    opacity: 0.9;
+.login-btn:hover { 
+    opacity: 0.9; 
 }
 
-/* Error Message */
 .error-msg {
     color: #d93025;
     font-size: 12px;
     margin-bottom: 15px;
     font-weight: 600;
+}
+
+
+
+.brand-name {
+    padding: 25px 30px;
+    font-size: 24px;
+    font-weight: 900;
+    color: #000;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 30px;
+    text-decoration: none;
+    color: #8e95a1; 
+    gap: 15px;
+    font-size: 13px;
+}
+
+.nav-link.active {
+    background: hsl(143, 35%, 29%);
+    color: #ffffff;
+    border-radius: 2px;
+}
+
+.nav-spacer {
+    height: 1px;
+    background: #f1f3f5;
+    margin: 20px 30px;
+}
+
+
+
+
+.page-title {
+    padding-left:70px ;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.top-bar-left { 
+    flex: 1; 
+}
+
+.search-wrapper {
+    position: relative; 
+    width: 100%;
+    max-width: 270px;
+    margin-left: auto; 
+    margin-right: 20px; 
+}
+
+.search-wrapper input {
+    width: 100%; 
+    background: #f8fafc;
+    border: 1px solid #e2e8f0; 
+    padding: 10px 15px 10px 40px; 
+    border-radius: 10px;
+    font-size: 13px;
+    outline: none;
+}
+
+.search-wrapper .fa-search {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 5;
+    transition: color 0.2s;
+}
+
+.top-bar-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    gap: 15px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.profile-box {
+    padding-left: 15px;
+    border-left: 1px solid #eee;
+}
+
+.admin-photo {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+
+.page-header-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.card-header {
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 12px;
+}
+
+/* Metric Dash Display Spacers Layout UI */
+.stats-container {
+    display: flex; 
+    padding: 5px;
+    justify-content: flex-start; 
+    gap: 10px;
+    width: 100%;
+    margin-top: 0px; 
+    margin-bottom: 15px;
+}
+
+.stat-card {
+    width: 230px; 
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.stat-icon {
+    width: 35px; 
+    height: 35px;
+    border-radius: 8px;
+    flex-shrink: 0; 
+    font-size: 14px;
+}
+
+.stat-details p {
+    font-size: 11px; 
+    margin: 0;
+    white-space: nowrap; 
+}
+
+.stat-details h3 {
+    font-size: 18px; 
+    margin: 0;
+    font-weight: 700;
+}
+
+/* --- Core Management Tables Frame --- */
+.table-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eef2f6;
+    max-width: 100%;
+   
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    padding: 15px;
+    border-spacing: 0 5px;
+    font-size: 14px;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 10px;
+    background: #f9fafb;
+    color: #6b7280;
+    font-size: 14px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.admin-table td {
+    padding: 10px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 12px;
+}
+
+/* ==========================================================================
+   🎮 CONTROL BUTTONS UI MATRIX
+   ========================================================================== */
+.btn-action {
+    padding: 4px 12px;
+    font-size: 11px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #e2e8f0;
+    background: rgba(97, 111, 210, 0.493);
+}
+
+.btn-block { 
+    color: #ef4444; 
+}
+.btn-block:hover { 
+    background: #ef4444; 
+    color: white; 
+}
+
+.btn-cat {
+    background-color: rgb(255, 208, 0);
+    text-decoration: none;
+    margin: 10px;
+    font-size: 8px;
+    color: #ffffff;
+    border-style: none;
+    padding: 5px;
+    border-radius: 15px;
+}
+.btn-cat:hover { 
+    background-color: rgb(243, 168, 6); 
+    color: #ffffff; 
+}
+
+.btn-unlist-small {
+   background-color: rgb(225, 120, 120);
+   color: rgb(235, 15, 15);
+   font-size: 10px;
+   padding: 2px 10px;
+   border-style: none;
+   border-radius: 12px;
+}
+
+.btn-edit-small {
+    text-decoration: none;
+    background-color: rgb(120, 151, 225);
+    color: rgb(15, 55, 235);
+    font-size: 10px;
+    padding: 2px 12px;
+    border-style: none;
+    border-radius: 12px;
+}
+
+/* ==========================================================================
+   🧭 NAVIGATION CONTROLS & PAGINATION
+   ========================================================================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 15px;
+}
+
+.page-link {
+    padding: 2px 8px;
+    background-color: #f1f5f9;
+    color: #334155;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.2s;
+    border: 1px solid #e2e8f0;
+}
+.page-link:hover { 
+    background-color: #e2e8f0; 
+}
+
+.page-info {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+
+
+/* ==========================================================================
+   ✨ SYSTEM DIALOGS, ALERTS, & TOAST FLOATING MODULES
+   ========================================================================== */
+.small-popup { border-radius: 10px !important; }
+.small-swal-popup { font-size: 0.8rem !important; border-radius: 12px !important; }
+.swal2-icon { width: 3.5em !important; height: 3.5em !important; margin: 0.5em auto !important; }
+.small-swal-title { font-size: 1.2rem !important; padding: 0 !important; margin-bottom: 5px !important; }
+.swal2-actions { margin-top: 10px !important; }
+
+.admin-toast-container {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    z-index: 9999; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; 
+}
+
+.toast {
+    pointer-events: auto; 
+    min-width: 280px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.success { background: linear-gradient(135deg, #28a745, #218838); border-left: 5px solid #1e7e34; }
+.toast.error { background: linear-gradient(135deg, #dc3545, #c82333); border-left: 5px solid #bd2130; }
+
+@keyframes toastSlideIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.toastify {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 10000 !important;
+    padding: 12px 24px !important;
+    max-width: 300px !important;
 }

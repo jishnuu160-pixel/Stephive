@@ -1,0 +1,718 @@
+<div class="customers-page">
+    <div class="table-card">
+
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>Add Product</h2>
+            <a href="/admin/products" class="btn-modal-cancel">✕</a>
+        </div>
+
+        <form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="modal-form-body">
+
+            <div class="form-row split-row4">
+                <div class="form-group">
+                    <label>Shoe Name</label>
+                    <input type="text" name="productName" placeholder="Curv Shoe" >
+                    <small class="field-error"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Brand</label>
+                    <input type="text" name="brand" placeholder="Curv">
+                    <small class="field-error"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Base Price</label>
+                    <input type="number" name="regularPrice" placeholder="5999">
+                    <small class="field-error"></small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" name="description" placeholder="Comfortable everyday sneaker">
+                <small class="field-error"></small>
+            </div>
+
+            <div class="form-row split-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Parent Category (e.g. Men, Women)</label>
+                   <select id="parentCategorySelect" name="parentCategory">
+                     <option value="">Select Parent Category</option>
+                       {{#each parentCategories}}
+                     <option value="{{this._id}}">
+                        {{this.name}}
+                     </option>
+                        {{/each}}
+                   </select>
+                   <small class="field-error"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Category Name (Subcategory)</label>
+                    <select id="subcategorySelect" name="category">
+                     <option value="">Select Subcategory</option>
+                    </select>
+                    <small class="field-error"></small>
+                </div>
+            </div>
+
+            <div class="variants-section">
+                <label class="section-main-label">Variants</label>
+
+                <div id="variantsContainer" class="variants-grid-wrapper"></div>
+
+                <button type="button" class="btn-add-variant-group" onclick="addColorVariantBlock()">
+                    + Add another color variant
+                </button>
+            </div>
+
+            <div class="form-row split-row4">
+                <div class="form-group">
+                    <label>Material</label>
+                    <input type="text" name="material" placeholder="Leather">
+                    <small class="field-error"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Closure Type</label>
+                    <input type="text" name="closureType" placeholder="Lace up">
+                    <small class="field-error"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Sole Type</label>
+                    <input type="text" name="soleType" placeholder="Rubber">
+                    <small class="field-error"></small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Weight</label>
+                    <input type="text" name="weight" placeholder="300g">
+                    <small class="field-error"></small>
+                </div>
+            </div>
+
+            <div class="form-row split-row4">
+                <div class="form-group">
+                    <label>Country of Origin</label>
+                    <input type="text" name="countryOfOrigin" placeholder="India">
+                    <small class="field-error"></small>
+                </div>
+            </div>
+
+            <div class="modal-action-footer">
+                <a href="/admin/products" class="btn-modal-cancel">Cancel</a>
+                <button type="submit" class="btn-modal-save">Save</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<div id="variantTemplate" style="display:none;">
+    <div class="variant-card" data-variant-index="0">
+        <hr style="border: 1px dashed #ccc; margin: 20px 0;">
+        
+        <div class="form-group">
+            <label>Color Name</label>
+            <input type="text" name="colorNames[]" placeholder="Color Name">
+
+            <div class="color-picker" style="margin-top: 10px;">
+                <input type="color" name="colorHex[]">
+                <span class="label"></span>
+                <input type="hidden" name="colorName[]" class="color-name">
+            </div>
+        </div>
+
+        <div class="sizes-container" style="margin-top: 15px;">
+            <label>Sizes & Stock</label>
+           <div class="size-row">
+    <div>
+        <input type="number" name="sizes_0[]" placeholder="Size">
+        <small class="field-error"></small>
+    </div>
+
+    <div>
+        <input type="number" name="stocks_0[]" placeholder="Stock">
+        <small class="field-error"></small>
+    </div>
+
+    <button type="button" class="remove-size">X</button>
+</div>
+            <button type="button" class="add-size" style="margin-top: 5px;">+ Add size</button>
+        </div>
+
+        <div class="form-group variant-images-section" style="margin-top: 20px;">
+            <label>Variant Images (Upload unique photos for this color)</label>
+            
+            <div class="image-drag-dropzone upload-box-variant">
+                <input 
+                    type="file" 
+                    name="variantImages_placeholder" 
+                    class="variant-image-input"
+                    data-index="0"
+                    multiple 
+                    accept="image/*" 
+                    style="display:none"
+                >
+                <div class="dropzone-inner-ui">
+                    <div class="camera-icon">📷</div>
+                    <p class="main-drop-text">Click to upload color specific images</p>
+                    <p class="sub-drop-text">JPG, PNG up to 2MB</p>
+                </div>
+            </div>
+            <div class="cropped-files-container" id="croppedFilesContainer_0"></div>
+            <div class="images-preview-gallery-variant" id="thumbnailsContainer_0" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+             <small class="field-error image-error"></small>
+        </div>
+
+        <button type="button" class="remove-variant" style="margin-top: 15px; background-color: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+            Remove Variant
+        </button>
+    </div>
+</div>
+
+
+<div id="cropperModal" class="cropper-modal-container" style="display: none;">
+    <div class="cropper-wrapper">
+        <h3>Crop Variant Image</h3>
+        <div class="image-preview-box">
+            <img id="cropperTargetImage" src="" alt="Target Crop" style="max-width: 100%; max-height: 100%; display: block;">
+        </div>
+        <div class="cropper-actions">
+            <button type="button" id="btnCancelCrop" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="btnSaveCrop" class="btn btn-primary">Crop & Save</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+let variantCounter = 0;
+let variantFilesMap = {};
+
+document.getElementById("parentCategorySelect").addEventListener("change", async function () {
+   const parentId = this.value;
+   const subSelect = document.getElementById("subcategorySelect");
+   subSelect.innerHTML = `<option value="">Loading...</option>`;
+
+   if (!parentId) {
+      subSelect.innerHTML = `<option value="">Select Subcategory</option>`;
+      return;
+   }
+
+   const res = await fetch(`/admin/categories/${parentId}/subcategories`);
+   const data = await res.json();
+
+   subSelect.innerHTML = `<option value="">Select Subcategory</option>`;
+   data.subcategories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat._id;
+      option.textContent = cat.name;
+      subSelect.appendChild(option);
+   });
+});
+
+function addColorVariantBlock() {
+    const template = document.querySelector("#variantTemplate .variant-card");
+    const clone = template.cloneNode(true);
+    
+    const currentIndex = variantCounter;
+    clone.setAttribute("data-variant-index", currentIndex);
+    variantFilesMap[currentIndex] = [];
+    
+    clone.querySelector('input[name="sizes_0[]"]').setAttribute("name", `sizes_${currentIndex}[]`);
+    clone.querySelector('input[name="stocks_0[]"]').setAttribute("name", `stocks_${currentIndex}[]`);
+    
+    const fileInput = clone.querySelector('.variant-image-input');
+    fileInput.setAttribute("name", `variantImages_${currentIndex}`);
+    fileInput.setAttribute("data-index", currentIndex);
+
+    clone.querySelector('.cropped-files-container').id = `croppedFilesContainer_${currentIndex}`;
+    clone.querySelector('.images-preview-gallery-variant').id = `thumbnailsContainer_${currentIndex}`;
+
+    document.getElementById("variantsContainer").appendChild(clone);
+    
+    bindColorPickers(clone);
+    bindVariantUploadZone(clone, currentIndex);
+    
+    variantCounter++;
+}
+
+function bindVariantUploadZone(variantCardElement, index) {
+    const uploadBox = variantCardElement.querySelector(".upload-box-variant");
+    uploadBox.addEventListener("click", () => {
+        variantCardElement.querySelector(".variant-image-input").click();
+    });
+}
+
+document.addEventListener("click", function (e) {
+   if (e.target.classList.contains("remove-variant")) {
+      const card = e.target.closest(".variant-card");
+      const index = card.getAttribute("data-variant-index");
+      delete variantFilesMap[index];
+      card.remove();
+   }
+});
+
+document.addEventListener("click", function (e) {
+   if (e.target.classList.contains("add-size")) {
+      const container = e.target.closest(".sizes-container");
+      const card = e.target.closest(".variant-card");
+      const index = card.getAttribute("data-variant-index");
+
+      const newRow = document.createElement("div");
+      newRow.classList.add("size-row");
+      newRow.style.marginTop = "5px";
+
+      newRow.innerHTML = `
+    <div>
+        <input type="number" name="sizes_${index}[]" placeholder="Size">
+        <small class="field-error"></small>
+    </div>
+
+    <div>
+        <input type="number" name="stocks_${index}[]" placeholder="Stock">
+        <small class="field-error"></small>
+    </div>
+
+    <button type="button" class="remove-size">X</button>
+`;
+      container.insertBefore(newRow, e.target);
+   }
+
+   if (e.target.classList.contains("remove-size")) {
+      e.target.parentElement.remove();
+   }
+});
+
+function bindColorPickers(scope = document) {
+   scope.querySelectorAll('.color-picker').forEach(wrapper => {
+      const input = wrapper.querySelector('input[type="color"]');
+      const label = wrapper.querySelector('.label');
+      const hiddenInput = wrapper.querySelector('.color-name');
+
+      function update() {
+         const hex = input.value;
+         label.textContent = hex.toUpperCase();
+         label.style.color = hex;
+         hiddenInput.value = hex;
+      }
+      input.addEventListener('input', update);
+      update();
+   });
+}
+
+let cropper = null;
+let currentFilesQueue = [];
+let currentQueueIndex = 0;
+let currentVariantIndex = null;
+
+const cropperModal = document.getElementById('cropperModal');
+const cropperTargetImage = document.getElementById('cropperTargetImage');
+const btnSaveCrop = document.getElementById('btnSaveCrop');
+const btnCancelCrop = document.getElementById('btnCancelCrop');
+
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.classList.contains('variant-image-input')) {
+        if (!e.target.files || e.target.files.length === 0) return;
+
+        const files = Array.from(e.target.files);
+        const filteredFiles = [];
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+
+        function showToastError(msg) {
+            if (typeof Toastify === "function") {
+                Toastify({
+                    text: msg,
+                    duration: 4000,
+                    gravity: "top",
+                    position: "right",
+                    style: { background: "#ef4444", borderRadius: "8px" }
+                }).showToast();
+            } else {
+                alert(msg);
+            }
+        }
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            if (!file.type.startsWith('image/') || !allowedExtensions.exec(file.name)) {
+                showToastError("Only image formats (JPG, JPEG, PNG, WebP) are allowed.");
+                continue; 
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                showToastError(`"${file.name}" exceeds the maximum 2MB size limit!`);
+                continue;
+            }
+
+            filteredFiles.push(file);
+        }
+
+        e.target.value = "";
+
+        if (filteredFiles.length === 0) return;
+
+        currentVariantIndex = e.target.getAttribute('data-index');
+        currentFilesQueue = filteredFiles;
+        currentQueueIndex = 0;
+
+        openCropperForNextInQueue();
+    }
+});
+
+function openCropperForNextInQueue() {
+    if (currentQueueIndex >= currentFilesQueue.length) {
+        finalizeVariantFilesInput(currentVariantIndex);
+        return;
+    }
+
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+
+    const currentFile = currentFilesQueue[currentQueueIndex];
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        cropperTargetImage.src = event.target.result;
+        cropperModal.style.display = 'flex';
+
+        cropperTargetImage.onload = function() {
+            if (cropper) cropper.destroy();
+
+            cropper = new Cropper(cropperTargetImage, {
+                aspectRatio: 1, 
+                viewMode: 1,     
+                autoCropArea: 0.8, 
+                responsive: true,
+                restore: false
+            });
+        };
+    };
+    reader.readAsDataURL(currentFile);
+}
+
+btnSaveCrop.addEventListener('click', () => {
+    if (!cropper) return;
+
+    const canvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
+
+    canvas.toBlob((blob) => {
+        const originalName = currentFilesQueue[currentQueueIndex].name;
+        const croppedFile = new File([blob], originalName, { type: 'image/jpeg' });
+
+        variantFilesMap[currentVariantIndex].push(croppedFile);
+
+        cropperModal.style.display = 'none';
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+
+        renderVariantImagesGallery(currentVariantIndex);
+
+        currentQueueIndex++;
+        openCropperForNextInQueue();
+    }, 'image/jpeg', 0.9);
+});
+
+function renderVariantImagesGallery(variantIdx) {
+    const thumbContainer = document.getElementById(`thumbnailsContainer_${variantIdx}`);
+    thumbContainer.innerHTML = ""; 
+
+    variantFilesMap[variantIdx].forEach((file, fileIdx) => {
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+        wrapper.style.display = "inline-block";
+        wrapper.style.margin = "10px";
+
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file); 
+        img.style.width = "90px";
+        img.style.height = "90px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "6px";
+
+        const btn = document.createElement("button");
+        btn.innerText = "×";
+        btn.type = "button";
+        btn.style.position = "absolute";
+        btn.style.top = "0";
+        btn.style.right = "0";
+        btn.style.background = "red";
+        btn.style.color = "white";
+        btn.style.border = "none";
+        btn.style.borderRadius = "50%";
+        btn.style.width = "20px";
+        btn.style.height = "20px";
+        btn.style.cursor = "pointer";
+
+        btn.onclick = () => {
+            variantFilesMap[variantIdx].splice(fileIdx, 1);
+            renderVariantImagesGallery(variantIdx);
+            finalizeVariantFilesInput(variantIdx);
+        };
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(btn);
+        thumbContainer.appendChild(wrapper);
+    });
+}
+
+
+function showFieldError(input, message) {
+    input.classList.add("input-error");
+
+    const errorBox = input.parentElement.querySelector(".field-error");
+    if (errorBox) {
+        errorBox.textContent = message;
+    }
+}
+
+function clearFieldError(input) {
+    input.classList.remove("input-error");
+
+    const errorBox = input.parentElement.querySelector(".field-error");
+    if (errorBox) {
+        errorBox.textContent = "";
+    }
+}
+
+
+function finalizeVariantFilesInput(variantIdx) {
+    const hiddenContainer = document.getElementById(`croppedFilesContainer_${variantIdx}`);
+    hiddenContainer.innerHTML = ""; 
+
+    const dataTransfer = new DataTransfer();
+    variantFilesMap[variantIdx].forEach(file => {
+        dataTransfer.items.add(file);
+    });
+
+    const hiddenFileInput = document.createElement('input');
+    hiddenFileInput.type = 'file';
+    hiddenFileInput.name = `variantImages_${variantIdx}`;
+    hiddenFileInput.multiple = true;
+    hiddenFileInput.style.display = 'none';
+    hiddenFileInput.files = dataTransfer.files; 
+    
+    hiddenContainer.appendChild(hiddenFileInput);
+}
+
+btnCancelCrop.addEventListener('click', () => {
+    cropperModal.style.display = 'none';
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+    currentQueueIndex++;
+    openCropperForNextInQueue();
+});
+
+document.querySelector('.modal-form-body').addEventListener('submit', function (e) {
+   e.preventDefault();
+
+   const productName = document.querySelector('[name="productName"]').value.trim();
+   const brand = document.querySelector('[name="brand"]').value.trim();
+   const description = document.querySelector('[name="description"]').value.trim();
+   const parentCategory = document.querySelector('[name="parentCategory"]').value;
+   const category = document.querySelector('[name="category"]').value;
+   const price = document.querySelector('[name="regularPrice"]').value;
+
+   let hasError = false;
+
+const productNameInput = document.querySelector('[name="productName"]');
+const brandInput = document.querySelector('[name="brand"]');
+const descriptionInput = document.querySelector('[name="description"]');
+const parentCategoryInput = document.querySelector('[name="parentCategory"]');
+const categoryInput = document.querySelector('[name="category"]');
+const priceInput = document.querySelector('[name="regularPrice"]');
+const materialInput = document.querySelector('[name="material"]');
+const closureTypeInput = document.querySelector('[name="closureType"]');
+const soleTypeInput = document.querySelector('[name="soleType"]');
+const weightInput = document.querySelector('[name="weight"]');
+const countryInput = document.querySelector('[name="countryOfOrigin"]');
+
+if (!productName) {
+    showFieldError(productNameInput, "Product name is required");
+    hasError = true;
+} else {
+    clearFieldError(productNameInput);
+}
+
+if (!brand) {
+    showFieldError(brandInput, "Brand is required");
+    hasError = true;
+} else {
+    clearFieldError(brandInput);
+}
+
+if (!description) {
+    showFieldError(descriptionInput, "Description is required");
+    hasError = true;
+} else {
+    clearFieldError(descriptionInput);
+}
+
+if (!parentCategory) {
+    showFieldError(parentCategoryInput, "Please select parent category");
+    hasError = true;
+} else {
+    clearFieldError(parentCategoryInput);
+}
+
+if (!category) {
+    showFieldError(categoryInput, "Please select subcategory");
+    hasError = true;
+} else {
+    clearFieldError(categoryInput);
+}
+
+if (!price || Number(price) <= 0) {
+    showFieldError(priceInput, "Enter valid price");
+    hasError = true;
+} else {
+    clearFieldError(priceInput);
+}
+
+
+if (!materialInput.value.trim()) {
+    showFieldError(materialInput, "Material is required");
+    hasError = true;
+} else {
+    clearFieldError(materialInput);
+}
+
+if (!closureTypeInput.value.trim()) {
+    showFieldError(closureTypeInput, "Closure type is required");
+    hasError = true;
+} else {
+    clearFieldError(closureTypeInput);
+}
+
+if (!soleTypeInput.value.trim()) {
+    showFieldError(soleTypeInput, "Sole type is required");
+    hasError = true;
+} else {
+    clearFieldError(soleTypeInput);
+}
+
+if (!weightInput.value.trim()) {
+    showFieldError(weightInput, "Weight is required");
+    hasError = true;
+} else {
+    clearFieldError(weightInput);
+}
+
+if (!countryInput.value.trim()) {
+    showFieldError(countryInput, "Country of origin is required");
+    hasError = true;
+} else {
+    clearFieldError(countryInput);
+}
+
+if (hasError) return;
+   
+   const totalCards = document.querySelectorAll('#variantsContainer .variant-card');
+   if (totalCards.length === 0) {
+       return showValidationError("Please add at least one color variant configuration");
+   }
+
+   let validationPassed = true;
+   let errorMessage = "";
+
+   for (let card of totalCards) {
+       const variantIdx = card.getAttribute('data-variant-index');
+       const colorNameInput = card.querySelector('input[name="colorNames[]"]');
+       const colorTitle = colorNameInput && colorNameInput.value.trim() ? colorNameInput.value.trim() : `Variant #${parseInt(variantIdx) + 1}`;
+
+       const imagesUploaded = variantFilesMap[variantIdx] ? variantFilesMap[variantIdx].length : 0;
+       const imageSection = card.querySelector('.variant-images-section');
+      const imageError = card.querySelector('.image-error');
+
+if (imageError) {
+    imageError.textContent = '';
+
+    if (imagesUploaded < 3) {
+        console.log("IMAGE ERROR TRIGGERED");
+        imageError.textContent = 'Minimum 3 images are required';
+        validationPassed = false;
+    }
+}
+
+
+       const sizeRows = card.querySelectorAll('.sizes-container .size-row');
+       if (sizeRows.length === 0) {
+           validationPassed = false;
+           errorMessage = `Please add at least one Size & Stock option line for "${colorTitle}".`;
+           break;
+       }
+
+       for (let row of sizeRows) {
+   
+const sizeInput = row.querySelector(`input[name^="sizes_"]`);
+const stockInput = row.querySelector(`input[name^="stocks_"]`);
+
+
+const sizeError =
+    sizeInput.parentElement.querySelector(".field-error");
+
+const stockError =
+    stockInput.parentElement.querySelector(".field-error");
+
+
+           const sizeVal = sizeInput ? sizeInput.value.trim() : "";
+           const stockVal = stockInput ? stockInput.value.trim() : "";
+
+
+if (sizeError) sizeError.textContent = "";
+if (stockError) stockError.textContent = "";
+
+sizeInput.classList.remove("input-error");
+stockInput.classList.remove("input-error");
+
+if (sizeVal === "") {
+    showFieldError(sizeInput, "Size is required");
+    validationPassed = false;
+}
+
+if (stockVal === "") {
+    showFieldError(stockInput, "Stock is required");
+    validationPassed = false;
+}
+
+
+
+           if (Number(sizeVal) < 0 || Number(stockVal) < 0) {
+               validationPassed = false;
+               errorMessage = `Size and Stock amounts cannot register as negative inside "${colorTitle}".`;
+               break;
+           }
+           
+           if (sizeInput) sizeInput.style.borderColor = "";
+           if (stockInput) stockInput.style.borderColor = "";
+       }
+
+       if (!validationPassed) break;
+   }
+
+   if (!validationPassed) {
+    return;
+}
+
+   Object.keys(variantFilesMap).forEach(variantIdx => {
+       finalizeVariantFilesInput(variantIdx);
+   });
+
+   this.submit();
+});
+
+bindColorPickers();
+addColorVariantBlock();
+</script>

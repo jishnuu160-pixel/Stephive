@@ -1,57 +1,26 @@
 import * as userService from '../services/userServices.js';
-import * as userRepo from '../repositories/userRepository.js';
-import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
 import { error, profile } from 'console';
-
-const uploadPath=path.join(process.cwd(),'public/uploads/profile_pics');
-
-if(!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadPath); 
-    },
-    filename: (req, file, cb) => {
-        cb(null, `avatar-${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
-
-export const uploadAvatar = multer({ storage: storage });
-
+import { title } from 'process';
 
 export const updateAvatar = async (req, res) => {
-
-   console.log('File Info:',req.file);
-   console.log('Body Info:',req.body);
-
     try {
-        
-        if (!req.file){
-      console.log('No files was found');
-            return res.status(400).json({ success: false });
-        } 
-        const userId = req.session.user.id;
-        const imagePath = `/uploads/profile_pics/${req.file.filename}`;
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No file uploaded" });
+        }
 
-       
+        const cloudinaryUrl = await userService.updateAvatar(req.session.user.id, req.file.buffer);
+        req.session.user.profileImage = cloudinaryUrl;
 
-        await userRepo.updateUserInfo(userId, { profileImage: imagePath });
-
-        req.session.user.profileImage = imagePath;
-
-        req.session.save(() => {
-            res.json({ success: true, imagePath });
+        return res.status(200).json({
+            success: true,
+            message: "Profile image updated successfully"
         });
-    } catch (error) {
-        console.error("Avatar Error:", error);
-        res.status(500).json({ success: false });
+
+    } catch (err) {
+        console.error("Avatar Update Error:", err);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
-
 
 export const getLogin = (req, res) => {
     res.render('user/login', {
@@ -72,7 +41,6 @@ export const postSignup = async (req, res, next) => {
             return res.redirect('/user/signup?error=' + encodeURIComponent("Passwords do not match!"));
         }
 
-        
         const existingEmail= await userRepo.findByEmail(email);
 
         if(existingEmail){
@@ -85,7 +53,6 @@ export const postSignup = async (req, res, next) => {
             return res.redirect('/user/signup?error=' + encodeURIComponent("Phone already registered"));
         }
       
-
         const user = await userService.signup({...req.body,phoneNumber});
 
         req.session.user = {
@@ -132,7 +99,7 @@ export const postLogin = async (req, res) => {
 
         req.session.save((err) => {
             if (err) return next(err);
-            res.redirect('/'); 
+            res.redirect('/shop'); 
         });
     } catch (err) {
        
@@ -152,6 +119,8 @@ export const postForgot = async (req, res) => {
         }
 
         await userService.sendOTP(email);
+
+        
         req.session.otpExpiryTime=Date.now() + 60000;
 
         res.redirect(`/user/verify-otp?email=${email}`);
@@ -179,8 +148,7 @@ export const postVerifyOTP = async (req, res) => {
             res.redirect(`/user/reset-password?email=${email}`);
         }
     } catch (err) {
-        res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${req.body.email}&target=${req.body.target}`);
-    }
+res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${req.body.email}&target=${req.body.target}`);    }
 };
 
 
@@ -274,6 +242,8 @@ export const userLogout = (req, res) => {
 
     req.user = null;
 
+    req.flash("success","Logout successfully");
+
     req.session.save((err) => {
         if (err) console.error("Session save error:", err);
         
@@ -282,17 +252,22 @@ export const userLogout = (req, res) => {
     });
 };
 
+
 export const getProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const user = await userRepo.findById(userId);
+        const user = await userService.getUserById(userId);
 
         if (!user) {
             console.log("User not found in database");
             return res.redirect('/user/login');
         }
 
-        res.render('user/profile', { user, activePage: 'profile' });
+      res.render('user/profile', {
+    user,
+    timestamp: Date.now(),
+    activePage:'profile'
+});
     } catch (error) {
        
         console.error("Profile Error:", error);
@@ -304,7 +279,7 @@ export const getProfile = async (req, res) => {
 export const getAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const user = await userRepo.findById(userId); 
+        const user = await userService.getUserById(userId);
 
         if (user && user.addresses) {
             console.log("Addresses found in DB:", user.addresses.length);
@@ -318,26 +293,70 @@ export const getAddress = async (req, res) => {
     }
 };
 
+export const getAddAddress = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+        const user = await userService.getUserById(userId);
+
+        res.render('user/add-address', {
+            user,
+            timestamp: Date.now(),
+            activePage: 'address'
+        });
+    } catch (error) {
+        res.redirect('/user/address');
+    }
+};
 
 export const postAddAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const addressData = req.body;
 
-        addressData.isDefault = req.body.isDefault === 'on';
+        await userService.addAddress(userId, {
+            ...req.body,
+            isDefault: req.body.isDefault === 'on'
+        });
+        req.flash('success', 'Address added successfully');
+        
+        res.redirect('/user/address');
 
-        const updatedUser = await userRepo.addAddress(userId, addressData);
+    } catch (error) {
 
-        if (!updatedUser) {
-            console.log("Failed to update user in DB");
+        const user = await userService.getUserById(
+            req.session.user.id
+        );
+
+        if (error.validationErrors) {
+
+            const allFieldsEmpty =
+                !req.body.fullName?.trim() &&
+                !req.body.phone?.trim() &&
+                !req.body.street?.trim() &&
+                !req.body.city?.trim() &&
+                !req.body.state?.trim() &&
+                !req.body.pincode?.trim();
+
+            return res.render('user/add-address', {
+                user,
+                activePage: 'address',
+                timestamp: Date.now(),
+                formData: req.body,
+                errors: allFieldsEmpty ? {} : error.validationErrors,
+                error: allFieldsEmpty
+                    ? "All fields are required"
+                    : null
+            });
         }
 
-        req.session.save(() => {
-            res.redirect('/user/address');
+        console.error(error);
+
+        res.render('user/add-address', {
+            user,
+            activePage: 'address',
+            timestamp: Date.now(),
+            formData: req.body,
+            error: error.message || "Something went wrong"
         });
-    } catch (error) {
-        console.error("Post Address Error:", error);
-        res.redirect('/user/address');
     }
 };
 
@@ -346,7 +365,8 @@ export const removeAddress = async (req, res) => {
         const userId = req.session.user.id;
         const addressId = req.params.id; 
         
-        await userRepo.deleteAddress(userId, addressId);
+        await userService.deleteAddress(userId, addressId);
+        req.flash('success',"Address deleted successfully");
         
         res.redirect('/user/address');
     } catch (error) {
@@ -358,36 +378,84 @@ export const postEditAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
         const addressId = req.params.id;
-        const updatedData = { ...req.body };
 
-        updatedData.isDefault = req.body.isDefault === 'on';
+        const updatedData = {
+            ...req.body,
+            isDefault: req.body.isDefault === 'on'
+        };
 
-        await userRepo.updateAddress(userId, addressId, updatedData);
-        
+        await userService.editAddress(userId, addressId, updatedData);
+        req.flash("success", "Address updated Successfully");
         res.redirect('/user/address');
+
     } catch (error) {
+        const user = await userService.getUserById(req.session.user.id);
+
+        const dbAddress = user.addresses.find(addr => addr._id.toString() === req.params.id);
+        
+        const mergedAddress = { ...dbAddress, ...req.body };
+
+        if (error.validationErrors) {
+            return res.render('user/edit-address', {
+                user, 
+                address: mergedAddress, 
+                errors: error.validationErrors,
+                activePage: 'address'
+            });
+        }
+
         console.error("Edit Error:", error);
+        res.render('user/edit-address', {
+            user,
+            address: mergedAddress,
+            error: "Something went wrong",
+            activePage: 'address'
+        });
+    }
+};
+
+export const getEditAddress = async (req, res) => {
+    try {
+        const user = await userService.getUserById(
+            req.session.user.id
+        );
+
+        const address = user.addresses.find(
+            addr => addr._id.toString() === req.params.id
+        );
+
+        if (!address) {
+            return res.redirect('/user/address');
+        }
+
+        res.render('user/edit-address', {
+             user, 
+            address,
+            activePage: 'address',
+            timestamp: Date.now()
+        });
+
+    } catch (error) {
+        console.error(error);
         res.redirect('/user/address');
     }
 };
 
-
 export const postUpdateProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const { fullName, phoneNumber, gender } = req.body;
+        await userService.updateProfile(userId, req.body);
 
-        await userRepo.updateUserInfo(userId, { fullName, phoneNumber, gender });
-
-        req.session.user.fullName = fullName;
-        req.session.user.phoneNumber = phoneNumber;
-        req.session.user.gender = gender;
-
-        req.session.save(() => {
-            res.redirect('/user/profile?success=Profile updated');
-        });
+        req.session.user = { ...req.session.user, ...req.body };
+        req.session.save(() => res.redirect('/user/profile?success=Updated'));
     } catch (error) {
-        res.redirect('/user/profile?error=Update failed');
+        const user = await userService.getUserById(req.session.user.id);
+        
+        res.render('user/edit-profile', { 
+            user: { ...user, ...req.body }, 
+            errors: error.validationErrors,
+            activePage: 'profile'
+        });
     }
 };
 
@@ -395,12 +463,13 @@ export const getEditProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
         
-        const user = await userRepo.findById(userId);
+        const user = await userService.getUserById(userId);
 
         if (!user) return res.redirect('/user/login');
 
         res.render('user/edit-profile', { 
             user,
+            errors:{},
             title: "Edit Profile",
             activePage: 'profile' 
         });
@@ -479,7 +548,7 @@ export const postChangeEmail = async (req, res) => {
             });
         }
 
-        await userRepo.updateUserInfo(userId, { email: sanitizedEmail });
+        await userService.updateUserInfo(userId, { email: sanitizedEmail });
 
         req.session.user.email = sanitizedEmail;
 
@@ -576,4 +645,19 @@ export const googleAuthSuccess = (req, res) => {
         res.redirect('/'); 
     });
 };
+
+
+
+
+export const getAbout = async(req,res)=>{
+    try{
+        res.render('/about',{
+            user:req.session.user
+        })
+    }catch(error){
+        res.redirect('/');
+    }
+}
+
+
 
