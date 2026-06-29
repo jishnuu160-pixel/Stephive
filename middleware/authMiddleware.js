@@ -58,8 +58,7 @@ export const isUserLoggedOut = (req, res, next) => {
     if (req.session && req.session.user) {
         const backURL = req.header('Referer') || '/';
         return res.redirect(backURL);
-    }
-
+    }  
     res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     next();
 };
