@@ -130,3 +130,10 @@ export const clearDefaultAddresses = async (userId) => {
         }
     );
 };
+
+export const clearOTP = async (email) => {
+    return await User.updateOne(
+        { email: email },
+        { $unset: { otp: "", otpExpiry: "" } }
+    );
+};
