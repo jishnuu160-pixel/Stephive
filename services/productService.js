@@ -54,10 +54,13 @@ const validateUploadedFile = (file) => {
 
 /* ---------------- SHOP PAGE ---------------- */
 
-export const getShopProducts = async (req, genderFilter = null) => {
+export const getShopProducts = async (req) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 8;
+        const skip = (page - 1) * limit;
+
         const allCategories = await findAllCategories();
-        
         const activeCategoryObjectIds = allCategories
             .filter(cat => !cat.isUnlisted)
             .map(cat => new mongoose.Types.ObjectId(cat._id));
@@ -67,22 +70,24 @@ export const getShopProducts = async (req, genderFilter = null) => {
             Category: { $in: activeCategoryObjectIds } 
         };
 
-        if (genderFilter) {
-            searchFilter.gender = genderFilter;
+        if (req.query.gender) {
+            searchFilter.gender = req.query.gender;
         }
 
-        if (req.query.search && req.query.search.trim() !== '') {
+        if (req.query.search?.trim()) {
             searchFilter.productName = { $regex: req.query.search.trim(), $options: 'i' };
         }
 
         if (req.query.category) {
-            const categoryIds = Array.isArray(req.query.category) ? req.query.category : [req.query.category];
-            const selectedObjectIds = categoryIds.filter(id => mongoose.Types.ObjectId.isValid(id)).map(id => new mongoose.Types.ObjectId(id));
+            const catIds = Array.isArray(req.query.category) ? req.query.category : [req.query.category];
+            const validIds = catIds
+                .filter(id => mongoose.Types.ObjectId.isValid(id))
+                .map(id => new mongoose.Types.ObjectId(id));
             
-            const authorizedIds = selectedObjectIds.filter(id => 
+            const authorizedIds = validIds.filter(id => 
                 activeCategoryObjectIds.some(activeId => activeId.equals(id))
             );
-            searchFilter.Category = { $in: authorizedIds };
+            if (authorizedIds.length > 0) searchFilter.Category = { $in: authorizedIds };
         }
 
         if (req.query.brand) {
@@ -90,11 +95,22 @@ export const getShopProducts = async (req, genderFilter = null) => {
             searchFilter.brand = { $in: brandIds };
         }
 
-        const products = await productRepo.findProducts(searchFilter, { createdAt: -1 });
-        const rawBrands = await productRepo.distinctBrands();
+        const [products, totalProducts, rawBrands] = await Promise.all([
+            productRepo.findProducts(searchFilter, { createdAt: -1 }, skip, limit),
+            productRepo.countProducts(searchFilter),
+            productRepo.distinctBrands()
+        ]);
+
+        const totalPages = Math.ceil(totalProducts / limit);
 
         return {
             products,
+            currentPage: page,
+            totalPages: totalPages || 1,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+            nextPage: page + 1,
+            prevPage: page - 1,
             searchValue: req.query.search || "",
             categories: allCategories.filter(cat => !cat.isUnlisted).map(cat => ({
                 ...cat,
@@ -108,6 +124,15 @@ export const getShopProducts = async (req, genderFilter = null) => {
     } catch (error) {
         console.error("Error inside getShopProducts:", error);
         throw error;
+    }
+};
+
+export const getBestSellers = async () => {
+    try {
+        return await productRepo.findProducts({ isListed: true }, { createdAt: -1 }, 0, 4);
+    } catch (error) {
+        console.error("Error fetching best sellers:", error);
+        return [];
     }
 };
 
@@ -250,7 +275,7 @@ export const getProductDetails = async (id) => {
 export const getProductsPage = async (queryParams) => {
     const searchQuery = queryParams.search ? queryParams.search.trim() : '';
     const page = parseInt(queryParams.page) || 1;
-    const limit = 5;
+    const limit = 10;
     const skip = (page - 1) * limit;
 
     let searchFilter = {};
