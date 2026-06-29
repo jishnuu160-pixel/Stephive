@@ -49,7 +49,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'stephive3@gmail.com', 
-        pass: 'luqf qasx eirr ggrj'  
+        pass: 'cyit nike essc orls'  
     }
 });
 
@@ -105,20 +105,20 @@ export const sendOTP = async (email) => {
 export const verifyOTP = async (email, otp) => {
     const user = await userRepo.findByEmail(email);
     
-    if (!user || !user.otp ) {
-        throw new Error("Invalid OTP code. Please try again.");
+    if (!user || !user.otp) {
+        throw new Error("Invalid or expired OTP.");
     }
 
     if (Date.now() > user.otpExpiry) {
-        await User.updateOne({email:email},{$unset:{otp:"",otpExpiry:""}});
-        throw new Error("OTP has expired. Please request a new one.");
+        await userRepo.clearOTP(email);
+        throw new Error("OTP has expired.");
     }
 
-    if (user.otp !== otp){
-        throw new Error('Invalid OTP code. Please try again.');
+    if (user.otp !== otp) {
+        throw new Error('Invalid OTP code.');
     }
-    await User.updateOne({email:email},{$unset:{otp:"",otpExpiry:""}});
 
+    await userRepo.clearOTP(email); 
     return true;
 };
 
@@ -156,7 +156,26 @@ export const getUserById = async (userId) => {
 };
 
 export const updateProfile = async (userId, data) => {
-   return await userRepo.updateUserInfo(userId, data);
+    const { fullName, phoneNumber } = data;
+    const errors = {};
+
+    if (!fullName || fullName.trim() === "") {
+        errors.fullName = "*Full Name is required";
+    }
+
+    const phoneStr = phoneNumber ? phoneNumber.toString().trim() : "";
+    if (!phoneStr) {
+        errors.phone = "*Mobile Number is required";
+    } else if (!/^\d{11,12}$/.test(phoneStr)) {
+        errors.phone = "*Phone number must be 11 or 12 digits";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        const error = new Error("Validation Failed");
+        error.validationErrors = errors; 
+        throw error;
+    }
+    return await userRepo.updateUserInfo(userId, data);
 };
 
 export const addAddress = async (userId, addressData) => {
@@ -256,11 +275,13 @@ export const editAddress = async (
         errors.fullName = "Full Name is required";
     }
 
-    if (!phone?.trim()) {
-        errors.phone = "Mobile Number is required";
-    } else if (!/^\d{10}$/.test(phone.trim())) {
-        errors.phone = "Phone number must be 10 digits";
-    }
+    const phoneStr = phone?.trim();
+
+    if (!phoneStr) {
+        errors.phone = "*Mobile Number is required";
+    } else if (!/^\d{11,12}$/.test(phoneStr)) {
+        errors.phone = "Phone number must be exactly 11 or 12 digits and contain only numbers";
+    }  
 
     if (!street?.trim()) {
         errors.street = "Address Line 1 is required";
