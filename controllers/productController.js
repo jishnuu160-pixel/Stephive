@@ -4,26 +4,30 @@ import * as productService from '../services/productService.js';
 
 export const getShop = async (req, res) => {
     try {
-        const result = await productService.getShopProducts(req);
+        const page = parseInt(req.query.page) || 1;
 
-        if (result.noProductsFound) {
-            req.flash('error', 'No matching products found');
-            return res.redirect('/shop');
+        const [shopData, bestSellers] = await Promise.all([
+            productService.getShopProducts(req, null, page),
+            productService.getBestSellers()
+        ]);
+
+        if (shopData.products && Array.isArray(shopData.products)) {
+            shopData.products = shopData.products.filter(
+                p => p.isListed !== false && p.isBlocked !== true
+            );
         }
 
-        if (result.redirectTo) {
-            return res.redirect(result.redirectTo);
-        }
-
-        if (result.products && Array.isArray(result.products)) {
-            result.products = result.products.filter(p => p.isListed !== false && p.isBlocked !== true);
-        }
-
-        return res.render('user/shop', result);
+        return res.render('user/shop', {
+            ...shopData,      
+            bestSellers,      
+            searchValue: req.query.search || ""
+        });
 
     } catch (error) {
-        console.log(error);
-        return res.status(500).send(error.message);
+        console.error("Shop Controller Error:", error);
+        return res.status(500).render('error', { 
+            message: "We encountered an issue loading the shop. Please try again later." 
+        });
     }
 };
 
