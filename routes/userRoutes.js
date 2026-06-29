@@ -125,12 +125,10 @@ router.get('/verify-password-otp', isUserAuthenticated, getVerifyPasswordOTP);
 router.post('/verify-password-otp', isUserAuthenticated, postVerifyPasswordOTP);
 
 
-
-// routes/userRoutes.js
 router.post(
     '/update-avatar',
     isUserAuthenticated,
-    uploadAvatar.single('profileImage'), // 'profileImage' MUST match the <input name="...">
+    uploadAvatar.single('profileImage'), 
     updateAvatar
 );
 export default router;
