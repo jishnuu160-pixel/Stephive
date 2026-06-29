@@ -4,14 +4,20 @@
         <h3>Personal Information</h3>
         <form action="/user/update-profile" method="POST">
             <div class="form-group">
-                <label>FULL NAME</label>
-                <input type="text" name="fullName" value="{{user.fullName}}">
-            </div>
-            
-            <div class="form-group">
-                <label>PHONE NUMBER</label>
-                <input type="text" name="phoneNumber" value="{{user.phoneNumber}}">
-            </div>
+    <label>FULL NAME</label>
+   <input type="text" name="fullName" value="{{user.fullName}}">
+{{#if errors.fullName}}
+    <span class="field-error">{{errors.fullName}}</span>
+{{/if}}
+</div>
+
+<div class="form-group">
+    <label>PHONE NUMBER</label>
+    <input type="text" name="phoneNumber" value="{{user.phoneNumber}}">
+{{#if errors.phone}}
+    <span class="field-error">{{errors.phone}}</span>
+{{/if}}
+</div>
 
             <div class="form-group">
                 <label>GENDER</label>
