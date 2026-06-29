@@ -95,3 +95,12 @@ export const findDuplicateProduct = async (productName, categoryId) => {
         Category: categoryId
     }).lean();
 };
+
+export const getProductWithPagination=async (searchFilter,sort,skip,limit)=>{
+      return await Product.findOne(searchFilter)
+         .sort(sort)
+         .skip(skip)
+         .limit(limit)
+         .lean()
+};
+
