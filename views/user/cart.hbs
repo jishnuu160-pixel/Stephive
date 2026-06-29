@@ -13,11 +13,15 @@
             {{#if cart.items.length}}
 
             {{#each cart.items}}
-            <div class="cart-card {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} {{#if this.hasInsufficientStock}}stock-error-border{{/if}}" 
-                 data-product-id="{{this.productId._id}}" 
-                 data-size="{{this.size}}" 
-                 data-color="{{this.color}}">
-                
+            <div class="cart-card 
+    {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} 
+    {{#if this.hasInsufficientStock}}stock-error-border{{/if}} 
+    {{#if this.isUnlisted}}disabled-item-opacity{{/if}}" 
+    data-product-id="{{this.productId._id}}" 
+    data-size="{{this.size}}" 
+    data-color="{{this.color}}">
+    
+
                 <div class="item-image-wrapper">
             {{#if this.productId.variants.[0].images.[0]}}
                 <img src="{{this.productId.variants.[0].images.[0]}}" 
@@ -33,12 +37,10 @@
                     
 
                    {{#if this.isOutOfStock}}
-    <span class="cart-error-badge">OUT OF STOCK</span>
-{{else if this.hasInsufficientStock}}
-    <span class="cart-error-badge">
-        EXCEEDS STOCK (Only {{this.availableStock}} left)
-    </span>
-{{/if}}
+                         <span class="cart-error-badge">OUT OF STOCK</span>
+                   {{else if this.hasInsufficientStock}}
+                         <span class="cart-error-badge"> EXCEEDS STOCK (Only {{this.availableStock}} left)</span>
+                   {{/if}}
                     
                     {{#if this.isUnlisted}}
                         <span class="cart-error-badge">PRODUCT UNAVAILABLE</span>
@@ -47,12 +49,12 @@
                     <div class="item-pricing-row">
                         <span class="item-price" data-base-price="{{this.price}}">₹{{this.price}}</span>
                         
-<div class="quantity-selector">
-    <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
-    <span class="qty-val" data-max="{{this.availableStock}}">{{this.quantity}}</span>
-    <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
-</div>
-                    </div>
+                    <div class="quantity-selector">
+                    <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
+                    <span class="qty-val" data-max="{{this.availableStock}}">{{this.quantity}}</span>
+                    <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
+                   </div>
+                 </div>
                 </div>
                 
                 <div class="item-actions-subtotal">
@@ -72,7 +74,7 @@
             <div class="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 30px 0;">
                 
                 {{#if hasPrevPage}}
-                    <a href="/user/cart?page={{subtract currentPage 1}}" class="pagination-btn">« Previous</a>
+                    <a href="/user/cart?page={{subtract currentPage 1}}" class="page-btn">« Previous</a>
                 {{/if}}
 
                 <span class="page-info" style="font-weight: 600; color: #475569;">
@@ -80,7 +82,7 @@
                 </span>
 
                 {{#if hasNextPage}}
-                   <a href="/user/cart?page={{add currentPage 1}}" class="pagination-btn">Next></a>
+                   <a href="/user/cart?page={{add currentPage 1}}" class="page-btn"> Next »</a>
                 {{/if}}
             </div>
         {{/if}}
@@ -160,6 +162,32 @@ function showToast(message, type = 'success') {
         toast.classList.remove('show');
     }, 2200);
 }
+
+
+    function enforceLock() {
+        // Target all cart cards
+        const cards = document.querySelectorAll('.cart-card');
+        
+        cards.forEach(card => {
+            // Check if the card has the 'disabled-item-opacity' class
+            // which we applied via HBS for Out of Stock or Unlisted
+            const isUnavailable = card.classList.contains('disabled-item-opacity') || 
+                                  card.classList.contains('stock-error-border');
+            
+            if (isUnavailable) {
+                const buttons = card.querySelectorAll('.qty-btn');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.style.pointerEvents = 'none'; // CSS lock
+                });
+            }
+        });
+    }
+
+   
+    document.addEventListener('DOMContentLoaded', enforceLock);
+
+
 
 async function adjustCartQuantity(buttonElement, operationalChange) {
 
@@ -310,6 +338,7 @@ async function removeCartRow(buttonElement) {
         showToast("Something went wrong", "error");
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.cart-card').forEach(card => {
@@ -331,7 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons[1].disabled = false;
 
     });
-
 });
 
 </script>
