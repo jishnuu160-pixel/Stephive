@@ -105,7 +105,7 @@ router.get('/logout', userLogout);
 
 router.get('/address',isUserAuthenticated, getAddress);
 
-router.get('/delete-address/:id', isUserAuthenticated, removeAddress);//chnage to delete
+router.get('/delete-address/:id', isUserAuthenticated, removeAddress);
 router.get('/add-address', isUserAuthenticated, getAddAddress);
 router.post('/add-address', isUserAuthenticated, postAddAddress);
 router.get('/edit-address/:id', isUserAuthenticated, getEditAddress);
