@@ -123,7 +123,10 @@
           Add to Cart
         </button>
         
-        <button type="button" class="btn-primary-buy">Buy Now</button>
+        <button type="button" class="btn-primary-buy">
+          <img class="nav-icons" src="/icons/shopping-bag.png">
+          Buy Now
+          </button>
       </div>
 
     </div>
@@ -170,36 +173,41 @@
     </div>
 
     <div class="related-products-grid">
-        {{#each relatedProducts}}
-        <a href="/details/{{this._id}}" class="related-product-card">
-            <div class="related-image-wrapper">
-                {{#if this.variants}}
-                   <img src="{{lookup (lookup (lookup this.variants 0) 'images') 0}}" alt="{{this.productName}}">
-                {{else}}
-                    <div class="related-no-image">No Image</div>
-                {{/if}}
-                {{#if this.salePrice}}
-                    <span class="related-discount-badge">SALE</span>
-                {{/if}}
-            </div>
-
-            <div class="related-card-content">
-                <h3 class="related-product-name">{{this.productName}}</h3>
-                <p class="related-product-description">{{this.description}}</p>
-                
-                <div class="related-price-row">
-                    {{#if this.salePrice}}
-                        <span class="related-sale-price">₹{{this.salePrice}}</span>
-                        <span class="related-original-price">₹{{this.regularPrice}}</span>
-                       
+        {{#if relatedProducts.length}}
+            {{#each relatedProducts}}
+            <a href="/details/{{this._id}}" class="related-product-card">
+                <div class="related-image-wrapper">
+                    {{#if this.variants.[0].images.[0]}}
+                        <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
                     {{else}}
-                        <span class="related-sale-price">₹{{this.regularPrice}}</span>
+                        <div class="related-no-image">No Image</div>
                     {{/if}}
                     
+                    {{#if this.salePrice}}
+                        <span class="related-discount-badge">SALE</span>
+                    {{/if}}
                 </div>
-            </div>
-        </a>
-        {{/each}}
+
+                <div class="related-card-content">
+                    <h3 class="related-product-name">{{this.productName}}</h3>
+                    <p class="related-product-description">{{this.description}}</p>
+                    
+                    <div class="related-price-row">
+                        {{#if this.salePrice}}
+                            <span class="related-sale-price">₹{{this.salePrice}}</span>
+                            <span class="related-original-price">₹{{this.regularPrice}}</span>
+                        {{else}}
+                            <span class="related-sale-price">₹{{this.regularPrice}}</span>
+                        {{/if}}
+                    </div>
+                </div>
+            </a>
+            {{/each}}
+        {{else}}
+            <p style="padding: 20px; text-align: center; color: #64748b;">
+                No related products available right now.
+            </p>
+        {{/if}}
     </div>
 </section>
 
