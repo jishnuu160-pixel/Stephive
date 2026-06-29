@@ -46,14 +46,14 @@
 /* 🟢 HERO WRAPPER - Force visible so the zoom box can overflow out to the right */
 .hero-image-wrapper{
     position:relative;
-    width:100%;
-    height:510px;
+    width:430px;
+    height:100%;
     border: 1px solid #e8e8ee;
     border-radius: 20px;
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:20px;
+   
     overflow: visible !important;
 }
 
@@ -61,11 +61,10 @@
     width:100%;
     height:100%;
     object-fit:contain;
+    border-radius: 32px;
 }
 
-.zoom-image.zoomed {
-    cursor: zoom-out;
-}
+
 
 .no-image-fallback {
     color: #f6faff;
@@ -323,7 +322,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 6px;
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -339,9 +338,12 @@
     color: #ffffff;
     border: none;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     transition: background 0.2s;
 }
 
@@ -351,7 +353,7 @@
 
 /* --- INFORMATION MATRIX BLOCK TAB SPECIFICATIONS --- */
 .product-specs-tabs {
-    margin-top: 70px;
+    margin-top: 50px;
 }
 
 .tabs-header-strip {
@@ -479,7 +481,7 @@
     border-radius:20px;
     overflow:hidden;
     text-decoration:none;
-    border:1px solid #edf2f7;
+    border:1px solid #bbbdbe;
     transition:0.25s ease;
     display:flex;
     flex-direction:column;
@@ -493,12 +495,12 @@
 
 .related-image-wrapper{
     position:relative;
-    height:260px;
+    height:210px;
     background:#f8fafc;
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:20px;
+    padding:10px;
 }
 
 .related-image-wrapper img{
@@ -526,21 +528,21 @@
 }
 
 .related-card-content{
-    padding:20px;
+    padding:10px;
 }
 
 .related-product-name{
-    font-size:18px;
+    font-size:14px;
     font-weight:700;
     color:#0f172a;
-    margin-bottom:8px;
+    margin-bottom:4px;
 }
 
 .related-product-description{
-    font-size:14px;
+    font-size:10px;
     color:#64748b;
     line-height:1.5;
-    margin-bottom:18px;
+    margin-bottom:10px;
     display:-webkit-box;
     -webkit-line-clamp:2;
     -webkit-box-orient:vertical;
@@ -554,7 +556,7 @@
 }
 
 .related-sale-price{
-    font-size:20px;
+    font-size:14px;
     font-weight:700;
     color:#0f172a;
 }
@@ -653,7 +655,6 @@
 .product-card {
     width: 400px;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
     border-radius: 16px;
     padding: 16px;
     display: flex;
@@ -788,3 +789,21 @@
 .stock-status .low-stock {
     animation: pulse 2s infinite;
 }
+
+.pagination-container .next {
+    width: 25px;       
+    height: 25px;
+    border-radius: 50%; 
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
