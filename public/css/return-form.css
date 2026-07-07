@@ -1,0 +1,108 @@
+/* Container for the whole page */
+.full-page-return {
+    padding: 40px 5%;
+    background-color: #fcfcfc;
+    min-height: 100vh;
+}
+
+.return-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Page Header */
+.return-header { margin-bottom: 30px; }
+.return-header h1 { font-size: 2rem; margin: 0; color: #111; }
+.back-link {margin-left: 500px; 
+    text-decoration: none;
+     color: #666; 
+     font-size: 0.9rem; }
+
+/* The main two-column grid */
+.return-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px; /* Left takes available space, Right is fixed width */
+    gap: 40px;
+    align-items: start;
+}
+
+/* Left Column: Product Selection */
+.form-section {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.item-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.item-card img {
+    max-width: 100px; /* Control image size */
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Right Column: Return Details */
+.form-section h3 { margin-top: 0; margin-bottom: 20px; }
+
+.field { margin-bottom: 20px; }
+.field label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
+
+.field select, .field textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.submit-full-btn {
+    width: 100%;
+    padding: 14px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.submit-full-btn:hover { background: #333; }
+
+/* Responsive: Stack on mobile */
+@media (max-width: 900px) {
+    .return-form-grid { grid-template-columns: 1fr; }
+}
+
+.add-address{
+    font-size: 8px;
+    text-decoration: none;
+    color: #ddd;
+    background-color: #333;
+    padding: 5px;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+.edit-address{
+    font-size: 8px;
+    text-decoration: none;
+    color: #ddd;
+    background-color: #333;
+    padding: 5px;
+    border-radius: 12px;
+   
+    margin-left: 20px;
+}
+
+
+.address-box p{
+
+    font-size: 13px;
+    padding: 10px;
+}

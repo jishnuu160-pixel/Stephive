@@ -1,0 +1,64 @@
+/* Layout */
+.orders-page { padding: 40px; background-color: #fcfcfc; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+
+/* Search Input */
+.search-bar input {
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 1px solid #d1d5db;
+    width: 250px;
+}
+
+/* Table Styling */
+.orders-table-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+table { width: 100%; border-collapse: collapse; text-align: left; }
+thead { background: #f9f9f9; }
+th { padding: 18px 25px; font-size: 11px; color: #6b7280; letter-spacing: 0.5px; }
+td { padding: 22px 25px; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.status-badge.Processing { background: #f3e8ff; color: #7e22ce; }
+.status-badge.Shipped { background: #dbeafe; color: #1e40af; }
+.status-badge.Cancelled { background: #fee2e2; color: #991b1b; }
+.status-badge.Delivered { background: #dcfce7; color: #166534; }
+
+/* Buttons */
+.btn-view {
+    background: #312e81;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+/* Pagination */
+.pagination { display: flex; gap: 10px; margin-top: 25px; justify-content: center; }
+.page-num, .page-next {
+    width: 35px; height: 35px;
+    border-radius: 8px; border: none; cursor: pointer;
+    background: #fff; border: 1px solid #e5e7eb;
+}
+.page-num.active { background: #111827; color: #fff; }
+
+.btn-view-small{
+  background-color: rgb(131, 165, 243);
+  text-decoration: none;
+  font-size: 12px;
+  border-radius: 20px;
+  padding: 2px 12px;
+}

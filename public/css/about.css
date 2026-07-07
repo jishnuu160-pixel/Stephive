@@ -1,0 +1,77 @@
+.about-page {
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    background-image: url('/images/about_bg.jpg');
+    background-size: cover;        /* Scales image to fill the container without distortion */
+    background-position: center;   /* Keeps the center of the image focused */
+    background-repeat: no-repeat;  /* Prevents the image from tiling */
+    background-attachment: fixed;  /* Keeps the image fixed while scrolling (premium feel) */
+    min-height: 100vh;
+}
+
+.hero-about { 
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-content{
+    margin-top: 20px;
+}
+
+.story { max-width: 700px; margin: 60px auto; text-align: center; color: #ccc; padding: 0 10px; }
+
+.glass-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.cta { text-align: center; padding: 80px 20px; }
+.btn-shop {
+    display: inline-block;
+    padding: 15px 40px;
+    background: #fff;
+    color: #000;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 700;
+    margin-top: 20px;
+}
+
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    transition: transform 0.3s ease, background 0.3s ease, border 0.3s ease;
+    cursor: pointer;
+}
+
+.glass-card:hover {
+    transform: translateY(-10px); /* Lifts the card up by 10px */
+    background: rgba(255, 255, 255, 0.1); /* Slightly brighter on hover */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Slightly brighter border */
+}
+
+.features h2{
+    margin-left: 70px;
+}
