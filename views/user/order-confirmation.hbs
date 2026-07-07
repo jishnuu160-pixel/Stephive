@@ -1,0 +1,146 @@
+<div id="order-confirmation-view-scoped">
+  <div class="confirmation-container">
+
+    <div class="stepper">
+      <div class="step completed">
+        <span class="step-num">✓</span>
+        <span class="step-label">Cart</span>
+      </div>
+      <div class="step-line active"></div>
+      <div class="step completed">
+        <span class="step-num">✓</span>
+        <span class="step-label">Checkout</span>
+      </div>
+      <div class="step-line active"></div>
+      <div class="step completed">
+        <span class="step-num">✓</span>
+        <span class="step-label">Confirmation</span>
+      </div>
+    </div>
+
+    <div class="card success-banner-card">
+      <div class="success-icon-wrapper">
+        <svg class="success-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h1 class="main-title">Order Confirmed!</h1>
+      <p class="subtitle">Thank you for your purchase.</p>
+      
+      <div class="order-id-badge">
+        ORDER ID: <span class="order-id-text">#{{order.orderId}}</span>
+      </div>
+      <p class="email-notice">A confirmation email has been sent to <span class="email-highlight">{{order.email}}</span></p>
+    </div>
+
+    <div class="main-layout">
+      
+      <div class="left-column">
+        
+        <div class="card ordered-items-card">
+          <h2 class="card-title">Ordered Items</h2>
+          <div class="items-list">
+            {{#each order.items}}
+            <div class="item-row">
+              <div class="item-img-wrapper">
+                {{#if this.productId.variants.[0].images.[0]}}
+                <img src="{{this.productId.productImage}}" 
+                     alt="{{this.productId.productName}}"  style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">
+            {{else}}
+                <div class="no-image-placeholder">No Image</div>
+            {{/if}}
+              </div>
+              <div class="item-info">
+                <h4 class="item-name">{{this.productName}}</h4>
+              </div>
+              <div class="item-qty-price">
+                <span class="item-qty">Qty: <strong>{{this.quantity}}</strong></span>
+                <span class="item-price">₹{{this.price}}</span>
+              </div>
+            </div>
+            {{#unless @last}}<hr class="item-divider">{{/unless}}
+            {{/each}}
+          </div>
+        </div>
+
+        <div class="card info-card">
+          <h2 class="card-title">Order Information</h2>
+          <div class="info-grid">
+            
+            <div class="info-block">
+              <h3>DELIVERY ADDRESS</h3>
+              <p class="user-name">{{order.deliveryAddress.fullName}}</p>
+              <p>{{order.deliveryAddress.addressLine1}},</p>
+              <p>{{order.deliveryAddress.city}}</p>
+              <p>{{order.deliveryAddress.state}}</p>
+              <p class="phone-number">Mobile: {{order.deliveryAddress.mobileNumber}}</p>
+            </div>
+
+            <div class="info-block gap-blocks">
+              <div class="sub-info-block">
+                <h3>PAYMENT METHOD</h3>
+                <div class="icon-text-row">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                  <span>{{order.paymentMethod}}</span>
+                </div>
+              </div>
+
+              <div class="sub-info-block">
+                <h3>ESTIMATED DELIVERY</h3>
+                <div class="icon-text-row">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                  <span class="delivery-date">{{formattedDate order.expectedDeliveryDate}}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="right-column">
+        <div class="card summary-card">
+          <h2 class="card-title">Payment Summary</h2>
+          
+          <div class="price-breakdown">
+            <div class="price-row">
+              <span>Subtotal</span>
+              <span>₹{{order.subtotal}}</span>
+            </div>
+            <div class="price-row">
+              <span>Shipping</span>
+              <span class="free-text">{{order.shipping}}</span>
+            </div>
+            <div class="price-row">
+              <span>Tax (10%)</span>
+              <span>₹{{order.tax}}</span>
+            </div>
+            <div class="price-row">
+              <span>Coupon Discount</span>
+              <span>-₹{{order.discount}}</span>
+            </div>
+          </div>
+
+          <div class="total-row">
+            <span>Total Amount</span>
+            <span class="total-price">₹{{order.total}}</span>
+          </div>
+
+          <div class="action-group">
+              
+             <a class="btn-track-order" href="/orders/{{this._id}}">Track Order</a>
+           
+            <a  class="btn-continue-shopping" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
+          </div>
+
+          <div class="support-footer">
+            <p>NEED HELP WITH YOUR ORDER?</p>
+            <a href="#" class="support-link">Contact Support</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

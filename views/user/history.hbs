@@ -1,0 +1,83 @@
+<div class="order-history-page">
+    <div class="profile-wrapper">
+        <nav class="breadcrumb-container">
+            <p class="breadcrumb">My Account <span >/</span> <strong>My Orders</strong></p>
+        </nav>
+
+        <div class="profile-layout">
+                {{> userSide user=user}}
+           
+            <main class="main-content">
+                <header class="content-header">
+                    <h2>Order History</h2>
+                    <div class="search-wrapper">
+                     <form action="/history" method="GET">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="search" placeholder="Search Orders..." value="{{searchQuery}}">
+                        {{#if searchQuery}}
+                            <a href="/history" class="search-clear-btn">
+                                <i class="fas fa-times-circle"></i>
+                            </a>
+                        {{/if}}
+                    </form>
+                    </div>
+        
+                    <select class="sort-select" onchange="window.location.href='/history?page=1&sort=' + this.value">
+                    <option value="latest" {{#if (eq currentSort 'latest')}}selected{{/if}}>Latest</option>
+                    <option value="oldest" {{#if (eq currentSort 'oldest')}}selected{{/if}}>Oldest</option>
+                    </select>
+                </header>
+
+                {{#each orders}}
+                <div class="order-item-card">
+                <div class="product-visual">
+                <img src="{{this.items.[0].productImage}}" alt="Product">
+                </div>
+                 <div class="product-meta">
+                  <div class="meta-top">
+                   <div class="order-info">
+                    <div class="order-header-line">
+                     <small class="order-id">ORDER #{{this.orderId}}</small>
+                    <span class="status-pill {{hyphenate this.status}}">{{this.status}}</span>
+                   </div>
+                  <h3 class="product-title">{{this.items.[0].productName}}</h3>
+                 <p class="purchase-date">Purchased on {{this.formattedDate}}</p>
+               </div>
+             <div class="price-display">₹{{this.finalAmount}}</div>
+          </div>
+     <hr class="separator">
+       <div class="meta-bottom">
+        <a href="/orders/{{this._id}}" class="action-link">View Details →</a>
+         </div>
+           </div>
+              </div>
+                {{/each}}
+            </main>
+        </div>
+<nav class="pagination-container" aria-label="Order history navigation">
+        
+        {{#if hasPrevPage}}
+           
+                <a href="/history?page={{prevPage}}&sort={{currentSort}}&search={{searchQuery}}" class="page-btn">
+                    « Previous
+                </a>
+      
+        {{/if}}
+
+      
+            <span class="current-page">Page {{currentPage}} of {{totalPages}}</span>
+  
+
+        {{#if hasNextPage}}
+           
+                <a href="/history?page={{nextPage}}&sort={{currentSort}}&search={{searchQuery}}" class="page-btn">
+                    Next »
+                </a>
+            
+        {{/if}}
+
+</nav>
+    </div> 
+    </div>
+</div>
+

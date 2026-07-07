@@ -1,0 +1,72 @@
+<section class="full-page-return">
+    <div class="return-container">
+        <header class="return-header">
+            <a href="/orders/{{order._id}}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Order</a>
+            <h1>Return Request</h1>
+            <p>Order #{{order.orderId}}</p>
+        </header>
+
+        <form action="/orders/return/{{order._id}}" method="POST" class="return-form-grid">
+            
+            <div class="form-section">
+                <h3>Select Item to Return</h3>
+                {{#each order.items}}
+                <div class="item-card">
+                    <input type="radio" name="productId" value="{{this.productId._id}}" required>
+                    <img src="{{this.productImage}}" alt="{{this.productName}}">
+                    <div class="item-info">
+                        <h4>{{this.productName}}</h4>
+                        <p>Size: {{this.size}} | Qty: {{this.quantity}} | Price: ₹{{this.price}}</p>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+
+            <div class="form-section">
+                <h3>Return Details</h3>
+                
+                <div class="field">
+                    <label>Return Reason</label>
+                    <select name="reason" required>
+                        <option value="">Select a reason...</option>
+                        <option value="size">Size issue</option>
+                        <option value="defective">Item defective</option>
+                        <option value="not-as-described">Not as described</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" placeholder="Tell us more..."></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Preferred Refund Method</label>
+                    <select name="refundMethod">
+                        <option value="bank">Bank Transfer</option>
+                        <option value="wallet">Store Credit</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Pickup Address</label>
+                    <div class="address-box">
+                        <p>{{order.deliveryAddress.fullName}},<br>{{order.deliveryAddress.addressLine1}}, {{order.deliveryAddress.city}}, {{order.deliveryAddress.pincode}}<br>{{order.deliveryAddress.mobileNumber}}</p>
+                        <a href="/user/add-address" class="add-address">
+                      + Add Address
+                       </a>
+                       <a href="/user/edit-address/{{this._id}}" class="edit-address">Edit</a>
+                    </div>
+                    <input type="hidden" name="pickupAddress" value="{{order.deliveryAddress._id}}">
+                </div>
+
+                <div class="field">
+                    <label>Pickup Date</label>
+                    <input type="date" name="pickupDate" required>
+                </div>
+
+                <button type="submit" class="submit-full-btn">Submit Formal Request</button>
+            </div>
+        </form>
+    </div>
+</section>

@@ -1,0 +1,192 @@
+<section class="wishlist-page">
+    <div class="breadcrumb">
+        <a href="/">Home</a>
+        <span>/</span>
+        <a href="/shop">Shop</a>
+        <span>/</span>
+        <span class="wishlist">My Wishlist</span>
+    </div>
+
+    <div class="wishlist-header">
+        <p>{{#if wishlist.items}}
+             {{wishlist.items.length}}
+           {{else}}
+              0
+           {{/if}} items saved</p>
+
+        <a href="/shop" class="continue-btn">
+            ← Continue Shopping
+        </a>
+    </div>
+
+    {{#if wishlist.items.length}}
+
+    <table class="wishlist-table">
+        <thead>
+            <tr>
+                <th>PRODUCT</th>
+                <th>PRICE</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {{#each wishlist.items}}
+
+            <tr>
+                 
+                <td class="product-col">
+
+                    <img src="{{this.productId.variants.[0].images.[0]}}" alt="{{this.productId.productName}}">
+
+                    <div class="product-info">
+                        <h5>{{this.productId.productName}}</h5>
+                        <h6>{{this.productId.material}}</h6> 
+                    </div>
+
+                </td>
+
+                <td class="price-col">
+
+                    {{#if this.productId.salePrice}}
+                        ₹{{this.productId.salePrice}}
+                    {{else}}
+                        ₹{{this.productId.regularPrice}}
+                    {{/if}}
+
+                </td>
+
+                <td class="action-col">
+
+                    <a href="/details/{{this.productId._id}}" class="view-btn">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+
+                    <button type="button"  class="btn-secondary-cart"  onclick="addToCart('{{this.productId._id}}', '{{this.productId.variants.[0]._id}}', '{{this.productId.variants.[0].sizes.[0].size}}')">
+                       <i class="fa-solid fa-cart-shopping"></i>
+                    </button>
+
+                    <button class="delete-btn" data-id="{{this.productId._id}}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+
+                </td>
+
+            </tr>
+
+            {{/each}}
+
+        </tbody>
+
+    </table>
+
+    {{else}}
+
+    <div class="empty-wishlist">
+
+        <img src="/images/empty-wishlist.png" alt="Empty Wishlist">
+
+        <h3>Your Wishlist is Empty</h3>
+
+        <a href="/shop" class="continue-btn">Continue Shopping</a>
+    </div>
+    {{/if}}
+</section>
+
+<script>
+document.querySelectorAll(".delete-btn").forEach(button => {
+    button.addEventListener("click", async function () {
+        const productId = this.dataset.id;
+        const row = this.closest("tr");
+
+        const result = await Swal.fire({
+            title: "Remove from Wishlist?",
+            text: "This item will be removed from your wishlist.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Remove",
+            cancelButtonColor: "#6c757d",
+            confirmButtonColor: "#ef4444"
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const response = await fetch("/wishlist/toggle", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                row.remove();
+
+                const headerP = document.querySelector(".wishlist-header p");
+                let count = parseInt(headerP.innerText) - 1;
+                headerP.innerText = `${count} items saved`;
+
+                const badge = document.querySelector(".wishlist-badge-count");
+                if (badge) {
+                    badge.innerText = count;
+                    if (count <= 0) badge.style.display = 'none';
+                }
+
+                showToast("Removed from wishlist", "info");
+
+                if (count <= 0) {
+                    window.location.reload();
+                }
+            } else {
+                throw new Error(data.message || "Failed to remove item");
+            }
+        } catch (err) {
+            showToast(err.message || "Something went wrong", "error");
+        }
+    });
+});
+
+async function addToCart(productId, variantId, size) {
+    try {
+        const cartResponse = await fetch("/cart/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId, variantId, size, quantity: 1 })
+        });
+        const cartData = await cartResponse.json();
+
+        if (cartData.success) {
+            const wishlistResponse = await fetch("/wishlist/toggle", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
+            });
+            const wishlistData = await wishlistResponse.json();
+
+            showToast("Added to cart successfully", "success");
+
+            if (wishlistData.success) {
+                const button = document.querySelector(`button[onclick*="${productId}"]`);
+                if (button) {
+                    button.closest("tr").remove();
+                }
+
+                const headerP = document.querySelector(".wishlist-header p");
+                let currentCount = parseInt(headerP.innerText);
+                let newCount = currentCount - 1;
+                headerP.innerText = `${newCount >= 0 ? newCount : 0} items saved`;
+
+                setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+            }
+        } else {
+            throw new Error(cartData.message || "Failed to add to cart");
+        }
+    } catch (err) {
+        showToast(err.message || "Something went wrong", "error");
+    }
+}
+</script>

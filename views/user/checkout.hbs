@@ -1,0 +1,200 @@
+<div id="checkout-view-scoped">
+  <div class="checkout-container">
+    
+    <div class="stepper">
+      <div class="step completed">
+        <span class="step-num">1</span>
+        <span class="step-label">Cart</span>
+      </div>
+      <div class="step-line active"></div>
+      <div class="step active">
+        <span class="step-num">2</span>
+        <span class="step-label">Checkout</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step disabled">
+        <span class="step-num">3</span>
+        <span class="step-label">Payment</span>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      
+      <div class="left-column">
+        <div class="card delivery-card">
+  <h2 class="card-title">Delivery Address</h2>
+  
+  {{#each addresses}}
+  <div class="address-box {{#if isDefault}}selected{{/if}}">
+    <div class="address-header">
+       <label class="radio-container">
+        <input type="radio" name="selectedAddress" value="{{this._id}}" {{#if isDefault}}checked{{/if}}>
+        <span class="radio-checkmark"></span>
+       
+        <div class="address-details">
+        <span class="user-name">{{this.fullName}}</span>
+          <p>{{this.street}}</p>
+          <p>{{this.apartment}}, <br>{{this.city}}, {{this.state}} - {{this.pincode}}</p>
+          <p class="phone-number">Mobile: {{this.phone}}</p>
+    </div>
+      </label>
+      
+      <div class="address-actions">
+        <a href="/user/edit-address/{{this._id}}" class="btn-edit">Edit</a>
+      </div>
+    </div>
+    </div>
+{{else}}
+    <p>No addresses found. Please add an address to proceed.</p>
+  {{/each}}
+
+
+
+ <a href="/user/add-address" class="btn-add-address">
+                      + Add New Address
+  </a>
+ 
+</div>
+      </div>
+
+      <div class="right-column">
+        
+        <div class="card summary-card">
+          <h2 class="card-title">Order Summary</h2>
+          
+          <div class="cart-items">
+            {{#each cartItems}}
+            <div class="item-row">
+              <div class="item-img-wrapper">
+                {{#if this.productId.variants.[0].images.[0]}}
+                <img src="{{this.productId.variants.[0].images.[0]}}" 
+                     alt="{{this.productId.productName}}"  style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">
+            {{else}}
+                <div class="no-image-placeholder">No Image</div>
+            {{/if}}
+              </div>
+              <div class="item-info">
+                <h4 class="item-name">{{this.productId.productName}}</h4>
+                <p class="item-qty">Qty: {{this.quantity}}</p>
+              </div>
+              <div class="item-price">₹{{this.itemSubtotal}}</div>
+            </div>
+            {{/each}}
+          </div>
+
+          <div class="coupon-section">
+            <div class="coupon-input-group">
+              <input type="text" placeholder="Enter coupon code" class="coupon-input">
+              <button class="btn-apply">APPLY</button>
+            </div>
+            <a href="#" class="view-coupons-link">VIEW AVAILABLE COUPONS</a>
+          </div>
+
+          <div class="price-breakdown">
+            <div class="price-row">
+              <span>Subtotal</span>
+              <span>₹{{pricing.subtotal}}</span>
+            </div>
+            <div class="price-row">
+              <span>Shipping</span>
+              <span class="free-text">{{pricing.shipping}}</span>
+            </div>
+            <div class="price-row">
+              <span>Tax (10%)</span>
+              <span>₹{{pricing.tax}}</span>
+            </div>
+            <div class="price-row">
+              <span>Discount</span>
+              <span>-₹{{pricing.discount}}</span>
+            </div>
+          </div>
+
+          <div class="total-row">
+            <span>Total Amount</span>
+            <span class="total-price">₹{{pricing.total}}</span>
+          </div>
+        </div>
+
+        <div class="card payment-card">
+          <div class="payment-title-group">
+            <span class="payment-step-badge">2</span>
+            <h2 class="card-title">Payment Method</h2>
+          </div>
+          
+          <div class="payment-options">
+            <label class="payment-option selected">
+              <input type="radio" name="payment_method" value="razorpay" checked>
+              <div class="payment-option-content">
+                <svg class="payment-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+               <div class="payment-text">
+                 <span class="method-title">Razorpay (Cards/UPI/NetBanking)</span>
+               </div>
+              </div>
+            </label>
+
+            <label class="payment-option">
+              <input type="radio" name="payment_method" value="wallet">
+              <div class="payment-option-content">
+                <svg class="payment-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4v-6z"/></svg>
+                <div class="payment-text">
+                  <span class="method-title">Wallet</span>
+                  <p class="method-desc">Pay securely using your wallet balance (Balance: Rs. 0.00)</p>
+                </div>
+              </div>
+            </label>
+
+            <label class="payment-option">
+              <input type="radio" name="payment_method" value="cod">
+              <div class="payment-option-content">
+                <svg class="payment-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                <div class="payment-text">
+                 <span class="method-title">Cash on Delivery Available</span>
+                  <p class="method-desc">Pay at your doorstep</p>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="action-group">
+          <button class="btn-place-order">
+            Place Order 
+            <svg class="arrow-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <a href="/cart" class="back-to-cart">← Back to Cart</a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelector('.btn-place-order').addEventListener('click', async () => {
+    const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked')?.value;
+    const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value;
+
+    if (!selectedAddress) return showToast("Please select a delivery address", "error");
+
+    try {
+        const response = await fetch('/place-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                addressId: selectedAddress, 
+                paymentMethod: paymentMethod 
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            window.location.href = `/order-confirmation/${data.orderId}`;
+        } else {
+            showToast(data.message || "Order failed", "error");
+        }
+    } catch (err) {
+        showToast("Server error, please try again", "error");
+    }
+});
+</script>

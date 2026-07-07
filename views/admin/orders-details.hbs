@@ -1,0 +1,66 @@
+<div class="order-details-container">
+  <header class="order-header">
+    <div class="header-left">
+      <h1>Order #{{orderId}}</h1>
+      <p>Placed on {{createdAt}}</p>
+    </div>
+    <span class="status-badge">{{status}}</span>
+  </header>
+
+  <div class="order-main">
+    <section class="ordered-items">
+      <h2>ORDERED ITEMS</h2>
+     {{#each items}}
+<div class="item-card">
+  <img src="{{this.productImage}}" alt="{{this.productName}}">
+  
+  <div class="item-details">
+    <h3>{{this.productName}}</h3>
+    <p>Size: {{this.size}}, Color: {{this.color}}, Qty: {{this.quantity}}</p>
+    <span class="item-price">₹{{this.price}}</span>
+  </div>
+  
+</div>
+
+{{/each}}
+    </section>
+
+    <aside class="order-summary">
+      <h2>ORDER SUMMARY</h2>
+      <div class="summary-grid">
+        <span>Subtotal</span> <span>₹ {{subtotal}}</span>
+        <span>Discount</span> <span>₹0</span>
+        <span>Tax</span> <span>₹ {{tax}}</span>
+        <span>Shipping</span> <span>Free</span>
+        <strong>Total</strong> <strong>₹{{total}}</strong>
+        <span>Payment Method</span> <span>{{paymentMethod}}</span>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="order-footer">
+    <div class="customer-info">
+      <h2 >CUSTOMER INFO</h2>
+      <p><strong>Name:</strong> {{this.deliveryAddress.fullName}}<br>
+         <strong>Email:</strong> {{order.user_id.email}}<br>
+         <strong>Mobile:</strong> {{this.deliveryAddress.mobileNumber}}</p>
+      <h3>Delivery Address</h3>
+      <p>{{this.deliveryAddress.addressLine1}},<br> {{this.deliveryAddress.city}},<br>{{this.deliveryAddress.state}}, {{this.deliveryAddress.pincode}}</p>
+    </div>
+    
+    <div class="status-update">
+      <h2>UPDATE ORDER STATUS</h2>
+      <form action="/admin/orders/update/{{order._id}}" method="POST">
+        <label>CURRENT STATUS:</label>
+        <select name="status">
+          <option value="Processing" {{#if (eq order.status "Processing")}}selected{{/if}}>Processing</option>
+          <option value="Shipped" {{#if (eq order.status "Shipped")}}selected{{/if}}>Shipped</option>
+          <option value="Out of delivery" {{#if (eq order.status "Out of delivery")}}selected{{/if}}>Out of Delivery</option>
+          <option value="Delivered" {{#if (eq order.status "Delivered")}}selected{{/if}}>Delivered</option>
+          <option value="Cancelled" {{#if (eq order.status "Cancelled")}}selected{{/if}}>Cancelled</option>
+        </select>
+        <button type="submit" class="save-btn">Save changes</button>
+      </form>
+    </div>
+  </footer>
+</div>
