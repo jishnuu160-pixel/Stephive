@@ -1,6 +1,6 @@
 import User from '../models/userModel.js';
 import Cart from '../models/cartModel.js'; 
-
+import * as wishlistService from "../services/wishlistService.js";
 
 export const isUserAuthenticated = async (req, res, next) => {
     if (req.session && req.session.user) {
@@ -12,41 +12,28 @@ export const isUserAuthenticated = async (req, res, next) => {
                 if (req.session.passport) delete req.session.passport.user;
 
                 return req.session.save(() => {
-                    const isApiRequest =
-                        req.xhr ||
-                        req.headers.accept?.includes("json") ||
-                        req.headers["content-type"]?.includes("application/json");
-
+                    const isApiRequest = req.xhr || req.headers.accept?.includes("json") || req.headers["content-type"]?.includes("application/json");
                     if (isApiRequest) {
-                        return res.status(403).json({
-                            success: false,
-                            message: "User blocked"
-                        });
+                        return res.status(403).json({ success: false, message: "User blocked" });
                     }
-
                     return res.redirect('/user/login?error=blocked');
                 });
             }
+
+            req.user = user; 
 
             res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
             return next();
 
         } catch (error) {
             console.error("Database check failed:", error);
-            return next();
+            return res.status(500).json({ success: false, message: "Internal server error during auth check" });
         }
     } else {
-
-        const isApiRequest =
-            req.xhr ||
-            req.headers.accept?.includes("json") ||
-            req.headers["content-type"]?.includes("application/json");
+        const isApiRequest = req.xhr || req.headers.accept?.includes("json") || req.headers["content-type"]?.includes("application/json");
 
         if (isApiRequest) {
-            return res.status(401).json({
-                success: false,
-                message: "Please login!"
-            });
+            return res.status(401).json({ success: false, message: "Please login!" });
         }
 
         req.flash("error", "Please login first to continue");
@@ -80,12 +67,29 @@ export const injectNavbarData = async (req, res, next) => {
         if (req.session.user) {
             const cart = await Cart.findOne({ userId: req.session.user._id || req.session.user.id });
             if (cart && cart.items && cart.items.length > 0) {
-                res.locals.cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
+              
+          res.locals.cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
             }
         }
         next();
     } catch (error) {
         console.error("Error generating global navbar data:", error);
+        next();
+    }
+};
+
+
+export const wishlistCountMiddleware = async (req, res, next) => {
+    try {
+        if (req.session?.user?.id) {
+            const count = await wishlistService.getWishlistCount(req.session.user.id);
+            res.locals.globalWishlistCount = count;
+        } else {
+            res.locals.globalWishlistCount = 0;
+        }
+        next();
+    } catch (err) {
+        res.locals.globalWishlistCount = 0;
         next();
     }
 };
