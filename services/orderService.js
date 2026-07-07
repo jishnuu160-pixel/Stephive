@@ -1,0 +1,219 @@
+import * as OrderRepo from '../repositories/orderRepository.js';
+import * as ProductRepo from '../repositories/productRepository.js';
+import * as UserRepo from '../repositories/userRepository.js';
+import mongoose from 'mongoose';
+import { generateOrderID } from '../utils/idGenerator.js';
+
+
+export const calculatePricing = (items) => {
+    const itemsWithSubtotals = items.map(item => ({
+        ...item,
+        itemSubtotal: item.price * item.quantity
+    }));
+    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const tax = Math.floor(subtotal * 0.10);
+    
+    return {
+       items: itemsWithSubtotals, 
+        summary: {                
+            subtotal,
+            tax,
+            total: subtotal + tax,
+            shipping: "Free"
+        }
+    };
+};
+
+
+export const getCheckoutPageData = async (userId) => {
+    const [cart, user] = await Promise.all([
+        OrderRepo.getCartByUserId(userId),
+        UserRepo.findById(userId) 
+    ]);
+
+    if (!cart?.items?.length) throw new Error("Cart is empty");
+    return { cart, addresses: user?.addresses || [] };
+};
+
+export const processCheckout = async (userId, orderData, isDirect = false) => {
+    try {
+        for (const item of orderData.items) {
+            const product = await ProductRepo.findProductById(item.productId);
+            const variant = product.variants.find(v => v._id.toString() === item.variantId.toString());
+            const sizeObj = variant?.sizes.find(s => s.size === Number(item.size));
+
+            if (item.quantity > 5) {
+                throw new Error(`You cannot purchase more than 5 units of ${product.productName} per order.`);
+            }
+
+            if (!sizeObj || sizeObj.stock < item.quantity) {
+                throw new Error(`Insufficient stock for ${product.productName} (Size: ${item.size}). Only ${sizeObj ? sizeObj.stock : 0} left.`);
+            }
+        }
+        const edd = new Date();
+        edd.setDate(edd.getDate() + 5);
+
+        const generatedId = generateOrderID();
+        
+        for (const item of orderData.items) {
+            await ProductRepo.decreaseStock(item.productId, item.variantId, item.size, item.quantity);
+        }
+        
+        const orderToSave = { 
+            ...orderData, 
+            orderId: generatedId,
+            user_id: userId,
+            expectedDeliveryDate: edd
+        };
+
+        const newOrder = await OrderRepo.saveOrder(orderToSave);
+
+        if (!isDirect) {
+            await OrderRepo.clearCartByUserId(userId);
+        }  
+        return newOrder;
+    } catch (error) {
+        console.error("DEBUG: OrderService Error:", error);
+        throw error;
+    }
+};
+
+
+export const getUserOrderHistory = async (userId, page, sortQuery, search) => {
+    const limit = 3;
+    const skip = (page - 1) * limit;
+    const sortOrder = sortQuery === 'oldest' ? 1 : -1;
+
+    const [totalItems, orders] = await Promise.all([
+        OrderRepo.countOrdersByUserId(userId, search),
+        OrderRepo.findOrdersByUserId(userId, limit, skip, sortOrder, search)
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return {
+        orders: orders.map(order => ({
+            ...order,
+            formattedDate: new Date(order.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            })
+        })),
+        pagination: {
+            currentPage: page,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+            nextPage: page + 1,
+            prevPage: page - 1
+        }
+    };
+};
+
+export const getUserProfile = async (user_id) => {
+    return await OrderRepo.findByUserId(user_id);
+};
+
+export const getOrderDetails = async (orderId) => {
+    const order = await OrderRepo.findOrderById(orderId);
+    console.log("OrderDetails:",order);
+    if (!order) throw new Error('Order not found');
+    return order;
+};
+
+export const cancelUserOrder = async (orderId, userId) => {
+    const order = await OrderRepo.findUserOrderById(orderId, userId);
+    
+    if (!order) throw new Error("Order not found or access denied");
+    if (order.status === 'cancelled') throw new Error("Order is already cancelled");
+
+    const previousStatus = order.status;
+
+    for (const item of order.items) {
+        await ProductRepo.increaseStock(
+            item.productId._id, 
+            item.variantId, 
+            item.size, 
+            item.quantity
+        );
+    }
+
+    await OrderRepo.updateOrder(orderId, { 
+    status: 'cancelled',
+    previousStatus: order.status, 
+    cancelledAt: new Date() 
+});
+};
+
+
+export const getDirectProductDetails = async (productId, variantId, size, quantity) => {
+    const objId = new mongoose.Types.ObjectId(productId);
+    
+    const product = await ProductRepo.findProductById(objId);
+    if (!product) throw new Error(`Product not found for ID: ${productId}`);
+
+    const variant = product.variants.find(v => v._id.toString() === variantId.toString());
+    if (!variant) throw new Error("Variant not found");
+
+    const price = product.salePrice || product.regularPrice;
+    const qty = Number(quantity);
+
+    return {
+        productId: product,
+        variantId,
+        size,
+        quantity: qty,
+        price: price,
+        itemSubtotal: price * qty 
+    };
+};
+
+export const calculateDirectPricing = (item) => {
+    const subtotal = item.price * item.quantity;
+    const tax = Math.floor(subtotal * 0.10);
+    return {
+        subtotal,
+        tax,
+        total: subtotal + tax,
+        shipping: "Free"
+    };
+};
+
+
+export const getUserOrderDetails = async (orderId, userId) => {
+    const order = await OrderRepo.findUserOrderById(orderId, userId);
+    
+    if (!order) {
+        throw new Error('Order not found or access denied');
+    }
+
+    return {
+        ...order,
+        previousStatus: order.previousStatus || null,
+        formattedDate: new Date(order.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        })
+    };
+};
+
+export const getOrderForInvoice = async (orderId) => {
+    const order = await OrderRepo.findOrdersByUserId(userId);
+    if (!order) throw new Error("Order not found");
+    
+    return order;
+};
+
+
+export const cancelItemInOrder = async (orderId, itemId, userId) => {
+    
+    const order = await OrderRepo.findOrderById(orderId);
+    console.log("DEBUG: Found Order Object:", order);
+
+  return order;
+};
+
+
+const calculateEDD = (days = 5) => {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date;
+};
