@@ -1,4 +1,5 @@
 import Product from '../models/productModel.js';
+import mongoose from 'mongoose';
 
 export const countProducts = async (searchFilter) => {
      return await Product.countDocuments(
@@ -104,3 +105,50 @@ export const getProductWithPagination=async (searchFilter,sort,skip,limit)=>{
          .lean()
 };
 
+export const decreaseStock = async (productId, variantId, size, quantity) => {
+    return await Product.updateOne(
+        { 
+            _id: new mongoose.Types.ObjectId(productId),
+            "variants": {
+                $elemMatch: {
+                    "_id": new mongoose.Types.ObjectId(variantId),
+                    "sizes": {
+                        $elemMatch: {
+                            "size": Number(size),
+                            "stock": { $gte: quantity } 
+                        }
+                    }
+                }
+            }
+        },
+        { 
+            $inc: { "variants.$[v].sizes.$[s].stock": -quantity } 
+        },
+        { 
+            arrayFilters: [
+                { "v._id": new mongoose.Types.ObjectId(variantId) },
+                { "s.size": Number(size) }
+            ] 
+        }
+    );
+};
+
+export const increaseStock = async (productId, variantId, size, quantity, session = null) => {
+    return await Product.updateOne(
+        { 
+            _id: new mongoose.Types.ObjectId(productId),
+            "variants._id": new mongoose.Types.ObjectId(variantId),
+            "variants.sizes.size": Number(size)
+        },
+        { 
+            $inc: { "variants.$[v].sizes.$[s].stock": quantity } 
+        },
+        { 
+            arrayFilters: [
+                { "v._id": new mongoose.Types.ObjectId(variantId) },
+                { "s.size": Number(size) }
+            ],
+            session 
+        }
+    );
+};
