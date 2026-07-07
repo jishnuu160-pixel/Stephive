@@ -1,9 +1,7 @@
 <aside class="profile-sidebar">
     <div class="sidebar-user-header">
-        <div class="avatar-circle-small">
- <img src="{{user.profileImage}}?v={{timestamp}}" id="profile-preview"
-  class="user-icon sidebar-avatar" 
-  >
+       <div class="avatar-circle-small">
+          <img src="{{user.profileImage}}?v={{timestamp}}" id="profile-preview"class="user-icon sidebar-avatar">
         </div>
         <div class="user-meta">
             <h4>{{user.fullName}}</h4>
@@ -16,7 +14,7 @@
             <img src="/icons/profile.png" class="sidebar-icon"> <span>Profile</span>
         </a>
 
-        <a href="/user/orders" class="nav-item {{#if (eq activePage 'orders')}}active{{/if}}">
+        <a href="/history" class="nav-item {{#if (eq activePage 'orders')}}active{{/if}}">
             <img src="/icons/orders.png" class="sidebar-icon"> <span>My orders</span>
         </a>
 
