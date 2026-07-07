@@ -79,7 +79,7 @@
                     </td>
                     
                     <td>₹{{this.regularPrice}}</td>
-                    <td>{{this.totalQuantity}}</td>
+                    <td>{{this.displayStock}}</td>
 
                     <td>
                         <span class="badge {{#if this.isListed}}bg-success{{else}}bg-danger{{/if}}">
@@ -122,7 +122,7 @@
             <span class="page-info">Page {{pagination.page}} of {{pagination.totalPages}}</span>
             
             {{#if pagination.hasNextPage}}
-                <a href="/admin/products?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">Next »</a>
+                <a href="/admin/products?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">Next »</a>
             {{/if}}
         </div>
         {{/if}}
@@ -130,7 +130,6 @@
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function confirmProductToggle(button) {
     const isListed = button.getAttribute('data-listed') === 'true';
