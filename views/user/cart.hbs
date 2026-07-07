@@ -6,7 +6,6 @@
         </div>
         <a class="continue-shopping-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
     </header>
-
     <div class="cart-content">
         
         <section class="cart-items-list">
@@ -17,9 +16,9 @@
     {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} 
     {{#if this.hasInsufficientStock}}stock-error-border{{/if}} 
     {{#if this.isUnlisted}}disabled-item-opacity{{/if}}" 
-    data-product-id="{{this.productId._id}}" 
-    data-size="{{this.size}}" 
-    data-color="{{this.color}}">
+   data-product-id="{{this.productId._id}}" 
+    data-size="{{#if this.size}}{{this.size}}{{else}}default{{/if}}" 
+    data-color="{{#if this.color}}{{this.color}}{{else}}default{{/if}}">
     
 
                 <div class="item-image-wrapper">
@@ -65,7 +64,9 @@
                         <span class="subtotal-label">SUBTOTAL</span>
                         <span class="subtotal-price">₹{{this.itemSubtotal}}</span>
                     </div>
+                  
                 </div>
+                
             </div>
 
 
@@ -74,7 +75,7 @@
             <div class="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 30px 0;">
                 
                 {{#if hasPrevPage}}
-                    <a href="/user/cart?page={{subtract currentPage 1}}" class="page-btn">« Previous</a>
+                    <a href="/cart?page={{subtract currentPage 1}}" class="page-btn">« Previous</a>
                 {{/if}}
 
                 <span class="page-info" style="font-weight: 600; color: #475569;">
@@ -82,7 +83,7 @@
                 </span>
 
                 {{#if hasNextPage}}
-                   <a href="/user/cart?page={{add currentPage 1}}" class="page-btn"> Next »</a>
+                   <a href="/cart?page={{add currentPage 1}}" class="page-btn"> Next »</a>
                 {{/if}}
             </div>
         {{/if}}
@@ -133,10 +134,10 @@
                         Checkout Disabled
                     </button>
                 {{else}}
-                    <a href="/checkout" class="checkout-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                        <span>Proceed to Checkout</span>
-                        <span class="arrow">→</span>
-                    </a>
+                    
+<button type="button" class="checkout-btn" onclick="prepareAndGoToCheckout()">
+    Proceed to Checkout
+</button>
                 {{/if}}
                 
                 <p class="security-text">Secure SSL Encryption & 2-Year Warranty</p>
@@ -165,12 +166,9 @@ function showToast(message, type = 'success') {
 
 
     function enforceLock() {
-        // Target all cart cards
         const cards = document.querySelectorAll('.cart-card');
         
         cards.forEach(card => {
-            // Check if the card has the 'disabled-item-opacity' class
-            // which we applied via HBS for Out of Stock or Unlisted
             const isUnavailable = card.classList.contains('disabled-item-opacity') || 
                                   card.classList.contains('stock-error-border');
             
@@ -178,7 +176,7 @@ function showToast(message, type = 'success') {
                 const buttons = card.querySelectorAll('.qty-btn');
                 buttons.forEach(btn => {
                     btn.disabled = true;
-                    btn.style.pointerEvents = 'none'; // CSS lock
+                    btn.style.pointerEvents = 'none'; 
                 });
             }
         });
@@ -218,7 +216,7 @@ if (operationalChange > 0 && targetQuantity > maxStock) {
 
     try {
 
-        const response = await fetch('/user/cart/update-quantity', {
+        const response = await fetch('/cart/update-quantity', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -309,7 +307,7 @@ async function removeCartRow(buttonElement) {
     const color = card.getAttribute('data-color');
 
     try {
-        const response = await fetch('/user/cart/remove', {
+        const response = await fetch('/cart/remove', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -361,5 +359,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 });
+
+
+async function prepareAndGoToCheckout(event) {
+    if (event) event.preventDefault();
+    
+    console.log("DEBUG: Button clicked, starting checkout prep...");
+
+    const btn = document.querySelector('.checkout-btn');
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    try {
+        console.log("DEBUG: Sending POST request to /checkout...");
+        
+        const response = await fetch('/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        console.log("DEBUG: Response received. Status:", response.status);
+
+        const data = await response.json();
+        console.log("DEBUG: Response data:", data);
+
+        if (response.ok && data.success) {
+            console.log("DEBUG: Success! Redirecting to /checkout...");
+            window.location.href = '/checkout';
+        } else {
+            console.error("DEBUG: Server returned error:", data.message);
+            showToast(data.message || "Failed to prepare checkout", "error");
+            btn.disabled = false;
+            btn.innerText = "Proceed to Checkout";
+        }
+    } catch (error) {
+        console.error("DEBUG: Fetch caught error:", error);
+        showToast("Server error, please try again", "error");
+        btn.disabled = false;
+        btn.innerText = "Proceed to Checkout";
+    }
+}
 
 </script>
