@@ -6,9 +6,14 @@ import {
     getAdminLogin, 
     postAdminLogin, 
     getDashboard, 
-    getCustomers, 
+    getCustomers,
+    getOrders, 
     toggleUserStatus, 
-    adminLogout 
+    updateOrderStatus,
+    adminLogout, 
+    getOrderDetails,
+    getAllReturns,
+     updateReturnStatus
 } from '../controllers/adminController.js';
 
 import { 
@@ -59,15 +64,16 @@ router.get('/dashboard', isAdminAuthenticated, getDashboard);
 router.get('/customers', isAdminAuthenticated, getCustomers);
 router.post('/customers/toggle-status/:id', isAdminAuthenticated, toggleUserStatus);
 
+// --- Admin Order Routes ---
+router.get('/orders',isAdminAuthenticated,getOrders);
+router.get('/orders/:id',isAdminAuthenticated,getOrderDetails);
+router.post('/orders/update/:id',isAdminAuthenticated,updateOrderStatus);
+
+
 // --- Admin Product Management Routes ---
 router.get('/products', isAdminAuthenticated, getProducts);
 router.get('/products/add', isAdminAuthenticated, getAddProduct);
-router.get(
-  '/products/edit/:id',
-  isAdminAuthenticated,
-  getEditProduct
-);
-
+router.get('/products/edit/:id',isAdminAuthenticated, getEditProduct);
 router.post('/products/add', isAdminAuthenticated, upload.any(), postAddProduct);
 
 router.post(
@@ -85,6 +91,9 @@ router.post('/categories/add', isAdminAuthenticated, postAddCategory);
 router.post('/categories/edit/:id', isAdminAuthenticated, updateCategory);
 router.get('/categories/:id/subcategories', getSubcategoriesByParent);
 
+
+router.get('/returns', isAdminAuthenticated, getAllReturns);
+router.post('/returns/:id/status', isAdminAuthenticated, updateReturnStatus);
 
 router.get('/logout', adminLogout);
 

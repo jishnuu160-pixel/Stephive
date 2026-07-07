@@ -42,12 +42,6 @@ router.post('/signup', isUserLoggedOut, postSignup);
 router.get('/login', isUserLoggedOut, getLogin);
 router.post('/login', isUserLoggedOut, postLogin); 
 
-
-
-
-router.get('/about',getAbout);
-
-
 router.get('/forgot-password', isUserLoggedOut, getForgot);
 router.post('/forgot-password', postForgot);
 
@@ -87,6 +81,7 @@ router.get('/auth/google/callback',
 );
 
 
+router.get('/about',getAbout);
 
 router.use(isUserAuthenticated);
 
@@ -124,11 +119,11 @@ router.get('/update-password-init', isUserAuthenticated, sendUpdatePasswordOTP);
 router.get('/verify-password-otp', isUserAuthenticated, getVerifyPasswordOTP);
 router.post('/verify-password-otp', isUserAuthenticated, postVerifyPasswordOTP);
 
-
 router.post(
     '/update-avatar',
     isUserAuthenticated,
     uploadAvatar.single('profileImage'), 
     updateAvatar
 );
+
 export default router;
