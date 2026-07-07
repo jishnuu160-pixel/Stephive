@@ -39,10 +39,9 @@ const orderSchema = new mongoose.Schema({
     enum: ['pending', 'processing', 'shipped','out of delivery', 'delivered', 'cancelled'],
     default: 'pending'
   },
-expectedDeliveryDate: { type: Date },
+  expectedDeliveryDate: { type: Date },
   couponId: { type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' },
   courierName: String,
-  trackingId: String,
   cancelReason: String,
   cancelledAt: Date
 }, { timestamps: true }); 
