@@ -12,7 +12,11 @@ import adminRoutes from './routes/adminRoutes.js';
 import homeRoutes from './routes/homeRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import {wishlistCountMiddleware,injectNavbarData} from'./middleware/authMiddleware.js';
 import passport  from './config/passport.js';
+import * as wishlistService from './services/wishlistService.js';
 import * as cartService from './services/cartService.js';
 import { type } from 'os';
 
@@ -33,9 +37,22 @@ app.engine('hbs', engine({
         allowProtoMethodsByDefault: true,
     },
     helpers: {
-   lt: ((a, b) => a < b),
-   le: ((a, b) => a <= b),
-   ge: ((a, b) => a >= b),
+    hyphenate: (text) => {
+        return typeof text === 'string' ? text.toLowerCase().replace(/\s+/g, '-') : '';
+    },
+    isStepVisible: (stepRank, currentStatus) => {
+    const ranks = {
+        'Order Placed': 0,
+        'Processing at Atelier': 1,
+        'Shipped': 2,
+        'Out of delivery': 3,
+        'Delivered': 4
+    };
+    return stepRank <= (ranks[currentStatus] ?? 4); 
+    },
+    lt: ((a, b) => a < b),
+    le: ((a, b) => a <= b),
+    ge: ((a, b) => a >= b),
    eq: (a, b) => a?.toString() === b?.toString(),
    or: ((a, b) => a || b),
    includes: (array, value) => {
@@ -45,7 +62,7 @@ app.engine('hbs', engine({
             }
             return array.toString() === value?.toString();
        },
-    add: (a, b) => a + b,
+    add: (a, b, c) => (a || 0) + (b || 0) + (c || 0),
     subtract: (a, b) => (a || 0) - (b || 0),
     multiply: (a, b) => (a || 0) * (b || 0),
     json: (context) => {
@@ -53,6 +70,15 @@ app.engine('hbs', engine({
         },
     toLowerCase: (str) =>
         (typeof str === 'string' ? str.toLowerCase() : ''),
+    formattedDate: function(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return new Intl.DateTimeFormat('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }).format(date);
+        },
     firstVariantSizes: (variants) => {
         if (
             Array.isArray(variants) &&
@@ -74,6 +100,12 @@ app.engine('hbs', engine({
     },
     toString: function(value) {
     return value.toString();
+},
+isStepCompleted: function(itemStep, currentStep) {
+    return itemStep <= currentStep;
+},
+isStepActive: function(itemStep, currentStep) {
+    return itemStep === currentStep;
 },
   toUpperCase: (str) =>
     (typeof str === 'string' ? str.toUpperCase() : '')  
@@ -112,7 +144,30 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(injectNavbarData);
+app.use(wishlistCountMiddleware);
 
+app.use(async (req, res, next) => {
+    try {
+        if (req.session?.user?.id) {
+
+            const userId = req.session.user.id;
+
+            const count = await wishlistService.getWishlistCount(userId);
+
+            res.locals.globalWishlistCount = count;
+
+        } else {
+            res.locals.globalWishlistCount = 0;
+        }
+
+    } catch (err) {
+        console.error("Wishlist count middleware error:", err);
+        res.locals.globalWishlistCount = 0;
+    }
+
+    next();
+});
 
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -156,6 +211,9 @@ app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/', homeRoutes);
 app.use('/',productRoutes);
-app.use('/user/cart', cartRoutes);
+app.use('/cart', cartRoutes);
+app.use('/wishlist', wishlistRoutes);
+app.use('/', orderRoutes);
+
 
 export default app;
