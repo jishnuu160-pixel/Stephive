@@ -1,4 +1,5 @@
 
+import { error } from 'console';
 import adminRepo from '../repositories/adminRepository.js';
 import * as categoryRepo from '../repositories/categoryRepository.js';
 import * as productRepo from '../repositories/productRepository.js'; 
@@ -46,6 +47,10 @@ export const getCategoriesPage = async (queryParams) => {
 export const createCategory = async (body) => {
    const { categoryName, description, parentCategory, childCategory, discountValue } = body;
 
+   if(!categoryName?.trim() && !description?.trim()){
+      throw new Error("Category and description is required");
+   }
+
    if (!categoryName?.trim()) {
       throw new Error("Category name is required");
    }
@@ -78,10 +83,19 @@ export const createCategory = async (body) => {
 export const updateCategory = async (categoryId, body) => {
    const { categoryName, description, parentCategory, discountValue } = body;
 
-   if (!categoryName?.trim() || !description?.trim()) {
+   if (!categoryName?.trim() && !description?.trim()) {
       throw new Error('Category name and description fields are required.');
    }
 
+    if (!categoryName?.trim()) {
+      throw new Error("Category name is required");
+   }
+
+   if (!description?.trim()) {
+      throw new Error("Description is required");
+   }
+
+   
    const duplicate = await categoryRepo.findCategoryByNameAndParent(
        categoryName.trim(), 
        parentCategory || null,

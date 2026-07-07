@@ -1,4 +1,7 @@
 import  adminRepo from '../repositories/adminRepository.js';
+import * as OrderRepo from '../repositories/orderRepository.js';
+import Return from '../models/ReturnModel.js';
+
 import bcrypt from 'bcrypt';
 
 export const login = async (
@@ -129,12 +132,70 @@ export const toggleUserStatus = async (userId) => {
 };
 
 
+export const getAllOrders = async (queryParams) => {
+    const search = queryParams.search || '';
+    const page = parseInt(queryParams.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const orders = await OrderRepo.findOrdersWithSearch(search, limit, skip);
+    const totalOrders = await OrderRepo.countOrdersWithSearch(search);
+    const totalPages = Math.ceil(totalOrders / limit);
+   
+    return {
+        orders,
+        pagination: {
+            currentPage: page,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+            nextPage: page + 1,
+            prevPage: page - 1,
+            searchQuery: search
+        }
+    };
+};
 
 
+export const getOrderById = async (orderId) => {
+    const order = await OrderRepo.findOrderById(orderId);
+    if (!order) throw new Error("Order not found");
+    
+    return order;
+};
 
 
+export const updateOrderStatus = async (orderId, newStatus) => {
+    const validStatuses = [ 'Processing', 'Shipped','Out of delivery' ,'Delivered', 'Cancelled'];
+    const Order = await OrderRepo.findOrderById(orderId);
+    console.log(`DEBUG: Attempting to update Order ${orderId} from ${Order?.status} to ${newStatus}`);
+    if (!validStatuses.includes(newStatus)) {
+        throw new Error("Invalid status update");
+    } 
+    return await OrderRepo.updateStatus(orderId, newStatus);
+};
 
 
+export const fetchAllReturns = async () => {
+    return await Return.find()
+        .populate('orderId', 'orderId') 
+        .populate('userId', 'name')
+        .sort({ createdAt: -1 });
+};
+
+export const changeReturnStatus = async (returnId, newStatus) => {
+    const returnRequest = await Return.findByIdAndUpdate(
+        returnId, 
+        { returnStatus: newStatus }, 
+        { new: true }
+    );
+    
+    if (!returnRequest) throw new Error("Return request not found");
+    
+    if (newStatus === 'Approved') {
+    }
+    return returnRequest;
+};
 
 
 
