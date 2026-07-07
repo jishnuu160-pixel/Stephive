@@ -8,7 +8,7 @@
         <a href="/admin/products" class="nav-link {{#if (eq activePage 'products')}}active{{/if}}">
             <i class="fas fa-box"></i> <span>Product List</span>
         </a>
-        <a href="/admin/orders" class="nav-link ">
+        <a href="/admin/orders" class="nav-link  {{#if (eq activePage 'orders')}}active{{/if}}">
             <i class="fas fa-shopping-cart"></i> <span>Order Management</span>
         </a>
         <a href="/admin/customers" class="nav-link {{#if (eq activePage 'customers')}}active{{/if}}">
@@ -30,7 +30,7 @@
         <a href="/admin/brands" class="nav-link {{#if (eq activePage 'brands')}}active{{/if}}">
             <i class="fas fa-tags"></i> <span>Brand</span>
         </a>
-        <a href="/admin/returns" class="nav-link">
+        <a href="/admin/returns" class="nav-link {{#if (eq activePage 'return')}}active{{/if}}">
             <i class="fas fa-undo"></i> <span>Return</span>
         </a>
       
