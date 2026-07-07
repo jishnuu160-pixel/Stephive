@@ -19,11 +19,13 @@
 
         <div class="hero-image-wrapper" style="flex: 1; position: relative;">
 
-            <button class="wishlist-trigger" type="button" aria-label="Add to Wishlist">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-            </button>
+        <button class="wishlist-btn {{#if isWishlisted}}active{{/if}}" data-product-id="{{product._id}}">
+              {{#if isWishlisted}}
+                   <i class="fa-solid fa-heart"></i>
+              {{else}}
+                   <i class="fa-regular fa-heart"></i>
+              {{/if}}
+           </button>
 
             <div class="product-card">
     {{#if product.variants.[0].images.[0]}}
@@ -51,10 +53,6 @@
       </h1>
       <p class="item-tagline">• Brand: {{product.brand}}</p>
       
-      <div class="rating-row">
-        <span class="stars">★★★★★</span>
-        <span class="review-count">(124 Reviews)</span>
-      </div>
 
       <div class="pricing-row">
         <h2 class="current-price">
@@ -118,15 +116,16 @@
           <button type="button" onclick="updateQty(1)">+</button>
         </div>
         
-        <button type="button" class="btn-secondary-cart" onclick="addToCart('{{product._id}}')">
-          <img class="nav-icons" src="/icons/cart.png">
-          Add to Cart
-        </button>
+     <button type="button" class="btn-secondary-cart" 
+        onclick="addToCart('{{product._id}}', activeVariantId, chosenSize)">
+        <img class="nav-icons" src="/icons/cart.png">
+    Add to Cart
+</button>
         
-        <button type="button" class="btn-primary-buy">
+       <button type="button" class="btn-primary-buy" onclick="buyNow('{{product._id}}')">
           <img class="nav-icons" src="/icons/shopping-bag.png">
-          Buy Now
-          </button>
+            Buy Now
+       </button>
       </div>
 
     </div>
@@ -136,7 +135,6 @@
     <div class="tabs-header-strip">
       <button type="button" class="tab-trigger active-tab" onclick="switchProductTab(event, 'tab-specs')">Specifications</button>
       <button type="button" class="tab-trigger" onclick="switchProductTab(event, 'tab-description')">Description</button>
-      <button type="button" class="tab-trigger" onclick="switchProductTab(event, 'tab-reviews')">Reviews (124)</button>
     </div>
     
     <div id="tab-specs" class="tab-viewport-panel main-tab-content-panel" style="display: block;">
@@ -219,15 +217,15 @@
     let activeVariantId = "{{lookup (lookup product.variants 0) '_id'}}";
 
     const globalVariants = [
-        {{#each product.variants}}
-        {
-            _id: "{{this._id}}",
-            colorName: "{{this.colorName}}",
-            images: [{{#each this.images}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}],
-            sizes: [{{#each this.sizes}}{ size: "{{this.size}}" }{{#unless @last}},{{/unless}}{{/each}}]
-        }{{#unless @last}},{{/unless}}
-        {{/each}}
-    ];
+    {{#each product.variants}}
+    {
+        _id: "{{this._id}}",
+        colorName: "{{this.colorName}}",
+        images: [{{#each this.images}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}],
+        sizes: [{{#each this.sizes}}{ size: "{{this.size}}", stock: {{this.stock}} }{{#unless @last}},{{/unless}}{{/each}}]
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+];
 
     function initDrift() {
         const mainImg = document.querySelector('.zoom-image');
@@ -328,41 +326,82 @@ activeVariant.sizes.forEach(sizeObj => {
     }
 
     function updateSelectedSize(sizeValue, buttonElement) {
-        chosenSize = sizeValue;
-        document.getElementById("selectedSizeIndicator").innerText = sizeValue;
-        document.querySelectorAll('.size-chip').forEach(el => el.classList.remove('active-size'));
-        buttonElement.classList.add('active-size');
+    chosenSize = sizeValue;
+    document.getElementById("selectedSizeIndicator").innerText = sizeValue;
+    
+    document.querySelectorAll('.size-chip').forEach(el => el.classList.remove('active-size'));
+    buttonElement.classList.add('active-size');
+
+    document.getElementById("purchaseQty").value = 1;
+}
+
+   function updateQty(change) {
+    if (!chosenSize) {
+        return showToast("Please select a size first", "error");
     }
 
-    function updateQty(change) {
-        const qtyInput = document.getElementById("purchaseQty");
-        let qty = parseInt(qtyInput.value) || 1;
-        qty += change;
-        if (qty < 1) qty = 1;
-        if (qty > 5) return showToast("Max 5 units allowed.", "error");
-        qtyInput.value = qty;
+    const currentVariant = globalVariants.find(v => v._id === activeVariantId);
+    const sizeObj = currentVariant?.sizes.find(s => s.size == chosenSize);
+    if (!sizeObj) return;
+
+    const maxAllowed = 5;
+    const stockLimit = parseInt(sizeObj.stock);
+    const effectiveLimit = Math.min(maxAllowed, stockLimit);
+
+    const qtyInput = document.getElementById("purchaseQty");
+    let qty = parseInt(qtyInput.value) || 1;
+    
+    qty += change;
+
+    if (qty < 1) qty = 1;
+    if (qty > effectiveLimit) {
+        showToast(`Maximum ${effectiveLimit} units allowed`, "error");
+        qty = effectiveLimit;
+    }
+    
+    qtyInput.value = qty;
+}
+
+async function addToCart(productId, variantId, size) {
+    console.log("Frontend values:", { productId, variantId, size });
+
+    if (!variantId || !size) {
+        return showToast("Please select a color and size first!", "error");
     }
 
-    async function addToCart(productId) {
-        if (!chosenSize) return showToast("Please select a size", "error");
-        try {
-            const response = await fetch('/user/cart/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, variantId: activeVariantId, size: chosenSize, color: chosenColor, quantity: document.getElementById("purchaseQty").value })
-            });
+    try {
+        const response = await fetch("/cart/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                productId: productId, 
+                variantId: variantId, 
+                size: size, 
+                quantity: document.getElementById("purchaseQty")?.value || 1 
+            })
+        });
 
-
-
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message);
-            showToast("Added to cart successfully");
-            if (window.updateGlobalCartCount) window.updateGlobalCartCount(data.globalCartCount);
-            
-        } catch (error) {
-            showToast(error.message || "Connection failed", "error");
+        if (response.status === 401 || response.status === 403) {
+            window.location.href = "/user/login?error=Please login to continue";
+            return;
         }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast("Added to cart!", "success");
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 800); 
+
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (err) {
+        showToast(err.message, "error");
     }
+}
 
     function switchProductTab(event, targetTabId) {
         document.querySelectorAll('.main-tab-content-panel').forEach(p => p.style.display = 'none');
@@ -379,4 +418,93 @@ activeVariant.sizes.forEach(sizeObj => {
         setTimeout(() => toast.classList.add("show"), 100);
         setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 2500);
     }
+
+ document.querySelector(".wishlist-btn").addEventListener("click", async function(){
+    const btn = this;
+    const productId = btn.dataset.productId;
+
+    try {
+        const response = await fetch("/wishlist/toggle", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            btn.classList.toggle("active");
+            const icon = btn.querySelector("i");
+            const isNowActive = btn.classList.contains("active");
+
+            if (isNowActive) {
+                icon.classList.replace("fa-regular", "fa-solid");
+                showToast("Added to wishlist", "success");
+            } else {
+                icon.classList.replace("fa-solid", "fa-regular");
+                showToast("Removed from wishlist", "info");
+            }
+
+            if (window.updateGlobalWishlistCount) {
+                window.updateGlobalWishlistCount(data.newCount);
+            }
+        }else{
+            if(response.status=401){
+               if (typeof showToast === "function") showToast("Please log in to manage wishlist",'info');
+            }else{
+                if(typeof showToast === "function") showToast("Failed to add to wishlist","error");
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        showToast("Something went wrong", "error");
+    }
+});
+
+
+async function buyNow(productId) {
+    if (!chosenSize) return showToast("Please select a size", "error");
+    
+    const btn = document.querySelector('.btn-primary-buy');
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
+    const response = await fetch('/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            productId, 
+            variantId: activeVariantId, 
+            size: chosenSize, 
+            quantity: document.getElementById("purchaseQty").value 
+        })
+    });
+
+    if (response.ok) {
+        window.location.href = '/checkout'; 
+    } else {
+        btn.disabled = false;
+        btn.innerText = "Buy Now";
+        showToast("Please login to order", "error");
+         if (response.status === 401 || response.status === 403) {
+            window.location.href = "/user/login?error=Please login to continue";
+            return;
+        }
+    }
+}
+
+function updateStockUI(selectedVariant, selectedSize) {
+    const sizeObj = selectedVariant.sizes.find(s => s.size == selectedSize);
+    const buyBtn = document.getElementById("buyNowBtn");
+
+    if (sizeObj.stock <= 0) {
+        buyBtn.disabled = true;
+        buyBtn.innerText = "Out of Stock";
+        buyBtn.classList.add("btn-disabled");
+    } else {
+        buyBtn.disabled = false;
+        buyBtn.innerText = "Buy Now";
+        buyBtn.classList.remove("btn-disabled");
+    }
+}
 </script>
