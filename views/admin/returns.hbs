@@ -1,0 +1,47 @@
+<div class="admin-container">
+    <header class="admin-header">
+        <h1>Return Requests</h1>
+        <p>Manage and process customer return requests</p>
+    </header>
+
+    <div class="table-card">
+        <table class="return-table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Reason</th>
+                    <th>Refund</th>
+                    <th>Status</th>
+                    <th>Pickup Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each returns}}
+                <tr>
+                    <td>#{{this.orderId.orderId}}</td> 
+                    <td>{{this.reason}}</td>
+                    <td>{{this.refundMode}} (₹{{this.refundAmount}})</td>
+                    <td><span class="status-badge {{this.returnStatus}}">{{this.returnStatus}}</span></td>
+                    <td>{{formattedDate this.expectedPickupDate}}</td>
+                    <td>
+                        <button class="btn-action approve" onclick="updateStatus('{{this._id}}', 'Approved')">Approve</button>
+                        <button class="btn-action reject" onclick="updateStatus('{{this._id}}', 'Rejected')">Reject</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+async function updateStatus(id, status) {
+    const res = await fetch(`/admin/returns/${id}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+    });
+    if (res.ok) window.location.reload();
+}
+</script>

@@ -1,0 +1,253 @@
+<section class="order-details-page">
+    <div class="breadcrumb">
+        <a href="/">My Account</a> <span>/</span> <a href="/orders">Orders</a> <span>/</span> <span>Order Details</span>
+    </div>
+
+    <div class="order-header">
+        <div class="left">
+            <h1>Order #{{order.orderId}} 
+                <span class="status-badge {{toLowerCase order.status}}">{{order.status}}</span>
+            </h1>
+            <p>Placed on {{formattedDate order.createdAt}}</p>
+        </div>
+        <a href="/history" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Orders</a>
+    </div>
+
+  
+
+          <div class="order-layout">
+
+        <!-- LEFT SIDE -->
+
+        <div class="left-column">
+
+            <!-- Tracking -->
+
+            <div class="card tracking-card">
+
+                <h3>
+
+                    <i class="fa-solid fa-truck-fast"></i>
+
+                    Track Your Delivery
+
+                </h3>
+{{!-- <div class="timeline">
+    <div class="timeline-item {{#if (isStepCompleted 0 currentStep)}}completed{{/if}} {{#if (isStepActive 0 currentStep)}}active{{/if}}">
+        <span class="dot"></span>
+        <div class="content">
+            <h4>Order Placed</h4>
+            <p>Order confirmed and being verified.</p>
+            <small>{{ order.createdAt }}</small>
+        </div>
+    </div>
+
+    <div class="timeline-item {{#if (isStepCompleted 1 currentStep)}}completed{{/if}} {{#if (isStepActive 1 currentStep)}}active{{/if}}">
+        <span class="dot"></span>
+        <div class="content">
+            <h4>Processing at Atelier</h4>
+            <p>Quality check and luxury packaging in progress.</p>
+        </div>
+    </div>
+
+    <div class="timeline-item {{#if (isStepCompleted 2 currentStep)}}completed{{/if}} {{#if (isStepActive 2 currentStep)}}active{{/if}}">
+        <span class="dot"></span>
+        <div class="content">
+            <h4>Shipped</h4>
+            <p>Waiting to be picked up by courier.</p>
+        </div>
+    </div>
+
+    <div class="timeline-item {{#if (isStepCompleted 3 currentStep)}}completed{{/if}} {{#if (isStepActive 3 currentStep)}}active{{/if}}">
+        <span class="dot"></span>
+        <div class="content">
+            <h4>Out of delivery</h4>
+            <p>Order is out of delivery</p>
+            <small>{{ order.createdAt }}</small>
+        </div>
+    </div>
+
+   {{#if (eq order.status 'cancelled')}}
+    <div class="timeline-item active cancelled-status">
+        <span class="dot" style="background-color: #dc2626;"></span>
+        <div class="content">
+            <h4 style="color: #dc2626;">Order Cancelled</h4>
+            <p>This order has been cancelled per your request.</p>
+        </div>
+    </div>
+{{else}}
+    <div class="timeline-item {{#if (isStepCompleted 4 currentStep)}}completed{{/if}} {{#if (isStepActive 4 currentStep)}}active{{/if}}">
+        <span class="dot"></span>
+        <div class="content">
+            <h4>Delivered</h4>
+            <p>Delivered Successfully</p>
+        </div>
+    </div>
+{{/if}}
+</div> --}}
+<div class="timeline">
+    <div class="timeline-item {{#if (isStepCompleted 0 currentStep)}}completed{{/if}}">
+        <span class="dot"></span>
+        <div class="content"><h4>Order Placed</h4></div>
+    </div>
+    
+    <div class="timeline-item {{#if (isStepCompleted 1 currentStep)}}completed{{/if}}">
+        <span class="dot"></span>
+        <div class="content"><h4>Processing at Atelier</h4></div>
+    </div>
+
+    {{#unless (eq order.status 'cancelled')}}
+        <div class="timeline-item {{#if (isStepCompleted 2 currentStep)}}completed{{/if}}">
+            <span class="dot"></span>
+            <div class="content"><h4>Shipped</h4></div>
+        </div>
+        <div class="timeline-item {{#if (isStepCompleted 3 currentStep)}}completed{{/if}}">
+            <span class="dot"></span>
+            <div class="content"><h4>Out of delivery</h4></div>
+        </div>
+        <div class="timeline-item {{#if (isStepCompleted 4 currentStep)}}completed{{/if}}">
+            <span class="dot"></span>
+            <div class="content"><h4>Delivered</h4></div>
+        </div>
+    {{/unless}}
+
+    {{#if (eq order.status 'cancelled')}}
+        <div class="timeline-item active cancelled-status">
+            <span class="dot" style="background-color: #dc2626;"></span>
+            <div class="content">
+                <h4 style="color: #dc2626;">Order Cancelled</h4>
+                <p>This order was cancelled after <strong>{{order.previousStatus}}</strong>.</p>
+            </div>
+        </div>
+    {{/if}}
+</div>
+            </div>
+<div class="card order-items-card">
+    <h3><i class="fa-solid fa-bag-shopping"></i> Order Items</h3>
+    {{#each order.items}}
+    <div class="order-item">
+         <div class="product-visual">
+          <img src="{{this.productImage}}" alt="{{this.productName}}">
+         </div>
+        <div class="details">
+            <h4>{{this.productName}}</h4>
+            <p class="description">Size: {{this.size}}</p>
+            <div class="labels">
+                <span class="qty">Quantity: {{this.quantity}}</span>
+                <span class="processing">{{../order.status}}</span>
+            </div> 
+     
+        </div>
+        <div class="price">
+           Price: ₹{{this.price}}
+        </div>
+    </div>
+    {{/each}}
+</div>
+
+</div>
+
+        <div class="right-column">
+            <div class="card summary-card">
+                <h3>ORDER SUMMARY</h3>
+                <div class="row"><span>Subtotal</span><span>₹{{order.subtotal}}</span></div>
+                <div class="row"><span>Member Discount</span><span class="green">-₹{{order.discount}}</span></div>
+                <div class="row"><span>TAX (Included)</span><span>₹{{order.tax}}</span></div>
+                <div class="row total"><span>Total</span><span><strong>₹{{order.finalAmount}}</strong></span></div>
+            </div>
+
+            <div class="card">
+                <h3>DELIVERY INFORMATION</h3>
+                <div class="info">
+                    <p><strong>Recipient</strong><p class="delivery-font">{{order.deliveryAddress.fullName}}<br>{{order.deliveryAddress.addressLine1}}, {{order.deliveryAddress.city}}<br>{{order.deliveryAddress.pincode}}</p>
+                    <p><strong>Contact</strong><br> <p class="delivery-font">{{order.deliveryAddress.mobileNumber}}</p>
+                    <p><strong>Estimated Date</strong><br> <p class="delivery-font">{{formattedDate order.expectedDeliveryDate}}</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>PAYMENT METHOD</h3>
+                <div class="payment-info">
+                    <p><i class="fa-solid fa-credit-card"></i> {{order.paymentMethod}}</p>
+                    <span class="paid-badge">{{order.paymentStatus}}</span>
+                </div>
+            </div>
+<div class="card">
+    <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
+        <i class="fa-solid fa-download"></i> Download Invoice
+    </a>
+
+    {{#if isReturnable}}
+        <a href="/orders/return/{{order._id}}" class="return-order-btn">
+            <i class="fa-solid fa-rotate-left"></i> Return Order
+        </a>
+    {{else if showCancelButton}}
+       <button type="button" class="cancel-order-btn" onclick="confirmCancel('{{order._id}}')">
+    <i class="fa-solid fa-circle-xmark"></i> Cancel Order
+</button>
+    {{/if}}
+</div>
+
+{{#if isDelivered}}
+   <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
+    <i class="fa-solid fa-download"></i> Download Invoice
+   </a>
+<a href="/orders/return/{{order._id}}" class="return-order-btn">
+ <i class="fa-solid fa-rotate-left"></i> Return Order
+</a>  
+
+{{/if}}
+        </div> 
+</section>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('canceled') === 'true') {
+        Toastify({
+            text: "Item successfully cancelled!",
+            duration: 3000,
+            close: true,
+            gravity: "top", 
+            position: "right",
+            backgroundColor: "#dc2626",
+        }).showToast();
+    }
+
+    if (urlParams.get('error') === 'true') {
+        Toastify({
+            text: "Failed to cancel item.",
+            duration: 3000,
+            backgroundColor: "#7f1d1d",
+        }).showToast();
+    };
+
+async function confirmCancel(orderId) {
+    const result = await Swal.fire({
+        title: 'Are you sure you want to cancel this order?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, cancel it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch(`/orders/${orderId}/cancel`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                Swal.fire('Cancelled!', 'Your order has been cancelled.', 'success')
+                    .then(() => window.location.reload());
+            } else {
+                throw new Error('Failed to cancel');
+            }
+        } catch (error) {
+            Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+    }
+}
+</script>
