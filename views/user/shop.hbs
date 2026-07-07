@@ -1,11 +1,13 @@
 {{#unless searchValue}}
     <div class="shop-container">
-        <section class="hero-section">
+        <header class="hero-section">
             <div class="hero-content">
                 <h1>Shop the latest Sneakers</h1>
                 <p>Discover Your Next Favorite Pair</p>
             </div>
-            
+        </header>
+        
+        <section class="shop-products-section">
             <div class="products-wrapper-grid-shop">
                 {{#each products}}
                     {{> product-card}}
@@ -20,14 +22,25 @@
 
     <section class="categories-section">
         <h3>Browse by category</h3>
-          <div class="category-grid">
-            <div class="cat-card-running"><img src="/images/running-shoe.jpg" alt="Running"><span class="category-label">Running shoes<p>move faster run longer</p></span></div>
-            <div class="cat-card-casual"><img src="/images/casual-shoe.jpg" alt="Casual"><span class="category-label">Casual shoes<p>Street style daily comfort</p></span></div>
-            <div class="cat-card-training"><img src="/images/training-shoe.jpg" alt="Training"><span class="category-label">Training shoes<p>Power your workouts</p></span></div>
-            <div class="cat-card-limited"><img src="/images/limited-edition.jpg" alt="Limited"><span class="category-label">Limited Edition<p>Rare drops limited stock</p></span></div>
+        <div class="category-grid">
+            <div class="cat-card-running">
+                <img src="/images/running-shoe.jpg" alt="Running">
+                <div class="category-label"><h4>Running shoes</h4><p>move faster run longer</p></div>
+            </div>
+            <div class="cat-card-casual">
+                <img src="/images/casual-shoe.jpg" alt="Casual">
+                <div class="category-label"><h4>Casual shoes</h4><p>Street style daily comfort</p></div>
+            </div>
+            <div class="cat-card-training">
+                <img src="/images/training-shoe.jpg" alt="Training">
+                <div class="category-label"><h4>Training shoes</h4><p>Power your workouts</p></div>
+            </div>
+            <div class="cat-card-limited">
+                <img src="/images/limited-edition.jpg" alt="Limited">
+                <div class="category-label"><h4>Limited Edition</h4><p>Rare drops limited stock</p></div>
+            </div>
         </div>
-
-        </section>
+    </section>
 
     <section class="best-sellers">
         <h3>Best Sellers</h3>
@@ -56,3 +69,51 @@
         {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage}}
     </section>
 {{/if}}
+
+<script>
+document.addEventListener("click", async function (event) {
+    const btn = event.target.closest(".wishlist-btn");
+    if (!btn) return; 
+
+    event.preventDefault();
+    const productId = btn.dataset.productId;
+    if (!productId) return;
+
+    try {
+        const response = await fetch("/wishlist/toggle", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            btn.classList.toggle("active");
+            const icon = btn.querySelector("i");
+            const isNowActive = btn.classList.contains("active");
+
+            if (isNowActive) {
+                icon.classList.replace("fa-regular", "fa-solid");
+                if (typeof showToast === "function") showToast("Added to wishlist", "success");
+            } else {
+                icon.classList.replace("fa-solid", "fa-regular");
+                if (typeof showToast === "function") showToast("Removed from wishlist", "info");
+            }
+
+            if (window.updateGlobalWishlistCount) {
+                window.updateGlobalWishlistCount(data.newCount);
+            }
+        } else {
+            if (response.status === 401) {
+                if (typeof showToast === "function") showToast("Please log in to manage wishlist", "warning");
+            } else {
+                if (typeof showToast === "function") showToast("Failed to update wishlist", "error");
+            }
+        }
+    } catch (err) {
+        console.error("Wishlist sync error:", err);
+        if (typeof showToast === "function") showToast("Something went wrong", "error");
+    }
+});
+</script>
