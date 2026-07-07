@@ -52,8 +52,8 @@
 .auth-card {
   position: absolute;
   /* Adjust these to move it to the right of the text */
-  right: -360px; 
-  top:-10; 
+  right: -460px; 
+  top:-45px; 
   
   width: 170px;         
   height: auto;        
@@ -68,7 +68,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;           
+  gap: 10px;           
   z-index: 100;
 }
 

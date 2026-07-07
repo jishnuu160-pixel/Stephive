@@ -162,23 +162,6 @@
     margin-bottom:20px;
 }
 
-.rating-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 25px;
-}
-
-.stars {
-    color: #f59e0b;
-    font-size: 15px;
-}
-
-.review-count {
-    font-size: 13px;
-    color: #94a3b8;
-}
-
 .pricing-row {
     display: flex;
     align-items: baseline;
@@ -807,3 +790,49 @@
     transition: background-color 0.2s ease;
 }
 
+
+
+/* Container must be position: relative for this to work */
+.wishlist-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+/* Icon Styles */
+.wishlist-btn i {
+    font-size: 20px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect */
+.wishlist-btn:hover {
+    transform: translateY(-2px);
+    background: #fff;
+}
+
+.wishlist-btn:hover i {
+    color: #ff3b5f;
+}
+
+/* Active (Wishlisted) State */
+.wishlist-btn.active i {
+    color: #ff2d55;
+    font-weight: 900; /* Makes the solid heart look bolder */
+}
