@@ -1,4 +1,5 @@
 import * as productService from '../services/productService.js';
+import * as wishlistService from "../services/wishlistService.js";
 
 /* ---------------- SHOP ---------------- */
 
@@ -6,20 +7,45 @@ export const getShop = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
 
-        const [shopData, bestSellers] = await Promise.all([
+        const [shopData, bestSellersRaw] = await Promise.all([
             productService.getShopProducts(req, null, page),
             productService.getBestSellers()
         ]);
 
+        let activeProducts = [];
         if (shopData.products && Array.isArray(shopData.products)) {
-            shopData.products = shopData.products.filter(
+            activeProducts = shopData.products.filter(
                 p => p.isListed !== false && p.isBlocked !== true
             );
         }
 
+        const userId = req.session?.user?.id;
+        let wishlistedProductIds = new Set();
+
+        if (userId) {
+            const wishlist = await wishlistService.getWishlist(userId);
+            if (wishlist && wishlist.items) {
+                wishlist.items.forEach(item => {
+                    const id = item.productId?._id || item.productId;
+                    if (id) wishlistedProductIds.add(id.toString());
+                });
+            }
+        }
+
+        const productsWithWishlist = activeProducts.map(product => ({
+            ...product,
+            isWishlisted: wishlistedProductIds.has(product._id.toString())
+        }));
+
+        const bestSellersWithWishlist = bestSellersRaw.map(product => ({
+            ...product,
+            isWishlisted: wishlistedProductIds.has(product._id.toString())
+        }));
+
         return res.render('user/shop', {
             ...shopData,      
-            bestSellers,      
+            products: productsWithWishlist, 
+            bestSellers: bestSellersWithWishlist,      
             searchValue: req.query.search || ""
         });
 
@@ -91,12 +117,24 @@ export const getProductId = async (req, res) => {
         }
 
         if (result.relatedProducts && Array.isArray(result.relatedProducts)) {
-            result.relatedProducts = result.relatedProducts.filter(p => p.isListed !== false && p.isBlocked !== true);
+            result.relatedProducts = result.relatedProducts.filter(
+                p => p.isListed !== false && p.isBlocked !== true
+            );
+        }
+
+        let isWishlisted = false;
+
+        if (req.session.user) {
+            isWishlisted = await wishlistService.isInWishlist(
+                req.session.user.id,
+                result.product._id
+            );
         }
 
         return res.render('user/productPage', {
             ...result,
-            user: req.session.user || null
+            user: req.session.user || null,
+            isWishlisted
         });
 
     } catch (error) {
@@ -104,7 +142,6 @@ export const getProductId = async (req, res) => {
         return res.status(500).send("Internal Server Error");
     }
 };
-
 
 /* ---------------- ADMIN CONTROLLERS (Unchanged) ---------------- */
 
@@ -207,7 +244,9 @@ export const postEditProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
    try {
+
       const data = await productService.getProductsPage(req.query);
+      
       res.render('admin/product', data);
    } catch (error) {
       console.error(error);

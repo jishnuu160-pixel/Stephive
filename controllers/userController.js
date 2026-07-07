@@ -647,17 +647,17 @@ export const googleAuthSuccess = (req, res) => {
 };
 
 
-
-
-export const getAbout = async(req,res)=>{
-    try{
-        res.render('/about',{
-            user:req.session.user
-        })
-    }catch(error){
+export const getAbout = async (req, res) => {
+    try {
+        res.render('user/about', { 
+            user: req.session.user
+        });
+    } catch (error) {
+        console.error("About Error:", error);
         res.redirect('/');
     }
-}
+};
+
 
 
 
