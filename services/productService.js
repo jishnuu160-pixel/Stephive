@@ -59,6 +59,7 @@ export const getShopProducts = async (req) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 8;
         const skip = (page - 1) * limit;
+        const startIndex = skip;
 
         const allCategories = await findAllCategories();
         const activeCategoryObjectIds = allCategories
@@ -105,6 +106,7 @@ export const getShopProducts = async (req) => {
 
         return {
             products,
+            startIndex,
             currentPage: page,
             totalPages: totalPages || 1,
             hasNextPage: page < totalPages,
@@ -126,6 +128,9 @@ export const getShopProducts = async (req) => {
         throw error;
     }
 };
+
+
+
 
 export const getBestSellers = async () => {
     try {
@@ -272,6 +277,14 @@ export const getProductDetails = async (id) => {
     };
 };
 
+
+const calculateTotalStock = (product) => {
+    return (product.variants || []).reduce((acc, variant) => {
+        const variantTotal = (variant.sizes || []).reduce((sSum, sz) => sSum + (sz.stock || 0), 0);
+        return acc + variantTotal;
+    }, 0);
+};
+
 export const getProductsPage = async (queryParams) => {
     const searchQuery = queryParams.search ? queryParams.search.trim() : '';
     const page = parseInt(queryParams.page) || 1;
@@ -285,30 +298,33 @@ export const getProductsPage = async (queryParams) => {
 
     const sortQuery = { createdAt: -1 };
     const products = await productRepo.findProducts(searchFilter, sortQuery, skip, limit);
+    
+    const productsWithStock = products.map(product => ({
+        ...product,
+        displayStock: calculateTotalStock(product) 
+    }));
+
     const totalProducts = await productRepo.countProducts(searchFilter);
     const rawCategories = await findAllCategories();
     const totalPages = Math.ceil(totalProducts / limit);
 
-    const parentCategories = rawCategories.filter(cat => !cat.parentCategory);
-    const subcategories = rawCategories.filter(cat => cat.parentCategory);
-
     return {
         isAdmin: true,
         activePage: 'products',
-        products,
+        products: productsWithStock, 
         startIndex: skip,
-        parentCategories,
-        subcategories,
-        pagination: {
-            page,
-            limit,
-            totalPages: totalPages || 1,
-            totalProducts,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1,
-            nextPage: page + 1,
-            prevPage: page - 1
-        },
+        parentCategories: rawCategories.filter(cat => !cat.parentCategory),
+        subcategories: rawCategories.filter(cat => cat.parentCategory),
+pagination: {
+    page,
+    limit,
+    totalPages: totalPages || 1,
+    totalProducts,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+    nextPage: page + 1,
+    prevPage: page - 1
+},
         searchQuery
     };
 };

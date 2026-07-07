@@ -131,7 +131,7 @@ export const resetPassword = async (email, newPassword) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-    const updatedUser = await User.findOneAndUpdate(
+    const updatedUser = await userRepo.findOneAndUpdate(
         { email: email },
         { $set: { password: hashedPassword } },
         { new: true }
