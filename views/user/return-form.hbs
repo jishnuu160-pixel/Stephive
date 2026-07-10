@@ -7,7 +7,7 @@
         </header>
 
         <form action="/orders/return/{{order._id}}" method="POST" class="return-form-grid">
-            
+            <input type="hidden" name="orderId" value="{{order.orderId}}">
             <div class="form-section">
                 <h3>Select Item to Return</h3>
                 {{#each order.items}}
@@ -16,7 +16,7 @@
                     <img src="{{this.productImage}}" alt="{{this.productName}}">
                     <div class="item-info">
                         <h4>{{this.productName}}</h4>
-                        <p>Size: {{this.size}} | Qty: {{this.quantity}} | Price: ₹{{this.price}}</p>
+                        <p>Size: {{this.size}} | Qty: {{this.quantity}} | Price: ₹{{this.total}}</p>
                     </div>
                 </div>
                 {{/each}}
@@ -24,7 +24,13 @@
 
             <div class="form-section">
                 <h3>Return Details</h3>
-                
+                <div class="form-group">
+                 <label>Request Type</label>
+                     <select name="returnType" required>
+                         <option value="Return">Return (Refund)</option>
+                         <option value="Exchange">Exchange (Replace)</option>
+                     </select>
+                </div>
                 <div class="field">
                     <label>Return Reason</label>
                     <select name="reason" required>
@@ -55,7 +61,7 @@
                         <a href="/user/add-address" class="add-address">
                       + Add Address
                        </a>
-                       <a href="/user/edit-address/{{this._id}}" class="edit-address">Edit</a>
+                       <a href="/user/edit-address/{{order.deliveryAddress._id}}" class="edit-address">Edit</a>
                     </div>
                     <input type="hidden" name="pickupAddress" value="{{order.deliveryAddress._id}}">
                 </div>
