@@ -1,5 +1,6 @@
 import * as OrderRepo from '../repositories/orderRepository.js';
 import * as ProductRepo from '../repositories/productRepository.js';
+import * as ReturnRepo from '../repositories/returnRepository.js';
 import * as UserRepo from '../repositories/userRepository.js';
 import mongoose from 'mongoose';
 import { generateOrderID } from '../utils/idGenerator.js';
@@ -181,14 +182,20 @@ export const calculateDirectPricing = (item) => {
 
 export const getUserOrderDetails = async (orderId, userId) => {
     const order = await OrderRepo.findUserOrderById(orderId, userId);
+    if (!order) throw new Error('Order not found or access denied');
+
+    const returnRequest = await ReturnRepo.findByOrderId(order.orderId);
+    let displayStatus = order.status; 
+    if (returnRequest && returnRequest.status !== 'Rejected' && returnRequest.status !== 'CancelledByAdmin') {
+        displayStatus = `Return ${returnRequest.status}`;
+    } 
     
-    if (!order) {
-        throw new Error('Order not found or access denied');
-    }
+    console.log("DEBUG: Found Return Request:", returnRequest);
 
     return {
         ...order,
-        previousStatus: order.previousStatus || null,
+        displayStatus,
+        returnRequest,
         formattedDate: new Date(order.createdAt).toLocaleDateString('en-US', {
             year: 'numeric', month: 'long', day: 'numeric'
         })
