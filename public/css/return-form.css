@@ -1,108 +1,240 @@
-/* Container for the whole page */
+/* ===========================
+   RETURN REQUEST PAGE
+=========================== */
+
 .full-page-return {
-    padding: 40px 5%;
-    background-color: #fcfcfc;
+    background: #f5f6fa;
     min-height: 100vh;
+    padding: 40px 20px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-.return-container {
+.full-page-return .return-container {
     max-width: 1200px;
-    margin: 0 auto;
-}
-
-/* Page Header */
-.return-header { margin-bottom: 30px; }
-.return-header h1 { font-size: 2rem; margin: 0; color: #111; }
-.back-link {margin-left: 500px; 
-    text-decoration: none;
-     color: #666; 
-     font-size: 0.9rem; }
-
-/* The main two-column grid */
-.return-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 350px; /* Left takes available space, Right is fixed width */
-    gap: 40px;
-    align-items: start;
-}
-
-/* Left Column: Product Selection */
-.form-section {
-    background: white;
-    padding: 30px;
+    margin: auto;
+    background: #fff;
     border-radius: 12px;
-    border: 1px solid #eee;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
 }
 
-.item-card {
+.full-page-return .return-header {
+    padding: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.full-page-return .return-header h1 {
+    margin: 15px 0 5px;
+    font-size: 30px;
+}
+
+.full-page-return .return-header p {
+    color: #666;
+}
+
+.full-page-return .back-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+}
+
+.full-page-return .back-link i {
+    margin-right: 6px;
+}
+
+/* ===========================
+   GRID
+=========================== */
+
+.full-page-return .return-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 35px;
+    padding: 30px;
+}
+
+.full-page-return .form-section {
+    background: #fafafa;
+    border: 1px solid #ececec;
+    border-radius: 10px;
+    padding: 25px;
+}
+
+.full-page-return .form-section h3 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #222;
+}
+
+/* ===========================
+   ITEM CARD
+=========================== */
+
+.full-page-return .item-card {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 18px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: .3s;
 }
 
-.item-card img {
-    max-width: 100px; /* Control image size */
-    height: auto;
+.full-page-return .item-card:hover {
+    border-color: #000;
+    background: #f8f8f8;
+}
+
+.full-page-return .item-card input[type="radio"] {
+    transform: scale(1.2);
+}
+
+.full-page-return .item-card img {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
     border-radius: 8px;
 }
 
-/* Right Column: Return Details */
-.form-section h3 { margin-top: 0; margin-bottom: 20px; }
+.full-page-return .item-info h4 {
+    margin-bottom: 6px;
+}
 
-.field { margin-bottom: 20px; }
-.field label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
+.full-page-return .item-info p {
+    color: #666;
+    font-size: 14px;
+}
 
-.field select, .field textarea {
+/* ===========================
+   FORM
+=========================== */
+
+.full-page-return .field,
+.full-page-return .form-group {
+    margin-bottom: 22px;
+}
+
+.full-page-return label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.full-page-return select,
+.full-page-return textarea,
+.full-page-return input[type="date"] {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 12px;
+    border: 1px solid #d8d8d8;
     border-radius: 6px;
+    font-size: 15px;
+    outline: none;
+    transition: .3s;
     box-sizing: border-box;
 }
 
-.submit-full-btn {
+.full-page-return select:focus,
+.full-page-return textarea:focus,
+.full-page-return input[type="date"]:focus {
+    border-color: #000;
+}
+
+.full-page-return textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+/* ===========================
+   ADDRESS BOX
+=========================== */
+
+.full-page-return .address-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.full-page-return .address-box p {
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.full-page-return .add-address,
+.full-page-return .edit-address {
+    display: inline-block;
+    text-decoration: none;
+    color: #000;
+    font-weight: 600;
+    margin-right: 18px;
+}
+
+.full-page-return .add-address:hover,
+.full-page-return .edit-address:hover {
+    text-decoration: underline;
+}
+
+/* ===========================
+   BUTTON
+=========================== */
+
+.full-page-return .submit-full-btn {
     width: 100%;
     padding: 14px;
     background: #000;
     color: #fff;
     border: none;
     border-radius: 6px;
-    font-weight: bold;
+    font-size: 16px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: .3s;
 }
 
-.submit-full-btn:hover { background: #333; }
+.full-page-return .submit-full-btn:hover {
+    background: #333;
+}
 
-/* Responsive: Stack on mobile */
+/* ===========================
+   RESPONSIVE
+=========================== */
+
 @media (max-width: 900px) {
-    .return-form-grid { grid-template-columns: 1fr; }
+
+    .full-page-return .return-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-page-return .item-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .full-page-return .item-card img {
+        width: 120px;
+        height: 120px;
+    }
+
 }
 
-.add-address{
-    font-size: 8px;
-    text-decoration: none;
-    color: #ddd;
-    background-color: #333;
-    padding: 5px;
-    border-radius: 12px;
-    margin-top: 10px;
-}
+@media (max-width: 600px) {
 
-.edit-address{
-    font-size: 8px;
-    text-decoration: none;
-    color: #ddd;
-    background-color: #333;
-    padding: 5px;
-    border-radius: 12px;
-   
-    margin-left: 20px;
-}
+    .full-page-return {
+        padding: 15px;
+    }
 
+    .full-page-return .return-header {
+        padding: 20px;
+    }
 
-.address-box p{
+    .full-page-return .return-header h1 {
+        font-size: 24px;
+    }
 
-    font-size: 13px;
-    padding: 10px;
+    .full-page-return .return-form-grid {
+        padding: 20px;
+    }
+
 }

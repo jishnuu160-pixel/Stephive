@@ -14,12 +14,12 @@
     margin-bottom: 2rem;
 }
 
-.status-badge {
+.status-badge-order {
     background: #e5d3d3;
-    padding: 6px 16px;
+    padding: 4px 10px;
     border-radius: 6px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 10px;
 }
 
 .order-main {
@@ -127,4 +127,13 @@
 
 .item-details{
     padding: 10px;
+}
+
+.table-card-order{
+    padding: 10px;
+    background: #fff;
+    width: 170vh;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    overflow: hidden;
 }

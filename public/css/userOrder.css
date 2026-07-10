@@ -1,5 +1,5 @@
 /* Layout */
-.orders-page { padding: 40px; background-color: #fcfcfc; }
+.orders-page { padding: 20px; background-color: #fcfcfc; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
 
 /* Search Input */

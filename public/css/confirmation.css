@@ -355,6 +355,7 @@
     color: #ffffff;
     border: none;
     border-radius: 12px;
+    text-decoration: none;
     padding: 15px;
     font-family: inherit;
     font-size: 14px;
@@ -405,7 +406,7 @@
       font-size: 12px;
       font-weight: 700;
       color: var(--co-text-main);
-      text-decoration: underline;
+      text-decoration: none;
     }
   }
 

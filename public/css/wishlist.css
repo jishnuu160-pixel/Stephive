@@ -172,11 +172,21 @@ body {
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.empty-wishlist img{
-    width: 80px;
-    height: 60px;
+.empty-wishlist-img{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 40px;
 }
 
+.empty-wishlist{
+    height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 70px;
+}
 
 .wishlist-header {
     display: flex;
