@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <form action="/admin/returns/update-status/{{return._id}}" method="POST">
+        <form action="/admin/returns/update/{{returnDetails._id}}" method="POST">
 
             <!-- Product -->
 
@@ -70,70 +70,61 @@
                         <label>Refund Method</label>
                         <p>{{returnDetails.refundMode}}</p>
                     </div>
-
                     <div class="info-item">
                         <label>Pickup Date</label>
                         <p>{{formattedDate returnDetails.expectedPickupDate}}</p>
                     </div>
-
                 </div>
-
             </div>
 
             <!-- Pickup Address -->
 
             <div class="return-card">
-
                 <h4 class="section-title">PICKUP ADDRESS</h4>
-
                 <p>
                     {{returnDetails.pickupAddress.fullName}} <br>
-
                     {{returnDetails.pickupAddress.addressLine1}} <br>
-
                     {{returnDetails.pickupAddress.city}},
                     {{returnDetails.pickupAddress.state}} -
                     {{returnDetails.pickupAddress.pincode}} <br>
-
                     {{returnDetails.pickupAddress.mobileNumber}}
                 </p>
-
             </div>
 
             <!-- Update Status -->
 
             <div class="return-card">
-
-                <h4 class="section-title">UPDATE STATUS</h4>
-
+               <h4 class="section-title">UPDATE STATUS</h4>
                 <select name="status">
-
-                    <option value="Requested">Requested</option>
-
-                    <option value="Picked Up">Picked Up</option>
-
-                    <option value="Refunded">Refunded</option>
-
-                    <option value="Rejected">Rejected</option>
-
-                </select>
-
+    {{#ifEquals returnDetails.status "Requested"}}<option value="Requested" selected>Requested</option>{{else}}<option value="Requested">Requested</option>{{/ifEquals}}
+    {{#ifEquals returnDetails.status "Picked Up"}}<option value="Picked Up" selected>Picked Up</option>{{else}}<option value="Picked Up">Picked Up</option>{{/ifEquals}}
+    {{#ifEquals returnDetails.status "Refunded"}}<option value="Refunded" selected>Refunded</option>{{else}}<option value="Refunded">Refunded</option>{{/ifEquals}}
+    {{#ifEquals returnDetails.status "Rejected"}}<option value="Rejected" selected>Rejected</option>{{else}}<option value="Rejected">Rejected</option>{{/ifEquals}}
+</select>
             </div>
-
             <div class="page-actions">
-
-                <a href="/admin/returns" class="btn-cancel">
+             <a href="/admin/returns" class="btn-cancel">
                     Cancel
                 </a>
-
                 <button class="btn-save">
                     Save Changes
                 </button>
-
             </div>
-
         </form>
-
     </div>
-
 </section>
+
+<script>
+const response = await fetch(`/admin/returns/update/{{returnDetails._id}}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: document.querySelector('select[name="status"]').value })
+});
+
+const data = await response.json();
+if (response.ok) {
+    window.location.href = '/admin/returns';
+} else {
+    alert("Update failed: " + data.error);
+}
+</script>
