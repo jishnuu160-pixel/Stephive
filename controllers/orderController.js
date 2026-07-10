@@ -252,9 +252,9 @@ export const cancelOrderItem = async (req, res) => {
 export const getReturnForm = async (req, res) => {
     try {
         const orderId = req.params.id;
-        console.log("Attempting to load return form for:", orderId);
         
-        const order = await OrderService.getUserOrderDetails(req.params.id, req.session.user.id);        
+        
+        const order = await OrderService.getUserOrderDetails(orderId, req.session.user.id); 
         if (!order) {
             return res.status(404).send("Order not found");
         }
@@ -263,7 +263,8 @@ export const getReturnForm = async (req, res) => {
         
     } catch (error) {
         console.error("DEBUG ERROR in getReturnForm:", error);
-        res.status(500).send("Server Error: Unable to load return form");
+        req.flash('error', "Return request as already done.");
+        res.redirect('/history');
     }
 };
 
