@@ -1,4 +1,4 @@
-import mongoose  from "mongoose";
+import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
   orderId: { type: String, required: true },
@@ -36,7 +36,7 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['razorpay', 'cod', 'wallet'] },
   status: { 
     type: String, 
-    enum: ['pending', 'processing', 'shipped','out of delivery', 'delivered', 'cancelled'],
+    enum: ['pending', 'processing', 'shipped', 'out of delivery', 'delivered', 'cancelled', 'Returned'],
     default: 'pending'
   },
   expectedDeliveryDate: { type: Date },
@@ -46,4 +46,7 @@ const orderSchema = new mongoose.Schema({
   cancelledAt: Date
 }, { timestamps: true }); 
 
-export default mongoose.model('Order', orderSchema);
+// The 'Safety Gate' pattern:
+const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
+
+export default Order;
