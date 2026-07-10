@@ -43,17 +43,18 @@
             {{#each order.items}}
             <div class="item-row">
               <div class="item-img-wrapper">
-                {{#if this.productId.variants.[0].images.[0]}}
-                <img src="{{this.productId.productImage}}" 
-                     alt="{{this.productId.productName}}"  style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">
-            {{else}}
+               {{#if this.productImage}}
+                <img src="{{this.productImage}}" alt="{{this.productName}}" style="width:60px;height:60px;border-radius:5px;object-fit:cover;">
+              {{else}}
                 <div class="no-image-placeholder">No Image</div>
-            {{/if}}
+              {{/if}}
               </div>
               <div class="item-info">
                 <h4 class="item-name">{{this.productName}}</h4>
+               
               </div>
               <div class="item-qty-price">
+                 <span class="item-qty">Size: <strong>{{this.size}}</strong></span>
                 <span class="item-qty">Qty: <strong>{{this.quantity}}</strong></span>
                 <span class="item-price">₹{{this.price}}</span>
               </div>
