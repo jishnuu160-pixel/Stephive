@@ -1,0 +1,222 @@
+/* ==========================
+   RETURN DETAILS PAGE
+========================== */
+
+.return-details-page {
+    background: #f5f7fb;
+    min-height: 100vh;
+    padding: 40px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.return-details-page .return-details-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* ==========================
+   HEADER
+========================== */
+
+.return-details-page .return-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.return-details-page .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #475569;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.return-details-page .back-link:hover {
+    color: #2563eb;
+}
+
+.return-details-page .return-page-header h1 {
+    font-size: 30px;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* ==========================
+   CARD
+========================== */
+
+.return-details-page .return-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.return-details-page .section-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+/* ==========================
+   PRODUCT
+========================== */
+
+.return-details-page .product-box {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.return-details-page .product-box img {
+    width: 90px;
+    height: 90px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+}
+
+.return-details-page .product-box h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: #1e293b;
+}
+
+.return-details-page .product-box p {
+    margin: 0;
+    color: #64748b;
+}
+
+/* ==========================
+   INFO GRID
+========================== */
+
+.return-details-page .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 25px;
+}
+
+.return-details-page .info-item label {
+    display: block;
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.return-details-page .info-item p {
+    margin: 0;
+    color: #1f2937;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* ==========================
+   ADDRESS
+========================== */
+
+.return-details-page .return-card p {
+    color: #334155;
+    line-height: 1.8;
+}
+
+/* ==========================
+   SELECT
+========================== */
+
+.return-details-page select {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+    outline: none;
+    transition: .3s;
+}
+
+.return-details-page select:focus {
+    border-color: #2563eb;
+}
+
+/* ==========================
+   BUTTONS
+========================== */
+
+.return-details-page .page-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.return-details-page .btn-cancel {
+    display: inline-block;
+    text-decoration: none;
+    padding: 12px 28px;
+    background: #e2e8f0;
+    color: #475569;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.return-details-page .btn-cancel:hover {
+    background: #cbd5e1;
+}
+
+.return-details-page .btn-save {
+    border: none;
+    background: #22c55e;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.return-details-page .btn-save:hover {
+    background: #16a34a;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media (max-width: 768px) {
+
+    .return-details-page .product-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .return-details-page .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .return-details-page .page-actions {
+        flex-direction: column;
+    }
+
+    .return-details-page .btn-cancel,
+    .return-details-page .btn-save {
+        width: 100%;
+        text-align: center;
+    }
+
+    .return-details-page .return-page-header h1 {
+        font-size: 24px;
+    }
+}

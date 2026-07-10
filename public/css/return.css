@@ -1,0 +1,64 @@
+/* Container and Table Layout */
+.rm-container { font-family: sans-serif; padding: 20px; color: #333; }
+
+.rm-table { width: 100%; border-collapse: separate; border-spacing: 0 15px; }
+
+.rm-table th { text-align: left; color: #666; font-size: 0.85rem; padding: 10px; }
+
+.rm-table td { background: #fff; padding: 20px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+
+/* Product Details */
+.rm-product-name { font-weight: 600; }
+
+/* Status and Type Badges */
+.rm-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+.rm-Return { background: #f3e5f5; color: #7b1fa2; }
+.rm-Exchange { background: #e8f5e9; color: #2e7d32; }
+
+.rm-status { font-size: 0.8rem; font-weight: 500; }
+.rm-status-Requested { color: #0288d1; }
+.rm-status-PickedUp { color: #f57c00; }
+.rm-status-Refunded { color: #00796b; }
+.rm-status-Rejected { color: #d32f2f; }
+
+/* Buttons */
+.rm-btn-view { 
+  background-color: #6200ea; color: white; border: none; 
+  padding: 8px 20px; border-radius: 20px; cursor: pointer; 
+}
+
+/* Pagination */
+.rm-pagination button { border: none; padding: 5px 12px; margin: 0 5px; cursor: pointer; }
+.rm-page-active { background: #333; color: white; border-radius: 4px; }
+/* Search Form Styling */
+.return-mgmt-app .rm-search-form {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    width: 300px;
+}
+
+.return-mgmt-app .rm-search-form input {
+    border: none;
+    outline: none;
+    padding: 5px 10px;
+    width: 100%;
+}
+
+.return-mgmt-app .rm-search-clear {
+    color: #999;
+    text-decoration: none;
+    font-size: 1.2rem;
+    margin-left: 10px;
+}
+
+.return-mgmt-app .rm-search-form i {
+    color: #888;
+}
+
+.badgeBold{
+    font-weight: 600;
+}
