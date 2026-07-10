@@ -2,7 +2,7 @@
     <div class="table-card">
 
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Return Requests</h2>
+            <h4>Return Requests</h4>
 
             <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 500px; justify-content: flex-end;">
 
@@ -52,20 +52,19 @@
                     <td class="badgeBold">{{this.orderId}}</td>
 
                     <td>
-                        <span class="badge {{#ifEquals this.returnType 'Return'}}bg-primary{{else}}bg-warning{{/ifEquals}}">
+                        <span class="badge-type">
                             {{this.returnType}}
                         </span>
                     </td>
-
                     <td>
-                        <span class="badge
-                            {{#ifEquals this.returnStatus 'Pending'}}bg-warning{{/ifEquals}}
-                            {{#ifEquals this.returnStatus 'Approved'}}bg-success{{/ifEquals}}
-                            {{#ifEquals this.returnStatus 'Rejected'}}bg-danger{{/ifEquals}}
-                            {{#ifEquals this.returnStatus 'Completed'}}bg-info{{/ifEquals}}">
-                            {{this.returnStatus}}
+                        <span class="badge 
+                            {{#ifEquals this.status 'Requested'}}bg-secondary{{/ifEquals}}
+                            {{#ifEquals this.status 'Picked Up'}}bg-primary{{/ifEquals}}
+                            {{#ifEquals this.status 'Refunded'}}bg-success{{/ifEquals}}
+                            {{#ifEquals this.status 'Rejected'}}bg-danger{{/ifEquals}}">
+                            {{this.status}}
                         </span>
-                    </td>
+                      </td>
 
                     <td>
                        <a href="/admin/returns/{{this.returnId}}" class="btn-edit-small">View</a>
