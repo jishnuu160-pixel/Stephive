@@ -35,6 +35,7 @@ import {
 
 import {getEditBrandPage,updateBrand,getAddBrandPage,postAddBrand} from '../controllers/brandController.js';
 
+import {getReturnDetails} from '../controllers/returnController.js';
 import brandRoutes from './brandRoutes.js'
 
 import { 
@@ -93,7 +94,8 @@ router.get('/categories/:id/subcategories', getSubcategoriesByParent);
 
 
 router.get('/returns', isAdminAuthenticated, getAllReturns);
-router.post('/returns/:id/status', isAdminAuthenticated, updateReturnStatus);
+router.get('/returns/:id', isAdminAuthenticated, getReturnDetails);
+router.post('/returns/:id', isAdminAuthenticated, updateReturnStatus);
 
 router.get('/logout', adminLogout);
 
