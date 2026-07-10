@@ -79,47 +79,16 @@
   </div>
 </section>
 
-<section class="categories">
-  <h2 class="section-title">Browse by category</h2>
 
-     <section class="categories-section">
-        <div class="category-grid">
-            <div class="cat-card-running"><img src="/images/running-shoe.jpg"> <span class="category-label"> Running shoes</span></div>
-            <div class="cat-card-casual"><img src="/images/casual-shoe.jpg"> <span class="category-label"> Casual shoes</span></div>
-            <div class="cat-card-training"><img src="/images/training-shoe.jpg"> <span class="category-label">Training shoes</span></div>
-            <div class="cat-card-limited"><img src="/images/limited-edition.jpg"><span class="category-label">Limited Edition</span></div>
-        </div>
-    </section>
-</section>
 
   <section class="best-sellers">
-        <h3>Best Sellers</h3>
-        <div class="category-grid">
-            <div class="product-card">
-                <img src="/images/running-shoe-nike.jpg">
-                <h4>Nike Air Max</h4>
-                <button class="add-btn">Add to Cart</button>
-            </div>
-
-             <div class="product-card">
-                <img src="/images/casual-shoe-nike.jpg">
-                <h4>Nike Air Max</h4>
-                <button class="add-btn">Add to Cart</button>
-            </div>
-
-             <div class="product-card">
-                <img src="/images/training-shoe-nike.jpg">
-                
-                      <h4>Nike Air Max</h4>
-          
-                <button class="add-btn">Add to Cart</button>
-            </div>
-               <div class="product-card">
-                <img src="/images/running-shoe-nike.jpg">
-                <h4>Nike Air Max</h4>
-                <button class="add-btn">Add to Cart</button>
-            </div>
-           
-            </div>      
+        <h3>Latest</h3>
+        <div class="best-sellers-shelf-grid">
+            {{#each bestSellers}}
+               {{> product-card}}
+            {{else}}
+                <p>No products available right now.</p>
+            {{/each}}
+        </div>      
     </section>
 
