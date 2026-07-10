@@ -1,5 +1,7 @@
 import  adminRepo from '../repositories/adminRepository.js';
 import * as OrderRepo from '../repositories/orderRepository.js';
+import * as returnRepo from '../repositories/returnRepository.js';
+
 import Return from '../models/ReturnModel.js';
 
 import bcrypt from 'bcrypt';
@@ -183,21 +185,28 @@ export const fetchAllReturns = async () => {
         .sort({ createdAt: -1 });
 };
 
+
 export const changeReturnStatus = async (returnId, newStatus) => {
-    const returnRequest = await Return.findByIdAndUpdate(
-        returnId, 
-        { returnStatus: newStatus }, 
-        { new: true }
-    );
-    
-    if (!returnRequest) throw new Error("Return request not found");
-    
-    if (newStatus === 'Approved') {
+    try {
+        const updatedReturn = await returnRepo.updateReturnStatusInDb(returnId, newStatus);
+        if (!updatedReturn) throw new Error("Return request not found");
+
+        if (newStatus === 'Picked Up') {
+            updatedReturn.pickedUpAt = new Date();
+            await updatedReturn.save();
+        } else if (newStatus === 'Refunded') {
+            const orderRes = await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, 'Returned');
+            if (!orderRes) throw new Error("Order update failed");
+        } else if (newStatus === 'Rejected') {
+            const orderRes = await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, 'Delivered');
+            if (!orderRes) throw new Error("Order update failed");
+        }
+        return updatedReturn;
+    } catch (error) {
+        console.error("SERVICE ERROR:", error.message);
+        throw error; 
     }
-    return returnRequest;
 };
-
-
 
 
 
