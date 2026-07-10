@@ -1,4 +1,5 @@
 import * as OrderService from '../services/OrderService.js';
+import * as ReturnService from '../services/returnService.js';
 import * as UserRepo from '../repositories/userRepository.js';
 import puppeteer from 'puppeteer';
 import mongoose  from 'mongoose';
@@ -34,14 +35,13 @@ export const getUserOrders = async (req, res) => {
 };
 
 export const getOrderById = async (req, res) => {
-  try {
-    const order = await OrderService.getOrderDetails(req.params.id);
-    console.log("Data:",order);
-    return res.render('user/order-detail',
-        order
-    );
-  } catch (error) {
-    return res.status(error.message === 'Order not found' ? 404 : 500).json({ 
+       try {
+            const order = await OrderService.getOrderDetails(req.params.id);
+             return res.render('user/order-detail',
+             order
+            );
+       }catch (error) {
+        return res.status(error.message === 'Order not found' ? 404 : 500).json({ 
         success: false, 
         message: error.message 
     });
@@ -214,6 +214,7 @@ export const getOrderDetails = async (req, res) => {
         const status = order.status.toLowerCase();
         const statusOrder = ['pending', 'processing', 'shipped', 'out of delivery', 'delivered'];
         const currentStep = statusOrder.indexOf(status);
+        
         
         const isCancelled = status === 'cancelled';
         
