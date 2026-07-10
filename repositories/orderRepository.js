@@ -62,13 +62,11 @@ export const clearCartByUserId = async (userId) => {
 
 export const findUserOrderById = async (orderId, userId) => {
     try {
-        // 1. Sanity Check: Is it a valid 24-character hex string?
         if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(userId)) {
             console.warn(`Invalid ID format provided: OrderId=${orderId}, UserId=${userId}`);
-            return null; // Return null gracefully instead of crashing
+            return null; 
         }
 
-        // 2. Perform the Query
         return await Order.findOne({ 
             _id: new mongoose.Types.ObjectId(orderId), 
             user_id: new mongoose.Types.ObjectId(userId) 
