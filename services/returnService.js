@@ -1,16 +1,35 @@
 import * as ReturnRepo from '../repositories/ReturnRepository.js';
 import * as OrderService from './OrderService.js';
+import { generateReturnID } from '../utils/idGenerator.js';
+import ReturnModel from '../models/ReturnModel.js';
 
 export const processReturnRequest = async (userId, orderId, body) => {
     const order = await OrderService.getUserOrderDetails(orderId, userId);
     
-    const item = order.items.find(i => i.productId.toString() === body.productId);
-    const refundAmount = item ? item.price : 0;
+    const existingReturn=await ReturnModel.findOne({orderId:orderId});
+    if(existingReturn){
+        throw new Error("A return request already made for this order");
+    }
+    
+    const item = order.items.find(i => 
+        i.productId._id.toString() === body.productId.toString()
+    );
+    if (!item) {
+        throw new Error("The requested product was not found in this order.");
+    }
+
+    const refundAmount = item.price || 0;
+    const generatedId = generateReturnID();
 
     const returnData = {
         userId,
-        orderId,
+        orderId: order.orderId,
+        returnId: generatedId,
         productId: body.productId,
+        productName: item.productName,      
+        size: item.size,                    
+        quantity: item.quantity,            
+        productImage: item.productImage,      
         returnType: body.returnType,
         reason: body.reason,
         refundMode: body.refundMode,
@@ -19,6 +38,21 @@ export const processReturnRequest = async (userId, orderId, body) => {
         pickupAddress: order.deliveryAddress,
         returnStatus: 'Pending'
     };
-
     return await ReturnRepo.saveReturn(returnData);
+};
+
+
+export const getReturnDetailsById = async (returnId) => {
+    const returnData = await ReturnRepo.findReturnById(returnId);
+    
+    if (!returnData) {
+        throw new Error('Return request not found');
+    }
+    return returnData;
+};
+
+export const checkIfReturnExists = async (orderIdString) => {
+    const existing = await ReturnModel.findOne({ orderId: orderIdString});
+    console.log("Existing:",existing);
+    return !!existing;
 };
