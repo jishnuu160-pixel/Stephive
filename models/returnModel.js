@@ -3,7 +3,12 @@ import mongoose from 'mongoose';
 const returnSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-    orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
+    returnId:{ type: String,unique:true, required: true },
+    orderId: { type: String, unique:true,required: true },
+    productName: { type: String, required: true },
+    size: { type: String, required: true },
+    quantity: { type: String, required: true },
+    productImage: { type: String, required: true },
     returnType: { type: String, required: true }, 
     returnStatus: { type: String, default: 'Pending' }, 
     reason: { type: String, required: true },
