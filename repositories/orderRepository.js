@@ -60,23 +60,15 @@ export const clearCartByUserId = async (userId) => {
     return await Cart.deleteOne({ userId: userId });
 };
 
-
 export const findUserOrderById = async (orderId, userId) => {
     try {
-        console.log("--- DATABASE QUERY DEBUG ---");
-        console.log("Searching for OrderID:", orderId, "(Type: " + typeof orderId + ")");
-        console.log("Searching for UserID:", userId, "(Type: " + typeof userId + ")");
-
-        const checkOrder = await Order.findById(orderId).lean();
-        
-        if (checkOrder) {
-            console.log("Order EXISTS in DB. Actual owner in DB:", checkOrder.user_id.toString());
-            console.log("Does it match logged in user?", checkOrder.user_id.toString() === userId.toString());
-        } else {
-            console.log("Order does NOT exist in the database with this ID.");
+        // 1. Sanity Check: Is it a valid 24-character hex string?
+        if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(userId)) {
+            console.warn(`Invalid ID format provided: OrderId=${orderId}, UserId=${userId}`);
+            return null; // Return null gracefully instead of crashing
         }
-        console.log("----------------------------");
 
+        // 2. Perform the Query
         return await Order.findOne({ 
             _id: new mongoose.Types.ObjectId(orderId), 
             user_id: new mongoose.Types.ObjectId(userId) 
@@ -84,6 +76,7 @@ export const findUserOrderById = async (orderId, userId) => {
         .populate('user_id', 'fullName email')
         .populate('items.productId', 'productName productImage')
         .lean();
+
     } catch (error) {
         console.error("DEBUG: Repo Error:", error);
         throw new Error('Error retrieving order details from database');
