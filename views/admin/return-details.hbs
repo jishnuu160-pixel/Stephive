@@ -1,0 +1,139 @@
+<section class="return-details-page">
+    <div class="return-details-container">
+        <div class="return-page-header">
+            <div>
+                <a href="/admin/returns" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </a>
+
+                <h1>Return #{{returnDetails.returnId}}</h1>
+            </div>
+        </div>
+
+        <form action="/admin/returns/update-status/{{return._id}}" method="POST">
+
+            <!-- Product -->
+
+            <div class="return-card">
+
+                <h4 class="section-title">PRODUCT</h4>
+
+                <div class="product-box">
+
+                    <img src="{{returnDetails.productImage}}" alt="{{return.productName}}">
+
+                    <div>
+
+                        <h2>{{returnDetails.productName}}</h2>
+
+                        <p>
+                            {{return.productColor}} |
+                            Size : {{returnDetails.size}}|
+                            Qty : {{returnDetails.quantity}}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Return Info -->
+
+            <div class="return-card">
+
+                <h4 class="section-title">RETURN INFORMATION</h4>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <label>Customer</label>
+                        <p>{{returnDetails.pickupAddress.fullName}}</p>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Return Type</label>
+                        <p>{{returnDetails.returnType}}</p>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Reason</label>
+                        <p>{{returnDetails.reason}}</p>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Description</label>
+                        <p>{{returnDetails.description}}</p>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Refund Method</label>
+                        <p>{{returnDetails.refundMode}}</p>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Pickup Date</label>
+                        <p>{{formattedDate returnDetails.expectedPickupDate}}</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Pickup Address -->
+
+            <div class="return-card">
+
+                <h4 class="section-title">PICKUP ADDRESS</h4>
+
+                <p>
+                    {{returnDetails.pickupAddress.fullName}} <br>
+
+                    {{returnDetails.pickupAddress.addressLine1}} <br>
+
+                    {{returnDetails.pickupAddress.city}},
+                    {{returnDetails.pickupAddress.state}} -
+                    {{returnDetails.pickupAddress.pincode}} <br>
+
+                    {{returnDetails.pickupAddress.mobileNumber}}
+                </p>
+
+            </div>
+
+            <!-- Update Status -->
+
+            <div class="return-card">
+
+                <h4 class="section-title">UPDATE STATUS</h4>
+
+                <select name="status">
+
+                    <option value="Requested">Requested</option>
+
+                    <option value="Picked Up">Picked Up</option>
+
+                    <option value="Refunded">Refunded</option>
+
+                    <option value="Rejected">Rejected</option>
+
+                </select>
+
+            </div>
+
+            <div class="page-actions">
+
+                <a href="/admin/returns" class="btn-cancel">
+                    Cancel
+                </a>
+
+                <button class="btn-save">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
