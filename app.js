@@ -56,9 +56,9 @@ app.engine('hbs', engine({
     lt: ((a, b) => a < b),
     le: ((a, b) => a <= b),
     ge: ((a, b) => a >= b),
-   eq: (a, b) => a?.toString() === b?.toString(),
-   or: ((a, b) => a || b),
-   includes: (array, value) => {
+    eq: (a, b) => a?.toString() === b?.toString(),
+    or: ((a, b) => a || b),
+    includes: (array, value) => {
             if (!array) return false;
             if (Array.isArray(array)) {
                 return array.map(item => item.toString()).includes(value?.toString());

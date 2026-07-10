@@ -168,11 +168,15 @@ export const getAllReturns = async (req, res) => {
 export const updateReturnStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body; 
+        const { status } = req.body;
+        
         await adminService.changeReturnStatus(id, status);
-        req.flash("success","Status updated successfully");
-        res.status(200).json({ message: "Status updated successfully" });
+        
+        req.flash("success", "Status updated successfully");
+        res.redirect('/admin/returns'); 
     } catch (error) {
-        res.status(500).json({ error: "Failed to update status" });
+        console.error("Update Controller Error:", error);
+        req.flash("error", "Failed to update status");
+        res.redirect('/admin/returns'); 
     }
 };
