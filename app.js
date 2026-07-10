@@ -40,6 +40,9 @@ app.engine('hbs', engine({
     hyphenate: (text) => {
         return typeof text === 'string' ? text.toLowerCase().replace(/\s+/g, '-') : '';
     },
+    ifEquals:  (arg1, arg2, options)=>{
+    return arg1 === arg2 ? options.fn(this) : options.inverse(this);
+    },
     isStepVisible: (stepRank, currentStatus) => {
     const ranks = {
         'Order Placed': 0,
@@ -206,6 +209,7 @@ app.use(async (req, res, next) => {
     }
     next();
 });
+
 
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
