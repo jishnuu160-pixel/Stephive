@@ -2,7 +2,6 @@
     <div class="breadcrumb">
         <a href="/">My Account</a> <span>/</span> <a href="/orders">Orders</a> <span>/</span> <span>Order Details</span>
     </div>
-
     <div class="order-header">
         <div class="left">
             <h1>Order #{{order.orderId}} 
@@ -13,129 +12,104 @@
         <a href="/history" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Orders</a>
     </div>
 
-  
-
-          <div class="order-layout">
-
-        <!-- LEFT SIDE -->
-
+    <div class="order-layout">
         <div class="left-column">
 
-            <!-- Tracking -->
+<div class="card tracking-card">
+    <h3>
+        <i class="fa-solid {{#if order.returnRequest}}fa-rotate-left{{else}}fa-truck-fast{{/if}}"></i>
+        {{#if order.returnRequest}}Track Your Return{{else}}Track Your Delivery{{/if}}
+    </h3>
 
-            <div class="card tracking-card">
-
-                <h3>
-
-                    <i class="fa-solid fa-truck-fast"></i>
-
-                    Track Your Delivery
-
-                </h3>
-{{!-- <div class="timeline">
-    <div class="timeline-item {{#if (isStepCompleted 0 currentStep)}}completed{{/if}} {{#if (isStepActive 0 currentStep)}}active{{/if}}">
+    {{#if order.returnRequest}}
+        <div class="timeline">
+    <div class="timeline-item completed">
         <span class="dot"></span>
-        <div class="content">
-            <h4>Order Placed</h4>
-            <p>Order confirmed and being verified.</p>
-            <small>{{ order.createdAt }}</small>
-        </div>
+        <div class="content"><h4>Return Requested</h4></div>
     </div>
 
-    <div class="timeline-item {{#if (isStepCompleted 1 currentStep)}}completed{{/if}} {{#if (isStepActive 1 currentStep)}}active{{/if}}">
-        <span class="dot"></span>
-        <div class="content">
-            <h4>Processing at Atelier</h4>
-            <p>Quality check and luxury packaging in progress.</p>
-        </div>
-    </div>
-
-    <div class="timeline-item {{#if (isStepCompleted 2 currentStep)}}completed{{/if}} {{#if (isStepActive 2 currentStep)}}active{{/if}}">
-        <span class="dot"></span>
-        <div class="content">
-            <h4>Shipped</h4>
-            <p>Waiting to be picked up by courier.</p>
-        </div>
-    </div>
-
-    <div class="timeline-item {{#if (isStepCompleted 3 currentStep)}}completed{{/if}} {{#if (isStepActive 3 currentStep)}}active{{/if}}">
-        <span class="dot"></span>
-        <div class="content">
-            <h4>Out of delivery</h4>
-            <p>Order is out of delivery</p>
-            <small>{{ order.createdAt }}</small>
-        </div>
-    </div>
-
-   {{#if (eq order.status 'cancelled')}}
-    <div class="timeline-item active cancelled-status">
-        <span class="dot" style="background-color: #dc2626;"></span>
-        <div class="content">
-            <h4 style="color: #dc2626;">Order Cancelled</h4>
-            <p>This order has been cancelled per your request.</p>
-        </div>
-    </div>
-{{else}}
-    <div class="timeline-item {{#if (isStepCompleted 4 currentStep)}}completed{{/if}} {{#if (isStepActive 4 currentStep)}}active{{/if}}">
-        <span class="dot"></span>
-        <div class="content">
-            <h4>Delivered</h4>
-            <p>Delivered Successfully</p>
-        </div>
-    </div>
-{{/if}}
-</div> --}}
-<div class="timeline">
-    <div class="timeline-item {{#if (isStepCompleted 0 currentStep)}}completed{{/if}}">
-        <span class="dot"></span>
-         <div class="content">
-            <h4>Order Placed</h4>
-            <p>Order confirmed and being verified.</p>
-            <small>{{ order.createdAt }}</small>
-        </div>
-    </div>
-    
-    <div class="timeline-item {{#if (isStepCompleted 1 currentStep)}}completed{{/if}}">
-        <span class="dot"></span>
-        <div class="content">
-            <h4>Processing at Atelier</h4>
-            <p>Quality check and luxury packaging in progress.</p>
-        </div>
-    </div>
-
-    {{#unless (eq order.status 'cancelled')}}
-        <div class="timeline-item {{#if (isStepCompleted 2 currentStep)}}completed{{/if}}">
-            <span class="dot"></span>
-           <div class="content">
-            <h4>Shipped</h4>
-            <p>Waiting to be picked up by courier.</p>
-        </div>
-        </div>
-        <div class="timeline-item {{#if (isStepCompleted 3 currentStep)}}completed{{/if}}">
-            <span class="dot"></span>
-            <div class="content">
-            <h4>Out of delivery</h4>
-            <p>Order is out of delivery</p>
-            <small>{{ order.createdAt }}</small>
-        </div>
-        </div>
-        <div class="timeline-item {{#if (isStepCompleted 4 currentStep)}}completed{{/if}}">
-            <span class="dot"></span>
-            <div class="content"><h4>Delivered</h4></div>
-        </div>
-    {{/unless}}
-
-    {{#if (eq order.status 'cancelled')}}
+    {{#if (eq order.returnRequest.status 'CancelledByAdmin')}}
         <div class="timeline-item active cancelled-status">
             <span class="dot" style="background-color: #dc2626;"></span>
             <div class="content">
-                <h4 style="color: #dc2626;">Order Cancelled</h4>
-                <p>This order was cancelled after <strong>{{order.previousStatus}}</strong>.</p>
+                <h4 style="color: #dc2626;">Return Cancelled</h4>
+                <p>The return request was cancelled by the administrator.</p>
             </div>
+        </div>
+    {{else if (eq order.returnRequest.status 'Rejected')}}
+        <div class="timeline-item active rejected-status">
+            <span class="dot" style="background-color: #991b1b;"></span>
+            <div class="content">
+                <h4 style="color: #991b1b;">Return Rejected</h4>
+                <p>Your return request was not approved.</p>
+            </div>
+        </div>
+    {{else}}
+        <div class="timeline-item {{#if (or (eq order.returnRequest.status 'Picked Up') (eq order.returnRequest.status 'Refunded'))}}completed{{/if}}">
+            <span class="dot"></span>
+            <div class="content"><h4>Picked Up</h4></div>
+        </div>
+        <div class="timeline-item {{#if (eq order.returnRequest.status 'Refunded')}}completed{{/if}}">
+            <span class="dot"></span>
+            <div class="content"><h4>Refunded</h4></div>
         </div>
     {{/if}}
 </div>
+    {{else}}
+         <div class="timeline">
+            <div class="timeline-item {{#if (isStepCompleted 0 currentStep)}}completed{{/if}}">
+                <span class="dot"></span>
+                <div class="content">
+                    <h4>Order Placed</h4>
+                    <p>Order confirmed and being verified.</p>
+                    <small>{{ order.createdAt }}</small>
+                </div>
             </div>
+            
+            <div class="timeline-item {{#if (isStepCompleted 1 currentStep)}}completed{{/if}}">
+                <span class="dot"></span>
+                <div class="content">
+                    <h4>Processing at Atelier</h4>
+                    <p>Quality check and luxury packaging in progress.</p>
+                </div>
+            </div>
+
+            {{#unless (eq order.status 'cancelled')}}
+                <div class="timeline-item {{#if (isStepCompleted 2 currentStep)}}completed{{/if}}">
+                    <span class="dot"></span>
+                    <div class="content">
+                        <h4>Shipped</h4>
+                        <p>Waiting to be picked up by courier.</p>
+                    </div>
+                </div>
+                <div class="timeline-item {{#if (isStepCompleted 3 currentStep)}}completed{{/if}}">
+                    <span class="dot"></span>
+                    <div class="content">
+                        <h4>Out of delivery</h4>
+                        <p>Order is out of delivery</p>
+                        <small>{{ order.createdAt }}</small>
+                    </div>
+                </div>
+                <div class="timeline-item {{#if (isStepCompleted 4 currentStep)}}completed{{/if}}">
+                    <span class="dot"></span>
+                    <div class="content"><h4>Delivered</h4></div>
+                </div>
+            {{/unless}}
+
+            {{#if (eq order.status 'cancelled')}}
+                <div class="timeline-item active cancelled-status">
+                    <span class="dot" style="background-color: #dc2626;"></span>
+                    <div class="content">
+                        <h4 style="color: #dc2626;">Order Cancelled</h4>
+                        <p>This order was cancelled after <strong>{{order.previousStatus}}</strong>.</p>
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    {{/if}}
+</div>
+
+
 <div class="card order-items-card">
     <h3><i class="fa-solid fa-bag-shopping"></i> Order Items</h3>
     {{#each order.items}}
@@ -158,7 +132,6 @@
     </div>
     {{/each}}
 </div>
-
 </div>
 
         <div class="right-column">
@@ -186,23 +159,22 @@
                     <span class="paid-badge">{{order.paymentStatus}}</span>
                 </div>
             </div>
-<div class="card">
-    {{!-- Only show Invoice button if status is NOT 'cancelled' --}}
-    {{#unless (eq order.status 'cancelled')}}
+      <div class="card">
+      {{#unless (eq order.status 'cancelled')}}
         <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
             <i class="fa-solid fa-download"></i> Download Invoice
         </a>
-    {{/unless}}
+      {{/unless}}
 
-    {{#if isReturnable}}
+      {{#if isReturnable}}
         <a href="/orders/return/{{order._id}}" class="return-order-btn">
             <i class="fa-solid fa-rotate-left"></i> Return Order
         </a>
-    {{else if showCancelButton}}
+      {{else if showCancelButton}}
         <button type="button" class="cancel-order-btn" onclick="confirmCancel('{{order._id}}')">
             <i class="fa-solid fa-circle-xmark"></i> Cancel Order
         </button>
-    {{/if}}
+      {{/if}}
 </div>
 
 {{#if isDelivered}}
@@ -214,7 +186,7 @@
 </a>  
 
 {{/if}}
-        </div> 
+</div> 
 </section>
 
 <script>
