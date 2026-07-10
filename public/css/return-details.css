@@ -220,3 +220,13 @@
         font-size: 24px;
     }
 }
+
+.badge{
+    font-size: 10px;
+    color: #fff;
+}
+
+.badge.bg-secondary { background-color: #6c757d !important; }
+.badge.bg-primary   { background-color: #0d6efd !important; }
+.badge.bg-success   { background-color: #198754 !important; }
+.badge.bg-danger    { background-color: #dc3545 !important; }

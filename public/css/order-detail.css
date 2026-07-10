@@ -489,3 +489,15 @@
     font-size: 10px;
     color: #e41e1e;
 }
+
+
+/* Example CSS structure */
+.timeline-item.completed .dot {
+    background-color: #fbbf24; /* Your yellow color */
+    border-color: #fbbf24;
+}
+
+/* Also ensure the line connecting them changes color */
+.timeline-item.completed::before {
+    background-color: #fbbf24;
+}
