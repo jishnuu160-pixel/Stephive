@@ -10,7 +10,11 @@ const returnSchema = new mongoose.Schema({
     quantity: { type: String, required: true },
     productImage: { type: String, required: true },
     returnType: { type: String, required: true }, 
-    returnStatus: { type: String, default: 'Pending' }, 
+    status: {
+    type: String,
+    enum: ['Requested', 'Picked Up', 'Refunded', 'Rejected'],
+    default: 'Requested'
+}, 
     reason: { type: String, required: true },
     refundAmount: { type: Number },
     refundMode: { type: String },
@@ -24,9 +28,7 @@ const returnSchema = new mongoose.Schema({
         pincode: String,
         mobileNumber: String
     },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
-});
+ }, { timestamps: true });
 
 const ReturnModel = mongoose.model('ReturnDetail', returnSchema, 'return_details');
 export default ReturnModel;
