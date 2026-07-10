@@ -88,22 +88,36 @@
 <div class="timeline">
     <div class="timeline-item {{#if (isStepCompleted 0 currentStep)}}completed{{/if}}">
         <span class="dot"></span>
-        <div class="content"><h4>Order Placed</h4></div>
+         <div class="content">
+            <h4>Order Placed</h4>
+            <p>Order confirmed and being verified.</p>
+            <small>{{ order.createdAt }}</small>
+        </div>
     </div>
     
     <div class="timeline-item {{#if (isStepCompleted 1 currentStep)}}completed{{/if}}">
         <span class="dot"></span>
-        <div class="content"><h4>Processing at Atelier</h4></div>
+        <div class="content">
+            <h4>Processing at Atelier</h4>
+            <p>Quality check and luxury packaging in progress.</p>
+        </div>
     </div>
 
     {{#unless (eq order.status 'cancelled')}}
         <div class="timeline-item {{#if (isStepCompleted 2 currentStep)}}completed{{/if}}">
             <span class="dot"></span>
-            <div class="content"><h4>Shipped</h4></div>
+           <div class="content">
+            <h4>Shipped</h4>
+            <p>Waiting to be picked up by courier.</p>
+        </div>
         </div>
         <div class="timeline-item {{#if (isStepCompleted 3 currentStep)}}completed{{/if}}">
             <span class="dot"></span>
-            <div class="content"><h4>Out of delivery</h4></div>
+            <div class="content">
+            <h4>Out of delivery</h4>
+            <p>Order is out of delivery</p>
+            <small>{{ order.createdAt }}</small>
+        </div>
         </div>
         <div class="timeline-item {{#if (isStepCompleted 4 currentStep)}}completed{{/if}}">
             <span class="dot"></span>
@@ -136,7 +150,7 @@
                 <span class="qty">Quantity: {{this.quantity}}</span>
                 <span class="processing">{{../order.status}}</span>
             </div> 
-     
+      <p class="cancel-item">cancel item 🗙</p>
         </div>
         <div class="price">
            Price: ₹{{this.price}}
@@ -173,18 +187,21 @@
                 </div>
             </div>
 <div class="card">
-    <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
-        <i class="fa-solid fa-download"></i> Download Invoice
-    </a>
+    {{!-- Only show Invoice button if status is NOT 'cancelled' --}}
+    {{#unless (eq order.status 'cancelled')}}
+        <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
+            <i class="fa-solid fa-download"></i> Download Invoice
+        </a>
+    {{/unless}}
 
     {{#if isReturnable}}
         <a href="/orders/return/{{order._id}}" class="return-order-btn">
             <i class="fa-solid fa-rotate-left"></i> Return Order
         </a>
     {{else if showCancelButton}}
-       <button type="button" class="cancel-order-btn" onclick="confirmCancel('{{order._id}}')">
-    <i class="fa-solid fa-circle-xmark"></i> Cancel Order
-</button>
+        <button type="button" class="cancel-order-btn" onclick="confirmCancel('{{order._id}}')">
+            <i class="fa-solid fa-circle-xmark"></i> Cancel Order
+        </button>
     {{/if}}
 </div>
 
