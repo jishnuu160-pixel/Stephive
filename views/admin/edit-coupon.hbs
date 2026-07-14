@@ -1,0 +1,42 @@
+<div class="coupon-container">
+    <div class="coupon-header">
+        <h2>Edit Coupon</h2>
+    </div>
+    <form action="/admin/coupons/edit/{{coupon._id}}?_method=PUT" method="POST" class="coupon-form">
+        
+        <div class="row">
+            <div class="col">
+                <label>Coupon NAME</label>
+                <input type="text" name="name" value="{{coupon.name}}" required>
+            </div>
+            <div class="col">
+                <label>Coupon CODE</label>
+                <input type="text" name="couponCode" value="{{coupon.code}}" required>
+            </div>
+        </div>
+
+        <div class="section-divider">Discount</div>
+        <label>DISCOUNT TYPE</label>
+        <div class="radio-group">
+            <label class="radio-card">
+              <input type="radio" name="discountType" value="percentage" {{#if (eq coupon.discountType 'percentage')}}checked{{/if}}>Percentage            </label>
+            <label class="radio-card">
+            <input type="radio" name="discountType" value="fixed" {{#if (eq coupon.discountType 'fixed')}}checked{{/if}}>Flat Amount    </label>
+        </div>
+
+        <div class="row">
+            <div class="col"><label>DISCOUNT VALUE</label><input type="number" name="discountValue" value="{{coupon.discountValue}}" required></div>
+            <div class="col"><label>MAX DISCOUNT</label><input type="number" name="maxDiscountAmount" value="{{coupon.maxDiscountAmount}}"></div>
+        </div>
+        <div class="row">
+            <div class="col"><label>MIN ORDER AMOUNT</label><input type="number" name="min_orderAmount" value="{{coupon.min_orderAmount}}" required></div>
+            <div class="col"><label>EXPIRY DATE</label><input type="date" name="expiryDate" value="{{coupon.expiryDate}}" required></div>
+             <div class="col"><label>MAX USE COUNT</label><input type="number" name="maxUseCount"  value="{{coupon.use_count}}" required></div>
+        </div>
+
+        <div class="footer-actions">
+            <a href="/admin/coupons" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">Update Coupon</button>
+        </div>
+    </form>
+</div>

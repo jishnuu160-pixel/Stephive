@@ -1,0 +1,65 @@
+
+  
+     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header h1 { margin: 0; font-size: 32px; color: #333; }
+   .controls { display: flex; gap: 10px; align-items: center; }
+ .search-box { padding: 10px 15px; border: 1px solid #ccc; border-radius: 20px; width: 300px; }
+ .btn-add-coupon {
+    background-color: rgb(255, 208, 0);
+    text-decoration: none;
+    margin: 10px;
+    font-size: 8px;
+    color: #ffffff;
+    border-style: none;
+    padding: 5px;
+    border-radius: 15px;
+    white-space: nowrap;
+}
+
+
+    table { width: 100%; border-collapse: collapse; }
+    th { background-color: #f4f4f4; padding: 15px; text-align: left; font-size: 12px; text-transform: uppercase; color: #555; }
+   td { padding: 20px 15px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
+ .status-active { background-color: #e0f7fa; color: #00838f; padding: 5px 12px; border-radius: 12px; font-weight: 500; font-size: 12px; }
+    .status-inactive { background-color: #eeeeee; color: #616161; padding: 5px 12px; border-radius: 12px; font-weight: 500; font-size: 12px; }
+
+     .btn-action { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; margin-right: 5px; white-space: nowrap;}
+     .btn-edit { background-color: #D1C4E9; color: #4527A0; }
+     .btn-delete { background-color: #FFCDD2; color: #C62828; }
+
+     .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 30px; align-items: center; }
+    .page-num { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #333; color: white; cursor: pointer; }
+    .coupon-page-wrapper .page-num.inactive { background: transparent; color: #333; }
+
+    /* add coupon */
+ .coupon-container { max-width: 800px;  padding: 25px;background-color: #fff; border: 1px solid #0c0d0e; border-radius: 12px; font-family: sans-serif; }
+.coupon-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.row { display: flex; gap: 20px; margin-bottom: 15px;  }
+.col { flex: 1; }
+label { display: block; margin-bottom: 5px; color: #64748b; font-size: 0.85rem; font-weight: 600; }
+input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; }
+
+/* Section styling */
+.section-divider { margin: 25px 0 15px; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; }
+
+/* Radio Cards */
+.radio-group { display: flex; gap: 15px; }
+.radio-card { border: 1px solid #e2e8f0; padding: 12px 10px; border-radius: 10px; cursor: pointer; flex: 1; text-align: center; }
+.visibility-box { border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; }
+
+/* Toggle Switch */
+.toggle-container { display: flex; align-items: center; gap: 10px; margin: 20px 0; }
+.switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 24px; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; }
+input:checked + .slider { background-color: #22c55e; }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* Footer */
+.footer-actions { display: flex; justify-content: flex-end; gap: 20px; margin-top: 30px; }
+.btn-save { background: #dcd0a5; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.btn-cancel { background: none; margin-top: 20px;text-decoration: none;font-size: 12px; border: none; color: #94a3b8; cursor: pointer; }
+.font-coupon{
+        font-size: 12px;
+}

@@ -1,0 +1,56 @@
+<div class="coupon-container">
+    <div class="coupon-header">
+        <h2>add Coupon</h2>
+        <span class="close-icon">&times;</span>
+    </div>
+
+    <form action="/admin/coupons/add" method="POST" class="coupon-form">
+        <div class="row">
+            <div class="col">
+                <label>Coupon NAME</label>
+                <input type="text" name="name" placeholder="SummerSale" required>
+            </div>
+            <div class="col">
+                <label>Coupon CODE</label>
+                <input type="text" name="couponCode" placeholder="SUMMER121" required>
+            </div>
+        </div>
+
+        <div class="section-divider">Discount</div>
+        <label>DISCOUNT TYPE</label>
+        <div class="radio-group">
+            <label class="radio-card">
+                <input type="radio" name="discountType" value="percentage" > Percentage
+            </label>
+            <label class="radio-card">
+                <input type="radio" name="discountType" value="fixed"> Flat Amount
+            </label>
+        </div>
+
+        <div class="row">
+            <div class="col"><label>DISCOUNT VALUE</label><input type="number" name="discountValue" placeholder="eg: 10" required></div>
+            <div class="col"><label>MAX ORDER AMOUNT</label><input type="number" name="maxOrderAmount" placeholder="eg: 5000"></div>
+        </div>
+        <div class="row">
+            <div class="col"><label>MIN ORDER AMOUNT</label><input type="number" name="min_orderAmount" placeholder="eg: 500" required></div>
+        </div>
+
+        <div class="section-divider">Expiry & usage</div>
+        <div class="row">
+            <div class="col"><label>EXPIRY DATE</label><input type="date" name="expiryDate" required></div>
+            <div class="col"><label>MAX USE COUNT</label><input type="number" name="maxUseCount" placeholder="eg: 100"></div>
+        </div>
+
+        <div class="section-divider">Visibility</div>
+        <label>WHO CAN SEE THIS COUPON?</label>
+        <div class="radio-group visibility-box">
+            <label><input type="radio" name="visibility" value="public" checked> Public</label>
+            <label><input type="radio" name="visibility" value="private"> Private</label>
+        </div>
+
+        <div class="footer-actions">
+            <a href="/admin/coupons" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">save Coupon</button>
+        </div>
+    </form>
+</div>
