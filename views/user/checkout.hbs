@@ -1,6 +1,5 @@
 <div id="checkout-view-scoped">
-  <div class="checkout-container">
-    
+  <div class="checkout-container"> 
     <div class="stepper">
       <div class="step completed">
         <span class="step-num">1</span>
@@ -50,7 +49,7 @@
 
 
 
- <a href="/user/add-address" class="btn-add-address">
+ <a href="/user/add-address" class="btn-add-address-checkout">
                       + Add New Address
   </a>
  
@@ -82,18 +81,26 @@
             {{/each}}
           </div>
 
-          <div class="coupon-section">
-            <div class="coupon-input-group">
-              <input type="text" placeholder="Enter coupon code" class="coupon-input">
-              <button class="btn-apply">APPLY</button>
-            </div>
-            <a href="#" class="view-coupons-link">VIEW AVAILABLE COUPONS</a>
-          </div>
+<div class="coupon-section">
+    <div class="coupon-input-group">
+        <input type="text" id="couponCodeInput" placeholder="Enter coupon code" class="coupon-input">
+        <button class="btn-apply" onclick="applyCoupon()">APPLY</button>
+    </div>
+    <a href="javascript:void(0)" class="view-coupons-link" onclick="openCouponModal()">VIEW AVAILABLE COUPONS</a>
+</div>
+
+<div id="couponModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Available Coupons</h3>
+        <div id="couponList"></div>
+        <button onclick="closeCouponModal()">Close</button>
+    </div>
+</div>
 
           <div class="price-breakdown">
             <div class="price-row">
               <span>Subtotal</span>
-              <span>₹{{pricing.subtotal}}</span>
+              <span id="subtotal-display">₹{{pricing.subtotal}}</span>
             </div>
             <div class="price-row">
               <span>Shipping</span>
@@ -101,17 +108,17 @@
             </div>
             <div class="price-row">
               <span>Tax (10%)</span>
-              <span>₹{{pricing.tax}}</span>
+              <span id="tax-display">₹{{pricing.tax}}</span>
             </div>
             <div class="price-row">
-              <span>Discount</span>
-              <span>-₹{{pricing.discount}}</span>
+             <span>Discount</span>
+               <span id="discount-display">-₹{{pricing.discount}}</span>
             </div>
           </div>
 
           <div class="total-row">
             <span>Total Amount</span>
-            <span class="total-price">₹{{pricing.total}}</span>
+            <span id="total-display" class="total-price">₹{{pricing.total}}</span>
           </div>
         </div>
 
@@ -163,18 +170,35 @@
           </button>
           <a href="/cart" class="back-to-cart">← Back to Cart</a>
         </div>
-
       </div>
-
     </div>
   </div>
 </div>
 
 <script>
-document.querySelector('.btn-place-order').addEventListener('click', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
+        const applyBtn = document.querySelector('.btn-apply');
+        if (applyBtn) applyBtn.addEventListener('click', applyCoupon);
+
+        const placeOrderBtn = document.querySelector('.btn-place-order');
+        if (placeOrderBtn) placeOrderBtn.addEventListener('click', handlePlaceOrder);
+    });
+
+   
+    async function handlePlaceOrder() {
     const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked')?.value;
     const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value;
+    const couponInput = document.getElementById('couponCodeInput');
+    
+    const subtotal = parseFloat(document.getElementById('subtotal-display')?.innerText.replace(/[^0-9.]/g, "")) || 0;
+    const tax = parseFloat(document.getElementById('tax-display')?.innerText.replace(/[^0-9.]/g, "")) || 0;
 
+    const discountEl = document.getElementById('discount-display');
+    const rawDiscountText = discountEl ? discountEl.innerText : "0";
+    const match = rawDiscountText.match(/[\d.]+/); 
+    const discount = match ? parseFloat(match[0]) : 0;
+
+   
     if (!selectedAddress) return showToast("Please select a delivery address", "error");
 
     try {
@@ -183,18 +207,83 @@ document.querySelector('.btn-place-order').addEventListener('click', async () =>
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 addressId: selectedAddress, 
-                paymentMethod: paymentMethod 
+                paymentMethod: paymentMethod,
+                couponCode: couponInput ? couponInput.value : "",
+                subtotal: subtotal,
+                tax: tax,
+                discount: discount  
             })
         });
 
         const data = await response.json();
         if (data.success) {
             window.location.href = `/order-confirmation/${data.orderId}`;
-        } else {
+        }else{
             showToast(data.message || "Order failed", "error");
         }
-    } catch (err) {
+     }catch(err) {
+        console.error(err);
         showToast("Server error, please try again", "error");
     }
-});
+}
+   
+    async function applyCoupon() {
+        const code = document.getElementById('couponCodeInput')?.value;
+        const subtotalEl = document.getElementById('subtotal-display');
+        const subtotal = parseFloat(subtotalEl?.innerText.replace(/[^0-9.]/g, "")) || 0;
+
+        try {
+            const response = await fetch('/user/apply-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, subtotal })
+            });
+            
+            const data = await response.json();
+
+      if (data.success) {
+      const discountEl = document.getElementById('discount-display');
+      discountEl.innerText = `-₹${data.discount.toFixed(2)}`;
+      discountEl.dataset.value = data.discount;
+
+      updateCurrencyDisplay('tax-display', '₹', data.tax);
+      updateCurrencyDisplay('total-display', '₹', data.total);
+    
+      localStorage.setItem('appliedCouponCode', code);
+    
+      alert("Coupon applied successfully!");
+      window.location.reload();
+}else{
+      alert(data.message || "Failed to apply coupon");
+      }
+    }catch(err) {
+      alert("Error connecting to server.");
+    }
+}
+
+    function updateCurrencyDisplay(id, prefix, value) {
+        const el = document.getElementById(id);
+        if (el) {
+            const num = parseFloat(value) || 0;
+            el.innerText = `${prefix}${num.toFixed(2)}`;
+        }
+    }
+
+    async function openCouponModal() {
+        document.getElementById('couponModal').style.display = 'block';
+        try {
+            const res = await fetch('/user/get-available-coupons');
+            const coupons = await res.json();
+            const list = document.getElementById('couponList');
+            list.innerHTML = coupons.length ? coupons.map(c => `
+                <div class="coupon-item"><strong>${c.code}</strong> - ${c.discountValue}% OFF 
+                <button onclick="selectCoupon('${c.code}')">Apply</button></div>
+            `).join('') : "<p>No coupons available.</p>";
+        } catch (err) {
+            document.getElementById('couponList').innerHTML = "Failed to load.";
+        }
+    }
+
+    function closeCouponModal() { document.getElementById('couponModal').style.display = 'none'; }
+    function selectCoupon(code) { document.getElementById('couponCodeInput').value = code; closeCouponModal(); }
 </script>
