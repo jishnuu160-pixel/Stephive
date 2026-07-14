@@ -37,46 +37,73 @@ export const getCheckoutPageData = async (userId) => {
 };
 
 export const processCheckout = async (userId, orderData, isDirect = false) => {
-    try {
-        for (const item of orderData.items) {
-            const product = await ProductRepo.findProductById(item.productId);
-            const variant = product.variants.find(v => v._id.toString() === item.variantId.toString());
-            const sizeObj = variant?.sizes.find(s => s.size === Number(item.size));
+    const sanitize = (val) => {
+        const num = parseFloat(val);
+        return isNaN(num) ? 0 : num; 
+    };
+    
+    const subtotal = sanitize(orderData.subtotal);
+    const tax = sanitize(orderData.tax);
+    const discount = sanitize(orderData.discount); 
 
-            if (item.quantity > 5) {
-                throw new Error(`You cannot purchase more than 5 units of ${product.productName} per order.`);
-            }
+    const calculatedTotal = (subtotal - discount) + tax; 
 
-            if (!sizeObj || sizeObj.stock < item.quantity) {
-                throw new Error(`Insufficient stock for ${product.productName} (Size: ${item.size}). Only ${sizeObj ? sizeObj.stock : 0} left.`);
-            }
+    const sanitizedOrderData = {
+        user_id: userId,
+        items: orderData.items,
+        deliveryAddress: orderData.deliveryAddress,
+        paymentMethod: orderData.paymentMethod,
+        status: orderData.status,
+        subtotal: subtotal,
+        tax: tax,
+        discount: discount, 
+        total: calculatedTotal,
+        finalAmount: calculatedTotal
+    };
+
+    for (const item of sanitizedOrderData.items) {
+        const product = await ProductRepo.findProductById(item.productId);
+        const variant = product.variants.find(v => v._id.toString() === item.variantId.toString());
+        const sizeObj = variant?.sizes.find(s => s.size === Number(item.size));
+
+        if (item.quantity > 5) {
+            throw new Error(`You cannot purchase more than 5 units.`);
         }
-        const edd = new Date();
-        edd.setDate(edd.getDate() + 5);
-
-        const generatedId = generateOrderID();
-        
-        for (const item of orderData.items) {
-            await ProductRepo.decreaseStock(item.productId, item.variantId, item.size, item.quantity);
+        if (!sizeObj || sizeObj.stock < item.quantity) {
+            throw new Error(`Insufficient stock for ${product.productName}.`);
         }
-        
-        const orderToSave = { 
-            ...orderData, 
-            orderId: generatedId,
-            user_id: userId,
-            expectedDeliveryDate: edd
-        };
-
-        const newOrder = await OrderRepo.saveOrder(orderToSave);
-
-        if (!isDirect) {
-            await OrderRepo.clearCartByUserId(userId);
-        }  
-        return newOrder;
-    } catch (error) {
-        console.error("DEBUG: OrderService Error:", error);
-        throw error;
     }
+
+    const edd = new Date();
+    edd.setDate(edd.getDate() + 5);
+    
+   const orderToSave = { 
+    user_id: userId,
+    items: sanitizedOrderData.items,
+    deliveryAddress: sanitizedOrderData.deliveryAddress,
+    paymentMethod: sanitizedOrderData.paymentMethod,
+    status: sanitizedOrderData.status,
+    subtotal: sanitizedOrderData.subtotal,
+    tax: sanitizedOrderData.tax,
+    discount: sanitizedOrderData.discount, 
+    total: sanitizedOrderData.total,      
+    finalAmount: sanitizedOrderData.total,
+    orderId: generateOrderID(),
+    expectedDeliveryDate: edd
+};
+
+
+    const newOrder = await OrderRepo.saveOrder(orderToSave);
+
+    for (const item of sanitizedOrderData.items) {
+        await ProductRepo.decreaseStock(item.productId, item.variantId, item.size, item.quantity);
+    }
+    
+    if (!isDirect) {
+        await OrderRepo.clearCartByUserId(userId);
+    }  
+
+    return newOrder;
 };
 
 
@@ -116,7 +143,7 @@ export const getUserProfile = async (user_id) => {
 
 export const getOrderDetails = async (orderId) => {
     const order = await OrderRepo.findOrderById(orderId);
-    console.log("OrderDetails:",order);
+   
     if (!order) throw new Error('Order not found');
     return order;
 };
@@ -189,8 +216,6 @@ export const getUserOrderDetails = async (orderId, userId) => {
     if (returnRequest && returnRequest.status !== 'Rejected' && returnRequest.status !== 'CancelledByAdmin') {
         displayStatus = `Return ${returnRequest.status}`;
     } 
-    
-    console.log("DEBUG: Found Return Request:", returnRequest);
 
     return {
         ...order,
@@ -210,10 +235,8 @@ export const getOrderForInvoice = async (orderId) => {
 };
 
 
-export const cancelItemInOrder = async (orderId, itemId, userId) => {
-    
+export const cancelItemInOrder = async (orderId, itemId, userId) => { 
     const order = await OrderRepo.findOrderById(orderId);
-    console.log("DEBUG: Found Order Object:", order);
 
   return order;
 };
