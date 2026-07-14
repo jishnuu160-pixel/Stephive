@@ -1,0 +1,140 @@
+import * as couponService from '../services/couponService.js';
+import * as OrderService from '../services/orderService.js';
+
+export const getCouponPage = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5; 
+        const search = req.query.search || "";
+
+        const { coupons, total, totalPages } = await couponService.getAllCoupons(page, limit, search);
+
+        res.render('admin/coupons', {
+            coupons,
+            currentPage: page,
+            totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+            nextPage: page + 1,
+            prevPage: page - 1,
+            search,
+            activePage: 'coupons'
+        });
+    } catch (error) {
+        console.error("Error loading coupons:", error);
+        res.status(500).send("Error loading coupons");
+    }
+};
+
+export const getAddCouponPage = (req, res) => {
+    res.render('admin/add-coupon', { layout: 'admin-layout',activePage:'coupons' });
+};
+
+export const addCoupon = async (req, res) => {
+    try {
+        if (!req.body || Object.keys(req.body).length === 0) {
+            throw new Error("req.body is empty. Check your form inputs.");
+        }
+        await couponService.createNewCoupon(req.body);
+        req.flash("success","New Coupon Added");
+        return res.redirect('/admin/coupons');
+    } catch (error) {
+        console.error("addCoupon Error:", error.message);
+        res.status(400).send("Error: " + error.message);
+    }
+}
+
+export const getEditCouponPage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("DEBUG: Fetching coupon with ID:", id);
+
+        const couponDoc = await couponService.getCouponById(id);
+        
+        if (!couponDoc) {
+            return res.status(404).send("Coupon not found.");
+        }
+
+        const coupon = couponDoc.toObject();
+
+        if (coupon.expiryDate instanceof Date) {
+            coupon.expiryDate = coupon.expiryDate.toISOString().split('T')[0];
+        } else if (typeof coupon.expiryDate === 'string') {
+            coupon.expiryDate = coupon.expiryDate.split('T')[0];
+        }   
+        res.render('admin/edit-coupon', { coupon ,activePage:'coupons'});
+    } catch (error) {
+        console.error("DEBUG: Error in getEditCouponPage:", error);
+        res.status(500).send("Error loading edit page");
+    }
+};
+
+export const updateCoupon = async (req, res) => {
+    try {
+        await couponService.updateCoupon(req.params.id, req.body);
+        req.flash("success","Coupon updated");
+        res.redirect('/admin/coupons');
+    } catch (error) {
+        console.log("error:",error);
+        res.status(500).send("Error updating coupon");
+    }
+};
+
+
+export const toggleCouponStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await couponService.toggleCouponStatus(id);  
+        
+        res.redirect('/admin/coupons');
+    } catch (error) {
+        console.error("Error toggling status:", error.message);
+        res.status(500).send("Error updating coupon status");
+    }
+};
+
+export const applyCoupon = async (req, res) => {
+    try {
+        const { code, subtotal } = req.body;
+        
+        if (subtotal === undefined) return res.status(400).json({ success: false, message: "Subtotal is missing" });
+
+        const sub = parseFloat(subtotal);
+        const rawDiscount = await couponService.validate(code, sub);
+        const discount = isNaN(rawDiscount) ? 0 : rawDiscount;
+        
+        const tax = sub * 0.1;
+        const total = (sub - discount) + tax;
+
+        req.session.appliedCouponCode = code;
+        req.session.save((err) => {
+            if (err) {
+                console.error("Session Save Error:", err);
+                return res.status(500).json({ success: false, message: "Session save failed" });
+            }
+            
+            res.json({ success: true, discount: discount, tax: tax, total: total });
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+export const getAvailableCoupons = async (req, res) => {
+    try {
+        const coupons = await couponService.getActiveCoupons();
+        res.status(200).json(coupons);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching coupons" });
+    }
+};
+
+export const getAvailableCouponsAjax = async (req, res) => {
+    try {
+        const data = await couponService.fetchAvailableCoupons();
+        res.status(200).json(data);
+    } catch (error) {
+        console.error("TRACE [Controller]: Error:", error);
+        res.status(500).json({ message: "Error" });
+    }
+};
