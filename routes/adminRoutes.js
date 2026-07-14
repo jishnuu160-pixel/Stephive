@@ -34,7 +34,6 @@ import {
 } from '../controllers/categoryController.js';
 
 import {getEditBrandPage,updateBrand,getAddBrandPage,postAddBrand} from '../controllers/brandController.js';
-
 import {getReturnDetails} from '../controllers/returnController.js';
 import brandRoutes from './brandRoutes.js'
 
@@ -91,6 +90,7 @@ router.post('/categories/toggle-status/:id', isAdminAuthenticated, toggleListing
 router.post('/categories/add', isAdminAuthenticated, postAddCategory);
 router.post('/categories/edit/:id', isAdminAuthenticated, updateCategory);
 router.get('/categories/:id/subcategories', getSubcategoriesByParent);
+
 
 
 router.get('/returns', isAdminAuthenticated, getAllReturns);
