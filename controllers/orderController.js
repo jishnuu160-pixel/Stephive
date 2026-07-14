@@ -1,6 +1,8 @@
 import * as OrderService from '../services/OrderService.js';
 import * as ReturnService from '../services/returnService.js';
 import * as UserRepo from '../repositories/userRepository.js';
+import * as CouponRepo from '../repositories/couponRepository.js';
+import * as CouponService from '../services/couponService.js';
 import puppeteer from 'puppeteer';
 import mongoose  from 'mongoose';
 
@@ -69,23 +71,31 @@ export const cancelOrder = async (req, res) => {
 
 export const renderCheckoutPage = async (req, res) => {
     try {
+        console.log("DEBUG: Session on Load:", req.session.appliedCouponCode);
+        
         let checkoutData;
+        const availableCoupons = await CouponService.fetchAvailableCoupons();
 
         if (req.session.directPurchase) {
             const { productId, variantId, size, quantity } = req.session.directPurchase;
-            
             const directItem = await OrderService.getDirectProductDetails(productId, variantId, size, quantity);
+            
+            if (!directItem) return res.redirect('/cart');
             
             checkoutData = {
                 cartItems: [directItem], 
                 pricing: OrderService.calculateDirectPricing(directItem),
                 isDirect: true
             };
-        } 
-        else {
+        } else {
             const { cart, addresses } = await OrderService.getCheckoutPageData(req.user.id);
+            
+            if (!cart || !cart.items || cart.items.length === 0) {
+                req.session.appliedCouponCode = null;
+                return res.redirect('/cart');
+            }
+
             const { items, summary } = OrderService.calculatePricing(cart.items);
-           
             checkoutData = {
                 cartItems: items, 
                 pricing: summary,
@@ -93,20 +103,39 @@ export const renderCheckoutPage = async (req, res) => {
                 isDirect: false
             };
         }
-      
+
+        let discount = 0;
+        if (req.session.appliedCouponCode) {
+            try {
+                const result = await CouponService.validate(req.session.appliedCouponCode, checkoutData.pricing.subtotal);
+                discount = Number(result.amount) || 0;
+            } catch (err) {
+                console.warn("Coupon invalid for current cart, clearing session:", err.message);
+                req.session.appliedCouponCode = null;
+                discount = 0;
+            }
+        }
+
+        const finalPricing = {
+            ...checkoutData.pricing,
+            discount: discount,
+            total: Math.max(0, (checkoutData.pricing.subtotal - discount) + checkoutData.pricing.tax)
+        };
+
         return res.render('user/checkout', {
             title: 'Checkout',
             cartItems: checkoutData.cartItems,
-            pricing: checkoutData.pricing,
+            pricing: finalPricing,
             addresses: checkoutData.addresses || req.user?.addresses || [],
-            isDirect: checkoutData.isDirect
+            isDirect: checkoutData.isDirect,
+            coupons: availableCoupons,
+            appliedCoupon: req.session.appliedCouponCode
         });
     } catch (error) {
         console.error("DEBUG: Render Error:", error);
         return res.redirect('/cart');
     }
 };
-
 
 export const handleCheckoutData = (req, res) => {
     try {
@@ -147,6 +176,29 @@ export const placeOrder = async (req, res) => {
             summary = pricing.summary;
         }
 
+        const subtotal = Number(summary.subtotal) || 0;
+        const tax = Number(summary.tax) || 0;
+        let discount = 0;
+        let couponId = null;
+
+     if (req.session.appliedCouponCode) {
+      try {
+        const result = await CouponService.validate(req.session.appliedCouponCode, summary.subtotal);
+        
+        discount = (result && typeof result.amount === 'number') ? result.amount : 0;
+        couponId = (result && result._id) ? result._id : null;
+        
+        console.log("DEBUG: Final validation check - Discount:", discount, "CouponID:", couponId);
+    } catch (err) {
+        console.error("DEBUG: Coupon validation failed:", err);
+        discount = 0;
+        couponId = null;
+    }
+} else {
+    console.log("DEBUG: No coupon found in session.");
+}
+        
+        const finalTotal = (summary.subtotal - discount) + summary.tax;
         const user = await UserRepo.findById(userId);
         const selectedAddress = user.addresses.find(a => a._id.toString() === addressId);
         if (!selectedAddress) throw new Error("Delivery address not found");
@@ -170,18 +222,32 @@ export const placeOrder = async (req, res) => {
                 pincode: selectedAddress.pincode,
                 mobileNumber: selectedAddress.phone
             },
-            subtotal: summary.subtotal,
-            tax: summary.tax,
-            total: summary.total,
-            finalAmount: summary.total,
+            subtotal: subtotal,
+            discount: discount,
+            tax: tax,
+            total: finalTotal,
+            finalAmount: finalTotal,
             paymentMethod: paymentMethod,
             status: (paymentMethod === 'COD') ? 'pending' : 'processing'
         };
 
-        req.flash('success',"Order placed successfully");
+        console.log("DEBUG: Final object sent to service:place order controller", orderData);
+        
         const newOrder = await OrderService.processCheckout(userId, orderData, !!req.session.directPurchase);
-        req.session.directPurchase = null; 
+        
+     if (couponId) {
+       try {
+        await CouponRepo.decrementUseCount(couponId);
+        console.log("DEBUG: Coupon use_count successfully decremented.");
+    } catch (err) {
+        console.error("DEBUG: Failed to decrement coupon use_count:", err);
+    }
+}
+        
+        req.session.directPurchase = null;
+        req.session.appliedCouponCode = null; 
 
+        req.flash('success', "Order placed successfully");
         res.status(200).json({ success: true, orderId: newOrder._id });
 
     } catch (error) {
