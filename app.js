@@ -14,6 +14,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import couponRoutes from './routes/couponRoutes.js';
 import {wishlistCountMiddleware,injectNavbarData} from'./middleware/authMiddleware.js';
 import passport  from './config/passport.js';
 import * as wishlistService from './services/wishlistService.js';
@@ -54,6 +55,7 @@ app.engine('hbs', engine({
     return stepRank <= (ranks[currentStatus] ?? 4); 
     },
     lt: ((a, b) => a < b),
+    gt: ((a, b) => b > a),
     le: ((a, b) => a <= b),
     ge: ((a, b) => a >= b),
     eq: (a, b) => a?.toString() === b?.toString(),
@@ -110,12 +112,10 @@ isStepCompleted: function(itemStep, currentStep) {
 isStepActive: function(itemStep, currentStep) {
     return itemStep === currentStep;
 },
-  toUpperCase: (str) =>
+toUpperCase: (str) =>
     (typeof str === 'string' ? str.toUpperCase() : '')  
 }
 }));
-
-
 
 app.set('view engine', 'hbs');
 app.set('views', path.join(process.cwd(), 'views'));
@@ -125,7 +125,6 @@ app.use(express.static(path.join(process.cwd(), 'public')));
 app.use('/uploads/profile_pics', express.static(path.join(process.cwd(),'public', 'uploads', 'profile_pics')));
 
 app.use('/uploads', express.static(path.join(process.cwd(),'public', 'uploads', 'products')));
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
@@ -141,6 +140,10 @@ app.use(session({
         httpOnly: true        
     }
 }));
+app.use((req, res, next) => {
+    console.log(`DEBUG: Incoming Request -> ${req.method} ${req.url}`);
+    next();
+});
 
 app.use(flash());
 
@@ -210,7 +213,6 @@ app.use(async (req, res, next) => {
     next();
 });
 
-
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/', homeRoutes);
@@ -218,6 +220,6 @@ app.use('/',productRoutes);
 app.use('/cart', cartRoutes);
 app.use('/wishlist', wishlistRoutes);
 app.use('/', orderRoutes);
-
+app.use('/admin/coupons',couponRoutes);
 
 export default app;
