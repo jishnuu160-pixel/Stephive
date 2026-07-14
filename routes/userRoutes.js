@@ -19,6 +19,7 @@ import {
     getAbout
 } from '../controllers/userController.js';
 import { addToCart } from '../controllers/cartController.js';
+import { getAvailableCouponsAjax,applyCoupon} from '../controllers/couponController.js';
 import { isUserAuthenticated, isUserLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
 import {uploadAvatar} from '../middleware/upload.middleware.js';
 import {handleUploadError} from '../middleware/uploadError.middleware.js';
@@ -125,5 +126,8 @@ router.post(
     uploadAvatar.single('profileImage'), 
     updateAvatar
 );
+
+router.get('/get-available-coupons', isUserAuthenticated,getAvailableCouponsAjax);
+router.post('/apply-coupon', isUserAuthenticated,applyCoupon);
 
 export default router;
