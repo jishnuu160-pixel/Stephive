@@ -37,6 +37,7 @@ export const getCheckoutPageData = async (userId) => {
 };
 
 export const processCheckout = async (userId, orderData, isDirect = false) => {
+    
     const sanitize = (val) => {
         const num = parseFloat(val);
         return isNaN(num) ? 0 : num; 
@@ -45,30 +46,16 @@ export const processCheckout = async (userId, orderData, isDirect = false) => {
     const subtotal = sanitize(orderData.subtotal);
     const tax = sanitize(orderData.tax);
     const discount = sanitize(orderData.discount); 
-
     const calculatedTotal = (subtotal - discount) + tax; 
 
-    const sanitizedOrderData = {
-        user_id: userId,
-        items: orderData.items,
-        deliveryAddress: orderData.deliveryAddress,
-        paymentMethod: orderData.paymentMethod,
-        status: orderData.status,
-        subtotal: subtotal,
-        tax: tax,
-        discount: discount, 
-        total: calculatedTotal,
-        finalAmount: calculatedTotal
-    };
-
-    for (const item of sanitizedOrderData.items) {
+    for (const item of orderData.items) {
         const product = await ProductRepo.findProductById(item.productId);
+        if (!product) throw new Error(`Product not found: ${item.productId}`);
+        
         const variant = product.variants.find(v => v._id.toString() === item.variantId.toString());
         const sizeObj = variant?.sizes.find(s => s.size === Number(item.size));
 
-        if (item.quantity > 5) {
-            throw new Error(`You cannot purchase more than 5 units.`);
-        }
+        if (item.quantity > 5) throw new Error(`You cannot purchase more than 5 units.`);
         if (!sizeObj || sizeObj.stock < item.quantity) {
             throw new Error(`Insufficient stock for ${product.productName}.`);
         }
@@ -77,33 +64,34 @@ export const processCheckout = async (userId, orderData, isDirect = false) => {
     const edd = new Date();
     edd.setDate(edd.getDate() + 5);
     
-   const orderToSave = { 
-    user_id: userId,
-    items: sanitizedOrderData.items,
-    deliveryAddress: sanitizedOrderData.deliveryAddress,
-    paymentMethod: sanitizedOrderData.paymentMethod,
-    status: sanitizedOrderData.status,
-    subtotal: sanitizedOrderData.subtotal,
-    tax: sanitizedOrderData.tax,
-    discount: sanitizedOrderData.discount, 
-    total: sanitizedOrderData.total,      
-    finalAmount: sanitizedOrderData.total,
-    orderId: generateOrderID(),
-    expectedDeliveryDate: edd
-};
-
+    const orderToSave = { 
+        user_id: userId,
+        items: orderData.items,
+        deliveryAddress: orderData.deliveryAddress,
+        paymentMethod: orderData.paymentMethod,
+        status: orderData.status || 'pending', 
+        subtotal, tax, discount, 
+        total: calculatedTotal,
+        finalAmount: calculatedTotal,
+        orderId: generateOrderID(),
+        expectedDeliveryDate: edd
+    };
 
     const newOrder = await OrderRepo.saveOrder(orderToSave);
+    
+    if (!newOrder) {
+        console.error("DEBUG: OrderRepo.saveOrder returned null!");
+        throw new Error("Failed to save order in database.");
+    }
 
-    for (const item of sanitizedOrderData.items) {
+    for (const item of orderData.items) {
         await ProductRepo.decreaseStock(item.productId, item.variantId, item.size, item.quantity);
     }
     
     if (!isDirect) {
         await OrderRepo.clearCartByUserId(userId);
-    }  
-
-    return newOrder;
+    }   
+    return newOrder; 
 };
 
 
@@ -142,8 +130,12 @@ export const getUserProfile = async (user_id) => {
 };
 
 export const getOrderDetails = async (orderId) => {
+    if (!orderId || orderId === 'undefined') {
+        throw new Error('Invalid Order ID provided');
+    }
+
     const order = await OrderRepo.findOrderById(orderId);
-   
+    
     if (!order) throw new Error('Order not found');
     return order;
 };
@@ -246,4 +238,25 @@ const calculateEDD = (days = 5) => {
     const date = new Date();
     date.setDate(date.getDate() + days);
     return date;
+};
+
+export const updatePaymentStatus = async (orderId, paymentId, status) => {
+    return await OrderRepo.updateOrder(orderId, { 
+        paymentId: paymentId,
+        status: status 
+    });
+};
+
+export const getSelectedAddress = async (userId, addressId) => {
+    const user = await UserRepo.findById(userId);
+
+    const address = user.addresses.find(
+        a => a._id.toString() === addressId
+    );
+
+    if (!address) {
+        throw new Error("Delivery address not found");
+    }
+
+    return address;
 };
