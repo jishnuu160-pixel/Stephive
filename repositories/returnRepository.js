@@ -9,6 +9,10 @@ export const findByOrderId = async (orderId) => {
     return await Return.findOne({ orderId: orderId });
 };
 
+export const getOrderById = async (orderId) => {
+    return await Order.findOne({ orderId: orderId });
+};
+
 export const findReturnById = async (id) => {
     if (id.length === 24) {
         return await Return.findById(id).populate('productId');
