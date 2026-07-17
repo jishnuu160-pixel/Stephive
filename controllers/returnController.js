@@ -2,7 +2,7 @@ import * as ReturnService from '../services/ReturnService.js';
 
 export const handleReturnRequest = async (req, res) => {
     try {
-        console.log("Full Request Body:", JSON.stringify(req.body, null, 2)); // Add this
+        console.log("Full Request Body:", JSON.stringify(req.body, null, 2));
         const orderIdString = req.body.orderId;
         const userId = req.session.user.id;
         const mongoId = req.params.id; 
@@ -54,7 +54,8 @@ export const getReturnDetails = async (req, res) => {
         
         res.render('admin/return-details', { 
             returnDetails: returnData,
-            pageTitle: 'Return Request Details'
+            pageTitle: 'Return Request Details',
+            activePage:'return'
         });
     } catch (error) {
         console.error("Error loading return details:", error);
