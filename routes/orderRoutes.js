@@ -1,6 +1,6 @@
 import express from "express";
 
-import { placeOrder, getUserOrders, getOrderById, getOrderConfirmation, cancelOrder,handleCheckoutData,renderCheckoutPage,getOrderDetails,getReturnForm,downloadInvoice} from '../controllers/OrderController.js';
+import { placeOrder, getUserOrders, getOrderById, getOrderConfirmation, cancelOrder,handleCheckoutData,renderCheckoutPage,getOrderDetails,getReturnForm,downloadInvoice,renderPaymentFailurePage} from '../controllers/OrderController.js';
 import { isUserAuthenticated } from '../middleware/authMiddleware.js';
 import {handleReturnRequest} from '../controllers/returnController.js';
 
@@ -17,6 +17,7 @@ router.get('/order-confirmation/:id', isUserAuthenticated, getOrderConfirmation)
 router.post('/orders/:id/cancel', isUserAuthenticated, cancelOrder);
 router.get('/orders/:id', isUserAuthenticated,getOrderDetails );
 
+router.get('/orders/payment-failed', renderPaymentFailurePage);
 
 router.get('/orders/return/:id', isUserAuthenticated, getReturnForm);
 router.post('/orders/return/:id', isUserAuthenticated, handleReturnRequest);
