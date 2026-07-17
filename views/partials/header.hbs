@@ -74,7 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// Upgraded updateQuantity mechanism with complete parameters and interceptor logic
 async function updateQuantity(productId, newQty, size = "M", variantId = null) {
     try {
         const response = await fetch('/user/cart/update-quantity', {
@@ -82,13 +81,12 @@ async function updateQuantity(productId, newQty, size = "M", variantId = null) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 productId, 
-                targetQuantity: newQty, // Standardized key to match backend service mapping
+                targetQuantity: newQty, 
                 size: size,
                 variantId: variantId
             })
         });
 
-        // Dynamic Auth Gatekeeper: Forces a login page redirect if session drops mid-session
         if (response.status === 401 || response.status === 403) {
             window.location.href = "/user/login?error=session_expired";
             return;
