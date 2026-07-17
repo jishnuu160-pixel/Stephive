@@ -6,7 +6,6 @@ const router= express.Router();
 
 router.get('/', getBrand);
 
-// brandRoutes.js
 router.get('/add', getAddBrandPage);
 router.get('/add', isAdminAuthenticated, getAddBrandPage);      
 router.post('/add', isAdminAuthenticated, postAddBrand);      

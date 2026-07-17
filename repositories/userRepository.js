@@ -137,3 +137,16 @@ export const clearOTP = async (email) => {
         { $unset: { otp: "", otpExpiry: "" } }
     );
 };
+
+
+export const getAddressById = async (userId, addressId) => {
+    try {
+        const user = await User.findById(userId, 'addresses').lean();
+        if (!user || !user.addresses) return null;
+        
+        return user.addresses.find(addr => addr._id.toString() === addressId.toString());
+    } catch (error) {
+        console.error("Repo Error (getAddressById):", error.message);
+        throw error;
+    }
+};
