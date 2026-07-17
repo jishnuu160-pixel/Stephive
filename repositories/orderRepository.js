@@ -25,8 +25,10 @@ export const countOrdersByUserId = async (userId) => {
     }
 };
 
-export const saveOrder = async (orderData) => {
-    return await Order.create(orderData);
+export const saveOrder = async (orderToSave) => {
+    const order = new Order(orderToSave);
+    const result = await order.save();
+    return result; 
 };
 
 export const findOrdersByUserId = async (user_id, limit, skip, sortOrder=-1,search) => {
@@ -136,3 +138,7 @@ export const updateStatus = async (orderId, newStatus) => {
     ).lean();
 };
 
+
+export const findOneAndUpdate = async (filter, update) => {
+    return await Order.findOneAndUpdate(filter, update, { new: true });
+};
