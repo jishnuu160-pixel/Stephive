@@ -46,7 +46,7 @@ const orderSchema = new mongoose.Schema({
   cancelledAt: Date
 }, { timestamps: true }); 
 
-// The 'Safety Gate' pattern:
+
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 
 export default Order;
