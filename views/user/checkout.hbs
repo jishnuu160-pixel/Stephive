@@ -175,6 +175,12 @@
   </div>
 </div>
 
+
+
+
+
+
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const applyBtn = document.querySelector('.btn-apply');
@@ -184,45 +190,80 @@
         if (placeOrderBtn) placeOrderBtn.addEventListener('click', handlePlaceOrder);
     });
 
-   
-    async function handlePlaceOrder() {
+async function handlePlaceOrder() {
     const selectedAddress = document.querySelector('input[name="selectedAddress"]:checked')?.value;
     const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value;
-    const couponInput = document.getElementById('couponCodeInput');
     
-    const subtotal = parseFloat(document.getElementById('subtotal-display')?.innerText.replace(/[^0-9.]/g, "")) || 0;
-    const tax = parseFloat(document.getElementById('tax-display')?.innerText.replace(/[^0-9.]/g, "")) || 0;
-
-    const discountEl = document.getElementById('discount-display');
-    const rawDiscountText = discountEl ? discountEl.innerText : "0";
-    const match = rawDiscountText.match(/[\d.]+/); 
-    const discount = match ? parseFloat(match[0]) : 0;
-
-   
     if (!selectedAddress) return showToast("Please select a delivery address", "error");
+    if (!paymentMethod) return showToast("Please select a payment method", "error");
 
     try {
-        const response = await fetch('/place-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                addressId: selectedAddress, 
-                paymentMethod: paymentMethod,
-                couponCode: couponInput ? couponInput.value : "",
-                subtotal: subtotal,
-                tax: tax,
-                discount: discount  
-            })
-        });
+        if (paymentMethod === 'cod') {
+            const response = await fetch('/place-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ addressId: selectedAddress, paymentMethod: 'cod' })
+            });
+            const data = await response.json();
 
-        const data = await response.json();
-        if (data.success) {
-            window.location.href = `/order-confirmation/${data.orderId}`;
-        }else{
-            showToast(data.message || "Order failed", "error");
+            console.log("COD server reponse:",data);
+            
+            if (data.success && data.orderId) {
+                window.location.href = `/order-confirmation/${data.orderId}`;
+            } else {
+              console.error("Server success but orderId missing:", data);
+                showToast(data.message || "COD Order failed", "error");
+            }
+        } 
+        
+        else if (paymentMethod === 'razorpay') {
+            const response = await fetch('/place-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                addressId: selectedAddress,
+                paymentMethod: 'razorpay'
+              }) 
+            });
+            const data = await response.json();
+
+            console.log("Razorpay Session Data:", data);
+
+            const options = {
+                key: data.key,
+                amount: data.amount, 
+                order_id: data.razorpayOrderId,
+                handler: async function (response) {
+   
+
+   
+            const verifyRes = await fetch('/payment/verify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+             })
+         });
+    
+         const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+             window.location.href = `/order-confirmation/${verifyData.orderId}`;
+          } else {
+            showToast(verifyData.message || "Payment verification failed", "error");
+          }
+          },
+           modal: {
+             ondismiss: function () {
+        window.location.href = "payment/payment-failed";
+    }
+}
+            };
+            new Razorpay(options).open();
         }
-     }catch(err) {
-        console.error(err);
+    } catch (err) {
+        console.error("Order placing errror:",err);
         showToast("Server error, please try again", "error");
     }
 }
