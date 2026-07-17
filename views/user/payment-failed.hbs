@@ -1,0 +1,20 @@
+<div class="failure-container">
+    <div class="failure-card">
+        <div class="icon-circle">
+            <span class="exclamation">!</span>
+        </div>
+        <h1>Payment Failed</h1>
+        <p>Your payment could not be completed. Please try again or use a different payment method.</p>
+
+        <div class="order-details">
+            <div class="detail-row"><span>ORDER ID</span> <strong>{{orderId}}</strong></div>
+            <div class="detail-row"><span>ATTEMPTED AMOUNT</span> <strong>₹{{amount}}</strong></div>
+            <div class="detail-row"><span>PAYMENT METHOD</span> <span>{{paymentMethod}}</span></div>
+        </div>
+
+        <button class="btn-retry" onclick="retryPayment()">Retry Payment</button>
+        <button class="btn-cart" onclick="window.location.href='/cart'">Go to Cart</button>
+        
+        <p class="refund-note">If the amount was deducted from your account, it will be automatically refunded within 3-5 business days.</p>
+    </div>
+</div>
