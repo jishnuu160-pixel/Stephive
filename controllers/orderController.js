@@ -1,10 +1,20 @@
 import * as OrderService from '../services/OrderService.js';
 import * as ReturnService from '../services/returnService.js';
 import * as UserRepo from '../repositories/userRepository.js';
+import * as OrderRepo from '../repositories/orderRepository.js';
 import * as CouponRepo from '../repositories/couponRepository.js';
 import * as CouponService from '../services/couponService.js';
+import Order from '../models/orderModel.js';
+
+import Razorpay from 'razorpay';
 import puppeteer from 'puppeteer';
 import mongoose  from 'mongoose';
+
+
+const razorpayInstance = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 export const getUserOrders = async (req, res) => {
     try {
@@ -163,7 +173,6 @@ export const placeOrder = async (req, res) => {
         const userId = req.user._id;
         
         let items, summary;
-
         if (req.session.directPurchase) {
             const { productId, variantId, size, quantity } = req.session.directPurchase;
             const directItem = await OrderService.getDirectProductDetails(productId, variantId, size, quantity);
@@ -181,26 +190,18 @@ export const placeOrder = async (req, res) => {
         let discount = 0;
         let couponId = null;
 
-     if (req.session.appliedCouponCode) {
-      try {
-        const result = await CouponService.validate(req.session.appliedCouponCode, summary.subtotal);
-        
-        discount = (result && typeof result.amount === 'number') ? result.amount : 0;
-        couponId = (result && result._id) ? result._id : null;
-        
-        console.log("DEBUG: Final validation check - Discount:", discount, "CouponID:", couponId);
-    } catch (err) {
-        console.error("DEBUG: Coupon validation failed:", err);
-        discount = 0;
-        couponId = null;
-    }
-} else {
-    console.log("DEBUG: No coupon found in session.");
-}
+        if (req.session.appliedCouponCode) {
+            try {
+                const result = await CouponService.validate(req.session.appliedCouponCode, summary.subtotal);
+                discount = (result && typeof result.amount === 'number') ? result.amount : 0;
+                couponId = (result && result._id) ? result._id : null;
+            } catch (err) {
+                console.error("Coupon validation failed:", err);
+            }
+        }
         
         const finalTotal = (summary.subtotal - discount) + summary.tax;
-        const user = await UserRepo.findById(userId);
-        const selectedAddress = user.addresses.find(a => a._id.toString() === addressId);
+        const selectedAddress = await OrderService.getSelectedAddress(userId,addressId);
         if (!selectedAddress) throw new Error("Delivery address not found");
 
         const orderData = {
@@ -222,33 +223,48 @@ export const placeOrder = async (req, res) => {
                 pincode: selectedAddress.pincode,
                 mobileNumber: selectedAddress.phone
             },
-            subtotal: subtotal,
-            discount: discount,
-            tax: tax,
+            subtotal, discount, tax,
             total: finalTotal,
             finalAmount: finalTotal,
-            paymentMethod: paymentMethod,
-            status: (paymentMethod === 'COD') ? 'pending' : 'processing'
+            paymentMethod,
+            status: 'pending'
         };
 
-        console.log("DEBUG: Final object sent to service:place order controller", orderData);
-        
-        const newOrder = await OrderService.processCheckout(userId, orderData, !!req.session.directPurchase);
-        
-     if (couponId) {
-       try {
-        await CouponRepo.decrementUseCount(couponId);
-        console.log("DEBUG: Coupon use_count successfully decremented.");
-    } catch (err) {
-        console.error("DEBUG: Failed to decrement coupon use_count:", err);
-    }
-}
-        
-        req.session.directPurchase = null;
-        req.session.appliedCouponCode = null; 
+        if (paymentMethod === 'cod') {
+            const newOrder = await OrderService.processCheckout(userId, orderData, !!req.session.directPurchase);
+            
+            req.flash('success', 'Order placed successfully');
 
-        req.flash('success', "Order placed successfully");
-        res.status(200).json({ success: true, orderId: newOrder._id });
+            if (couponId) await CouponRepo.decrementUseCount(couponId);
+            req.session.directPurchase = null;
+            req.session.appliedCouponCode = null;
+
+            return res.status(200).json({ success: true, orderId: newOrder._id });
+
+        } else {
+            const options = {
+                amount: Math.round(finalTotal * 100),
+                currency: "INR",
+                receipt: "rcpt_" + Date.now() 
+            };
+            
+           const rzpOrder = await razorpayInstance.orders.create(options);
+
+           req.session.pendingOrder = orderData;
+           req.session.failedPayment = {
+            orderId: rzpOrder.id,      
+            amount: finalTotal,       
+            paymentMethod: paymentMethod
+};
+
+
+          return res.status(200).json({
+            success: true,
+            razorpayOrderId: rzpOrder.id,
+            amount: rzpOrder.amount,
+            key: process.env.RAZORPAY_KEY_ID
+          });
+        }
 
     } catch (error) {
         console.error("Order Placement Error:", error);
@@ -368,3 +384,24 @@ export const downloadInvoice = async (req, res) => {
     }
 };
 
+
+export const renderPaymentFailurePage = async (req, res) => {
+    try {
+        const { orderId } = req.query;
+        
+        const order = await Order.findById(orderId).populate('items.productId');
+        
+        if (!order) {
+            return res.status(404).send("Order not found");
+        }
+
+        res.render('payment-failed', { 
+            orderId: order._id, 
+            amount: order.finalAmount, 
+            paymentMethod: order.paymentMethod 
+        });
+    } catch (error) {
+        console.error("Error rendering failure page:", error);
+        res.status(500).send("Server Error");
+    }
+};
