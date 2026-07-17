@@ -1,6 +1,8 @@
 import  adminRepo from '../repositories/adminRepository.js';
 import * as OrderRepo from '../repositories/orderRepository.js';
 import * as returnRepo from '../repositories/returnRepository.js';
+import * as productRepo from "../repositories/productRepository.js";
+
 
 import Return from '../models/ReturnModel.js';
 
@@ -189,25 +191,41 @@ export const fetchAllReturns = async () => {
 export const changeReturnStatus = async (returnId, newStatus) => {
     try {
         const updatedReturn = await returnRepo.updateReturnStatusInDb(returnId, newStatus);
+
         if (!updatedReturn) throw new Error("Return request not found");
 
-        if (newStatus === 'Picked Up') {
+        if (newStatus === "Picked Up") {
             updatedReturn.pickedUpAt = new Date();
             await updatedReturn.save();
-        } else if (newStatus === 'Refunded') {
-            const orderRes = await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, 'Returned');
-            if (!orderRes) throw new Error("Order update failed");
-        } else if (newStatus === 'Rejected') {
-            const orderRes = await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, 'Delivered');
-            if (!orderRes) throw new Error("Order update failed");
         }
+
+        else if (newStatus === "Refunded") {
+
+            const order = await returnRepo.getOrderById(updatedReturn.orderId);
+
+            for (const item of order.items) {
+                await productRepo.increaseStock(
+                    item.productId,
+                    item.variantId,
+                    item.size,
+                    item.quantity
+                );
+            }
+
+            await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, "Returned");
+        }
+
+        else if (newStatus === "Rejected") {
+            await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, "Delivered");
+        }
+
         return updatedReturn;
+
     } catch (error) {
-        console.error("SERVICE ERROR:", error.message);
-        throw error; 
+        console.error(error);
+        throw error;
     }
 };
-
 
 
 
