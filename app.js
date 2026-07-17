@@ -15,6 +15,8 @@ import productRoutes from './routes/productRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+
 import {wishlistCountMiddleware,injectNavbarData} from'./middleware/authMiddleware.js';
 import passport  from './config/passport.js';
 import * as wishlistService from './services/wishlistService.js';
@@ -140,10 +142,6 @@ app.use(session({
         httpOnly: true        
     }
 }));
-app.use((req, res, next) => {
-    console.log(`DEBUG: Incoming Request -> ${req.method} ${req.url}`);
-    next();
-});
 
 app.use(flash());
 
@@ -221,5 +219,6 @@ app.use('/cart', cartRoutes);
 app.use('/wishlist', wishlistRoutes);
 app.use('/', orderRoutes);
 app.use('/admin/coupons',couponRoutes);
+app.use('/payment', paymentRoutes);
 
 export default app;
