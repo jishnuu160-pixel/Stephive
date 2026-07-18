@@ -1,4 +1,5 @@
 import * as userService from '../services/userServices.js';
+import * as userRepo from '../repositories/userRepository.js';
 import { error, profile } from 'console';
 import { title } from 'process';
 
@@ -471,7 +472,7 @@ export const getEditProfile = async (req, res) => {
             user,
             errors:{},
             title: "Edit Profile",
-            activePage: 'profile' 
+            se: 'profile' 
         });
     } catch (error) {
         console.error("GET Edit Profile Error:", error);
