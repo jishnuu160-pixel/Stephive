@@ -215,8 +215,23 @@ async function handlePlaceOrder() {
                 showToast(data.message || "COD Order failed", "error");
             }
         } 
-        
-        else if (paymentMethod === 'razorpay') {
+    else if (paymentMethod === 'wallet') {
+        const response = await fetch('/place-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            addressId: selectedAddress, 
+            paymentMethod: 'wallet' 
+        })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+        window.location.href = `/order-confirmation/${data.orderId}`;
+    } else {
+        showToast(data.message || "Wallet payment failed", "error");
+    }
+}else if (paymentMethod === 'razorpay') {
             const response = await fetch('/place-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
