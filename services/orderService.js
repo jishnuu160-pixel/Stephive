@@ -2,6 +2,7 @@ import * as OrderRepo from '../repositories/orderRepository.js';
 import * as ProductRepo from '../repositories/productRepository.js';
 import * as ReturnRepo from '../repositories/returnRepository.js';
 import * as UserRepo from '../repositories/userRepository.js';
+import * as WalletRepo from '../repositories/walletRepository.js';
 import mongoose from 'mongoose';
 import { generateOrderID } from '../utils/idGenerator.js';
 
@@ -140,13 +141,12 @@ export const getOrderDetails = async (orderId) => {
     return order;
 };
 
+
 export const cancelUserOrder = async (orderId, userId) => {
     const order = await OrderRepo.findUserOrderById(orderId, userId);
     
     if (!order) throw new Error("Order not found or access denied");
     if (order.status === 'cancelled') throw new Error("Order is already cancelled");
-
-    const previousStatus = order.status;
 
     for (const item of order.items) {
         await ProductRepo.increaseStock(
@@ -157,13 +157,37 @@ export const cancelUserOrder = async (orderId, userId) => {
         );
     }
 
-    await OrderRepo.updateOrder(orderId, { 
-    status: 'cancelled',
-    previousStatus: order.status, 
-    cancelledAt: new Date() 
-});
-};
 
+const method = order.paymentMethod ? order.paymentMethod.trim().toLowerCase() : '';
+    const paidMethods = ['razorpay', 'wallet'];
+
+
+    if (paidMethods.includes(method) && order.status !== 'pending') {
+        const refundAmount = Number(order.finalAmount) || 0;
+
+        if (refundAmount > 0) {
+            console.log(`DEBUG: Refunding ₹${refundAmount} to user ${userId}`);
+            
+            await WalletRepo.updateWallet(
+                userId, 
+                refundAmount, 
+                'credit', 
+                `Refund for cancelled Order #${order.orderId || order._id}`,
+                order._id
+            );
+        } else {
+            console.warn(`DEBUG: Refund triggered but amount is ${refundAmount}. Skipping wallet update.`);
+        }
+    } else {
+        console.log(`DEBUG: No refund needed. Method: ${method}, Status: ${order.status}`);
+    }
+
+    await OrderRepo.updateOrder(orderId, { 
+        status: 'cancelled',
+        previousStatus: order.status, 
+        cancelledAt: new Date() 
+    });
+};
 
 export const getDirectProductDetails = async (productId, variantId, size, quantity) => {
     const objId = new mongoose.Types.ObjectId(productId);
