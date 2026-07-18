@@ -1,5 +1,6 @@
 import * as OrderService from '../services/OrderService.js';
 import * as ReturnService from '../services/returnService.js';
+import * as WalletService from '../services/walletService.js';
 import * as UserRepo from '../repositories/userRepository.js';
 import * as OrderRepo from '../repositories/orderRepository.js';
 import * as CouponRepo from '../repositories/couponRepository.js';
@@ -71,6 +72,16 @@ export const cancelOrder = async (req, res) => {
         }
 
         await OrderService.cancelUserOrder(orderId, userId);
+
+        if (order.paymentMethod === 'wallet') {
+            await WalletService.updateWallet(
+                userId, 
+                order.finalAmount, 
+                'credit', 
+                `Refund for Order: ${order._id}`, 
+                orderId
+            );
+        }
 
         return res.status(200).json({ success: true, message: "Order cancelled successfully" });
     } catch (error) {
@@ -169,8 +180,14 @@ export const handleCheckoutData = (req, res) => {
 
 export const placeOrder = async (req, res) => {
     try {
+       const user = req.session?.user || req.user; 
+
+        if (!user || !user.id) {
+            return res.status(401).json({ message: "User not authenticated" });
+        }
+        const userId = user.id;
         const { addressId, paymentMethod } = req.body;
-        const userId = req.user._id;
+        
         
         let items, summary;
         if (req.session.directPurchase) {
@@ -200,7 +217,15 @@ export const placeOrder = async (req, res) => {
             }
         }
         
-        const finalTotal = (summary.subtotal - discount) + summary.tax;
+       if (!summary || summary.subtotal === undefined) {
+        throw new Error("Pricing calculation failed: Missing summary data.");
+        }
+
+       const finalTotal = (Number(summary.subtotal) - Number(discount)) + Number(summary.tax);
+
+       if (isNaN(finalTotal) || finalTotal <= 0) {
+         throw new Error("Invalid total calculated.");
+       }
         const selectedAddress = await OrderService.getSelectedAddress(userId,addressId);
         if (!selectedAddress) throw new Error("Delivery address not found");
 
@@ -241,7 +266,31 @@ export const placeOrder = async (req, res) => {
 
             return res.status(200).json({ success: true, orderId: newOrder._id });
 
-        } else {
+        }else if (paymentMethod === 'wallet') {
+    const wallet = await WalletService.getWalletDetails(userId);
+    
+    if (!wallet || wallet.balance < finalTotal) {
+        return res.status(400).json({ 
+            success: false, 
+            message: "Insufficient wallet balance." 
+        });
+    }
+    const newOrder = await OrderService.processCheckout(userId, orderData, !!req.session.directPurchase);
+    
+    await WalletService.updateWallet(
+        userId, 
+        finalTotal, 
+        'debit', 
+        'Order Payment', 
+        newOrder._id
+    );
+
+    if (couponId) await CouponRepo.decrementUseCount(couponId);
+    req.session.directPurchase = null;
+    req.session.appliedCouponCode = null;
+
+    return res.status(200).json({ success: true, orderId: newOrder._id });
+} else {
             const options = {
                 amount: Math.round(finalTotal * 100),
                 currency: "INR",
