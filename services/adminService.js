@@ -2,6 +2,7 @@ import  adminRepo from '../repositories/adminRepository.js';
 import * as OrderRepo from '../repositories/orderRepository.js';
 import * as returnRepo from '../repositories/returnRepository.js';
 import * as productRepo from "../repositories/productRepository.js";
+import * as WalletRepo from "../repositories/walletRepository.js";
 
 
 import Return from '../models/ReturnModel.js';
@@ -47,11 +48,8 @@ export const countCustomers = async (query) => {
 export const getCustomersPage = async (queryParams) => {
 
    const search = queryParams.search || '';
-
    const page = parseInt(queryParams.page) || 1;
-
    const limit = 4;
-
    const skip = (page - 1) * limit;
 
    let query = {
@@ -59,7 +57,6 @@ export const getCustomersPage = async (queryParams) => {
    };
 
    if (search) {
-
       query.$and = [
          { isAdmin: { $ne: true } },
          {
@@ -109,13 +106,10 @@ export const getCustomersPage = async (queryParams) => {
       prevPage: page - 1,
       searchQuery: search
    };
-
 };
 
 export const toggleUserStatus = async (userId) => {
-
-   const user =
-      await adminRepo.findUserById(userId);
+   const user = await adminRepo.findUserById(userId);
 
    if (!user) {
       throw new Error('User not found.');
@@ -132,7 +126,6 @@ export const toggleUserStatus = async (userId) => {
             : 'unblocked'
       }`
    };
-
 };
 
 
@@ -197,24 +190,38 @@ export const changeReturnStatus = async (returnId, newStatus) => {
         if (newStatus === "Picked Up") {
             updatedReturn.pickedUpAt = new Date();
             await updatedReturn.save();
+        } 
+       else if (newStatus === "Refunded") {
+
+    const order = await returnRepo.getOrderById(updatedReturn.orderId);
+
+    if (order && order.items) {
+        for (const item of order.items) {
+            await productRepo.increaseStock(
+                item.productId,
+                item.variantId,
+                item.size,
+                item.quantity
+            );
         }
+    }
 
-        else if (newStatus === "Refunded") {
+    console.log("Attempting wallet update for user:", updatedReturn.userId);
+    
+    if (updatedReturn.userId && updatedReturn.refundAmount) {
+        await WalletRepo.updateWallet(
+            updatedReturn.userId,
+            Number(updatedReturn.refundAmount), 
+            'credit',
+            `Refund for return ${updatedReturn.returnId}`,
+            updatedReturn.orderId
+        );
+    } else {
+        console.error("Wallet update skipped: Missing userId or refundAmount");
+    }
 
-            const order = await returnRepo.getOrderById(updatedReturn.orderId);
-
-            for (const item of order.items) {
-                await productRepo.increaseStock(
-                    item.productId,
-                    item.variantId,
-                    item.size,
-                    item.quantity
-                );
-            }
-
-            await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, "Returned");
-        }
-
+    await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, "Returned");
+} 
         else if (newStatus === "Rejected") {
             await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, "Delivered");
         }
@@ -222,7 +229,7 @@ export const changeReturnStatus = async (returnId, newStatus) => {
         return updatedReturn;
 
     } catch (error) {
-        console.error(error);
+        console.error("Change Status Error:", error);
         throw error;
     }
 };
