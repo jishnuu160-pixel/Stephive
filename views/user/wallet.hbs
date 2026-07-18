@@ -1,0 +1,132 @@
+<div class="order-history-page">
+    <div class="profile-wrapper">
+        <nav class="breadcrumb-container">
+            <p class="breadcrumb">My Account <span>/</span> <strong>Wallet</strong></p>
+        </nav>
+
+        <div class="profile-layout">
+            {{> userSide}}
+
+            <main class="main-content">
+                <header class="content-header">
+                    <h2>My Wallet</h2>
+                    <button class="add-money-btn">+ Add Money</button>
+                </header>
+
+                <div class="wallet-balance-card">
+                    <small>TOTAL BALANCE</small>
+                    <h2>₹{{wallet.balance}} <span class="currency">IND</span></h2>
+                </div>
+
+               <div class="transactions-container">
+    <div class="transactions-header">
+        <h3>Transactions</h3>
+        <a href="#" class="download-link">↓ Download Statement</a>
+    </div>
+
+    <table class="transactions-table">
+        <thead>
+            <tr>
+                <th>DESCRIPTION</th>
+                <th>DATE</th>
+                <th>AMOUNT</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each wallet.transactions}}
+            <tr>
+                <td>
+                    <div class="desc-cell">
+                        <div class="icon-wrapper">
+                            <i class="fas {{#if (eq this.type 'credit')}}fa-arrow-left text-blue{{else}}fa-circle text-gray{{/if}}"></i>
+                        </div>
+                        <div>
+                            <p class="title">{{this.description}}</p>
+                            <small class="subtitle">{{this.subtext}}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <p>{{formattedDate this.date}}</p>
+                    <small>{{formattedTime this.date}}</small>
+                </td>
+                <td class="amount {{this.type}}">
+                    {{#if (eq this.type 'credit')}}+{{else}}-{{/if}} ₹{{this.amount}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- Add Money Modal -->
+<div id="addMoneyModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Add Money to Wallet</h3>
+        <input type="number" id="walletAmount" placeholder="Enter amount" required>
+        <button id="submitAddMoney">Add Funds</button>
+        <button onclick="document.getElementById('addMoneyModal').style.display='none'">Cancel</button>
+    </div>
+</div>
+
+
+<script>
+    const addMoneyBtn = document.querySelector('.add-money-btn');
+    const modal = document.getElementById('addMoneyModal');
+    const submitBtn = document.getElementById('submitAddMoney');
+
+    addMoneyBtn.addEventListener('click', () => {
+        modal.style.display = 'block';
+    });
+
+    submitBtn.addEventListener('click', async () => {
+        const amount = document.getElementById('walletAmount').value;
+        if (!amount || amount <= 0) return alert("Please enter a valid amount");
+
+        const response = await fetch('/payment/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: amount, isWalletRecharge: true })
+        });
+        const order = await response.json();
+
+        const options = {
+            key: "{{RAZORPAY_KEY_ID}}", 
+            amount: order.amount,
+            currency: "INR",
+            order_id: order.id,
+           handler: async (response) => {
+    try {
+        const res = await fetch('/payment/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                isWalletRecharge: true, 
+                amount: amount
+            })
+        });
+
+        const data = await res.json();
+        
+        if (data.success) {
+            alert("Money added successfully!");
+            setTimeout(() => { location.reload(); }, 500); 
+        } else {
+            alert("Verification failed: " + (data.message || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Verification fetch error:", err);
+        alert("An error occurred during verification.");
+    }
+}
+        };
+        new Razorpay(options).open();
+    });
+</script>
