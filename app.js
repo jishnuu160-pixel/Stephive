@@ -16,6 +16,7 @@ import wishlistRoutes from './routes/wishlistRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import walletRoutes from './routes/walletRoutes.js';
 
 import {wishlistCountMiddleware,injectNavbarData} from'./middleware/authMiddleware.js';
 import passport  from './config/passport.js';
@@ -86,6 +87,14 @@ app.engine('hbs', engine({
                 day: 'numeric'
             }).format(date);
         },
+    formattedTime: function(date) {
+            if (!date) return '';
+            return new Date(date).toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            })
+    },    
     firstVariantSizes: (variants) => {
         if (
             Array.isArray(variants) &&
@@ -220,5 +229,6 @@ app.use('/wishlist', wishlistRoutes);
 app.use('/', orderRoutes);
 app.use('/admin/coupons',couponRoutes);
 app.use('/payment', paymentRoutes);
+app.use('/',walletRoutes);
 
 export default app;
