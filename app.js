@@ -17,6 +17,7 @@ import orderRoutes from './routes/orderRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import walletRoutes from './routes/walletRoutes.js';
+import referralRoutes from './routes/referralRoutes.js';
 
 import {wishlistCountMiddleware,injectNavbarData} from'./middleware/authMiddleware.js';
 import passport  from './config/passport.js';
@@ -41,6 +42,11 @@ app.engine('hbs', engine({
         allowProtoMethodsByDefault: true,
     },
     helpers: {
+    addParams:function(query, page) {
+    let params = new URLSearchParams(query);
+    params.set('page', page); 
+    return '?' + params.toString();
+    },
     hyphenate: (text) => {
         return typeof text === 'string' ? text.toLowerCase().replace(/\s+/g, '-') : '';
     },
@@ -230,5 +236,6 @@ app.use('/', orderRoutes);
 app.use('/admin/coupons',couponRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/',walletRoutes);
+app.use('/',referralRoutes);
 
 export default app;
