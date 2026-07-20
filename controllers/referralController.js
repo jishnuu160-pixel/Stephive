@@ -1,0 +1,22 @@
+import * as referralService from '../services/referralService.js';
+
+export const getReferralPage = async (req, res) => {
+    try {
+        const userId = req.user.id; 
+        const data = await referralService.getReferralDashboardData(userId);
+        
+        console.log("Referal data:",data);
+        res.render('user/refer-earn', { 
+            layout: 'main', 
+            totalReferrals: data.stats.totalReferrals,
+            successfulReferrals: data.stats.successfulReferrals,
+            rewardsEarned: data.stats.totalEarned,
+            history: data.history,
+            activePage:'referral',
+            referralCode: data.referralCode
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error loading referral page");
+    }
+};

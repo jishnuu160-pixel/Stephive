@@ -1,0 +1,66 @@
+<div class="order-history-page">
+    <div class="profile-wrapper">
+        <nav class="breadcrumb-container">
+      <p class="breadcrumb">My Account <span>/</span> <strong>Refer & Earn</strong></p>
+    </nav>
+
+    <div class="profile-layout">
+      {{> userSide}}
+
+      <main class="main-content-referal">
+        <!-- Referral Hero -->
+        <section class="referral-hero">
+          <div class="hero-content">
+            <span class="badge">🎁 REFERRAL REWARD</span>
+            <h2>Earn ₹500 for every referral</h2>
+            <p>Give your friends a 10% discount on their first luxury shoe. You earn ₹500 in wallet credit instantly.</p>
+          </div>
+          <img src="/path-to-your-image.png" alt="Referral Rewards" />
+        </section>
+
+<section class="referral-code-section">
+  <h3>Share your invite code</h3>
+  <div class="code-box">
+<input type="text" id="myReferralCode" value="{{referralCode}}" readonly />
+    <button onclick="copyCode()" class="btn-copy">Copy Code</button>
+  </div>
+  <p class="helper-text">Share this code with your friends and earn rewards!</p>
+</section>
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <small>TOTAL REFERRALS</small>
+            <h3>12</h3>
+          </div>
+          <div class="stat-card">
+            <small>SUCCESSFUL</small>
+            <h3>5</h3>
+          </div>
+          <div class="stat-card">
+            <small>REWARDS EARNED</small>
+            <h3>₹10,000</h3>
+          </div>
+        </div>
+
+        <!-- Referral Link & History -->
+        <div class="referral-bottom-row">
+
+          <section class="history-section">
+            <h3>Referral History</h3>
+            <!-- Referral list items -->
+            <button class="view-all">View All History</button>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyCode() {
+  const copyText = document.getElementById("myReferralCode");
+  copyText.select();
+  document.execCommand("copy");
+  alert("Referral code copied: " + copyText.value);
+}
+</script>

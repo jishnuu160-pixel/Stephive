@@ -1,0 +1,38 @@
+/* Scoped Wrapper */
+ .referral-hero {
+  display: flex;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  border: 1px solid #dbd4d4;
+}
+
+.main-content-referal{
+    padding: 30px;
+}
+
+ .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+ .stat-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #dbd4d4;
+}
+
+ .referral-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+
+
