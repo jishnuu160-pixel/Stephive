@@ -10,6 +10,11 @@ const userSchema = new mongoose.Schema({
         type:String,
         default: ''
     },
+    referralCode: { 
+        type: String, 
+        unique: true, 
+        index: true 
+    },
     otp: { type: String, default: null },
     otpExpiry: { type: Date, default: null },
     isBlocked: { type: Boolean, default: false },
