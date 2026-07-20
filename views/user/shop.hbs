@@ -1,74 +1,61 @@
-{{#unless searchValue}}
-    <div class="shop-container">
+<div class="shop-container">
+    {{#if searchValue}}
+        <!-- SEARCH RESULTS VIEW -->
+        <div class="search-results-page">
+            <a href="/shop">Back to Shop</a>
+            <h2>Search Results For "{{searchValue}}"</h2>
+            
+            <div class="products-wrapper-grid-search">
+                {{#each products}}
+                    {{> product-card}}
+                {{else}}
+                    <div class="no-products">
+                        <p>No sneakers found matching "{{searchValue}}"</p>
+                    </div>
+                {{/each}}
+            </div>
+            
+            {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage queryParams=queryParams}}
+        </div>
+
+    {{else}}
+        <!-- NORMAL SHOP PAGE VIEW -->
         <header class="hero-section">
             <div class="hero-content">
                 <h1>Shop the latest Sneakers</h1>
                 <p>Discover Your Next Favorite Pair</p>
             </div>
         </header>
-        
-        <section class="shop-products-section">
-            <div class="products-wrapper-grid-shop">
-                {{#each products}}
+
+        <div class="shop-main-layout">
+            <aside class="sidebar-wrapper">
+                {{> filter-sidebar}}
+            </aside>
+
+            <main class="products-main">
+                <div class="products-wrapper-grid-shop">
+                    {{#each products}}
+                        {{> product-card}}
+                    {{else}}
+                        <p>No products available.</p>
+                    {{/each}}
+                </div>
+                {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage queryParams=queryParams}}
+            </main>
+        </div>
+
+        <section class="best-sellers">
+            <h3>Latest Shoes</h3>
+            <div class="best-sellers-shelf-grid">
+                {{#each bestSellers}}
                     {{> product-card}}
                 {{else}}
-                    <div class="no-products"><p>No sneakers found.</p></div>
+                    <p>No products available right now.</p>
                 {{/each}}
-            </div>
-            
-            {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage}}
+            </div>      
         </section>
-    </div>
-
-    {{!-- <section class="categories-section">
-        <h3>Browse by category</h3>
-        <div class="category-grid">
-            <div class="cat-card-running">
-                <img src="/images/running-shoe.jpg" alt="Running">
-                <div class="category-label"><h4>Running shoes</h4><p>move faster run longer</p></div>
-            </div>
-            <div class="cat-card-casual">
-                <img src="/images/casual-shoe.jpg" alt="Casual">
-                <div class="category-label"><h4>Casual shoes</h4><p>Street style daily comfort</p></div>
-            </div>
-            <div class="cat-card-training">
-                <img src="/images/training-shoe.jpg" alt="Training">
-                <div class="category-label"><h4>Training shoes</h4><p>Power your workouts</p></div>
-            </div>
-            <div class="cat-card-limited">
-                <img src="/images/limited-edition.jpg" alt="Limited">
-                <div class="category-label"><h4>Limited Edition</h4><p>Rare drops limited stock</p></div>
-            </div>
-        </div>
-    </section> --}}
-
-    <section class="best-sellers">
-        <h3>Latest Shoes</h3>
-        <div class="best-sellers-shelf-grid">
-            {{#each bestSellers}}
-               {{> product-card}}
-            {{else}}
-                <p>No products available right now.</p>
-            {{/each}}
-        </div>      
-    </section>
-{{/unless}}
-
-{{#if searchValue}}
-    <section class="shop-products-section">
-        <h2>Search Results For "{{searchValue}}"</h2>
-
-        <div class="products-wrapper-grid-shop">
-            {{#each products}}
-                {{> product-card}}
-            {{else}}
-                <div class="no-products"><p>No sneakers found matching "{{searchValue}}".</p></div>
-            {{/each}}
-        </div>
-
-        {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage}}
-    </section>
-{{/if}}
+    {{/if}}
+</div>
 
 <script>
 document.addEventListener("click", async function (event) {
@@ -117,3 +104,8 @@ document.addEventListener("click", async function (event) {
     }
 });
 </script>
+
+
+
+
+
