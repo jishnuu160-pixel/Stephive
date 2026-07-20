@@ -323,78 +323,62 @@
 }
 
 .search-form {
-  display: flex;
-  align-items: center;
-  position: relative;
-  background: rgba(255, 255, 255, 0.08); /* Subtle glassmorphism tint */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  border-radius: 30px;
-  padding: 6px 0px;
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Premium easeOutExpo transition */
-
+    display: flex;
+    align-items: center;
 }
 
-/* Luxury active state when you click/focus on the search */
-.search-form:focus-within {
-  background: #ffffff;
-  border-color: #0f172a;
-  box-shadow: 0 8px 24px rgba(27, 27, 27, 0.12);
-}
 
 .search-input {
-  border: none !important;
-  background: transparent !important;
-  outline: none !important;
-  font-size: 13px;
-  font-weight: 500;
-  color: #ffffff; /* White text over dark background imagery */
-  padding: 2px 4px 2px 6px;
-  width: 130px; /* Snug default state */
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 0; /* Starts hidden */
+    opacity: 0;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 0;
+    transition: width 0.4s ease, opacity 0.4s ease;
 }
 
-.search-form:focus-within .search-input {
-  width: 220px; /* Smoothly stretches wider */
-  color: #0f172a; 
+.search-input.visible {
+    width: 150px; 
+    opacity: 1;
+    padding:  10px;
+    border: 1px solid black;
+    border-radius: 12px;
 }
 
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-  transition: color 0.3s ease;
+.search-input-container {
+    display: flex;
+    align-items: center;
+    position: relative;
 }
 
-.search-form:focus-within .search-input::placeholder {
-  color: #94a3b8;
+/* When the user clicks into the box, it expands */
+.search-input:focus {
+    width: 250px; /* Expanded width */
 }
 
 .search-submit-btn {
-  background: none !important;
-  border: none !important;
-  padding: 0 !important;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
-.search-submit-btn .nav-icons {
-  margin: 0 !important;
-  width: 18px; /* Standardize icon scaling */
-  height: 18px;
-  transition: transform 0.3s ease, filter 0.3s ease;
+.search-submit-btn img {
+    width: 18px; /* Standardize icon size */
+    height: 18px;
 }
 
-/* subtle icon rotation and color flip on form hover/focus */
-.search-form:hover .search-submit-btn .nav-icons {
-  transform: scale(1.08);
+.clear-search-btn {
+    text-decoration: none;
+    color: #666;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-left: 5px;
+    cursor: pointer;
 }
 
-.search-form:focus-within .search-submit-btn .nav-icons {
-  filter: invert(1); /* Inverts white icon to dark if using standard dark image assets */
-}
 
 .nav-icons:hover{
   transform: scale(1.08);

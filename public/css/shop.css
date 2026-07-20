@@ -6,6 +6,8 @@
     background-color: #ffffff;
 }
 
+
+
 .shop-page {
     max-width: 1400px;
     margin: 0 auto;
@@ -181,16 +183,34 @@
 
 .products-wrapper-grid-shop{
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    padding: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    padding: 1cap;
 }
 
-.products-wrapper-grid {
+.products-wrapper-grid-search{
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    padding: 1cap;
 }
+
+.search-results-page a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f4f4f4; /* Light gray background */
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.search-results-page a:hover {
+    background-color: #ddd; /* Darker on hover */
+}
+
 
 .product-card-gender {
     background: #ffffff;
@@ -212,6 +232,24 @@
     box-shadow: 0 12px 24px -5px rgba(15, 23, 42, 0.08);
     border-color: #cbd5e1;
 }
+
+.shop-main-layout {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.sidebar-wrapper {
+    flex: 0 0 250px; /* Sidebar width */
+}
+
+.products-main {
+    flex: 1; /* Main content takes the rest */
+}
+
+
 
 .product-image {
     width: 100%;
@@ -331,7 +369,7 @@
 .best-sellers .best-sellers-shelf-grid {
     padding: 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     width: 100%;
 }
