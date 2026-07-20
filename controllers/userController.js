@@ -36,7 +36,7 @@ export const getSignup = (req, res) => {
 
 export const postSignup = async (req, res, next) => {
     try {
-        const { password, confirmPassword, email,phoneNumber } = req.body;
+        const { password, confirmPassword, email,phoneNumber,referralCode } = req.body;
 
         if (password !== confirmPassword) {
             return res.redirect('/user/signup?error=' + encodeURIComponent("Passwords do not match!"));
