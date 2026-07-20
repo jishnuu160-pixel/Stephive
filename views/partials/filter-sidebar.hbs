@@ -1,0 +1,130 @@
+{{#unless searchValue}}
+     <aside class="filter-section">
+       <form id="filterForm" action="/shop" method="GET">
+       <input type="hidden" name="search" value="{{searchValue}}">
+          <div class="filter-header">
+            <h3>Filter By</h3>
+            <a href="/shop" class="clear-all-btn">CLEAR ALL</a>
+          </div>
+          
+       <div class="filter-box">
+  <h4>Categories</h4>
+  {{#each categories}}
+  <label>
+    <!-- Change value to this.name -->
+   <input type="checkbox" name="category" value="{{this.name}}" 
+       {{#if (includes ../activeCategory this.name)}}checked{{/if}} 
+       onchange="this.form.submit()">
+    {{this.name}}
+  </label>
+  {{/each}}
+</div>
+          
+          <div class="filter-box">
+            <h4>Price</h4>
+            <label>
+              <input type="radio" name="price" value="all" 
+                     {{#if (eq activePrice 'all')}}checked{{/if}} 
+                     {{#if (eq activePrice undefined)}}checked{{/if}}
+                     onchange="document.getElementById('filterForm').submit()"> All Prices
+            </label>
+            <label>
+              <input type="radio" name="price" value="under5k" {{#if (eq activePrice 'under5k')}}checked{{/if}} onchange="document.getElementById('filterForm').submit()"> Under ₹5,000
+            </label>
+            <label>
+              <input type="radio" name="price" value="5k-10k" {{#if (eq activePrice '5k-10k')}}checked{{/if}} onchange="document.getElementById('filterForm').submit()"> ₹5,000 - ₹10,000
+            </label>
+            <label>
+              <input type="radio" name="price" value="above10k" {{#if (eq activePrice 'above10k')}}checked{{/if}} onchange="document.getElementById('filterForm').submit()"> Above ₹10,000
+            </label>
+          </div>
+          
+ <div class="filter-box">
+  <h4>Material Type</h4>
+  {{#each materials}}
+    <label>
+      <input type="radio" 
+             name="material" 
+             value="{{this.name}}" 
+             {{#if (eq ../activeMaterial this.name)}}checked{{/if}} 
+             onchange="document.getElementById('filterForm').submit()"> 
+      {{this.name}}
+    </label>
+  {{/each}}
+</div>
+          
+          <div class="filter-box">
+            <h4>Sort By</h4>
+
+            <label>
+              <input
+                type="radio"
+                name="sort"
+                value="popularity"
+                {{#if activeSort}}
+                  {{#if (eq activeSort "popularity")}}checked{{/if}}
+                {{/if}}
+                onchange="document.getElementById('filterForm').submit()"
+              >
+              Popularity
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="sort"
+                value="low-high"
+                {{#if (eq activeSort 'low-high')}}checked{{/if}}
+                onchange="document.getElementById('filterForm').submit()"
+              >
+              Price: Low to High
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="sort"
+                value="high-low"
+                {{#if (eq activeSort 'high-low')}}checked{{/if}}
+                onchange="document.getElementById('filterForm').submit()"
+              >
+              Price: High to Low
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="sort"
+                value="a-z"
+                {{#if (eq activeSort 'a-z')}}checked{{/if}}
+                onchange="document.getElementById('filterForm').submit()"
+              >
+              Alphabetical: A-Z
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="sort"
+                value="z-a"
+                {{#if (eq activeSort 'z-a')}}checked{{/if}}
+                onchange="document.getElementById('filterForm').submit()"
+              >
+              Alphabetical: Z-A
+            </label>
+          </div>
+          
+          <div class="filter-box">
+            <h4>Brands</h4>
+           {{#each brands}}
+    <label>
+      <input type="radio" name="brand" value="{{this.name}}" 
+             {{#if isSelected}}checked{{/if}} 
+             onchange="document.getElementById('filterForm').submit()"> 
+      {{this.name}}
+    </label>
+    {{/each}}
+          </div>
+        </form>
+      </aside>
+      {{/unless}}
