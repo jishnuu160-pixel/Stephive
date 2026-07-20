@@ -12,3 +12,8 @@ export const generateReturnID = () => {
     const timestamp = Date.now().toString().slice(-4);
     return `RET-${timestamp}-${paddedNum}`; 
 };
+
+export const generateReferralCode = (username) => {
+    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `STEPHYVE-${randomSuffix}`;
+};
