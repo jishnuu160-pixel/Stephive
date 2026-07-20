@@ -1,4 +1,5 @@
 import Product from '../models/productModel.js';
+import Category from '../models/categoryModel.js';
 import mongoose from 'mongoose';
 
 export const countProducts = async (searchFilter) => {
@@ -151,4 +152,8 @@ export const increaseStock = async (productId, variantId, size, quantity, sessio
             session 
         }
     );
+};
+
+export const getCategoryIdsByNames = async (names) => {
+    return await Category.find({ name: { $in: names } }).select('_id');
 };
