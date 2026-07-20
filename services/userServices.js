@@ -2,25 +2,49 @@ import * as userRepo from '../repositories/userRepository.js';
 import { uploadToCloudinary } from '../utils/cloudinaryUtils.js'; 
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
+import { generateReferralCode } from '../utils/idGenerator.js';
 
 export const signup = async (data) => {
     const existingUser = await userRepo.findByEmail(data.email);
-
     if (existingUser) {
         throw new Error('User already exists');
     }
    
+    const myCode = generateReferralCode(data.fullName);
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
     const userData = {
         ...data,
         password: hashedPassword,
+        referralCode: myCode,
         isBlocked: false, 
         otp: null,
         otpExpiry: null
     };
-    return await userRepo.createUser(userData);
+
+    const newUser = await userRepo.createUser(userData);
+
+    if (data.referralCode) {
+        if (data.referralCode.toUpperCase() === myCode.toUpperCase()) {
+            throw new Error("You cannot use your own referral code.");
+        }
+
+        const referrer = await userRepo.findByReferralCode(data.referralCode.toUpperCase());
+        
+        if (referrer) {
+            await userRepo.createReferral({
+                referrer_user_id: referrer._id,
+                referred_user_id: newUser._id, 
+                status: 'pending',
+                rewardAmount: 2000 
+            });
+        } else {
+            throw new Error("Invalid referral code.");
+        }
+    }
+
+    return newUser;
 };
 
 
