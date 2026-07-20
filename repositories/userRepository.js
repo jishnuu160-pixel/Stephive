@@ -1,4 +1,5 @@
 import User from '../models/userModel.js';
+import Referral from '../models/referralModel.js';
 
 export const findByEmail = async (email) => {
     return await User.findOne({ email: email }).lean();
@@ -149,4 +150,14 @@ export const getAddressById = async (userId, addressId) => {
         console.error("Repo Error (getAddressById):", error.message);
         throw error;
     }
+};
+
+
+export const findByReferralCode = async (code) => {
+    return await User.findOne({ referralCode: code });
+};
+
+export const createReferral = async (referralData) => {
+    const newReferral = new Referral(referralData);
+    return await newReferral.save();
 };
