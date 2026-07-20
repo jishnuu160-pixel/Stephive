@@ -7,6 +7,14 @@ export const getShop = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
 
+        const activeCategory = Array.isArray(req.query.category) 
+                               ? req.query.category 
+                               : (req.query.category ? [req.query.category] : []);
+        const activePrice = req.query.price || 'all';
+        const activeBrand = req.query.brand || null;
+        const activeSort = req.query.sort || null;
+        const activeMaterial = req.query.material || null;
+
         const [shopData, bestSellersRaw] = await Promise.all([
             productService.getShopProducts(req, null, page),
             productService.getBestSellers()
@@ -42,11 +50,23 @@ export const getShop = async (req, res) => {
             isWishlisted: wishlistedProductIds.has(product._id.toString())
         }));
 
+        const subcategoriesOnly = shopData.categories.filter(cat => cat.parentCategory !== null);
+
+        console.log("Shop data:",shopData.materials);
         return res.render('user/shop', {
             ...shopData,      
             products: productsWithWishlist, 
             bestSellers: bestSellersWithWishlist,      
-            searchValue: req.query.search || ""
+            searchValue: req.query.search || "",
+           categories: subcategoriesOnly,  
+            brands: shopData.brands,        
+            materials: shopData.materials,
+            activeCategory,
+            activePrice,
+            activeBrand,
+            activeSort,
+            activeMaterial,
+            queryParams: req.query
         });
 
     } catch (error) {
