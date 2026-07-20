@@ -1,11 +1,11 @@
 <nav class="pagination-container">
     {{#if hasPrevPage}}
-        <a href="?page={{prevPage}}{{#if searchValue}}&search={{searchValue}}{{/if}}" class="page-btn">« Previous</a>
+        <a href="/shop{{addParams queryParams prevPage}}" class="page-btn">« Previous</a>
     {{/if}}
 
     <span class="current-page">Page {{currentPage}} of {{totalPages}}</span>
 
     {{#if hasNextPage}}
-        <a href="?page={{nextPage}}{{#if searchValue}}&search={{searchValue}}{{/if}}" class="page-btn"> Next »</a>
+        <a href="/shop{{addParams queryParams nextPage}}" class="page-btn">Next »</a>
     {{/if}}
 </nav>
