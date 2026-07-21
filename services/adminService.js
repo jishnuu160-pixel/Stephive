@@ -168,7 +168,7 @@ export const updateOrderStatus = async (orderId, newStatus) => {
     console.log(`DEBUG: Attempting to update Order ${orderId} from ${Order?.status} to ${newStatus}`);
     if (!validStatuses.includes(newStatus)) {
         throw new Error("Invalid status update");
-    } 
+    }  
     return await OrderRepo.updateStatus(orderId, newStatus);
 };
 
