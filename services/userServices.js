@@ -1,8 +1,10 @@
 import * as userRepo from '../repositories/userRepository.js';
+import * as walletRepo from '../repositories/walletRepository.js';
 import { uploadToCloudinary } from '../utils/cloudinaryUtils.js'; 
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import { generateReferralCode } from '../utils/idGenerator.js';
+
 
 export const signup = async (data) => {
     const existingUser = await userRepo.findByEmail(data.email);
@@ -23,30 +25,53 @@ export const signup = async (data) => {
         otpExpiry: null
     };
 
-    const newUser = await userRepo.createUser(userData);
+    let referrer = null;
 
-    if (data.referralCode) {
+    if (data.referralCode && data.referralCode.trim() !== '') {
         if (data.referralCode.toUpperCase() === myCode.toUpperCase()) {
             throw new Error("You cannot use your own referral code.");
         }
 
-        const referrer = await userRepo.findByReferralCode(data.referralCode.toUpperCase());
+        referrer = await userRepo.findByReferralCode(data.referralCode.toUpperCase());
         
-        if (referrer) {
-            await userRepo.createReferral({
-                referrer_user_id: referrer._id,
-                referred_user_id: newUser._id, 
-                status: 'pending',
-                rewardAmount: 2000 
-            });
-        } else {
+        if (!referrer) {
             throw new Error("Invalid referral code.");
         }
     }
 
+    const newUser = await userRepo.createUser(userData);
+
+    const SIGNUP_BONUS = 500;
+    const REFERRAL_BONUS = 500;
+
+    await walletRepo.createWallet(newUser._id);
+
+    if (referrer) {
+        await walletRepo.updateWallet(
+            newUser._id, 
+            SIGNUP_BONUS, 
+            'credit', 
+            'Signup bonus via referral code'
+        );
+
+        await userRepo.createReferral({
+            referrer_user_id: referrer._id,
+            referred_user_id: newUser._id, 
+            status: 'completed', 
+            rewardAmount: REFERRAL_BONUS ,
+            referralCode: data.referralCode.toUpperCase()
+        });
+
+        await walletRepo.updateWallet(
+            referrer._id, 
+            REFERRAL_BONUS, 
+            'credit', 
+            `Referral reward for inviting ${newUser.fullName || 'a user'}`
+        );
+    }
+
     return newUser;
 };
-
 
 
 export const login = async (data) => {
