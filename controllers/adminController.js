@@ -42,7 +42,7 @@ export const postAdminLogin = async (req, res) => {
 export const getDashboard = async(req, res) => {
    try{
     const userCount= await adminService.countCustomers();
-   
+
        res.render('admin/dashboard', {
         isAdmin: true, 
         title: 'Admin Dashboard',
@@ -180,3 +180,5 @@ export const updateReturnStatus = async (req, res) => {
         res.redirect('/admin/returns'); 
     }
 };
+
+

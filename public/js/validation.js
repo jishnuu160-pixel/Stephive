@@ -43,7 +43,7 @@ if (signupForm) {
             }
         }
 
-        if (password !== confirmPass) {
+         if (password !== confirmPass) {
             e.preventDefault();
             if (jsErrorBox) {
                 jsErrorBox.innerText = "Passwords doesn't match";

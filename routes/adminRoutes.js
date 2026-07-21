@@ -92,10 +92,10 @@ router.post('/categories/edit/:id', isAdminAuthenticated, updateCategory);
 router.get('/categories/:id/subcategories', getSubcategoriesByParent);
 
 
-
 router.get('/returns', isAdminAuthenticated, getAllReturns);
 router.get('/returns/:id', isAdminAuthenticated, getReturnDetails);
 router.post('/returns/update/:id', isAdminAuthenticated, updateReturnStatus);
+
 
 router.get('/logout', adminLogout);
 
