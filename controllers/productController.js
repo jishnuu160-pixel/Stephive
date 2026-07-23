@@ -8,8 +8,8 @@ export const getShop = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
 
         const activeCategory = Array.isArray(req.query.category) 
-                               ? req.query.category 
-                               : (req.query.category ? [req.query.category] : []);
+                                    ? req.query.category 
+                                    : (req.query.category ? [req.query.category] : []);
         const activePrice = req.query.price || 'all';
         const activeBrand = req.query.brand || null;
         const activeSort = req.query.sort || null;
@@ -40,25 +40,41 @@ export const getShop = async (req, res) => {
             }
         }
 
-        const productsWithWishlist = activeProducts.map(product => ({
-            ...product,
-            isWishlisted: wishlistedProductIds.has(product._id.toString())
-        }));
+        const attachOfferPricing = (product) => {
+            let discount = 0;
+            
+            if (product.offer && product.offer.isActive) {
+                discount = product.offer.discountValue;
+            } 
+            else if (product.Category && product.Category.offer && product.Category.offer.isActive) {
+                discount = product.Category.offer.discountValue;
+            }
 
-        const bestSellersWithWishlist = bestSellersRaw.map(product => ({
-            ...product,
-            isWishlisted: wishlistedProductIds.has(product._id.toString())
-        }));
+            const hasOffer = discount > 0;
+            const salePrice = hasOffer 
+                ? Math.round(product.regularPrice * (1 - discount / 100)) 
+                : product.regularPrice;
+
+            return {
+                ...product,
+                isWishlisted: wishlistedProductIds.has(product._id.toString()),
+                hasOffer,
+                salePrice,
+                regularPrice: product.regularPrice
+            };
+        };
+
+        const productsWithWishlist = activeProducts.map(attachOfferPricing);
+        const bestSellersWithWishlist = bestSellersRaw.map(attachOfferPricing);
 
         const subcategoriesOnly = shopData.categories.filter(cat => cat.parentCategory !== null);
 
-        console.log("Shop data:",shopData.materials);
         return res.render('user/shop', {
             ...shopData,      
             products: productsWithWishlist, 
             bestSellers: bestSellersWithWishlist,      
             searchValue: req.query.search || "",
-           categories: subcategoriesOnly,  
+            categories: subcategoriesOnly,  
             brands: shopData.brands,        
             materials: shopData.materials,
             activeCategory,
@@ -70,7 +86,6 @@ export const getShop = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Shop Controller Error:", error);
         return res.status(500).render('error', { 
             message: "We encountered an issue loading the shop. Please try again later." 
         });
@@ -150,6 +165,8 @@ export const getProductId = async (req, res) => {
                 result.product._id
             );
         }
+
+        console.log("Product controller details:",result);
 
         return res.render('user/productPage', {
             ...result,
