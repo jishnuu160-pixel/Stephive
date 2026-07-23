@@ -639,7 +639,7 @@
     
     .pagination-container {
         gap: 6px;
-        margin-top: 30px;
+        margin-top: 10px;
     }
     
     .next, .active {
@@ -731,7 +731,7 @@
     justify-content: center;
     align-items: center;
     gap: 15px;
-    margin: 40px 0;
+    margin: 10px 0;
 }
 
 .current-page{

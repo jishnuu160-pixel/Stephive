@@ -46,21 +46,20 @@
         </div>
 
     </div>
-
-    <div class="product-configurator-block">
+<div class="product-configurator-block">
       <h1 class="item-title">
         {{#if product.productName}}{{product.productName}}{{else}}StepHive Premium Sneaker{{/if}}
       </h1>
       <p class="item-tagline">• Brand: {{product.brand}}</p>
       
-
       <div class="pricing-row">
         <h2 class="current-price">
           ₹{{#if product.salePrice}}{{product.salePrice}}{{else}}{{product.regularPrice}}{{/if}}
         </h2>
-        {{#if product.salePrice}}
+        
+        {{#if product.effectiveDiscount}}
           <span class="slashed-price">₹{{product.regularPrice}}</span>
-          <span class="discount-pill">SAVE {{#if product.discountPercentage}}{{product.discountPercentage}}{{else}}12{{/if}}% OFF</span>
+          <span class="discount-pill">SAVE {{product.effectiveDiscount}}% OFF (₹{{product.discountAmount}})</span>
         {{/if}}
       </div>
 
@@ -76,38 +75,34 @@
             onclick="updateSelectedColor('{{this.colorName}}', '{{this._id}}', {{@index}}, this)">
           </button>
           {{/each}}
-          
         </div>
       </div>
       {{/if}}
 
     <div class="config-group">
-  <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
-  <div class="size-chips-grid" id="sizeChipsGrid">
-  {{#each product.variants.[0].sizes}}
-    <div class="size-container" style="display: flex; flex-direction: column; align-items: center;">
-      
-      <button 
-        type="button" 
-        class="size-chip {{#if (eq this.stock 0)}}out-of-stock{{/if}}" 
-        {{#if (eq this.stock 0)}}disabled{{/if}}
-        onclick="updateSelectedSize('{{this.size}}', this)">
-        {{this.size}}
-      </button>
+      <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
+      <div class="size-chips-grid" id="sizeChipsGrid">
+        {{#each product.variants.[0].sizes}}
+          <div class="size-option-card">
+            <button 
+              type="button" 
+              class="size-chip {{#if (eq this.stock 0)}}out-of-stock{{/if}}" 
+              {{#if (eq this.stock 0)}}disabled{{/if}}
+              onclick="updateSelectedSize('{{this.size}}', this)">
+              {{this.size}}
+            </button>
 
-     
-
-    </div>
-     <div class="stock-status">
-        {{#if (eq this.stock 0)}}
-          <small class="sold-out">(Sold Out)</small>
-        {{else if (lt this.stock 5)}}
-          <small class="low-stock">(Only {{this.stock}} left)</small>
-        {{/if}}
+            <div class="stock-status">
+              {{#if (eq this.stock 0)}}
+                <small class="sold-out">(Sold Out)</small>
+              {{else if (lt this.stock 5)}}
+                <small class="low-stock">(Only {{this.stock}} left)</small>
+              {{/if}}
+            </div>
+          </div>
+        {{/each}}
       </div>
-  {{/each}}
-</div>
-</div>
+    </div>
 
       <div class="purchase-action-matrix">
         <div class="quantity-stepper">
@@ -116,19 +111,19 @@
           <button type="button" onclick="updateQty(1)">+</button>
         </div>
         
-     <button type="button" class="btn-secondary-cart" 
-        onclick="addToCart('{{product._id}}', activeVariantId, chosenSize)">
-        <img class="nav-icons" src="/icons/cart.png">
-    Add to Cart
-</button>
+        <button type="button" class="btn-secondary-cart" 
+          onclick="addToCart('{{product._id}}', activeVariantId, chosenSize)">
+          <img class="nav-icons" src="/icons/cart.png">
+          Add to Cart
+        </button>
         
-       <button type="button" class="btn-primary-buy" onclick="buyNow('{{product._id}}')">
+        <button type="button" class="btn-primary-buy" onclick="buyNow('{{product._id}}')">
           <img class="nav-icons" src="/icons/shopping-bag.png">
-            Buy Now
-       </button>
+          Buy Now
+        </button>
       </div>
 
-    </div>
+</div>
   </div>
 
   <div class="product-specs-tabs">
@@ -181,9 +176,6 @@
                         <div class="related-no-image">No Image</div>
                     {{/if}}
                     
-                    {{#if this.salePrice}}
-                        <span class="related-discount-badge">SALE</span>
-                    {{/if}}
                 </div>
 
                 <div class="related-card-content">
@@ -291,49 +283,48 @@
             thumbStrip.appendChild(thumbFrame);
         });
 
-const sizeChipsGrid = document.getElementById('sizeChipsGrid');
-sizeChipsGrid.innerHTML = ''; 
-activeVariant.sizes.forEach(sizeObj => {
-    const isOutOfStock = sizeObj.stock === 0;
-    const isLowStock = sizeObj.stock > 0 && sizeObj.stock < 5;
+        const sizeChipsGrid = document.getElementById('sizeChipsGrid');
+        sizeChipsGrid.innerHTML = ''; 
+        
+        activeVariant.sizes.forEach(sizeObj => {
+            const isOutOfStock = sizeObj.stock === 0;
+            const isLowStock = sizeObj.stock > 0 && sizeObj.stock < 5;
 
-    const container = document.createElement('div');
-    container.className = 'size-container';
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.alignItems = 'center';
+            const container = document.createElement('div');
+            container.className = 'size-option-card';
 
-    const sizeButton = document.createElement('button');
-    sizeButton.type = "button";
-    sizeButton.className = `size-chip ${isOutOfStock ? 'out-of-stock' : ''}`;
-    sizeButton.disabled = isOutOfStock;
-    sizeButton.innerText = sizeObj.size;
-    sizeButton.onclick = () => updateSelectedSize(sizeObj.size, sizeButton);
+            const sizeButton = document.createElement('button');
+            sizeButton.type = "button";
+            sizeButton.className = `size-chip ${isOutOfStock ? 'out-of-stock' : ''}`;
+            sizeButton.disabled = isOutOfStock;
+            sizeButton.innerText = sizeObj.size;
+            sizeButton.onclick = () => updateSelectedSize(sizeObj.size, sizeButton);
 
-    const statusDiv = document.createElement('div');
-    statusDiv.className = 'stock-status';
-    if (isOutOfStock) {
-        statusDiv.innerHTML = '<small>(Sold Out)</small>';
-    } else if (isLowStock) {
-        statusDiv.innerHTML = `<small>(Only ${sizeObj.stock} left)</small>`;
-    }
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'stock-status';
+            
+            if (isOutOfStock) {
+                statusDiv.innerHTML = '<small class="sold-out">(Sold Out)</small>';
+            } else if (isLowStock) {
+                statusDiv.innerHTML = `<small class="low-stock">(Only ${sizeObj.stock} left)</small>`;
+            }
 
-    container.appendChild(sizeButton);
-    container.appendChild(statusDiv);
-    
-    sizeChipsGrid.appendChild(container);
-});
+            container.appendChild(sizeButton);
+            container.appendChild(statusDiv);
+            
+            sizeChipsGrid.appendChild(container);
+        });
     }
 
     function updateSelectedSize(sizeValue, buttonElement) {
-    chosenSize = sizeValue;
-    document.getElementById("selectedSizeIndicator").innerText = sizeValue;
-    
-    document.querySelectorAll('.size-chip').forEach(el => el.classList.remove('active-size'));
-    buttonElement.classList.add('active-size');
+        chosenSize = sizeValue;
+        document.getElementById("selectedSizeIndicator").innerText = sizeValue;
+        
+        document.querySelectorAll('.size-chip').forEach(el => el.classList.remove('active-size'));
+        buttonElement.classList.add('active-size');
 
-    document.getElementById("purchaseQty").value = 1;
-}
+        document.getElementById("purchaseQty").value = 1;
+    }
 
    function updateQty(change) {
     if (!chosenSize) {
@@ -419,7 +410,7 @@ async function addToCart(productId, variantId, size) {
         setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 2500);
     }
 
- document.querySelector(".wishlist-btn").addEventListener("click", async function(){
+  document.querySelector(".wishlist-btn").addEventListener("click", async function(){
     const btn = this;
     const productId = btn.dataset.productId;
 

@@ -28,7 +28,6 @@
                     <th>Category</th>
                     <th>Description</th>
                     <th>Parent</th> 
-                    <th>Offer</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -41,21 +40,13 @@
                     <td>{{this.description}}</td>
                     <td style="color: rgb(45, 42, 42); font-weight: 700;">{{this.parentCategory.name}}</td>
                     <td>
-                        {{#if this.offer.isActive}}
-                            <span class="badge bg-info text-dark">{{this.offer.discountValue}}% Off</span>
-                        {{else}} 
-                            <span class="text-muted">No Offer</span>
-                        {{/if}}
-                    </td>
-                    <td>
                         {{#if this.isListed}}Listed{{else}}Unlisted{{/if}}
                     </td>
                     <td>
                         <div style="display: flex; gap: 8px; text-decoration: none;">
-                           <button type="button" class="btn-edit-small" 
-    onclick="openEditModal(event, '{{this._id}}', '{{this.name}}', '{{this.description}}', '{{this.parentCategory._id}}', '{{this.childCategory}}', '{{this.offer.discountValue}}')">
-    Edit
-</button>
+                           <button type="button" class="btn-edit-small" onclick="openEditModal(event, '{{this._id}}', '{{this.name}}', '{{this.description}}', '{{this.parentCategory._id}}', '{{this.childCategory}}', '{{this.offer.discountValue}}')">
+                                Edit
+                           </button>
 
                             <form action="/admin/categories/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
                                 <button 
@@ -89,118 +80,101 @@
 </div>
 <div class="admin-toast-container"></div>
 
-<div id="addCategoryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.4); z-index: 99999; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif;">
-    <div style="background: #fff; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; position: relative;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem 0.25rem 1.5rem;">
-            <h4 style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #1e293b;">add Category</h4>
-            <button type="button" onclick="closeCategoryModal()" style="background: none; border: none; font-size: 1.3rem; color: #94a3b8; cursor: pointer;">&times;</button>
+<div id="addCategoryModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h4 class="modal-title">add Category</h4>
+            <button type="button" class="modal-close-btn" onclick="closeCategoryModal()">&times;</button>
         </div>
         <form id="addCategoryForm" onsubmit="submitForm(event, '/admin/categories/add', 'addErrorContainer')">
-            <div id="addErrorContainer" style="display: none; background: #fee2e2; color: #b91c1c; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; margin-bottom: 1rem; border: 1px solid #fecaca; text-align: center;"></div>
-            <div style="padding: 0.75rem 1.5rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.9rem;">
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                    <label style="font-size: 0.7rem; font-weight: 500; color: #94a3b8; text-transform: capitalize;">Category Name</label>
-                    <input type="text" name="categoryName" placeholder="e.g., Running, Casual, Boots"  style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 0.8rem; color: #334155; outline: none;">
-                   
+            <div id="addErrorContainer" class="error-container"></div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Category Name</label>
+                    <input type="text" name="categoryName" placeholder="e.g., Running, Casual, Boots" class="form-input">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                    <label style="font-size: 0.7rem; font-weight: 500; color: #94a3b8; text-transform: capitalize;">Description</label>
-                    <input type="text" name="description" placeholder="Footwear of athletic activities"  style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 0.8rem; color: #334155; outline: none;">
-                  
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description" placeholder="Footwear of athletic activities" class="form-input">
                 </div>
 
-    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-        <input type="checkbox" id="isParentCheckboxAdd" onchange="toggleParentField(this.checked, 'parentCategoryWrapperAdd', 'addParentSelect')">
-        <span style="font-size: 0.75rem; color: #334155;">Set as Parent Category</span>
-    </label>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="isParentCheckboxAdd" onchange="toggleParentField(this.checked, 'parentCategoryWrapperAdd', 'addParentSelect')">
+                        <span class="checkbox-text">Set as Parent Category</span>
+                    </label>
+                </div>
+
+                <div id="parentCategoryWrapperAdd" class="parent-wrapper-add">
+                    <div class="parent-inner-grid">
+                        <div class="form-group">
+                            <label class="form-label">parent category</label>
+                            <select id="addParentSelect" name="parentCategory" class="form-select cursor-pointer">
+                                 <option value="">None (Main Parent)</option>
+                                 {{#each @root.parentCategories}}
+                                    <option value="{{this._id}}">{{this.name}}</option>
+                                 {{/each}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeCategoryModal()">Cancel</button>
+                <button type="submit" class="btn-submit-add">save changes</button>
+            </div>
+        </form>
+    </div>
 </div>
-                <div id="parentCategoryWrapperAdd" style="display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start;">
-                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                        <label style="font-size: 0.7rem; font-weight: 500; color: #94a3b8; text-transform: capitalize;">parent category</label>
-                        <select name="parentCategory" style="width: 100%; padding: 0.45rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.75rem; color: #334155; outline: none; background: #fff; cursor: pointer;">
+
+<div id="editCategoryModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h4 class="modal-title">Edit Category</h4>
+            <button type="button" class="modal-close-btn" onclick="closeEditModal()">&times;</button>
+        </div>
+        
+        <form id="editCategoryForm" onsubmit="submitForm(event, event.target.action, 'editErrorContainer')">
+            <div id="editErrorContainer" class="error-container"></div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Category Name</label>
+                    <input type="text" id="editCategoryName" name="categoryName" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" id="editDescription" name="description" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="isParentCheckbox" onchange="toggleParentField(this.checked, 'parentCategoryWrapper', 'editParentCategory')">
+                        <span class="checkbox-text">Set as Parent Category</span>
+                    </label>
+                </div>
+
+                <div id="parentCategoryWrapper" class="parent-wrapper">
+                    <div class="form-group">
+                        <label class="form-label">Parent Category</label>
+                        <select id="editParentCategory" name="parentCategory" class="form-select">
                              <option value="">None (Main Parent)</option>
                              {{#each @root.parentCategories}}
                                 <option value="{{this._id}}">{{this.name}}</option>
                              {{/each}}
                         </select>
                     </div>
-                   
-                   </div>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 0.3rem; border-top: 1px dashed #f1f5f9; padding-top: 0.6rem;">
-                    <label style="font-size: 0.7rem; font-weight: 500; color: #94a3b8; text-transform: capitalize;">Category Offer</label>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="padding: 0.35rem 0.65rem; border: 1px solid #64748b; border-radius: 8px; font-size: 0.75rem; color: #334155; background: #fff;">Percentage</div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <input type="number" name="discountValue" placeholder="10" style="width: 55px; padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.75rem; text-align: center; outline: none;">
-                            <span style="font-size: 0.75rem; color: #475569;">%</span>
-                        </div>
-                    </div>
                 </div>
             </div>
-            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 0.75rem 1.5rem 1.25rem 1.5rem;">
-                <button type="button" onclick="closeCategoryModal()" style="background: none; border: none; font-size: 0.75rem; color: #94a3b8; cursor: pointer;">Cancel</button>
-                <button type="submit" style="background: #e2e8f0; border: none; padding: 0.5rem 1.25rem; border-radius: 16px; font-size: 0.75rem; font-weight: 600; color: #0f172a; cursor: pointer;">save changes</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<div id="editCategoryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.4); z-index: 99999; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif;">
-    <div style="background: #fff; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; position: relative;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem 0.25rem 1.5rem;">
-            <h4 style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #1e293b;">Edit Category</h4>
-            <button type="button" onclick="closeEditModal()" style="background: none; border: none; font-size: 1.3rem; color: #94a3b8; cursor: pointer;">&times;</button>
-        </div>
-        
-        <form id="editCategoryForm" onsubmit="submitForm(event, event.target.action, 'editErrorContainer')">
-            <div id="editErrorContainer" style="display: none; background: #fee2e2; color: #b91c1c; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; margin-bottom: 1rem; border: 1px solid #fecaca; text-align: center;">
-    </div>
-            <div style="padding: 0.75rem 1.5rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: 0.9rem;">
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                    <label style="font-size: 0.7rem; font-weight: 500; color: #94a3b8; text-transform: capitalize;">Category Name</label>
-                    <input type="text" id="editCategoryName" name="categoryName"  style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 0.8rem; color: #334155; outline: none;">
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                    <label style="font-size: 0.7rem; font-weight: 500; color: #94a3b8; text-transform: capitalize;">Description</label>
-                    <input type="text" id="editDescription" name="description"  style="width: 100%; padding: 0.55rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 0.8rem; color: #334155; outline: none;">
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-        <input type="checkbox" id="isParentCheckbox" onchange="toggleParentField(this.checked, 'parentCategoryWrapper', 'editParentCategory')">
-        <span style="font-size: 0.75rem; color: #334155;">Set as Parent Category</span>
-    </label>
-</div>
-<div id="parentCategoryWrapper" style="display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start;">
-    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-        <label style="font-size: 0.7rem; font-weight: 500; color: #94a3b8; text-transform: capitalize;">Parent Category</label>
-        
-        <select id="editParentCategory" name="parentCategory" style="width: 100%; padding: 0.45rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.75rem; color: #334155; outline: none; background: #fff;">
-             <option value="">None (Main Parent)</option>
-             {{#each @root.parentCategories}}
-                <option value="{{this._id}}">{{this.name}}</option>
-             {{/each}}
-        </select>
-    </div>
-</div>
-        
-
-                <div style="display: flex; flex-direction: column; gap: 0.3rem; border-top: 1px dashed #f1f5f9; padding-top: 0.6rem;">
-                    <label style="font-size: 0.7rem; font-weight: 500; color: #94a3b8; text-transform: capitalize;">Category Offer</label>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="padding: 0.35rem 0.65rem; border: 1px solid #64748b; border-radius: 8px; font-size: 0.75rem; color: #334155; background: #fff;">Percentage</div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <input type="number" id="editDiscountValue" name="discountValue" style="width: 55px; padding: 0.35rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.75rem; text-align: center; outline: none;">
-                            <span style="font-size: 0.75rem; color: #475569;">%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 0.75rem 1.5rem 1.25rem 1.5rem;">
-                <button type="button" onclick="closeEditModal()" style="background: none; border: none; font-size: 0.75rem; color: #94a3b8; cursor: pointer;">Cancel</button>
-                <button type="submit" style="background: #1e293b; border: none; padding: 0.5rem 1.25rem; border-radius: 16px; font-size: 0.75rem; font-weight: 600; color: #fff; cursor: pointer;">Update Category</button>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn-submit">Update Category</button>
             </div>
         </form>
     </div>
@@ -208,46 +182,53 @@
 
 
 <script>
-    // ---  MODAL CONTROLS ---
-    const showModal = (id) => document.getElementById(id).style.display = 'flex';
-    const closeCategoryModal = () => document.getElementById('addCategoryModal').style.display = 'none';
-    const closeEditModal = () => document.getElementById('editCategoryModal').style.display = 'none';
+    // --- 1. MODAL CONTROLS ---
+    const showModal = (id) => {
+        const modal = document.getElementById(id);
+        if (modal) modal.style.display = 'flex';
+    };
 
+    const closeCategoryModal = () => {
+        document.getElementById('addCategoryModal').style.display = 'none';
+    };
 
-    // ---  UNIFIED FORM SUBMISSION ---
+    const closeEditModal = () => {
+        document.getElementById('editCategoryModal').style.display = 'none';
+    };
+
+    // --- 2. UNIFIED FORM SUBMISSION ---
     async function submitForm(event, url, errorContainerId) {
-    event.preventDefault();
-    const form = event.target;
-    const errorContainer = document.getElementById(errorContainerId);
-    const data = Object.fromEntries(new FormData(form).entries());
+        event.preventDefault();
+        const form = event.target;
+        const errorContainer = document.getElementById(errorContainerId);
+        const data = Object.fromEntries(new FormData(form).entries());
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        if (response.ok) {
-            const modal = form.closest('[id$="Modal"]');
-            if (modal) modal.style.display = 'none';
-            
-            form.reset();
-
-            showToast(result.message || 'Operation successful!');
-            
-            setTimeout(() => location.reload(), 2000);
-        } else {
-            errorContainer.textContent = result.message || 'Action failed.';
+            if (response.ok) {
+                const modal = form.closest('[id$="Modal"]');
+                if (modal) modal.style.display = 'none';
+                
+                form.reset();
+                showToast(result.message || 'Operation successful!');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                errorContainer.textContent = result.message || 'Action failed.';
+                errorContainer.style.display = 'block';
+            }
+        } catch (error) {
+            errorContainer.textContent = 'Connection error. Please try again.';
             errorContainer.style.display = 'block';
         }
-    } catch (error) {
-        errorContainer.textContent = 'Connection error. Please try again.';
-        errorContainer.style.display = 'block';
     }
-}
+
     // --- 3. DYNAMIC UI LOGIC ---
     function openEditModal(event, id, name, description, parentId, childCat, discount) {
         if (event) event.stopPropagation();
@@ -255,15 +236,20 @@
         const form = document.getElementById('editCategoryForm');
         form.action = `/admin/categories/edit/${id}`;
         
-        document.getElementById('editCategoryName').value = name;
-        document.getElementById('editDescription').value = description;
-        document.getElementById('editDiscountValue').value = (discount !== "undefined" && discount !== "null") ? discount : "";
+        document.getElementById('editCategoryName').value = name !== 'undefined' ? name : '';
+        document.getElementById('editDescription').value = description !== 'undefined' ? description : '';
+        document.getElementById('editDiscountValue').value = (discount && discount !== "undefined" && discount !== "null") ? discount : "";
 
-        const isParent = (!parentId || parentId === "undefined" || parentId === "null" || parentId === "");
-        document.getElementById('isParentCheckbox').checked = isParent;
+        const isMainParent = (!parentId || parentId === "undefined" || parentId === "null" || parentId === "");
         
-        toggleParentField(isParent, 'parentCategoryWrapper', 'editParentCategory');
-        if (!isParent) document.getElementById('editParentCategory').value = parentId;
+        const checkbox = document.getElementById('isParentCheckbox');
+        checkbox.checked = isMainParent;
+        
+        toggleParentField(isMainParent, 'parentCategoryWrapper', 'editParentCategory');
+        
+        if (!isMainParent) {
+            document.getElementById('editParentCategory').value = parentId;
+        }
         
         showModal('editCategoryModal');
     }
@@ -271,8 +257,10 @@
     function toggleParentField(isParent, wrapperId, selectId) {
         const wrapper = document.getElementById(wrapperId);
         const select = document.getElementById(selectId);
+        
+        
         wrapper.style.display = isParent ? 'none' : 'block';
-        if (isParent) select.value = "";
+        if (isParent && select) select.value = "";
     }
 
     // --- 4. GLOBAL EVENT LISTENERS & HELPERS ---
@@ -304,11 +292,11 @@
             showCancelButton: true,
             confirmButtonColor: isListed ? '#d33' : '#28a745',
             confirmButtonText: `Yes, ${actionText}!`,
-             customClass: {
-            popup: 'small-swal-popup',
-            title: 'small-swal-title',
-            htmlContainer: 'small-swal-text'
-        }
+            customClass: {
+                popup: 'small-swal-popup',
+                title: 'small-swal-title',
+                htmlContainer: 'small-swal-text'
+            }
         });
 
         if (result.isConfirmed) {

@@ -166,27 +166,37 @@
     display: flex;
     align-items: baseline;
     gap: 12px;
-    margin-bottom: 30px;
+    flex-wrap: wrap;
+    margin: 12px 0;
 }
 
-.current-price{
-    font-size:22px;
-    font-weight:800;
-    color:#0f172a;
+.current-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827; /* Dark modern gray/black */
+    margin: 0;
 }
 
 .slashed-price {
-    font-size: 18px;
-    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 400;
+    color: #9ca3af; /* Muted gray */
     text-decoration: line-through;
 }
 
 .discount-pill {
-    color: #ef4444;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
     font-size: 12px;
-    margin-left: 4px;
+    font-weight: 600;
+    color: #047857; /* Deep green text */
+    background-color: #ecfdf5; /* Light green background */
+    border-radius: 4px;
+    letter-spacing: 0.025em;
 }
+
+
 
 .config-group {
     margin-bottom: 20px;
@@ -226,34 +236,76 @@
     outline-offset:3px;
 }
 
-/* Size Blocks Layout */
+
+/* Container for the size layout options */
 .size-chips-grid {
     display: flex;
-    gap: 10px;
     flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
 }
 
-.size-chip{
-    width:22px;
-    height:22px;
-    border-radius:10px;
-    border:1px solid #dbe2ea;
-    background:#fff;
-    font-size:15px;
-    font-weight:600;
-    cursor:pointer;
-    transition:0.2s ease;
+/* Unified card block for each size + stock text */
+.size-option-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Individual size button styling */
+.size-chip {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 10px;
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .size-chip:hover {
-    border-color: #0f172a;
+    border-color: #111827;
 }
 
 .size-chip.active-size {
-    background: #0f172a;
-    border-color: #0f172a;
+    border-color: #111827;
+    background-color: #111827;
     color: #ffffff;
 }
+
+.size-chip.out-of-stock {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+/* Stock status sub-label styling */
+.stock-status {
+    height: 18px; /* Fixed container height to avoid layout shift */
+    margin-top: 4px;
+}
+
+.stock-status .low-stock {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #d97706; /* Amber tone for low stock */
+}
+
+.stock-status .sold-out {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #ef4444; /* Red tone for sold out */
+}
+
+
+
+
+
 
 /* Action Inputs Matrix */
 .purchase-action-matrix{

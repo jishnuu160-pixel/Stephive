@@ -3,7 +3,7 @@
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2>Orders</h2>
             
-            <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 400px; justify-content: flex-end;">
+            <div class="header-actions">
                 <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
                     <form action="/admin/orders" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
                         <i class="fas fa-search"></i>
@@ -34,7 +34,7 @@
             <tbody>
                 {{#each orders}}
                 <tr>
-                    <td>{{add @root.startIndex @index 1}}</td>
+                     <td>{{add @root.startIndex @index 1}}</td>
                     <td><strong>#{{this.orderId}}</strong></td>
                     <td>{{this.user_id.fullName}}</td>
                     <td>{{formattedDate this.createdAt}}</td>
@@ -43,7 +43,7 @@
                         <span class="status-badge-order {{this.status}}">{{this.status}}</span>
                     </td>
                     <td>
-                        <a href="/admin/orders/{{this._id}}" class="btn-view-small">View</a>
+                        <a href="/admin/orders/{{this._id}}" class="btn-edit-small">View</a>
                     </td>
                 </tr>
                 {{else}}
@@ -53,22 +53,18 @@
                 {{/each}}
             </tbody>
         </table>
-{{#if orders.length}}
-          <div class="pagination">
-           {{#if orders.length}}
-<div class="pagination">
-    {{#if pagination.hasPrevPage}}
-        <a href="/admin/orders?page={{pagination.prevPage}}&search={{pagination.searchQuery}}" class="page-link">« Prev</a>
-    {{/if}}
+<!-- Pagination Section -->
+        {{#if orders.length}}
+        <div class="pagination">
+            {{#if pagination.hasPrevPage}}
+                <a href="/admin/orders?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">« Prev</a>
+            {{/if}}
 
-    <span class="page-link active">{{pagination.currentPage}}</span>
+            <span class="page-link active">{{pagination.currentPage}}</span>
 
-    {{#if pagination.hasNextPage}}
-        <a href="/admin/orders?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">Next »</a>
-    {{/if}}
-    
-</div>
-{{/if}}
+            {{#if pagination.hasNextPage}}
+                <a href="/admin/orders?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">Next »</a>
+            {{/if}}
         </div>
         {{/if}}
     </div>

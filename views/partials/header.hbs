@@ -8,7 +8,6 @@
     <div class="icons">
 <form action="/shop" method="GET" class="search-form">
     <div class="search-input-container">
-        <!-- The Submit Button now acts as a toggle -->
         <button type="button" class="search-submit-btn" onclick="toggleSearch()">
             <img src="/icons/search (2).png" alt="Search">
         </button>
@@ -48,7 +47,6 @@
             <a href="/user/login" class="cart-anchor-wrapper" style="position: relative; display: inline-block;">
         {{/if}}
             <img class="nav-icons" src="/icons/cart.png" alt="Cart">
-            <!-- Fixed variable from globalCartCount to cartCount to align with middleware -->
             <span id="globalCartBadge" class="cart-badge-count" 
                   style="display: {{#if user}}{{#if cartCount}}flex{{else}}none{{/if}}{{else}}none{{/if}};">
                 {{cartCount}}
@@ -134,7 +132,6 @@ window.updateGlobalWishlistCount = function(newCount) {
 };
 
 
-// Toggle function for the icon
 function toggleSearch() {
     const input = document.getElementById('headerSearchInput');
     input.classList.toggle('visible');

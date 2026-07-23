@@ -1,182 +1,345 @@
-/* ==========================================================================
-   Brand Management Page Layout - Full CSS
-   ========================================================================== */
+/* =================================================================
+   Brands Page - Admin Dashboard Styles
+   ================================================================= */
 
 .customers-page {
     padding: 24px;
-    background-color: #f3f4f6;
+    background-color: #f8fafc;
     min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #0f172a;
 }
 
 .table-card {
     background: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
     overflow: hidden;
 }
 
-/* --- Card Header --- */
+/* --- Card Header & Search Layout --- */
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 24px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: nowrap;
+    gap: 20px;
 }
 
 .page-title {
     font-size: 20px;
     font-weight: 700;
-    color: #111827;
+    color: #0f172a;
     margin: 0;
+    white-space: nowrap;
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+    justify-content: flex-end;
+    margin-left: auto;
 }
 
-/* --- Search Bar --- */
-.search-container { position: relative; }
-.search-form { display: flex; align-items: center; position: relative; }
+.search-container {
+    flex-grow: 1;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    position: relative;
+}
+
+.search-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.search-wrapper i.fa-search,
+.search-form .search-icon {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    font-size: 14px;
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+    z-index: 2;
+}
 
 .search-input {
-    width: 260px;
-    padding: 10px 40px 10px 14px;
-    border: 1px solid #d1d5db;
+    width: 100%;
+    padding: 8px 36px 8px 38px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
     border-radius: 8px;
     outline: none;
-    font-size: 14px;
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
+    background-color: #f8fafc;
+    color: #0f172a;
 }
 
-.search-input:focus { border-color: #111827; }
-
-.search-icon {
-    width: 18px; height: 18px;
-    position: absolute; right: 12px;
-    color: #6b7280; pointer-events: none;
+.search-input:focus {
+    border-color: #3b82f6;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .search-clear-btn {
-    position: absolute; right: 40px;
-    color: #6b7280; display: flex;
+    position: absolute;
+    right: 12px;
+    color: #94a3b8;
+    font-size: 14px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+    z-index: 2;
 }
 
-/* --- Buttons --- */
-.btn-primary {
-    background: #111827; color: white;
-    padding: 10px 18px; border-radius: 8px;
-    border: none; cursor: pointer; font-weight: 600;
+.search-clear-btn:hover {
+    color: #475569;
+}
+
+/* --- Add Brand Button --- */
+.btn-cat {
+    background-color: #0f172a;
+    color: #ffffff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.btn-cat:hover {
+    background-color: #1e293b;
+    color: #ffffff;
+}
+
+.btn-cat:active {
+    transform: scale(0.98);
 }
 
 /* --- Table Styles --- */
-.table-wrapper { overflow-x: auto; }
-.admin-table { width: 100%; border-collapse: collapse; text-align: left; }
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
 
 .admin-table th {
-    background: #f9fafb; padding: 14px 24px;
-    font-size: 12px; font-weight: 700;
-    color: #4b5563; text-transform: uppercase;
-    border-bottom: 1px solid #e5e7eb;
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .admin-table td {
-    padding: 16px 24px;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
+    color: #334155;
 }
 
-/* --- Brand Rows --- */
-.brand-cell { display: flex; align-items: center; gap: 12px; }
+.admin-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* --- Brand Specific Cell Styles --- */
+.brand-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
 .brand-logo-container {
-    width: 50px; height: 50px; border-radius: 8px;
-    overflow: hidden; background: #f5f5f5;
-    border: 1px solid #e5e7eb; flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
 }
 
-.brand-logo-img { width: 100%; height: 100%; object-fit: cover; }
-.brand-logo-placeholder { width: 100%; height: 100%; background: #e5e7eb; }
-
-.brand-name { font-weight: 600; color: #0f172a; font-size: 15px; }
-.brand-desc { color: #6b7280; font-size: 14px; max-width: 350px; }
-
-/* --- Status & Actions --- */
-.status-badge { font-size: 12px; padding: 4px 12px; border-radius: 50px; font-weight: 600; }
-.status-listed { background: #10b981; color: #ffffff; }
-.status-unlisted { background: #ef4444; color: #ffffff; }
-
-.btn-edit {
-    padding: 6px 14px; border-radius: 6px; font-size: 13px;
-    font-weight: 500; cursor: pointer; text-decoration: none;
-    transition: all 0.2s; border: 1px solid #cbd5e1;
+.brand-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
 }
 
-.btn-status-unlist { background: #fee2e2 !important; color: #ef4444 !important; border-color: #fca5a5 !important; }
-.btn-status-list { background: #ccfbf1 !important; color: #0d9488 !important; border-color: #99f6e4 !important; }
-
---- Pagination ---
-.pagination-container {
-    display: flex; justify-content: center; align-items: center;
-    gap: 10px; padding: 20px 0; background: #f9fafb; border-top: 1px solid #e5e7eb;
+.brand-logo-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #f1f5f9;
 }
 
-.page-num {
-    background: #0f172a; color: #ffffff; border: none;
-    width: 36px; height: 36px; border-radius: 6px; font-weight: 600;
+.brand-names {
+    padding-left:10px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.brand-desc {
+    color: #475569;
+}
+
+/* --- Status Badges --- */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-listed {
+    background-color: #ccfbf1;
+    color: #0f766e;
+}
+
+.status-unlisted {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* --- Table Action Buttons & Forms --- */
+.action-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.inline-form {
+    display: inline-block;
+    margin: 0;
 }
 
 
-/* 
-EDIT BRAND */
-/* The Modal Background Overlay */
-#cropperModal {
-    display: none; 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: rgba(0, 0, 0, 0.85); 
-    z-index: 9999; 
-    overflow-y: auto;
-    padding: 20px;
+
+.btn-status-unlist:hover {
+    background: #fecaca;
 }
 
-/* The Modal Content Box */
-#cropperModal .modal-content {
-    background: white; 
-    width: 100%; 
-    max-width: 600px; 
-    margin: 50px auto; 
-    padding: 20px; 
-    border-radius: 8px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+.btn-status-list {
+    background: #ccfbf1;
+    color: #0f766e;
+    border-color: #99f6e4;
 }
 
-/* Image Container for Cropper */
-#cropperImage {
-    max-width: 100%;
-    display: block;
+.btn-status-list:hover {
+    background: #99f6e4;
 }
 
-/* The Save Button */
-#cropSaveBtn {
-    width: 100%; 
-    padding: 12px; 
-    margin-top: 15px; 
-    background-color: #0f172a; 
-    color: white; 
-    border: none; 
-    border-radius: 6px; 
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s ease;
+/* --- Empty State --- */
+.table-empty-state {
+    text-align: center;
+    padding: 40px !important;
+    color: #64748b;
+    font-style: italic;
 }
 
-#cropSaveBtn:hover {
-    background-color: #1e293b;
+/* --- Pagination Styles --- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 0;
+    border-top: 1px solid #f1f5f9;
+}
+
+.page-link {
+    text-decoration: none;
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background 0.2s;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+}
+
+.page-link:hover:not(.disabled) {
+    background-color: #f1f5f9;
+}
+
+.page-link.disabled {
+    color: #94a3b8;
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* --- SweetAlert Customizations --- */
+.small-swal-popup {
+    border-radius: 12px !important;
+    padding: 20px !important;
+}
+
+.small-swal-title {
+    font-size: 18px !important;
+    color: #0f172a !important;
+}
+
+.small-swal-text {
+    font-size: 14px !important;
+    color: #475569 !important;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .card-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .header-actions {
+        max-width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        margin-left: 0;
+    }
+
+    .btn-cat {
+        width: 100%;
+        justify-content: center;
+    }
 }

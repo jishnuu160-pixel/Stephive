@@ -14,7 +14,7 @@
                  {{/if}}
           </form>
         </div>
-            <a href="/admin/coupons/add" class="btn-add-coupon" >Add coupon</a>    
+            <a href="/admin/coupons/add" class="btn-cat" >Add coupon</a>    
         </div>
     </div>
 
@@ -48,16 +48,19 @@
                             <span class="status-inactive">Inactive</span>
                         {{/if}}
                     </td>
-                   <td>
-                <a href="/admin/coupons/edit/{{this._id}}" class="btn-edit-small">Edit</a> 
-                <form action="/admin/coupons/toggle-status/{{this._id}}" method="POST" style="display:inline;">
-                  <button type="button" 
-                    class="btn-unlist-small {{#if (eq this.status 'Active')}}btn-delete{{else}}btn-success{{/if}}"
-                   onclick="confirmToggle(this, '{{this.name}}', {{#if (eq this.status 'Inactive')}}true{{else}}false{{/if}})">
-                     {{#if (eq this.status 'Active')}}Unlist{{else}}List{{/if}}
-                  </button>
-                </form>
-               </td>
+                  <td>
+    <div style="display: flex; gap: 8px; text-decoration: none; align-items: center;">
+        <a href="/admin/coupons/edit/{{this._id}}" class="btn-edit-small">Edit</a>
+        
+        <form action="/admin/coupons/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
+            <button type="button" 
+                    class="btn-unlist-small {{#if (eq this.status 'Active')}}active{{else}}inactive{{/if}}"
+                    onclick="confirmToggle(this, '{{this.name}}', {{#if (eq this.status 'Inactive')}}true{{else}}false{{/if}})">
+                {{#if (eq this.status 'Active')}}Unlist{{else}}List{{/if}}
+            </button>
+        </form>
+    </div>
+</td>
             </tr>
             {{/each}}
             </tbody>

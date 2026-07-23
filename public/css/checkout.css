@@ -567,3 +567,528 @@
     color: #a0aec0;
     margin-top: 20px;
 }
+
+
+#editCategoryModal.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+#editCategoryModal .modal-container {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    position: relative;
+}
+
+#editCategoryModal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem 0.25rem 1.5rem;
+}
+
+#editCategoryModal .modal-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+#editCategoryModal .modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+#editCategoryModal .error-container {
+    display: none;
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #fecaca;
+    text-align: center;
+}
+
+#editCategoryModal .modal-body {
+    padding: 0.75rem 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+#editCategoryModal .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+#editCategoryModal .form-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #94a3b8;
+    text-transform: capitalize;
+}
+
+#editCategoryModal .form-input {
+    width: 100%;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #334155;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#editCategoryModal .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+#editCategoryModal .checkbox-text {
+    font-size: 0.75rem;
+    color: #334155;
+}
+
+#editCategoryModal .parent-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+#editCategoryModal .form-select {
+    width: 100%;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    color: #334155;
+    outline: none;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+#editCategoryModal .offer-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    border-top: 1px dashed #f1f5f9;
+    padding-top: 0.6rem;
+}
+
+#editCategoryModal .offer-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#editCategoryModal .offer-badge {
+    padding: 0.35rem 0.65rem;
+    border: 1px solid #64748b;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    color: #334155;
+    background: #fff;
+}
+
+#editCategoryModal .offer-input-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#editCategoryModal .offer-input {
+    width: 55px;
+    padding: 0.35rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    text-align: center;
+    outline: none;
+}
+
+#editCategoryModal .offer-symbol {
+    font-size: 0.75rem;
+    color: #475569;
+}
+
+#editCategoryModal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 1.5rem 1.25rem 1.5rem;
+}
+
+#editCategoryModal .btn-cancel {
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+#editCategoryModal .btn-submit {
+    background: #1e293b;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* ===========================
+   Coupon Section
+=========================== */
+
+.coupon-input-group{
+    display:flex;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.coupon-input{
+    flex:1;
+    padding:12px 15px;
+    border:1px solid #dcdcdc;
+    border-radius:8px;
+    font-size:15px;
+    outline:none;
+    transition:.3s;
+}
+
+.coupon-input:focus{
+    border-color:#111827;
+    box-shadow:0 0 0 3px rgba(17,24,39,.08);
+}
+
+.btn-apply{
+    background:#111827;
+    color:#fff;
+    border:none;
+    padding:0 22px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-apply:hover{
+    background:#2563eb;
+}
+
+.view-coupons-link{
+    color:#2563eb;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+}
+
+.view-coupons-link:hover{
+    text-decoration:underline;
+}
+
+
+/* ===========================
+   Coupon Modal
+=========================== */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+    padding:200px;
+}
+
+
+
+/* Scrollbar */
+
+.modal-content-coupon::-webkit-scrollbar{
+    width:6px;
+}
+
+.modal-content-coupon::-webkit-scrollbar-thumb{
+    background:#d1d5db;
+    border-radius:20px;
+}
+
+/* Heading */
+
+
+
+/* ===========================
+   Coupon Card
+=========================== */
+
+
+.coupon-item:hover{
+    background:#eef2ff;
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+}
+
+.coupon-left{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.coupon-code{
+    font-size:18px;
+    font-weight:700;
+    color:#111827;
+    letter-spacing:.4px;
+}
+
+.coupon-discount{
+    color:#16a34a;
+    font-size:16px;
+    font-weight:600;
+}
+
+.coupon-text{
+    color:#6b7280;
+    font-size:13px;
+}
+
+/* ===========================
+   Apply Button
+=========================== */
+
+.apply-btn{
+    background:#111827;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:11px 22px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.25s;
+}
+
+.apply-btn:hover{
+    background:#2563eb;
+}
+
+/* ===========================
+   Empty State
+=========================== */
+
+.no-coupon{
+    text-align:center;
+    padding:30px;
+    color:#6b7280;
+    font-size:15px;
+}
+
+/* ===========================
+   Close Button
+=========================== */
+
+.modal-content-coupon>button{
+    width:100%;
+    margin-top:10px;
+    border:none;
+    background:#ef4444;
+    color:#fff;
+    padding:13px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.modal-content-coupon>button:hover{
+    background:#dc2626;
+}
+
+/* ===========================
+   Animation
+=========================== */
+
+@keyframes popup{
+
+    from{
+        opacity:0;
+        transform:translateY(-20px) scale(.95);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+
+}
+/* ==========================================
+   MODAL CONTAINER & BACKDROP
+   ================================---------- */
+.modal {
+    display: none; /* Controlled by JS ('flex' or 'none') */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.6); /* Modern dark slate backdrop */
+    backdrop-filter: blur(4px); /* Soft blur effect */
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+    padding: 40px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* ==========================================
+   MODAL CONTENT BOX
+   ================================---------- */
+.modal-content-coupon {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 440px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content-coupon h3 {
+    margin: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+/* ==========================================
+   COUPON LIST & ITEMS
+   ================================---------- */
+#couponList {
+    max-height: 260px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 30px;
+}
+
+/* Scrollbar styling for a cleaner look */
+#couponList::-webkit-scrollbar {
+    width: 6px;
+}
+#couponList::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+.coupon-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.coupon-item:hover {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.coupon-item span {
+    font-size: 0.95rem;
+    color: #334155;
+}
+
+.coupon-item strong {
+    color: #1e293b;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================
+   BUTTONS
+   ================================---------- */
+.coupon-item button {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px; 
+    font-size: 12px; /* Scaled up so text fits the button naturally */
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-block;
+    box-sizing: border-box; /* Ensures padding doesn't break width calculations */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.coupon-item button:hover {
+    background-color: #1d4ed8;
+}
+
+.coupon-item button:active {
+    transform: scale(0.96);
+}
+
+.modal-content-coupon > button {
+    display: block;
+    width: 100%;
+    
+    border: none;
+    border-radius: 8px;
+    background: #111827;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-content-coupon > button:hover {
+    background: #2563eb;
+}
+
+/* ==========================================
+   ANIMATIONS
+   ================================---------- */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

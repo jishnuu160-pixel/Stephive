@@ -45,7 +45,7 @@
                         <td>
                       <form action="/admin/customers/toggle-status/{{this._id}}" method="POST" style="display:inline;">
        <button type="button" 
-        class="btn-action {{#if this.isBlocked}}btn-unblock{{else}}btn-block{{/if}}" 
+        class="btn-action-customer {{#if this.isBlocked}}btn-unblock{{else}}btn-block{{/if}}" 
         onclick="confirmToggle(this, '{{this.fullName}}', {{this.isBlocked}})">
     {{#if this.isBlocked}}Unblock{{else}}Block{{/if}}
 </button>

@@ -1,11 +1,11 @@
 <div class="product-card-gender">      
      <button class="wishlist-btn {{#if isWishlisted}}active{{/if}}" data-product-id="{{this._id}}">
-              {{#if isWishlisted}}
-                   <i class="fa-solid fa-heart"></i>
-              {{else}}
-                   <i class="fa-regular fa-heart"></i>
-              {{/if}}
-           </button>
+           {{#if isWishlisted}}
+                <i class="fa-solid fa-heart"></i>
+           {{else}}
+                <i class="fa-regular fa-heart"></i>
+           {{/if}}
+        </button>
     <div class="product-image">
         {{#if this.variants.[0].images.[0]}}
             <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
@@ -23,8 +23,18 @@
             {{else if this.Category.name}} {{this.Category.name}} Fit
             {{else}} Premium Collection {{/if}}
         </p>    
+    
         <div class="product-action-block">
-            <h4>₹{{this.regularPrice}}</h4>
+            <!-- Pricing Section: Shows offer pricing ONLY when hasOffer is true -->
+            <div class="product-pricing">
+                {{#if this.hasOffer}}
+                    <span class="offer-price" style="font-weight: 700; color: #111011; margin-right: 8px;">₹{{this.salePrice}}</span>
+                    <span class="regular-price" style="text-decoration: line-through; color: #9ca3af; font-size: 0.9rem;">₹{{this.regularPrice}}</span>
+                {{else}}
+                    <span class="regular-price" style="font-weight: 700;">₹{{this.regularPrice}}</span>
+                {{/if}}
+            </div>
+
             <a href="/details/{{this._id}}" class="rec-discover-btn">
                 <button type="button">DISCOVER MORE</button>
             </a>

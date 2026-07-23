@@ -14,13 +14,6 @@
     margin-bottom: 2rem;
 }
 
-.status-badge-order {
-    background: #e5d3d3;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 10px;
-}
 
 .order-main {
     display: grid;
@@ -48,9 +41,9 @@
 .order-footer {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 50px;
-    margin-top: 40px;
-    padding-top: 30px;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px solid #f3f4f6;
 }
 
@@ -132,8 +125,71 @@
 .table-card-order{
     padding: 10px;
     background: #fff;
-    width: 170vh;
+    width: 155vh;
     border-radius: 16px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.05);
     overflow: hidden;
+}
+
+
+/* Base style for the status badge */
+.status-badge-order {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.status-badge-order.pending {
+    background-color: #f8ca10;
+    color: #fdfeff;
+}
+
+/* Placed - Blue */
+.status-badge-order.placed {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+/* Processing - Yellow / Orange */
+.status-badge-order.Processing {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+/* Shipped - Purple */
+.status-badge-order.Shipped {
+    background-color: #ede9fe;
+    color: #6d28d9;
+}
+
+/* Delivered - Green */
+.status-badge-order.Delivered {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+/* Color for Cancelled (Soft Red) */
+.status-badge-order.Cancelled {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Color for Returned (Soft Orange / Amber) */
+.status-badge-order.Returned {
+    background-color: #ffedd5;
+    color: #c2410c;
+}
+/* Color for Delivered */
+.status-badge-order.Delivered {
+    background-color: #dcfce7;
+    color: #16ad4e;
+}
+
+/* Color for Out of delivery */
+.status-badge-order[class*="Out of delivery"] {
+    background-color: #ccfbf1;
+    color: #0f766e;
 }

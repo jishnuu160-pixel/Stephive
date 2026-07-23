@@ -90,7 +90,7 @@
 </div>
 
 <div id="couponModal" class="modal" style="display:none;">
-    <div class="modal-content">
+    <div class="modal-content-coupon">
         <h3>Available Coupons</h3>
         <div id="couponList"></div>
         <button onclick="closeCouponModal()">Close</button>
@@ -326,7 +326,7 @@ async function handlePlaceOrder() {
     }
 
     async function openCouponModal() {
-        document.getElementById('couponModal').style.display = 'block';
+        document.getElementById('couponModal').style.display = 'flex';
         try {
             const res = await fetch('/user/get-available-coupons');
             const coupons = await res.json();
