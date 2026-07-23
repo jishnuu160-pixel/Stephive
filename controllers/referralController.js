@@ -7,6 +7,7 @@ export const getReferralPage = async (req, res) => {
         
         console.log("Referal data:",data);
         res.render('user/refer-earn', { 
+            user: data.user, 
             layout: 'main', 
             totalReferrals: data.stats.totalReferrals,
             successfulReferrals: data.stats.successfulReferrals,
@@ -18,5 +19,22 @@ export const getReferralPage = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send("Error loading referral page");
+    }
+};
+
+export const getAllReferralHistory = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const data = await referralService.getFullReferralHistoryData(userId);
+
+        res.render('user/referral-history-full', {
+            user: data.user,
+            layout: 'main',
+            history: data.history,
+            activePage: 'referral'
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error loading referral history");
     }
 };
