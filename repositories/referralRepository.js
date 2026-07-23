@@ -12,7 +12,13 @@ export const getReferralStats = async (referrer_user_id) => {
                     $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] } 
                 },
                 totalEarned: { 
-                    $sum: { $cond: [{ $eq: ["$status", "rewarded"] }, "$rewardAmount", 0] } 
+                    $sum: { 
+                        $cond: [
+                            { $in: ["$status", ["completed", "rewarded"]] }, 
+                            "$rewardAmount", 
+                            0
+                        ] 
+                    } 
                 }
             }
         }
@@ -20,5 +26,9 @@ export const getReferralStats = async (referrer_user_id) => {
 };
 
 export const getReferralList = async (referrer_user_id) => {
-    return await Referral.find({ referrer_user_id }).sort({ createdAt: -1 }).limit(5);
+    return await Referral.find({ referrer_user_id })
+        .populate('referred_user_id', 'fullName email') 
+        .sort({ createdAt: -1 })
+        .limit(5);
 };
+
