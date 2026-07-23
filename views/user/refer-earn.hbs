@@ -5,8 +5,7 @@
     </nav>
 
     <div class="profile-layout">
-      {{> userSide}}
-
+      {{> userSide user=user}}
       <main class="main-content-referal">
         <!-- Referral Hero -->
         <section class="referral-hero">
@@ -30,27 +29,100 @@
         <div class="stats-grid">
           <div class="stat-card">
             <small>TOTAL REFERRALS</small>
-            <h3>12</h3>
+            <h3>{{totalReferrals}}</h3>
           </div>
           <div class="stat-card">
             <small>SUCCESSFUL</small>
-            <h3>5</h3>
+            <h3>{{totalReferrals}}</h3>
           </div>
           <div class="stat-card">
             <small>REWARDS EARNED</small>
-            <h3>₹10,000</h3>
+            <h3>{{rewardsEarned}}</h3>
           </div>
         </div>
 
         <!-- Referral Link & History -->
-        <div class="referral-bottom-row">
-
-          <section class="history-section">
+<div class="referral-bottom-row">
+    <section class="history-section">
+        <div class="history-header-flex">
             <h3>Referral History</h3>
-            <!-- Referral list items -->
-            <button class="view-all">View All History</button>
-          </section>
+            {{#if history.length}}
+                <button id="toggleHistoryBtn" class="view-all btn-view-all" type="button" onclick="toggleReferralHistory()">View All History</button>
+            {{/if}}
         </div>
+
+        {{#if history.length}}
+            <!-- Limited List -->
+            <div id="limitedHistoryList" class="history-list-container">
+                {{#each history}}
+                    <div class="history-row-card">
+                        <div class="history-info">
+                            <span class="history-label">User:</span>
+                            <span class="referred-user-name">
+                                {{#if this.referred_user_id}}
+                                    <strong>{{this.referred_user_id.fullName}}</strong>
+                                   
+                                {{else}}
+                                    <span class="text-muted">Awaiting Signup</span>
+                                {{/if}}
+                            </span>
+                        </div>
+                        <div class="history-info">
+                            <span class="history-label">Status:</span>
+                            <span class="status-badge {{this.status}}">{{this.status}}</span>
+                        </div>
+                        <div class="history-info">
+                            <span class="history-label">Reward:</span>
+                            <span class="reward-amount">₹{{this.rewardAmount}}</span>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+
+            <!-- Full List (Hidden by default) -->
+            <div id="fullHistoryList" class="history-list-container" style="display: none;">
+                {{#each history}}
+                    <div class="history-row-card">
+                        <div class="history-info">
+                            <span class="history-label">User:</span>
+                            <span class="referred-user-name">
+                                {{#if this.referred_user_id}}
+                                    <strong>{{this.referred_user_id.fullName}}</strong>
+                                    
+                                {{else}}
+                                    <span class="text-muted">Awaiting Signup</span>
+                                {{/if}}
+                            </span>
+                        </div>
+                                                      <div class="history-info">
+        <span class="history-label">Email:</span>
+        <span class="history-date">
+            {{this.referred_user_id.email}} 
+        </span>
+    </div>
+                       <div class="history-info">
+                 <span class="history-label">Date:</span>
+                     <span class="history-date">
+                       {{formattedDate this.createdAt}} 
+                    </span>
+                    </div>
+       
+                        <div class="history-info">
+                            <span class="history-label">Status:</span>
+                            <span class="status-badge {{this.status}}">{{this.status}}</span>
+                        </div>
+                        <div class="history-info">
+                            <span class="history-label">Reward:</span>
+                            <span class="reward-amount">₹{{this.rewardAmount}}</span>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        {{else}}
+            <p class="no-history">No referral history found.</p>
+        {{/if}}
+    </section>
+</div>
       </main>
     </div>
   </div>
@@ -63,4 +135,21 @@ function copyCode() {
   document.execCommand("copy");
   alert("Referral code copied: " + copyText.value);
 }
+
+function toggleReferralHistory() {
+    const limitedList = document.getElementById('limitedHistoryList');
+    const fullList = document.getElementById('fullHistoryList');
+    const btn = document.getElementById('toggleHistoryBtn');
+
+    if (fullList.style.display === 'none') {
+        limitedList.style.display = 'none';
+        fullList.style.display = 'block';
+        btn.textContent = 'Show Less';
+    } else {
+        limitedList.style.display = 'block';
+        fullList.style.display = 'none';
+        btn.textContent = 'View All History';
+    }
+}
+
 </script>
