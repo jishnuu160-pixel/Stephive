@@ -92,7 +92,6 @@ export const cancelOrder = async (req, res) => {
 
 export const renderCheckoutPage = async (req, res) => {
     try {
-        console.log("DEBUG: Session on Load:", req.session.appliedCouponCode);
         
         let checkoutData;
         const availableCoupons = await CouponService.fetchAvailableCoupons();
