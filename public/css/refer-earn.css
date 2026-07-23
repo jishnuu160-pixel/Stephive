@@ -1,38 +1,408 @@
-/* Scoped Wrapper */
- .referral-hero {
+/* --- Refer & Earn Page Styles --- */
+
+.order-history-page {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 40px 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a1a;
+}
+
+.profile-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Breadcrumb */
+.breadcrumb-container {
+  margin-bottom: 24px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0;
+}
+
+.breadcrumb span {
+  margin: 0 8px;
+  color: #adb5bd;
+}
+
+.breadcrumb strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+/* Layout */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.main-content-referal {
   display: flex;
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 16px;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  border: 1px solid #dbd4d4;
-}
-
-.main-content-referal{
-    padding: 30px;
-}
-
- .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
- .stat-card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #dbd4d4;
-}
-
- .referral-bottom-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  flex-direction: column;
   gap: 24px;
 }
 
+/* Referral Hero Section */
+.referral-hero {
+  background: linear-gradient(135deg, #111111 0%, #2c2c2c 100%);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
 
+.hero-content {
+  max-width: 500px;
+  z-index: 1;
+}
 
+.referral-hero .badge {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffd700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-bottom: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.referral-hero h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  line-height: 1.2;
+}
+
+.referral-hero p {
+  font-size: 15px;
+  color: #d1d5db;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.referral-hero img {
+  max-width: 200px;
+  height: auto;
+  object-fit: contain;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .referral-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 20px;
+  }
+  .referral-hero img {
+    margin-top: 20px;
+    max-width: 150px;
+  }
+}
+
+/* Referral Code Section */
+.referral-code-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.referral-code-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.code-box {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.code-box input {
+  flex: 1;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 1px;
+  outline: none;
+}
+
+.code-box input:focus {
+  border-color: #111111;
+  background-color: #ffffff;
+}
+
+.btn-copy {
+  background-color: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-copy:hover {
+  background-color: #333333;
+}
+
+.btn-copy:active {
+  transform: scale(0.98);
+}
+
+.helper-text {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.stat-card small {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.5px;
+}
+
+.stat-card h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111111;
+  margin: 0;
+}
+
+/* --- Referral History Section Container --- */
+.referral-bottom-row {
+  margin-top: 0;
+  width: 100%;
+}
+
+.history-section {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 1px solid #f0f0f0;
+}
+
+.history-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f3f5;
+  padding-bottom: 12px;
+}
+
+.history-header-flex h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.history-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --- Row Card Base Styles --- */
+.history-row-card {
+  display: grid;
+  align-items: center;
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.history-row-card:hover {
+  background: #f1f3f5;
+}
+
+/* --- Limited list layout (3 columns: User, Status, Reward) --- */
+#limitedHistoryList .history-row-card {
+  grid-template-columns: 2fr 1.2fr 1fr;
+  gap: 16px;
+}
+
+/* --- Full list layout (5 columns: User, Email, Date, Status, Reward) --- */
+/* Expanded columns for text items and allocated stable space for status & reward */
+#fullHistoryList .history-row-card {
+  grid-template-columns: 1fr 1.6fr 1fr 1.2fr 0.9fr;
+  gap: 12px;
+}
+
+/* --- Information Columns & Text Handling --- */
+.history-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0; /* Crucial for text-overflow to work inside CSS Grid */
+}
+
+/* Push the final reward column cleanly to the right */
+#limitedHistoryList .history-row-card .history-info:last-child,
+#fullHistoryList .history-row-card .history-info:last-child {
+  justify-content: flex-end;
+}
+
+.history-label {
+  color: #868e96;
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.referred-user-name,
+.history-date {
+  font-size: 13px;
+  color: #495057;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.referred-user-name strong {
+  color: #212529;
+  font-size: 14px;
+}
+
+.reward-amount {
+  font-weight: 600;
+  color: #2b8a3e;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* --- Status Badge Styling --- */
+.status-badge {
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.status-badge.completed, 
+.status-badge.rewarded {
+  background: #e6fcf5;
+  color: #0ca678;
+}
+
+.status-badge.pending {
+  background: #fff3bf;
+  color: #f08c00;
+}
+
+/* --- View All Button --- */
+.btn-view-all {
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  color: #495057;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.btn-view-all:hover {
+  background: #e9ecef;
+  color: #212529;
+}
+
+/* --- Utility States --- */
+.no-history {
+  color: #868e96;
+  font-style: italic;
+  margin: 0;
+}
+
+.text-muted {
+  color: #adb5bd;
+  font-size: 13px;
+}
+
+/* --- Responsive Media Query for Mobile Screens --- */
+@media (max-width: 768px) {
+  .history-header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .btn-view-all {
+    width: 100%;
+    text-align: center;
+  }
+
+  #fullHistoryList .history-row-card,
+  #limitedHistoryList .history-row-card {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+
+  #limitedHistoryList .history-row-card .history-info:last-child,
+  #fullHistoryList .history-row-card .history-info:last-child {
+    justify-content: flex-start;
+  }
+}
