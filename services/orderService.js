@@ -198,7 +198,41 @@ export const getDirectProductDetails = async (productId, variantId, size, quanti
     const variant = product.variants.find(v => v._id.toString() === variantId.toString());
     if (!variant) throw new Error("Variant not found");
 
-    const price = product.salePrice || product.regularPrice;
+    const regularPrice = product.regularPrice;
+    let maxDiscountAmount = 0;
+
+    if (product.offer && product.offer.isActive) {
+        const val = parseFloat(product.offer.discountValue) || 0;
+        if (product.offer.offerType === 'Percentage') {
+            const prodDiscountAmt = regularPrice * (val / 100);
+            if (prodDiscountAmt > maxDiscountAmount) {
+                maxDiscountAmount = prodDiscountAmt;
+            }
+        } else {
+            if (val > maxDiscountAmount) {
+                maxDiscountAmount = val;
+            }
+        }
+    }
+
+    if (product.Category) {
+        const category = await mongoose.model('Category').findById(product.Category);
+        if (category && category.offer && category.offer.isActive) {
+            const catVal = parseFloat(category.offer.discountValue) || 0;
+            if (category.offer.offerType === 'Percentage') {
+                const catDiscountAmt = regularPrice * (catVal / 100);
+                if (catDiscountAmt > maxDiscountAmount) {
+                    maxDiscountAmount = catDiscountAmt;
+                }
+            } else {
+                if (catVal > maxDiscountAmount) {
+                    maxDiscountAmount = catVal;
+                }
+            }
+        }
+    }
+
+    const finalPrice = Math.max(0, regularPrice - maxDiscountAmount);
     const qty = Number(quantity);
 
     return {
@@ -206,10 +240,11 @@ export const getDirectProductDetails = async (productId, variantId, size, quanti
         variantId,
         size,
         quantity: qty,
-        price: price,
-        itemSubtotal: price * qty 
+        price: Math.round(finalPrice),
+        itemSubtotal: Math.round(finalPrice) * qty 
     };
 };
+
 
 export const calculateDirectPricing = (item) => {
     const subtotal = item.price * item.quantity;
