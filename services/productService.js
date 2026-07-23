@@ -115,8 +115,8 @@ export const getShopProducts = async (req) => {
          ]);
 
        const brands = rawBrands.map(brandName => ({
-       name: brandName,
-       isSelected: req.query.brand === brandName 
+        name: brandName,
+        isSelected: req.query.brand === brandName 
        }));
 
         const materials = rawMaterials.map(m => ({
@@ -295,17 +295,95 @@ const getSort = (sort) => {
 /* ---------------- PRODUCT DETAILS LAYER ---------------- */
 
 export const getProductDetails = async (id) => {
-    const product = await productRepo.findProductById(id);
-    if (!product) return null;
+    const productDoc = await productRepo.findProductById(id);
+    if (!productDoc) return null;
 
-    const relatedProducts = await productRepo.findRelatedProducts(product);
+    const product = typeof productDoc.toObject === 'function' ? productDoc.toObject() : { ...productDoc };
+
+    let productLevelDiscount = product.discountPercentage || 0;
+    if (product.offer && product.offer.isActive) {
+        const subDocDiscount = Number(product.offer.discountValue) || 0;
+        if (subDocDiscount > productLevelDiscount) productLevelDiscount = subDocDiscount;
+    }
+
+    const categoryIdsToCheck = [
+        product.Category?._id,
+        product.Category,
+        product.Category?.parentCategory?._id,
+        product.Category?.parentCategory,
+        product.parentCategory?._id,
+        product.parentCategory
+    ].filter(Boolean);
+
+    const uniqueCategoryIds = [...new Set(categoryIdsToCheck.map(id => id.toString()))];
+    const categoryDiscount = await productRepo.getHighestCategoryDiscountForIds(uniqueCategoryIds);
+    
+    let effectiveDiscount = Math.max(productLevelDiscount, categoryDiscount);
+
+    const regularPrice = product.regularPrice;
+    let discountAmount = 0;
+    let salePrice = null;
+
+    if (effectiveDiscount > 0) {
+        discountAmount = Math.round((regularPrice * effectiveDiscount) / 100);
+        salePrice = Math.round(regularPrice - discountAmount);
+    } else {
+        effectiveDiscount = 0;
+    }
+
+    product.effectiveDiscount = effectiveDiscount;
+    product.regularPrice = regularPrice;
+    product.discountAmount = discountAmount;
+    product.salePrice = salePrice;
+
+    const rawRelatedProducts = await productRepo.findRelatedProducts(product);
+
+    const relatedProducts = await Promise.all(rawRelatedProducts.map(async (relProd) => {
+        let relDiscount = relProd.discountPercentage || 0;
+        if (relProd.offer && relProd.offer.isActive) {
+            const subVal = Number(relProd.offer.discountValue) || 0;
+            if (subVal > relDiscount) relDiscount = subVal;
+        }
+
+        const relCategoryIds = [
+            relProd.Category?._id,
+            relProd.Category,
+            relProd.Category?.parentCategory?._id,
+            relProd.Category?.parentCategory,
+            relProd.parentCategory?._id,
+            relProd.parentCategory
+        ].filter(Boolean);
+
+        const uniqueRelCategoryIds = [...new Set(relCategoryIds.map(id => id.toString()))];
+        const relCatDiscount = await productRepo.getHighestCategoryDiscountForIds(uniqueRelCategoryIds);
+        
+        let finalRelDiscount = Math.max(relDiscount, relCatDiscount);
+
+        const relRegularPrice = relProd.regularPrice;
+        let relDiscountAmount = 0;
+        let relSalePrice = null;
+
+        if (finalRelDiscount > 0) {
+            relDiscountAmount = Math.round((relRegularPrice * finalRelDiscount) / 100);
+            relSalePrice = Math.round(relRegularPrice - relDiscountAmount);
+        } else {
+            finalRelDiscount = 0;
+        }
+
+        return {
+            ...relProd,
+            effectiveDiscount: finalRelDiscount,
+            regularPrice: relRegularPrice,
+            discountAmount: relDiscountAmount,
+            salePrice: relSalePrice
+        };
+    }));
 
     return {
         product,
         relatedProducts
     };
 };
-
 
 const calculateTotalStock = (product) => {
     return (product.variants || []).reduce((acc, variant) => {
