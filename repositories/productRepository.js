@@ -43,21 +43,20 @@ export const distinctMaterials = (query) => {
     return Product.distinct('material', query);
 };
 
-export const findProducts = async (searchFilter, sort, skip, limit) => {
-   return await Product.find(searchFilter)
-      .populate({
-         path: 'Category',
-         populate: {
-            path: 'parentCategory',
-            model: 'Category'
-         }
-      })
-      .sort(sort || { createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+export const findProducts = async (filter, sort, skip, limit) => {
+    return await Product.find(filter)
+        .populate({
+            path: 'Category',
+            populate: {
+                path: 'parentCategory',
+                model: 'Category'
+            }
+        })
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .lean();
 };
-
 
 export const updateProduct = async (productId, updateData) => {
       return await Product.findByIdAndUpdate(
@@ -156,4 +155,31 @@ export const increaseStock = async (productId, variantId, size, quantity, sessio
 
 export const getCategoryIdsByNames = async (names) => {
     return await Category.find({ name: { $in: names } }).select('_id');
+};
+
+
+export const getHighestCategoryDiscountForIds = async (categoryIds) => {
+    if (!categoryIds || categoryIds.length === 0) return 0;
+    
+    const objectIds = categoryIds
+        .filter(id => mongoose.Types.ObjectId.isValid(id))
+        .map(id => new mongoose.Types.ObjectId(id));
+
+    if (objectIds.length === 0) return 0;
+
+    const categories = await Category.find({ _id: { $in: objectIds } }).lean();
+    let highestCatDiscount = 0;
+
+    categories.forEach(cat => {
+        const isOfferActive = cat.offer && cat.offer.isActive === true;
+        
+        if (isOfferActive) {
+            const catVal = Number(cat.offer.discountValue) || 0;
+            if (catVal > highestCatDiscount) {
+                highestCatDiscount = catVal;
+            }
+        }
+    });
+
+    return highestCatDiscount;
 };
