@@ -26,15 +26,25 @@ const productSchema = new mongoose.Schema({
         ref: 'Category',
         required: true
     },
+    offer: {
+        discountValue: { 
+            type: String, 
+            default: 0,
+            min: 0,
+            max: 99
+        },
+        isActive: { 
+            type: Boolean, 
+            default: false 
+        },
+        offerType: { 
+            type: String, 
+            default: 'Percentage' 
+        }
+    },
     regularPrice: {
         type: Number,
         required: true
-    },
-   discountPercentage: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 100 
     },
     variants: [{
         colorName: {
