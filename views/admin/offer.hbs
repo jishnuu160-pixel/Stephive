@@ -1,0 +1,227 @@
+<div class="stephive-offers-scope">
+    <div class="offers-page-layout">
+        
+        <main class="offers-main-content">
+            <h1 class="offers-main-title">Set Promotions & Offers</h1>
+
+            <div class="offers-dual-grid">
+                
+                <div class="setup-panel-card">
+                    <div class="panel-header header-amber">
+                        <div class="panel-icon bg-amber text-amber"><i class="fa-solid fa-tags"></i></div>
+                        <div class="panel-header-text">
+                            <h2>Product Offer Setup</h2>
+                            <p>Target a specific individual inventory item</p>
+                        </div>
+                    </div>
+                    
+                    <form action="/admin/offers/apply-product" method="POST" class="panel-form">
+                        <div class="panel-form-group">
+                            <label>Select Target Product</label>
+                            <select name="targetProduct" required>
+                                <option value="" disabled selected>Choose a product...</option>
+                                {{#each allProducts}}
+                                    <option value="{{this._id}}">{{this.productName}} (₹{{this.regularPrice}})</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="panel-form-group">
+                            <label>Discount Rate (%)</label>
+                            <input type="number" name="discountValue" min="1" max="99" placeholder="e.g. 15" required>
+                        </div>
+                        <button type="submit" class="panel-btn btn-apply">Apply Product Offer</button>
+                    </form>
+
+                    <div class="active-tracker-section">
+                        <h3>Active Product Discounts</h3>
+                        <div class="panel-scroll-box">
+                            {{#if productOffers.length}}
+                                {{#each productOffers}}
+                                <div class="tracker-item">
+                                    <div class="tracker-info">
+                                        <span class="tracker-name">{{this.productName}}</span>
+                                        <span class="tracker-badge color-amber">{{this.offer.discountValue}}% OFF</span>
+                                    </div>
+                                    <form action="/admin/offers/remove-product/{{this._id}}" method="POST">
+                                        <button type="submit" class="panel-btn btn-delete">Remove</button>
+                                    </form>
+                                </div>
+                                {{/each}}
+                            {{else}}
+                                <p class="tracker-empty">No current active product offers</p>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setup-panel-card">
+                    <div class="panel-header header-emerald">
+                        <div class="panel-icon bg-emerald text-emerald"><i class="fa-solid fa-folder-open"></i></div>
+                        <div class="panel-header-text">
+                            <h2>Category Offer Setup</h2>
+                            <p>Apply store-wide promotional rates</p>
+                        </div>
+                    </div>
+                    
+                    <form action="/admin/offers/apply-category" method="POST" class="panel-form" id="categoryOfferForm">
+                        
+                        <div class="panel-form-group">
+                            <label>Select Target Subcategory</label>
+                            <select name="targetSubCategoryName" id="targetSubCategory" required>
+                                <option value="" disabled selected>Choose a subcategory...</option>
+                                
+                                {{#if subCategories}}
+                                    {{#each subCategories}}
+                                        <option value="{{this.name}}" data-parent-name="{{#if this.parentCategory.name}}{{this.parentCategory.name}}{{else if this.parentCategory}}{{this.parentCategory}}{{else}}Department{{/if}}">
+                                            {{this.name}}
+                                        </option>
+                                    {{/each}}
+                                {{else if subcategories}}
+                                    {{#each subcategories}}
+                                        <option value="{{this.name}}" data-parent-name="{{#if this.parentCategory.name}}{{this.parentCategory.name}}{{else if this.parentCategory}}{{this.parentCategory}}{{else}}Department{{/if}}">
+                                            {{this.name}}
+                                        </option>
+                                    {{/each}}
+                                {{else if categories}}
+                                    {{#each categories}}
+                                        <option value="{{this.name}}" data-parent-name="{{#if this.parentCategory.name}}{{this.parentCategory.name}}{{else if this.parentCategory}}{{this.parentCategory}}{{else}}Department{{/if}}">
+                                            {{this.name}}
+                                        </option>
+                                    {{/each}}
+                                {{/if}}
+                                
+                            </select>
+                        </div>
+
+                        <div class="panel-form-group dynamic-hidden" id="parentCategoryWrapper">
+                            <label style="font-weight: 600; margin-bottom: 4px; display: block;">Affected Parent Departments</label>
+                            <span style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 8px;">Select one or more departments to apply this offer to.</span>
+                            <div id="parentCategoryDisplayTags" class="checkbox-pill-group">
+                            </div>
+                        </div>
+
+                        <div class="panel-form-group">
+                            <label>Discount Rate (%)</label>
+                            <input type="number" name="discountValue" min="1" max="99" placeholder="e.g. 20" required>
+                        </div>
+                        <button type="submit" class="panel-btn btn-apply">Apply Category Offer</button>
+                    </form>
+
+                  <div class="active-tracker-section">
+    <h3>Active Category Discounts</h3>
+    <div class="panel-scroll-box">
+        {{#if categoryOffers.length}}
+            {{#each categoryOffers}}
+            <div class="tracker-item">
+                <div class="tracker-info">
+                    <span class="tracker-name">
+                        {{this.name}}
+                        {{#if this.parentCategory.name}}
+                            <small class="tracker-parent-tag">({{#if this.parentCategory.name}}{{this.parentCategory.name}}{{else}}Parent{{/if}})</small>
+                        {{/if}}
+                        <small class="tracker-level-tag">(Subcategory Group)</small>
+                    </span>
+                    <span class="tracker-badge color-emerald">{{this.offer.discountValue}}% OFF</span>
+                </div>
+                <form action="/admin/offers/remove-category/{{this._id}}" method="POST">
+                    <button type="submit" class="panel-btn btn-delete">Remove</button>
+                </form>
+            </div>
+            {{/each}}
+        {{else}}
+            <p class="tracker-empty">No current active category offers</p>
+        {{/if}}
+    </div>
+</div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const subSelect = document.getElementById("targetSubCategory");
+        const parentWrapper = document.getElementById("parentCategoryWrapper");
+        const tagsContainer = document.getElementById("parentCategoryDisplayTags");
+        const offerForm = document.getElementById("categoryOfferForm");
+
+        if (!subSelect) return;
+
+        const originalOptions = Array.from(subSelect.options).map(opt => ({
+            value: opt.value,
+            text: opt.textContent.trim(),
+            parentName: opt.getAttribute("data-parent-name")
+        }));
+
+        const seenNames = new Set();
+        for (let i = subSelect.options.length - 1; i >= 0; i--) {
+            const val = subSelect.options[i].value;
+            if (val !== "") {
+                if (seenNames.has(val)) {
+                    subSelect.remove(i);
+                } else {
+                    seenNames.add(val);
+                }
+            }
+        }
+
+        const isMongoId = (str) => /^[0-9a-fA-F]{24}$/.test(str);
+
+        subSelect.addEventListener("change", function () {
+            const chosenName = this.value;
+            tagsContainer.innerHTML = ""; 
+
+            if (!chosenName) {
+                parentWrapper.classList.add("dynamic-hidden");
+                return;
+            }
+
+            const matchedDepartments = [];
+            originalOptions.forEach(opt => {
+                if (opt.value === chosenName && opt.parentName) {
+                    const trimmedParent = opt.parentName.trim();
+                    if (!isMongoId(trimmedParent) && trimmedParent !== "" && trimmedParent !== "Department" && trimmedParent !== "undefined") {
+                        if (!matchedDepartments.includes(trimmedParent)) {
+                            matchedDepartments.push(trimmedParent);
+                        }
+                    }
+                }
+            });
+
+            if (matchedDepartments.length > 0) {
+                matchedDepartments.forEach((dept) => {
+                    const labelNode = document.createElement("label");
+                    labelNode.className = "checkbox-pill-label";
+
+                    const checkboxInput = document.createElement("input");
+                    checkboxInput.type = "checkbox";
+                    checkboxInput.name = "targetParentCategories";
+                    checkboxInput.value = dept;
+                    checkboxInput.checked = true;
+
+                    const textNode = document.createTextNode(dept);
+
+                    labelNode.appendChild(checkboxInput);
+                    labelNode.appendChild(textNode);
+                    tagsContainer.appendChild(labelNode);
+                });
+                parentWrapper.classList.remove("dynamic-hidden");
+            } else {
+                parentWrapper.classList.add("dynamic-hidden");
+            }
+        });
+
+        offerForm.addEventListener("submit", function (e) {
+            if (!parentWrapper.classList.contains("dynamic-hidden")) {
+                const checkedBoxes = tagsContainer.querySelectorAll('input[type="checkbox"]:checked');
+                if (checkedBoxes.length === 0) {
+                    e.preventDefault();
+                    alert("Please check at least one parent category department to apply this offer.");
+                }
+            }
+        });
+    });
+</script>
