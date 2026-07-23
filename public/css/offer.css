@@ -1,0 +1,325 @@
+/* ==========================================================================
+   Stephive Offers Page - Complete Scoped CSS Stylesheet (Compact UI Update)
+   ========================================================================== */
+
+.stephive-offers-scope {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1f2937;
+    background-color: #f8fafc;
+    padding: 1.25rem 1rem; /* Reduced outer scope padding */
+    min-height: 100vh;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.stephive-offers-scope *,
+.stephive-offers-scope *::before,
+.stephive-offers-scope *::after {
+    box-sizing: inherit;
+}
+
+/* --- Layout Structure --- */
+.stephive-offers-scope .offers-page-layout {
+    max-width: 1200px; /* Snugger page bounds */
+    margin: 0 auto;
+}
+
+.stephive-offers-scope .offers-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Tighter gap */
+}
+
+.stephive-offers-scope .offers-main-title {
+    font-size: 1.5rem; /* Slightly smaller header */
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.25rem 0;
+    letter-spacing: -0.025em;
+}
+
+/* --- Dual Grid Container --- */
+.stephive-offers-scope .offers-dual-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* Adjusted minimum width lower */
+    gap: 1.25rem; /* Reduced grid distance */
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .stephive-offers-scope .offers-dual-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Setup Panel Card --- */
+.stephive-offers-scope .setup-panel-card {
+    background: #ffffff;
+    border-radius: 8px; /* Slightly crisper corners */
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s ease;
+}
+
+.stephive-offers-scope .setup-panel-card:hover {
+    box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* --- Panel Header Styles --- */
+.stephive-offers-scope .panel-header {
+    padding: 0.75rem 1rem; /* Tighter padding */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.stephive-offers-scope .header-amber {
+    background: linear-gradient(to right, #fffbeb, #ffffff);
+}
+
+.stephive-offers-scope .header-emerald {
+    background: linear-gradient(to right, #ecfdf5, #ffffff);
+}
+
+.stephive-offers-scope .panel-icon {
+    width: 32px; /* Scaled down from 42px */
+    height: 32px; /* Scaled down from 42px */
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.stephive-offers-scope .bg-amber { background-color: #fef3c7; }
+.stephive-offers-scope .text-amber { color: #d97706; }
+.stephive-offers-scope .bg-emerald { background-color: #d1fae5; }
+.stephive-offers-scope .text-emerald { color: #059669; }
+
+.stephive-offers-scope .panel-header-text h2 {
+    font-size: 0.95rem; /* Scaled down text density */
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.05rem 0;
+}
+
+.stephive-offers-scope .panel-header-text p {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* --- Panel Form Controls --- */
+.stephive-offers-scope .panel-form {
+    padding: 1rem; /* Reduced form block spacing */
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem; /* Less vertical space between elements */
+}
+
+.stephive-offers-scope .panel-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stephive-offers-scope .panel-form-group label {
+    font-size: 0.8rem; /* Cleaner, smaller labeling */
+    font-weight: 500;
+    color: #374151;
+}
+
+.stephive-offers-scope .panel-form-group select,
+.stephive-offers-scope .panel-form-group input[type="number"] {
+    width: 100%;
+    padding: 0.45rem 0.65rem; /* Significantly shorter click target vertical sizing */
+    font-size: 0.85rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #1f2937;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.stephive-offers-scope .panel-form-group select:focus,
+.stephive-offers-scope .panel-form-group input[type="number"]:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+}
+
+/* --- Dynamic Subcategory Elements & Pill Checkboxes --- */
+.stephive-offers-scope .dynamic-hidden {
+    display: none !important;
+}
+
+.stephive-offers-scope .checkbox-pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+}
+
+.stephive-offers-scope .checkbox-pill-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 0.25rem 0.55rem; /* Denser selection pills */
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.stephive-offers-scope .checkbox-pill-label:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.stephive-offers-scope .checkbox-pill-label input[type="checkbox"] {
+    accent-color: #059669;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+}
+
+/* --- Professional Apply & Delete Buttons --- */
+.stephive-offers-scope .panel-btn.btn-apply {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem; /* Tighter button boundaries */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px -1px rgba(245, 158, 11, 0.15);
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.stephive-offers-scope .panel-btn.btn-apply:hover {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.2);
+    transform: translateY(-0.5px);
+}
+
+.stephive-offers-scope .panel-btn.btn-apply:active {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    transform: translateY(0);
+}
+
+.stephive-offers-scope .panel-btn.btn-delete {
+    background-color: #fee2e2;
+    color: #991b1b;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem; /* Smaller track item buttons */
+    border: 1px solid #fecaca;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.stephive-offers-scope .panel-btn.btn-delete:hover {
+    background-color: #fecaca;
+    border-color: #fca5a5;
+}
+
+/* --- Active Tracker Sections --- */
+.stephive-offers-scope .active-tracker-section {
+    padding: 0 1rem 1rem 1rem; /* Scaled down container bounds */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-top: 1px solid #f3f4f6;
+    margin-top: auto;
+    background-color: #fafafa;
+}
+
+.stephive-offers-scope .active-tracker-section h3 {
+    font-size: 0.85rem; /* Shrunk subsection headers */
+    font-weight: 600;
+    color: #374151;
+    margin: 0.75rem 0 0 0;
+}
+
+.stephive-offers-scope .panel-scroll-box {
+    max-height: 140px; /* Reduced vertical footprint from 220px to save structural height */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-right: 0.25rem;
+}
+
+.stephive-offers-scope .panel-scroll-box::-webkit-scrollbar { width: 4px; }
+.stephive-offers-scope .panel-scroll-box::-webkit-scrollbar-track { background: #f1f1f1; }
+.stephive-offers-scope .panel-scroll-box::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+/* --- Tracker Item Elements --- */
+.stephive-offers-scope .tracker-item {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem; /* Made inner listing nodes distinctly thinner */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.stephive-offers-scope .tracker-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    min-width: 0;
+}
+
+.stephive-offers-scope .tracker-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stephive-offers-scope .tracker-level-tag {
+    font-size: 0.65rem;
+    color: #6b7280;
+}
+
+.stephive-offers-scope .tracker-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    width: fit-content;
+}
+
+.stephive-offers-scope .tracker-badge.color-amber { background-color: #fef3c7; color: #b45309; }
+.stephive-offers-scope .tracker-badge.color-emerald { background-color: #d1fae5; color: #047857; }
+
+.stephive-offers-scope .tracker-empty {
+    font-size: 0.8  rem;
+    color: #9ca3af;
+    text-align: center;
+    padding: 0.75rem 0;
+    margin: 0;
+    font-style: italic;
+}
