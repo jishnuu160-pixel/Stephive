@@ -37,6 +37,8 @@ import {getEditBrandPage,updateBrand,getAddBrandPage,postAddBrand} from '../cont
 import {getReturnDetails} from '../controllers/returnController.js';
 import brandRoutes from './brandRoutes.js'
 
+import {deleteCategoryOffer, deleteProductOffer, loadOffersPage, processCategoryOffer, processProductOffer} from '../controllers/offerController.js';
+
 import { 
     isAdminAuthenticated, 
     isAdminLoggedOut,
@@ -91,6 +93,12 @@ router.post('/categories/add', isAdminAuthenticated, postAddCategory);
 router.post('/categories/edit/:id', isAdminAuthenticated, updateCategory);
 router.get('/categories/:id/subcategories', getSubcategoriesByParent);
 
+
+router.get('/offer',isAdminAuthenticated,loadOffersPage);
+router.post('/offers/apply-category',isAdminAuthenticated,processCategoryOffer);
+router.post('/offers/apply-product',isAdminAuthenticated,processProductOffer);
+router.post('/offers/remove-product/:id',isAdminAuthenticated,deleteProductOffer);
+router.post('/offers/remove-category/:id',isAdminAuthenticated,deleteCategoryOffer);
 
 router.get('/returns', isAdminAuthenticated, getAllReturns);
 router.get('/returns/:id', isAdminAuthenticated, getReturnDetails);
