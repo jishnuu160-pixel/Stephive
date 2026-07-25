@@ -381,7 +381,7 @@ button {
 }
 
 /* Add size button */
-.add-size {
+.add-size,.edit-size {
     background: #10b981;
     color: white;
     font-size: 10px;
