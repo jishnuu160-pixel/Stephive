@@ -358,7 +358,7 @@ body.login-page {
 }
 
 .stat-card {
-    width: 230px; 
+    width: 200px; 
     background: #ffffff;
     padding: 20px;
     border-radius: 15px;
@@ -545,4 +545,174 @@ body.login-page {
     z-index: 10000 !important;
     padding: 12px 24px !important;
     max-width: 300px !important;
+}
+
+/* Ultra-Compact Dashboard Container */
+.dashboard-card {
+  width: 95%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  margin-bottom: 36px;
+}
+
+/* Compact Header & Filters */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dashboard-header h2 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.filter-buttons {
+  display: flex;
+  background: #f3f4f6;
+  padding: 2px;
+  border-radius: 4px;
+  gap: 2px;
+}
+
+.filter-btn {
+  background: transparent;
+  border: none;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+}
+
+.filter-btn:hover {
+  color: #111827;
+}
+
+.filter-btn.active {
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Micro Table Layout Wrapper */
+.table-responsive {
+  max-height: 260px; /* Shorter max height for tighter spacing */
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid #f3f4f6;
+}
+
+/* Tiny Admin Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8rem;
+}
+
+.admin-table th {
+  background-color: #f9fafb;
+  color: #6b7280;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.03em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.admin-table td {
+  padding: 6px 10px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+
+/* Micro Product Info */
+.product-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.product-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  background-color: #f3f4f6;
+}
+
+.product-name {
+  font-weight: 500;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+/* Chart Canvas Wrapper */
+.chart-container {
+  width: 100%;
+  position: relative;
+}
+
+
+.stat-icon.cancelled {
+  color: #e03131;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.stat-icon.sales {
+  color: #00f746;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.stat-icon.orders {
+  color: #fcbe06eb;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.stat-icon.users {
+  color: #06e7fceb;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.brand-table th,.category-table th,.product-table th{
+    text-align: center;
 }
