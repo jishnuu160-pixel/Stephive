@@ -1,4 +1,5 @@
 import Brand from '../models/brandModel.js';
+import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js'; 
 
 export const countBrands = async (filter) => {
@@ -67,4 +68,37 @@ export const updateBrand = async (id, updateData) => {
 export const createBrand = async (brandData) => {
     const brand = new Brand(brandData);
     return await brand.save();
+};
+
+
+export const getTopSellingBrandsFromDB = async () => {
+    return await Order.aggregate([
+        { $unwind: "$items" },
+        {
+            $lookup: {
+                from: "products",
+                localField: "items.productId",
+                foreignField: "_id",
+                as: "productDetails"
+            }
+        },
+        { $unwind: "$productDetails" },
+        {
+            $group: {
+                _id: "$productDetails.brand",
+                unitsSold: { $sum: "$items.quantity" },
+                revenue: { $sum: { $multiply: ["$items.quantity", "$items.price"] } }
+            }
+        },
+        { $sort: { revenue: -1 } },
+        { $limit: 10 },
+        {
+            $project: {
+                _id: 0,
+                brandName: "$_id",
+                unitsSold: 1,
+                revenue: 1
+            }
+        }
+    ]);
 };
