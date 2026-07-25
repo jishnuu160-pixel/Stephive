@@ -126,8 +126,17 @@ export const countOrdersWithSearch = async (search) => {
     return await Order.countDocuments(query);
 };
 
-export const countAllOrders = async (query) => {
-    return await Order.countDocuments(query);
+
+export const countActiveOrders = async () => {
+    return await Order.countDocuments({ 
+                status: { $nin: ['Cancelled', 'cancelled', 'Returned', 'returned','delivered','Delivered'] }
+    });
+};
+
+export const cancelledOrder=async()=>{
+    return await Order.countDocuments({
+        status:{$in:['cancelled','Cancelled']}
+    });
 };
 
 export const updateStatus = async (orderId, newStatus) => {
@@ -141,4 +150,21 @@ export const updateStatus = async (orderId, newStatus) => {
 
 export const findOneAndUpdate = async (filter, update) => {
     return await Order.findOneAndUpdate(filter, update, { new: true });
+};
+
+export const aggregateTotalSales = async () => {
+    const result = await Order.aggregate([
+        {
+            $match: {
+                status: { $nin: ['Cancelled', 'cancelled', 'Returned', 'returned','delivered','Delivered'] }
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalSales: { $sum: "$finalAmount" }
+            }
+        }
+    ]);
+    return result.length > 0 ? result[0].totalSales : 0;
 };
