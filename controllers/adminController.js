@@ -39,20 +39,76 @@ export const postAdminLogin = async (req, res) => {
     }
 };
 
-export const getDashboard = async(req, res) => {
-   try{
-    const userCount= await adminService.countCustomers();
 
-       res.render('admin/dashboard', {
-        isAdmin: true, 
-        title: 'Admin Dashboard',
-        activePage:'dashboard',
-        userCount,
-    });
-}catch(error){
-    console.error("Dashboard Error:",error);
- }
+export const getDashboard = async (req, res) => {
+    try {
+        const userCount = await adminService.countCustomers();
+        const cancelledOrder= await adminService.cancelledOrder();
+        const metrics = await adminService.getDashboardMetrics(); 
+        
+        const initialChartData = await adminService.getSalesChartData('week');
+        res.render('admin/dashboard', {
+            isAdmin: true, 
+            title: 'Admin Dashboard',
+            activePage: 'dashboard',
+            userCount,
+            cancelledOrder,
+            totalOrders: metrics.totalOrders,
+            totalSales: metrics.totalSales,
+            initialChartData: JSON.stringify(initialChartData)
+        });
+    } catch (error) {
+        console.error("Dashboard Error:", error);
+        res.status(500).send("Server Error");
+    }
 };
+
+export const getChartData = async (req, res) => {
+    try {
+        const { filter = 'week' } = req.query;
+        const chartData = await adminService.getSalesChartData(filter);
+         
+        res.json(chartData); 
+    } catch (error) {
+        console.error("Chart Data Controller Error:", error);
+        res.status(500).json({ error: 'Failed to fetch chart metrics' });
+    }
+};
+
+
+export const getTopProductsApi = async (req, res) => {
+    try {
+        const topProducts = await adminService.getTopSellingProducts();
+        
+        return res.status(200).json({
+            success: true,
+            products: topProducts
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        });
+    }
+};
+
+
+export const getTopCategories = async (req, res) => {
+    try {
+        const topCategories = await adminService.getTopCategoriesService();
+        res.status(200).json({
+            success: true,
+            data: topCategories
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 
 //Get User data
 export const getCustomers = async (req, res) => {
@@ -180,5 +236,4 @@ export const updateReturnStatus = async (req, res) => {
         res.redirect('/admin/returns'); 
     }
 };
-
 
