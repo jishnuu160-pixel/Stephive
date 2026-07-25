@@ -1,4 +1,5 @@
 import Product from '../models/productModel.js';
+import Order from '../models/orderModel.js';
 import Category from '../models/categoryModel.js';
 import mongoose from 'mongoose';
 
@@ -182,4 +183,68 @@ export const getHighestCategoryDiscountForIds = async (categoryIds) => {
     });
 
     return highestCatDiscount;
+};
+
+
+export const findTopProducts = async () => {
+    return await Order.aggregate([
+        { 
+            $match: { 
+                status: { $nin: ['Cancelled','cancelled','returned', 'Returned','delivered', 'Delivered'] } 
+            } 
+        },
+        { $unwind: '$items' },
+        {
+            $lookup: {
+                from: 'products',
+                localField: 'items.productId',
+                foreignField: '_id',
+                as: 'productInfo'
+            }
+        },
+        {
+            $unwind: {
+                path: '$productInfo',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        { 
+            $group: {
+                _id: '$items.productId',
+                totalQuantity: { $sum: '$items.quantity' },
+                totalRevenue: { $sum: { $multiply: ['$items.price', '$items.quantity'] } },
+                productName: { $first: '$productInfo.productName' },
+                productImage: { 
+                    $first: { 
+                        $arrayElemAt: [{ $arrayElemAt: ['$productInfo.variants.images', 0] }, 0] 
+                    } 
+                },
+                variants: { $first: '$productInfo.variants' }
+            } 
+        },
+        
+        { $sort: { totalQuantity: -1 } },
+        { $limit: 10 },
+        
+        {
+            $project: {
+                _id: 1,
+                totalQuantity: 1,
+                totalRevenue: 1,
+                productName: { $ifNull: ['$productName', 'Unknown Product'] },
+                productImage: { $ifNull: ['$productImage', ''] },
+                stock: {
+                    $sum: {
+                        $map: {
+                            input: { $ifNull: ['$variants', []] },
+                            as: 'variant',
+                            in: {
+                                $sum: '$$variant.sizes.stock'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]);
 };
