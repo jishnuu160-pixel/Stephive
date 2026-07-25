@@ -115,7 +115,6 @@ export const sendOTP = async (email) => {
     console.log(`\n=========================================`);
     console.log(` OTP for ${email} is [ ${otp} ]`);
     console.log(`=========================================\n`);
-    // ------------------------------------------
 
     const mailOptions = {
         from: '"StepHive Support" <stephive3@gmail.com>',

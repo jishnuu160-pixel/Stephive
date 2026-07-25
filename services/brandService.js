@@ -136,3 +136,8 @@ export const addBrand = async (data) => {
         isListed: true 
     });
 };
+
+
+export const getTopBrandsService = async () => {
+    return await brandRepo.getTopSellingBrandsFromDB();
+};
