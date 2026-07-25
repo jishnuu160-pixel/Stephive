@@ -1,0 +1,93 @@
+<div class="order-dashboard-wrapper">
+  <!-- Filter & Action Section -->
+  <form action="/admin/salesReport" method="GET" class="filter-card">
+    <div class="filter-main-row">
+      
+      <!-- Preset Quick Filters -->
+      <div class="preset-filters">
+        <button type="submit" name="filter" value="daily" class="btn-preset">Daily</button>
+        <button type="submit" name="filter" value="weekly" class="btn-preset">Weekly</button>
+        <button type="submit" name="filter" value="yearly" class="btn-preset">Yearly</button>
+      </div>
+
+            <div class="action-buttons">
+        <button type="button" class="btn-csv" onclick="downloadFile('csv')">Download CSV</button>
+        <button type="button" class="btn-pdf" onclick="downloadFile('pdf')">Download PDF</button>
+      </div>
+
+
+      <!-- Date Inputs & Filter Submit -->
+      <div class="filter-inputs">
+        <div class="input-group">
+          <label for="startDate">START DATE</label>
+          <input type="date" id="startDate" name="startDate" value="{{startDate}}" />
+        </div>
+        <div class="input-group">
+          <label for="endDate">END DATE</label>
+          <input type="date" id="endDate" name="endDate" value="{{endDate}}" />
+        </div>
+        <button type="submit" class="btn-filter">Filter</button>
+      </div>
+
+      <!-- Action Buttons (CSV & PDF) -->
+
+    </div>
+  </form>
+</div>
+
+  <!-- Orders Table Section -->
+  <div class="table-card">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>ORDER ID</th>
+          <th>CUSTOMER</th>
+          <th>DATE</th>
+          <th>DISCOUNT</th>
+          <th>TOTAL</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each orders}}
+        <tr>
+          <td><strong>{{orderId}}</strong></td>
+          <td>{{customerName}}</td>
+          <td>{{formattedDate createdAt}}</td>
+          <td>₹{{discount}}</td>
+          <td><strong>₹{{total}}</strong></td>
+         <td>
+    <!-- Use lowercase safe guard or direct helper call -->
+    <span class="badge {{statusClass this.status}}">{{this.status}}</span>
+</td>
+        </tr>
+        {{/each}}
+      </tbody>
+      <tfoot>
+        <tr class="table-footer">
+          <td colspan="2">totalOrders: <strong>{{summary.totalOrders}}</strong></td>
+          <td colspan="2">totalDiscount: <strong>{{summary.totalDiscount}}</strong></td>
+          <td colspan="2">Total Sales: <strong>₹{{summary.totalRevenue}}</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+
+<script>
+  function downloadFile(type) {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    const queryParams = new URLSearchParams();
+    if (startDate) queryParams.append('startDate', startDate);
+    if (endDate) queryParams.append('endDate', endDate);
+
+    const endpoint = type === 'csv' 
+      ? '/admin/salesReport/download-csv' 
+      : '/admin/salesReport/download-pdf';
+
+    window.location.href = `${endpoint}?${queryParams.toString()}`;
+  }
+</script>
