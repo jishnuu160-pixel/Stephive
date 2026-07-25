@@ -9,7 +9,7 @@
                 </div>
                 <div class="stat-details">
                     <p>Total Sales</p>
-                    <h3>₹4,25,000</h3>
+                    <h3>₹{{totalSales}}</h3>
                 </div>
             </div>
 
@@ -19,7 +19,7 @@
                 </div>
                 <div class="stat-details">
                     <p>Active Orders</p>
-                    <h3>105</h3>
+                    <h3>{{totalOrders}}</h3>
                 </div>
             </div>
 
@@ -32,6 +32,332 @@
                     <h3>{{userCount}}</h3>
                 </div>
             </div>
+                 <div class="stat-card">
+               <div class="stat-icon cancelled">
+                 <i class="fas fa-shopping-bag"></i>
+               </div>
+                <div class="stat-details">
+                    <p>Cancelled Orders</p>
+                    <h3>{{cancelledOrder}}</h3>
+                </div>
+            </div>
         </div>
     </main>
 </div>
+
+
+<div class="dashboard-card">
+  <div class="dashboard-header">
+    <h2>Report for this week</h2>
+    
+    <!-- Filter Buttons -->
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-filter="week">This week</button>
+      <button class="filter-btn" data-filter="month">This Month</button>
+      <button class="filter-btn" data-filter="year">Yearly</button>
+    </div>
+  </div>
+
+  <!-- Chart Canvas -->
+  <div class="chart-container" style="position: relative; height:350px;">
+    <canvas id="salesTrendChart"></canvas>
+  </div>
+</div>
+
+<div class="dashboard-card">
+  <div class="dashboard-header">
+    <h2>Top 10 Best-Selling Products</h2>
+  </div>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr class="product-table">
+          <th>Rank</th>
+          <th>Product</th>
+          <th>Units Sold</th>
+          <th>Revenue</th>
+          <th>Stock Status</th>
+        </tr>
+      </thead>
+      <tbody id="topProductsTableBody">
+        <tr>
+          <td colspan="5" class="loading-state">Loading top products...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="dashboard-card categories-card">
+  <div class="dashboard-header">
+    <h2>Top 10 Best-Selling Categories</h2>
+  </div>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr class="category-table">
+          <th>Rank</th>
+          <th>Category Name</th>
+          <th>Units Sold</th>
+          <th>Revenue</th>
+        </tr>
+      </thead>
+      <tbody id="topCategoriesTableBody">
+        <tr>
+          <td colspan="4" class="loading-state">Loading categories...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="dashboard-card brands-card">
+  <div class="dashboard-header">
+    <h2>Top 10 Best-Selling Brands</h2>
+  </div>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr class="brand-table">
+          <th>Rank</th>
+          <th>Brand Name</th>
+          <th>Units Sold</th>
+          <th>Revenue</th>
+        </tr>
+      </thead>
+      <tbody id="topBrandsTableBody">
+        <tr>
+          <td colspan="4" class="loading-state">Loading brands...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  let salesChart;
+
+  const initialData = JSON.parse('{{{initialChartData}}}');
+  console.log("Safely Parsed Initial Data:", initialData);
+
+  function renderChart(labels, data) {
+    const canvasElement = document.getElementById('salesTrendChart');
+    if (!canvasElement) {
+      console.error("Canvas element 'salesTrendChart' not found!");
+      return;
+    }
+
+    const ctx = canvasElement.getContext('2d');
+    
+    if (salesChart) {
+      salesChart.destroy(); 
+    }
+
+    let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(34, 197, 94, 0.4)');
+    gradient.addColorStop(1, 'rgba(34, 197, 94, 0.0)');
+
+    salesChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          borderColor: '#22c55e',
+          backgroundColor: gradient,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          pointHoverBackgroundColor: '#22c55e'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#22c55e',
+            titleFont: { size: 12 },
+            bodyFont: { size: 14, weight: 'bold' },
+            padding: 10,
+            displayColors: false
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: { 
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return value >= 1000 ? (value / 1000) + 'k' : value;
+              }
+            },
+            grid: { color: '#f3f4f6' }
+          }
+        }
+      }
+    });
+  }
+
+  if (initialData && initialData.labels) {
+    renderChart(initialData.labels, initialData.values);
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(button => {
+    button.addEventListener('click', async function() {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+
+      const filterType = this.getAttribute('data-filter');
+
+      try {
+        const response = await fetch(`/admin/api/sales-chart?filter=${filterType}`);
+        const result = await response.json();
+        
+        renderChart(result.labels, result.values);
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+      }
+    });
+  });
+
+  async function loadTopProducts() {
+    try {
+      const response = await fetch('/admin/api/top-products');
+      const result = await response.json();
+
+      const tbody = document.getElementById('topProductsTableBody');
+      tbody.innerHTML = '';
+
+      if (!result.success || !result.products || result.products.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #6b7280;">No sales data available yet.</td></tr>`;
+        return;
+      }
+
+      result.products.forEach((item, index) => {
+        let stockBadge = '';
+        if (item.stock <= 0) {
+          stockBadge = `<span style="color: #ef4444; font-weight: 600;">Out of Stock ❌</span>`;
+        } else if (item.stock < 5) {
+          stockBadge = `<span style="color: #f59e0b; font-weight: 600;">${item.stock} left (Low) ⚠️</span>`;
+        } else {
+          stockBadge = `<span style="color: #10b981;">${item.stock} in stock</span>`;
+        }
+
+        const row = `
+          <tr style="border-bottom: 1px solid #f3f4f6; font-size: 14px;">
+            <td style="padding: 12px; text-align:center; font-weight: bold; color: #374151;">#${index + 1}</td>
+            <td style="padding: 12px; display: flex; text-align:center; align-items: center; gap: 10px;">
+              <img src="${item.productImage || '/images/placeholder.png'}" alt="" style="width: 36px; height: 36px; object-fit: cover; border-radius: 4px; text-align:center;">
+              <span style="font-weight: 500; color: #111827; text-align:center;">${item.productName}</span>
+            </td>
+            <td style="padding: 12px; color: #4b5563; text-align:center;">${item.totalQuantity}</td>
+            <td style="padding: 12px; font-weight: 600; color: #111827; text-align:center;">₹${item.totalRevenue.toLocaleString()}</td>
+            <td style="padding: 12px; text-align:center;">${stockBadge}</td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+
+    } catch (error) {
+      console.error('Error loading top products:', error);
+      document.getElementById('topProductsTableBody').innerHTML = `
+        <tr><td colspan="5" style="text-align: center; padding: 20px; color: #ef4444;">Failed to load top products.</td></tr>
+      `;
+    }
+  }
+
+
+async function loadTopCategories() {
+    try {
+        const response = await fetch('/admin/top-categories');
+        const result = await response.json();
+
+        const tbody = document.getElementById('topCategoriesTableBody');
+        tbody.innerHTML = ''; 
+
+        if (!result.success || !result.data || result.data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: #6b7280;">No category sales data found.</td></tr>`;
+            return;
+        }
+
+        result.data.forEach((category, index) => {
+            const row = document.createElement('tr');
+            row.style.cssText = "border-bottom: 1px solid #f3f4f6; font-size: 14px;";
+            row.innerHTML = `
+                <td style="padding: 12px; text-align:center; font-weight: bold; color: #374151;" class="rank-pill">#${index + 1}</td>
+                <td style="padding: 12px;text-align:center; font-weight: 500; color: #111827;">
+                    <span class="product-name">${category.categoryName}</span>
+                </td>
+                <td style="padding: 12px; color: #4b5563; text-align: center; font-weight: 500;">${category.totalQuantity}</td>
+                <td style="padding: 12px; font-weight: 600; color: #059669; text-align: center;">₹${category.totalRevenue.toLocaleString()}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Failed to load top categories:', error);
+        document.getElementById('topCategoriesTableBody').innerHTML = `<tr><td colspan="4" style="text-align: center; color: #ef4444; padding: 15px;">Failed to load data</td></tr>`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof loadTopProducts === 'function') {
+        loadTopProducts();
+    }
+    loadTopCategories();
+});
+
+  async function loadTopBrands() {
+    try {
+      const response = await fetch('/admin/top-brands');
+      const result = await response.json();
+
+      const tbody = document.getElementById('topBrandsTableBody');
+      tbody.innerHTML = ''; 
+
+      const brandsData = Array.isArray(result) ? result : (result.data || result.topBrands);
+
+      if (!brandsData || brandsData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: #6b7280;">No brand sales data available yet.</td></tr>`;
+        return;
+      }
+
+      brandsData.forEach((brand, index) => {
+        const row = document.createElement('tr');
+        row.style.cssText = "border-bottom: 1px solid #f3f4f6; font-size: 14px;";
+        row.innerHTML = `
+          <td style="padding: 12px;text-align: center; font-weight: bold; color: #374151;">#${index + 1}</td>
+          <td style="padding: 12px; text-align: center;font-weight: 500; color: #111827;">${brand.brandName}</td>
+          <td style="padding: 12px; color: #4b5563; text-align: center; font-weight: 500;">${brand.unitsSold || brand.totalQuantity}</td>
+          <td style="padding: 12px; font-weight: 600; color: #059669; text-align: center;">₹${(brand.revenue || brand.totalRevenue).toLocaleString()}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+    } catch (error) {
+      console.error('Error loading top brands:', error);
+      document.getElementById('topBrandsTableBody').innerHTML = `
+        <tr><td colspan="4" style="text-align: center; padding: 15px; color: #ef4444;">Failed to load top brands.</td></tr>
+      `;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+      if (typeof loadTopProducts === 'function') {
+          loadTopProducts();
+      }
+      if (typeof loadTopCategories === 'function') {
+          loadTopCategories();
+      }
+      loadTopBrands();
+  });
+</script>
