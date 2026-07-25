@@ -63,6 +63,26 @@ app.engine('hbs', engine({
     };
     return stepRank <= (ranks[currentStatus] ?? 4); 
     },
+  statusClass: function (status) {
+        if (!status) return 'badge-secondary';
+        
+        switch (status.toLowerCase().trim()) {
+            case 'delivered':
+                return 'badge-success'; 
+            case 'pending':
+            case 'processing':
+            case 'placed':
+                return 'badge-warning'; 
+            case 'shipped':
+            case 'out of delivery':
+                return 'badge-info';
+            case 'cancelled':
+            case 'returned':
+                return 'badge-danger'; 
+            default:
+                return 'badge-secondary'; 
+        }
+    },
     lt: ((a, b) => a < b),
     gt: ((a, b) => b > a),
     le: ((a, b) => a <= b),
