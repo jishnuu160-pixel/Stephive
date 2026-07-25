@@ -92,3 +92,13 @@ export const postAddBrand = async (req, res) => {
         res.redirect('/admin/brands/add');
     }
 };
+
+export const getTopSellingBrands = async (req, res) => {
+    try {
+        const topBrands = await brandService.getTopBrandsService();
+        res.status(200).json(topBrands);
+    } catch (error) {
+        console.error("Error fetching top brands analytics:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
