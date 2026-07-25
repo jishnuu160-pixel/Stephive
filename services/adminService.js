@@ -3,11 +3,13 @@ import * as OrderRepo from '../repositories/orderRepository.js';
 import * as returnRepo from '../repositories/returnRepository.js';
 import * as productRepo from "../repositories/productRepository.js";
 import * as WalletRepo from "../repositories/walletRepository.js";
+import * as salesRepo from "../repositories/salesRepository.js";
 
 
 import Return from '../models/ReturnModel.js';
 
 import bcrypt from 'bcrypt';
+import Order from '../models/OrderModel.js';
 
 export const login = async (
    email,
@@ -40,9 +42,12 @@ export const getCustomers = async ( query, skip, limit) => {
 };
 
 export const countCustomers = async (query) => {
-
    return await adminRepo.countCustomers(query);
 
+};
+
+export const cancelledOrder= async(query)=>{
+    return await OrderRepo.cancelledOrder(query);
 };
 
 export const getCustomersPage = async (queryParams) => {
@@ -235,6 +240,61 @@ export const changeReturnStatus = async (returnId, newStatus) => {
 };
 
 
+export const getDashboardMetrics = async () => {
+    const totalOrders = await OrderRepo.countActiveOrders();
+    const totalSales = await OrderRepo.aggregateTotalSales();
+
+    const formattedSales = Number(totalSales).toLocaleString('en-IN', {
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0
+    });
+
+    return {
+        totalOrders,
+        totalSales: formattedSales
+    };
+};
 
 
+export const getSalesChartData = async (filter) => {
+    let groupFormat;
+    let startDate = new Date();
 
+    if (filter === 'week') {
+        startDate.setDate(startDate.getDate() - 7);
+        groupFormat = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
+    } else if (filter === 'month') {
+        startDate.setMonth(startDate.getMonth() - 1);
+        groupFormat = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
+    } else if (filter === 'year') {
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        groupFormat = { $dateToString: { format: "%Y-%m", date: "$createdAt" } };
+    }
+
+    const salesData = await salesRepo.getSalesChartDataFromDB(startDate, groupFormat);
+
+    const labels = salesData.map(item => item._id);
+    const values = salesData.map(item => item.totalSales);
+
+    return { labels, values };
+};
+
+
+export const getTopSellingProducts = async () => {
+    try {
+        const topProducts = await productRepo.findTopProducts();
+        
+        return topProducts;
+    } catch (error) {
+        throw new Error('Error fetching top selling products: ' + error.message);
+    }
+};
+
+
+export const getTopCategoriesService = async () => {
+    try {
+        return await salesRepo.findTopCategories();
+    } catch (error) {
+        throw new Error(`Error fetching top categories: ${error.message}`);
+    }
+};
