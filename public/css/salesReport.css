@@ -1,0 +1,227 @@
+/* Main Page Wrapper */
+.order-dashboard-wrapper {
+  padding: 24px;
+  background-color: #f8f9fa;
+  min-height: 10vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Filter Card Container */
+.filter-card {
+  background: #ffffff;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 24px;
+}
+
+/* Flex row keeping elements aligned properly on one or multiple lines */
+.filter-main-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Inputs wrapper to keep quick filters, dates, and filter button inline */
+.filter-inputs {
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* Preset Quick Filter Buttons (Daily, Weekly, Yearly) */
+.preset-filters {
+  display: flex;
+  gap: 8px;
+  align-self: center;
+}
+
+.btn-preset {
+  padding: 10px 14px;
+  background-color: #f1f3f5;
+  color: #495057;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 41px;
+}
+
+.btn-preset:hover {
+  background-color: #e9ecef;
+  color: #212529;
+  border-color: #ced4da;
+}
+
+/* Individual Form Input Group */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6c757d;
+  letter-spacing: 0.5px;
+}
+
+.input-group input[type="date"] {
+  padding: 10px 14px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  background-color: #fff;
+  transition: border-color 0.2s;
+  height: 41px;
+  box-sizing: border-box;
+}
+
+.input-group input[type="date"]:focus {
+  border-color: #ffc107;
+}
+
+/* Filter Submit Button */
+.btn-filter {
+  padding: 10px 20px;
+  background-color: #ffc107;
+  color: #000;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: 41px;
+}
+
+.btn-filter:hover {
+  background-color: #e0a800;
+}
+
+/* Action Buttons (CSV & PDF) */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-csv, .btn-pdf {
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  height: 41px;
+}
+
+.btn-csv {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.btn-csv:hover {
+  background-color: #badbcc;
+}
+
+.btn-pdf {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.btn-pdf:hover {
+  background-color: #b6d4fe;
+}
+
+/* Table Card Wrapper */
+.table-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* Orders Table Styling */
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.orders-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 16px 20px;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.orders-table td {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: #212529;
+  border-bottom: 1px solid #f1f3f5;
+  vertical-align: middle;
+}
+
+.orders-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Table Footer / Summary Row */
+.table-footer {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.table-footer td {
+  padding: 18px 20px;
+  border-top: 2px solid #dee2e6;
+  border-bottom: none;
+  color: #343a40;
+}
+
+/* Status Badges */
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.badge-success {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.badge-warning {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.badge-info {
+  background-color: #cff4fc;
+  color: #055160;
+}
+
+.badge-danger {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.badge-secondary {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
