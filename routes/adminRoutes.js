@@ -13,7 +13,10 @@ import {
     adminLogout, 
     getOrderDetails,
     getAllReturns,
-     updateReturnStatus
+     updateReturnStatus,
+     getChartData,
+     getTopProductsApi,
+     getTopCategories
 } from '../controllers/adminController.js';
 
 import { 
@@ -33,11 +36,12 @@ import {
     toggleListing
 } from '../controllers/categoryController.js';
 
-import {getEditBrandPage,updateBrand,getAddBrandPage,postAddBrand} from '../controllers/brandController.js';
+import {getEditBrandPage,updateBrand,getAddBrandPage,postAddBrand,getTopSellingBrands} from '../controllers/brandController.js';
 import {getReturnDetails} from '../controllers/returnController.js';
 import brandRoutes from './brandRoutes.js'
 
 import {deleteCategoryOffer, deleteProductOffer, loadOffersPage, processCategoryOffer, processProductOffer} from '../controllers/offerController.js';
+import {downloadCSV, downloadPDF, viewSalesReport}from '../controllers/salesReportController.js';
 
 import { 
     isAdminAuthenticated, 
@@ -63,6 +67,10 @@ router.post('/login', postAdminLogin);
 
 // --- Admin Core Dashboard Routes ---
 router.get('/dashboard', isAdminAuthenticated, getDashboard);
+router.get('/api/sales-chart', isAdminAuthenticated, getChartData);
+router.get('/api/top-products', isAdminAuthenticated, getTopProductsApi);
+router.get('/top-categories',isAdminAuthenticated, getTopCategories);
+router.get('/top-brands',isAdminAuthenticated, getTopSellingBrands);
 router.get('/customers', isAdminAuthenticated, getCustomers);
 router.post('/customers/toggle-status/:id', isAdminAuthenticated, toggleUserStatus);
 
@@ -104,6 +112,9 @@ router.get('/returns', isAdminAuthenticated, getAllReturns);
 router.get('/returns/:id', isAdminAuthenticated, getReturnDetails);
 router.post('/returns/update/:id', isAdminAuthenticated, updateReturnStatus);
 
+router.get('/salesReport',isAdminAuthenticated,viewSalesReport);
+router.get('/salesReport/download-csv',isAdminAuthenticated,downloadCSV);
+router.get('/salesReport/download-pdf',isAdminAuthenticated,downloadPDF);
 
 router.get('/logout', adminLogout);
 
