@@ -122,6 +122,7 @@
 
 /* OTHER ELEMENTS */
 .btn {
+    text-decoration: none;
   background: #f4a300;
   padding: 8px 12px;
   border: none;
@@ -194,41 +195,7 @@
     font-size: 12px;
 }
 
-/* Gradient Banner Styling */
-.sale-banner-container {
-    padding: 40px ;
-}
 
-.sale-gradient-box {
-    background: linear-gradient(90deg, #4495d7 0%, #85e5f1 100%);
-    border-radius: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 40px 30px;
-    color: white;
-}
-
-.banner-content h3 {
-    font-size: 15px;
-    margin-bottom: 5px;
-}
-
-.redeem-btn {
-    background-color: #000;
-    color: #fff;
-    border: none;
-    padding: 15px 25px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 12px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.redeem-btn:hover {
-    transform: scale(1.05);
-}
 /* Section Heading */
 .section-title {
     font-size: 1.8rem;
@@ -321,12 +288,22 @@
   align-items: center !important;
   gap: 20px !important;
 }
-
 .search-form {
     display: flex;
     align-items: center;
 }
 
+.search-input-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Wrapper around the input and clear button */
+.search-box-wrapper {
+    position: relative;
+    display: inline-block;
+}
 
 .search-input {
     width: 0; /* Starts hidden */
@@ -341,20 +318,14 @@
 .search-input.visible {
     width: 150px; 
     opacity: 1;
-    padding:  10px;
+    padding: 10px 32px 10px 10px; /* Right padding leaves space so text doesn't hide under the × button */
     border: 1px solid black;
     border-radius: 12px;
 }
 
-.search-input-container {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-/* When the user clicks into the box, it expands */
+/* When the user clicks into the box, it expands further */
 .search-input:focus {
-    width: 250px; /* Expanded width */
+    width: 250px; 
 }
 
 .search-submit-btn {
@@ -363,27 +334,45 @@
     cursor: pointer;
     display: flex;
     align-items: center;
+    transition: opacity 0.3s ease, width 0.3s ease;
+}
+
+/* Completely hides the search icon when the input is open */
+.search-submit-btn.hidden {
+    opacity: 0;
+    width: 0;
+    pointer-events: none;
+    overflow: hidden;
+    margin: 0;
 }
 
 .search-submit-btn img {
-    width: 18px; /* Standardize icon size */
+    width: 18px;
     height: 18px;
 }
 
+/* Positioned directly inside the right side of the input field */
 .clear-search-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     text-decoration: none;
     color: #666;
     font-size: 1.2rem;
     font-weight: bold;
-    margin-left: 5px;
     cursor: pointer;
+    z-index: 3;
+    line-height: 1;
 }
 
-
-.nav-icons:hover{
-  transform: scale(1.08);
+.clear-search-btn:hover {
+    color: #000;
 }
 
+.nav-icons:hover {
+    transform: scale(1.08);
+}
 
 .navbar {
     display: flex;

@@ -1,4 +1,3 @@
-
 <div class="customers-page">
     <div class="table-card">
         <header class="card-header">
@@ -6,22 +5,24 @@
         </header>
 
         <main class="form-wrapper" style="padding: 20px;">
-            <form action="/admin/brands/add" method="POST" id="brandForm">
-  
-                <div class="form-group">
-                    <label>Brand Name</label>
-                    <input type="text" name="name" class="form-control" >
+            <form action="/admin/brands/add" method="POST" id="brandForm" novalidate>
+ 
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">Brand Name</label>
+                    <input type="text" name="name" id="brandName" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    <small id="error-name" style="color: #ef4444; font-size: 12px; display: none; margin-top: 4px;"></small>
                 </div>
 
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" class="form-control"></textarea>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">Description</label>
+                    <textarea name="description" id="brandDescription" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; min-height: 100px;"></textarea>
+                    <small id="error-description" style="color: #ef4444; font-size: 12px; display: none; margin-top: 4px;"></small>
                 </div>
 
-                <div class="form-group">
-                    <label>Brand Logo</label>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">Brand Logo</label>
                     <div class="image-preview-container" id="previewContainer" style="margin-bottom: 10px;">
-                        <img id="imagePreview" src="" style="max-width: 200px; border: 1px solid #ddd; display: none;">
+                        <img id="imagePreview" style="max-width: 200px; border: 1px solid #ddd; display: none;">
                         <button type="button" id="removeImageBtn" class="btn btn-danger" 
                                 style="margin-top: 5px; color: red; background: none; border: none; cursor: pointer; display: none;">
                             Remove Image
@@ -29,6 +30,7 @@
                     </div>
                     <input type="file" id="imageInput" accept="image/*" class="form-control">
                     <input type="hidden" name="croppedImage" id="croppedImageData">
+                    <small id="error-image" style="color: #ef4444; font-size: 12px; display: none; margin-top: 4px;"></small>
                 </div>
 
                 <div class="form-actions" style="margin-top: 20px;">
@@ -42,15 +44,17 @@
     </div>
 </div>
 
+<!-- Cropper Modal -->
 <div id="cropperModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; overflow-y:auto;">
     <div style="background: white; width: 90%; max-width: 600px; margin: 50px auto; padding: 20px; border-radius: 8px;">
-        <img id="cropperImage" style="max-width: 100%;">
-        <button type="button" id="cropSaveBtn" class="btn btn-primary" style="width: 100%; padding: 10px; margin-top: 15px; background: #0f172a; color: white; border: none; cursor: pointer;">Crop & Save</button>
+        <div style="max-height: 400px; overflow: hidden;">
+            <img id="cropperImage" style="max-width: 100%;">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button type="button" id="cropSaveBtn" class="btn btn-primary" style="flex: 1; padding: 10px; background: #0f172a; color: white; border: none; border-radius: 4px; cursor: pointer;">Crop & Save</button>
+            <button type="button" id="cropCancelBtn" class="btn btn-secondary" style="flex: 1; padding: 10px; background: #e2e8f0; color: #334155; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+        </div>
     </div>
-</div>
-
-<div id="toastMessage" style="display:none; position:fixed; bottom: 20px; right: 20px; background: #ef4444; color: white; padding: 12px 24px; border-radius: 6px; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <span id="toastText"></span>
 </div>
 
 <script>
@@ -60,22 +64,33 @@
     const imagePreview = document.getElementById('imagePreview');
     const croppedImageData = document.getElementById('croppedImageData');
     const removeImageBtn = document.getElementById('removeImageBtn');
+    const brandForm = document.getElementById('brandForm');
     let cropper;
 
-    function showToast(message, isError = true) {
-        const toast = document.getElementById('toastMessage');
-        const toastText = document.getElementById('toastText');
-        toastText.innerText = message;
-        toast.style.backgroundColor = isError ? '#ef4444' : '#22c55e';
-        toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    function clearErrors() {
+        ['name', 'description', 'image'].forEach(field => {
+            const errorElement = document.getElementById(`error-${field}`);
+            errorElement.innerText = '';
+            errorElement.style.display = 'none';
+            const inputField = document.getElementById(field === 'image' ? 'imageInput' : `brand${field.charAt(0).toUpperCase() + field.slice(1)}`);
+            if (inputField) inputField.style.borderColor = '#cbd5e1';
+        });
+    }
+
+    function showFieldError(field, message) {
+        const errorElement = document.getElementById(`error-${field}`);
+        errorElement.innerText = message;
+        errorElement.style.display = 'block';
+        
+        const inputField = document.getElementById(field === 'image' ? 'imageInput' : `brand${field.charAt(0).toUpperCase() + field.slice(1)}`);
+        if (inputField) inputField.style.borderColor = '#ef4444';
     }
 
     imageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-            showToast("Please select a valid image (JPEG, PNG, or WEBP)");
+            showFieldError('image', "Please select a valid image (JPEG, PNG, or WEBP)");
             imageInput.value = '';
             return;
         }
@@ -90,6 +105,7 @@
     });
 
     document.getElementById('cropSaveBtn').addEventListener('click', () => {
+        if (!cropper) return;
         const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
         const dataURL = canvas.toDataURL('image/jpeg');
         imagePreview.src = dataURL;
@@ -97,7 +113,22 @@
         croppedImageData.value = dataURL;
         removeImageBtn.style.display = 'block';
         modal.style.display = 'none';
+        
+        const errorElement = document.getElementById('error-image');
+        errorElement.style.display = 'none';
+        imageInput.style.borderColor = '#cbd5e1';
+
         cropper.destroy();
+        cropper = null;
+    });
+
+    document.getElementById('cropCancelBtn').addEventListener('click', () => {
+        modal.style.display = 'none';
+        imageInput.value = '';
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
     });
 
     removeImageBtn.addEventListener('click', () => {
@@ -107,4 +138,43 @@
         imageInput.value = '';
         croppedImageData.value = '';
     });
+
+    brandForm.addEventListener('submit', (e) => {
+    clearErrors();
+    let isValid = true;
+
+    const brandName = document.getElementById('brandName').value.trim();
+    const description = document.getElementById('brandDescription').value.trim();
+    const croppedImage = croppedImageData.value;
+
+    const nameRegex = /^[A-Za-z\s]+$/;
+
+    if (!brandName) {
+        showFieldError('name', "Brand name cannot be empty.");
+        isValid = false;
+    } else if (!nameRegex.test(brandName)) {
+        showFieldError('name', "Brand name must contain only letters.");
+        isValid = false;
+    } else if (brandName.length > 50) {
+        showFieldError('name', "Brand name cannot exceed 50 characters.");
+        isValid = false;
+    }
+
+    if (!description) {
+        showFieldError('description', "Description cannot be empty.");
+        isValid = false;
+    } else if (description.length > 300) {
+        showFieldError('description', "Description cannot exceed 300 characters.");
+        isValid = false;
+    }
+
+    if (!croppedImage) {
+        showFieldError('image', "Please upload and crop a brand logo.");
+        isValid = false;
+    }
+
+    if (!isValid) {
+        e.preventDefault();
+    }
+});
 </script>

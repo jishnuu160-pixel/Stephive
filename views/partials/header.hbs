@@ -1,31 +1,33 @@
 <header class="navbar">
-   <div class="logo">StepHyve</div>
+    <div class="logo">StepHyve</div>
     <nav class="nav-links" id="mainNavLinks">
         <a href="/">Home</a>
         <a href="/shop">Shop</a>
         <a href="/user/about">About</a>
     </nav>
     <div class="icons">
-<form action="/shop" method="GET" class="search-form">
-    <div class="search-input-container">
-        <button type="button" class="search-submit-btn" onclick="toggleSearch()">
-            <img src="/icons/search (2).png" alt="Search">
-        </button>
+        <form action="/shop" method="GET" class="search-form">
+            <div class="search-input-container">
+                <button type="button" class="search-submit-btn" onclick="toggleSearch()">
+                    <img src="/icons/search (2).png" alt="Search">
+                </button>
 
-        <input 
-            type="text" 
-            name="search" 
-            placeholder="Search..." 
-            value="{{searchValue}}"
-            class="search-input hidden"
-            id="headerSearchInput"
-        >
-        
-        {{#if searchValue}}
-            <a href="/shop" class="clear-search-btn">&times;</a>
-        {{/if}}
-    </div>
-</form>
+                <div class="search-box-wrapper">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="Search..." 
+                        value="{{searchValue}}"
+                        class="search-input hidden"
+                        id="headerSearchInput"
+                    >
+                    
+                    {{#if searchValue}}
+                        <a href="/shop" class="clear-search-btn">&times;</a>
+                    {{/if}}
+                </div>
+            </div>
+        </form>
 
         {{#if user}}
             <a href="/wishlist" class="wishlist-anchor-wrapper" style="position: relative; display: inline-block;">
@@ -76,6 +78,14 @@ document.addEventListener("DOMContentLoaded", function () {
             link.classList.add("active-nav-link");
         }
     });
+
+    const searchInput = document.getElementById('headerSearchInput');
+    const submitBtn = document.querySelector(".search-submit-btn");
+
+    if (searchInput && searchInput.value.trim() !== "") {
+        searchInput.classList.add('visible');
+        if (submitBtn) submitBtn.classList.add('hidden');
+    }
 });
 
 async function updateQuantity(productId, newQty, size = "M", variantId = null) {
@@ -131,29 +141,17 @@ window.updateGlobalWishlistCount = function(newCount) {
     }
 };
 
-
 function toggleSearch() {
     const input = document.getElementById('headerSearchInput');
+    const submitBtn = document.querySelector(".search-submit-btn");
+
     input.classList.toggle('visible');
+    if (submitBtn) {
+        submitBtn.classList.toggle('hidden');
+    }
+
     if (input.classList.contains('visible')) {
         input.focus();
     }
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-    
-    const searchInput = document.getElementById('headerSearchInput');
-    if (searchInput && searchInput.value.trim() !== "") {
-        searchInput.classList.add('visible');
-    }
-
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll("#mainNavLinks a");
-    navLinks.forEach(link => {
-        if (currentPath === link.getAttribute("href")) {
-            link.classList.add("active-nav-link");
-        }
-    });
-});
-
 </script>

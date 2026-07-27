@@ -501,3 +501,35 @@
 .timeline-item.completed::before {
     background-color: #fbbf24;
 }
+
+.no-orders {
+    width: 100%;
+    min-height: 300px;
+    border: 1px dashed #d1d5db;
+    border-radius: 10px;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+}
+
+.no-orders h3 {
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.no-orders p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.shop-btn {
+    padding: 10px 20px;
+    background: #000;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+}

@@ -248,3 +248,54 @@ export const findTopProducts = async () => {
         }
     ]);
 };
+
+export const getBestSellers = async () => {
+    return await Order.aggregate([
+        { 
+            $match: { 
+                status: { $nin: ['Cancelled', 'cancelled', 'returned', 'Returned'] } 
+            } 
+        },
+        { $unwind: '$items' },
+        { 
+            $group: {
+                _id: '$items.productId',
+                totalQuantity: { $sum: '$items.quantity' }
+            } 
+        },
+        { $sort: { totalQuantity: -1 } },
+        { $limit: 10 },
+        {
+            $lookup: {
+                from: 'products',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'productDoc'
+            }
+        },
+        { $unwind: '$productDoc' },
+        {
+            $match: {
+                'productDoc.isListed': true,
+                'productDoc.isBlocked': { $ne: true }
+            }
+        },
+        {
+            $lookup: {
+                from: 'categories',
+                localField: 'productDoc.Category',
+                foreignField: '_id',
+                as: 'productDoc.Category'
+            }
+        },
+        {
+            $unwind: {
+                path: '$productDoc.Category',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $replaceRoot: { newRoot: '$productDoc' }
+        }
+    ]);
+};

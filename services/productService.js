@@ -158,10 +158,38 @@ export const getShopProducts = async (req) => {
     }
 };
 
-
-
-
 export const getBestSellers = async () => {
+    try {
+        const bestSellersRaw = await productRepo.getBestSellers(); 
+        
+        return bestSellersRaw.map(product => {
+            let productLevelDiscount = product.discountPercentage || 0;
+            if (product.offer && product.offer.isActive) {
+                const subDocDiscount = Number(product.offer.discountValue) || 0;
+                if (subDocDiscount > productLevelDiscount) productLevelDiscount = subDocDiscount;
+            }
+
+            const regularPrice = product.regularPrice || 0;
+            const salePrice = productLevelDiscount > 0 
+                ? Math.round(regularPrice * (1 - productLevelDiscount / 100)) 
+                : regularPrice;
+
+            return {
+                ...product,
+                effectiveDiscount: productLevelDiscount,
+                regularPrice,
+                salePrice,
+                hasOffer: productLevelDiscount > 0
+            };
+        });
+    } catch (error) {
+        console.error("Error fetching best sellers in service:", error);
+        return [];
+    }
+};
+
+
+export const getLatestSellers = async () => {
     try {
         return await productRepo.findProducts({ isListed: true }, { createdAt: -1 }, 0, 4);
     } catch (error) {
@@ -438,10 +466,13 @@ pagination: {
 
 export const getAddProductPage = async () => {
     const parentCategories = await findParentCategories();
+    const brands = await productRepo.distinctBrands(); 
+
     return {
         isAdmin: true,
         activePage: 'products',
-        parentCategories
+        parentCategories,
+        brands 
     };
 };
 
@@ -450,6 +481,7 @@ export const getEditProductPage = async (productId) => {
     if (!product) throw new Error("Product not found");
 
     const parentCategories = await findParentCategories();
+    const brands = await productRepo.distinctBrands();
     const selectedParentId = product.Category?.parentCategory?._id || product.Category?.parentCategory;
 
     const subcategories = selectedParentId
@@ -460,7 +492,8 @@ export const getEditProductPage = async (productId) => {
         product,
         parentCategories,
         subcategories, 
-        selectedParentId
+        selectedParentId,
+        brands
     };
 };
 

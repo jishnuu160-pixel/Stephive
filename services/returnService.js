@@ -63,3 +63,40 @@ export const checkIfReturnExists = async (orderIdString) => {
     return !!existing;
 };
 
+export const getAllReturnsPaginated = async (page = 1, limit = 10, searchQuery = '') => {
+    const pageNumber = parseInt(page, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 10;
+    const skip = (pageNumber - 1) * limitNumber;
+
+    let query = {};
+    if (searchQuery && searchQuery.trim() !== '') {
+        const regex = new RegExp(searchQuery.trim(), 'i');
+        query = {
+            $or: [
+                { returnId: regex },
+                { orderId: regex },
+                { productName: regex },
+                { reason: regex }
+            ]
+        };
+    }
+
+    const { returns, totalReturns } = await ReturnRepo.findAllReturns(skip, limitNumber, query);
+    const totalPages = Math.ceil(totalReturns / limitNumber) || 1;
+
+    return {
+        returns,
+        searchQuery,
+        startIndex: skip,
+        pagination: {
+            page: pageNumber,
+            limit: limitNumber,
+            totalPages: totalPages,
+            totalReturns: totalReturns,
+            hasPrevPage: pageNumber > 1,
+            hasNextPage: pageNumber < totalPages,
+            prevPage: pageNumber - 1,
+            nextPage: pageNumber + 1
+        }
+    };
+};

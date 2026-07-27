@@ -12,7 +12,6 @@ import {
     updateOrderStatus,
     adminLogout, 
     getOrderDetails,
-    getAllReturns,
      updateReturnStatus,
      getChartData,
      getTopProductsApi,
@@ -37,7 +36,7 @@ import {
 } from '../controllers/categoryController.js';
 
 import {getEditBrandPage,updateBrand,getAddBrandPage,postAddBrand,getTopSellingBrands} from '../controllers/brandController.js';
-import {getReturnDetails} from '../controllers/returnController.js';
+import {getReturnDetails,getAllReturns} from '../controllers/returnController.js';
 import brandRoutes from './brandRoutes.js'
 
 import {deleteCategoryOffer, deleteProductOffer, loadOffersPage, processCategoryOffer, processProductOffer} from '../controllers/offerController.js';

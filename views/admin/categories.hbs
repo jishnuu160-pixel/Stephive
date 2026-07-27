@@ -40,7 +40,11 @@
                     <td>{{this.description}}</td>
                     <td style="color: rgb(45, 42, 42); font-weight: 700;">{{this.parentCategory.name}}</td>
                     <td>
-                        {{#if this.isListed}}Listed{{else}}Unlisted{{/if}}
+                        {{#if this.isListed}}
+                                    <span class="status-badge status-listed">Listed</span>
+                                {{else}}
+                                    <span class="status-badge status-unlisted">Unlisted</span>
+                        {{/if}}
                     </td>
                     <td>
                         <div style="display: flex; gap: 8px; text-decoration: none;">
@@ -83,7 +87,7 @@
 <div id="addCategoryModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
-            <h4 class="modal-title">add Category</h4>
+            <h4 class="modal-title">Add Category</h4>
             <button type="button" class="modal-close-btn" onclick="closeCategoryModal()">&times;</button>
         </div>
         <form id="addCategoryForm" onsubmit="submitForm(event, '/admin/categories/add', 'addErrorContainer')">
@@ -97,26 +101,27 @@
                 
                 <div class="form-group">
                     <label class="form-label">Description</label>
-                    <input type="text" name="description" placeholder="Footwear of athletic activities" class="form-input">
+                    <input type="text" name="description" placeholder="Footwear for athletic activities" class="form-input">
                 </div>
 
                 <div class="form-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" id="isParentCheckboxAdd" onchange="toggleParentField(this.checked, 'parentCategoryWrapperAdd', 'addParentSelect')">
+                        <!-- Added 'checked' attribute here -->
+                        <input type="checkbox" id="isParentCheckboxAdd" checked onchange="toggleParentField(this.checked, 'parentCategoryWrapperAdd', 'addParentSelect')">
                         <span class="checkbox-text">Set as Parent Category</span>
                     </label>
                 </div>
 
-                <div id="parentCategoryWrapperAdd" class="parent-wrapper-add">
+                <!-- Added style="display: none;" so it's hidden initially when checked -->
+                <div id="parentCategoryWrapperAdd" class="parent-wrapper-add" style="display: none;">
                     <div class="parent-inner-grid">
                         <div class="form-group">
-                            <label class="form-label">parent category</label>
-                            <select id="addParentSelect" name="parentCategory" class="form-select cursor-pointer">
-                                 <option value="">None (Main Parent)</option>
-                                 {{#each @root.parentCategories}}
-                                    <option value="{{this._id}}">{{this.name}}</option>
-                                 {{/each}}
-                            </select>
+                            <label class="form-label">Parent Category</label>
+                           <select id="addParentSelect" name="parentCategory" class="form-select cursor-pointer">
+                             {{#each @root.parentCategories}}
+                              <option value="{{this._id}}">{{this.name}}</option>
+                             {{/each}}
+                           </select>
                         </div>
                     </div>
                 </div>
@@ -124,7 +129,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" onclick="closeCategoryModal()">Cancel</button>
-                <button type="submit" class="btn-submit-add">save changes</button>
+                <button type="submit" class="btn-submit-add">Save Changes</button>
             </div>
         </form>
     </div>
@@ -143,12 +148,12 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Category Name</label>
-                    <input type="text" id="editCategoryName" name="categoryName" class="form-input">
+                    <input type="text" id="editCategoryName" name="categoryName" placeholder="e.g., Running, Casual, Boots" class="form-input">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Description</label>
-                    <input type="text" id="editDescription" name="description" class="form-input">
+                    <input type="text" id="editDescription" name="description" placeholder="Footwear for athletic activities" class="form-input">
                 </div>
                 
                 <div class="form-group">
@@ -158,18 +163,16 @@
                     </label>
                 </div>
 
-                <div id="parentCategoryWrapper" class="parent-wrapper">
-                    <div class="form-group">
-                        <label class="form-label">Parent Category</label>
-                        <select id="editParentCategory" name="parentCategory" class="form-select">
-                             <option value="">None (Main Parent)</option>
-                             {{#each @root.parentCategories}}
-                                <option value="{{this._id}}">{{this.name}}</option>
-                             {{/each}}
-                        </select>
-                    </div>
-                </div>
-                </div>
+               <div id="parentCategoryWrapper" class="parent-wrapper">
+               <div class="form-group">
+                  <label class="form-label">Parent Category</label>
+                <select id="editParentCategory" name="parentCategory" class="form-select">
+                {{#each @root.parentCategories}}
+                <option value="{{this._id}}">{{this.name}}</option>
+                {{/each}}
+                </select>
+              </div>
+             </div>
             </div>
 
             <div class="modal-footer">
@@ -230,7 +233,7 @@
     }
 
     // --- 3. DYNAMIC UI LOGIC ---
-    function openEditModal(event, id, name, description, parentId, childCat, discount) {
+   function openEditModal(event, id, name, description, parentId, childCat, discount) {
         if (event) event.stopPropagation();
         
         const form = document.getElementById('editCategoryForm');
@@ -238,7 +241,6 @@
         
         document.getElementById('editCategoryName').value = name !== 'undefined' ? name : '';
         document.getElementById('editDescription').value = description !== 'undefined' ? description : '';
-        document.getElementById('editDiscountValue').value = (discount && discount !== "undefined" && discount !== "null") ? discount : "";
 
         const isMainParent = (!parentId || parentId === "undefined" || parentId === "null" || parentId === "");
         

@@ -25,34 +25,80 @@ if (loginForm) {
 
 if (signupForm) {
     signupForm.addEventListener("submit", (e) => {
+        let isValid = true;
+
+        document.querySelectorAll('.field-error').forEach(el => {
+            el.style.display = 'none';
+            el.innerText = '';
+        });
+
         const name = document.getElementById("fullName")?.value.trim();
         const email = document.getElementById("email")?.value.trim();
         const phone = document.getElementById("phoneNumber")?.value.trim();
         const password = document.getElementById("password")?.value;
         const confirmPass = document.getElementById("confirmPassword")?.value;
 
-        if (!name || !email || !phone || !password || !confirmPass) {
-            e.preventDefault();
-            if (jsErrorBox) {
-                jsErrorBox.innerText = "Please fill required fields!";
-                jsErrorBox.style.display = "block"; 
+        if (!name && !email && !phone && !password && !confirmPass) {
+    e.preventDefault();
 
-                setTimeout(() => {
-                    jsErrorBox.style.display = "none";
-                }, 3000);
-            }
+    jsErrorBox.innerText = "All fields are required!";
+    jsErrorBox.style.display = "block";
+
+    setTimeout(() => {
+        jsErrorBox.style.display = "none";
+    }, 3000);
+
+    return;
+}
+
+        const nameRegex = /^[A-Za-z ]{3,50}$/;
+       if (!name) {
+         showFieldError("fullNameError", "Full Name is required.");
+         isValid = false;
+       } else if (name.length < 3) {
+         showFieldError("fullNameError", "Full Name must be at least 3 characters.");
+         isValid = false;
+       } else if (!nameRegex.test(name)) {
+         showFieldError("fullNameError", "Only letters and spaces are allowed.");
+         isValid = false;
+      } 
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            showFieldError("emailError", "Email address is required.");
+            isValid = false;
+        } else if (!emailRegex.test(email)) {
+            showFieldError("emailError", "Please enter a valid email address.");
+            isValid = false;
         }
 
-         if (password !== confirmPass) {
-            e.preventDefault();
-            if (jsErrorBox) {
-                jsErrorBox.innerText = "Passwords doesn't match";
-                jsErrorBox.style.display = "block"; 
+        const phoneRegex = /^\d{11,12}$/;
+        if (!phone) {
+            showFieldError("phoneError", "Phone number is required.");
+            isValid = false;
+        } else if (!phoneRegex.test(phone)) {
+            showFieldError("phoneError", "Phone number must be exactly 11 or 12 digits.");
+            isValid = false;
+        }
 
-                setTimeout(() => {
-                    jsErrorBox.style.display = "none";
-                }, 3000);
-            }
+        if (!password) {
+            showFieldError("passwordError", "Password is required.");
+            isValid = false;
+        } else if (password.length < 6) {
+            showFieldError("passwordError", "Password must be at least 6 characters long.");
+            isValid = false;
+        }
+
+        if (!confirmPass) {
+            showFieldError("confirmPasswordError", "Please confirm your password.");
+            isValid = false;
+        } else if (password !== confirmPass) {
+            showFieldError("confirmPasswordError", "Passwords do not match.");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
         }
     });
 }
@@ -168,3 +214,16 @@ function showError(message) {
     }
 }
 });
+
+function showFieldError(id, message) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.innerText = message;
+        element.style.display = "block";
+
+        setTimeout(() => {
+            element.style.display = "none";
+        }, 3000);
+    }
+}

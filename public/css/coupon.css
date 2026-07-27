@@ -53,3 +53,11 @@ input:checked + .slider:before { transform: translateX(26px); }
 .font-coupon{
         font-size: 12px;
 }
+
+.error {
+    display: block;
+    margin-top: 5px;
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: 500;
+}

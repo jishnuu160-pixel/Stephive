@@ -82,9 +82,12 @@
                     <td>{{this.displayStock}}</td>
 
                     <td>
-                        <span class="badge {{#if this.isListed}}bg-success{{else}}bg-danger{{/if}}">
-                            {{#if this.isListed}}Listed{{else}}Unlisted{{/if}}
-                        </span>
+           
+                             {{#if this.isListed}}
+                                    <span class="status-badge status-listed">Listed</span>
+                                {{else}}
+                                    <span class="status-badge status-unlisted">Unlisted</span>
+                                {{/if}}
                     </td>
                     <td>
                         <div style="display: flex; gap: 8px;">

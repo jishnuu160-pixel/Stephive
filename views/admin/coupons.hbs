@@ -62,11 +62,17 @@
     </div>
 </td>
             </tr>
+            {{else}}
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 30px; color: #666;">
+                    No coupons found matching your search.
+                </td>
+            </tr>
             {{/each}}
             </tbody>
         </table>
     </div>
-
+    {{#if hasCoupons}}
     <div class="pagination">
    {{#if hasPrevPage}}
     <a href="/admin/coupons?page={{prevPage}}&search={{search}}" class="page-link">« Prev</a>
@@ -78,8 +84,10 @@
     <a href="/admin/coupons?page={{nextPage}}&search={{search}}"  class="page-link">Next »</a>
    {{/if}}
 </div>
+{{/if}}
 </div>
 </div>
+
 
 <script>
 function confirmToggle(button, name, isCurrentlyInactive) {

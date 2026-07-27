@@ -45,15 +45,16 @@
                         <span class="cart-error-badge">PRODUCT UNAVAILABLE</span>
                     {{/if}}
 
-                    <div class="item-pricing-row">
-                        <span class="item-price" data-base-price="{{this.price}}">₹{{this.price}}</span>
-                        
-                    <div class="quantity-selector">
-                    <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
-                    <span class="qty-val" data-max="{{this.availableStock}}">{{this.quantity}}</span>
-                    <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
-                   </div>
-                 </div>
+                   <div class="item-pricing-row">
+    <!-- Changed from {{this.price}} to {{this.currentPrice}} -->
+    <span class="item-price" data-base-price="{{this.currentPrice}}">₹{{this.currentPrice}}</span>
+    
+    <div class="quantity-selector">
+        <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
+        <span class="qty-val" data-max="{{this.availableStock}}">{{this.quantity}}</span>
+        <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
+    </div>
+</div>
                 </div>
                 
                 <div class="item-actions-subtotal">

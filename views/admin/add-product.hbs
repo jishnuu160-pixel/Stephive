@@ -15,11 +15,18 @@
                     <small class="field-error"></small>
                 </div>
 
+               <div class="form-row split-row4">
                 <div class="form-group">
-                    <label>Brand</label>
-                    <input type="text" name="brand" placeholder="Curv">
-                    <small class="field-error"></small>
-                </div>
+                 <label>Brand</label>
+                  <select name="brand" class="form-control">
+                   <option value="" disabled selected>Select Brand</option>
+                   {{#each brands}}
+                  <option value="{{this}}">{{this}}</option>
+                   {{/each}}
+                   </select>
+                   <small class="field-error"></small>
+               </div>
+               </div>
 
                 <div class="form-group">
                     <label>Base Price</label>

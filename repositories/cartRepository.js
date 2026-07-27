@@ -17,12 +17,26 @@ export const createCart = async (cartData) => {
     return await Cart.create(cartData); 
 };
 
+
 export const updateCart = async (userId, updatedData) => {
+    const id = typeof userId === 'string' ? new mongoose.Types.ObjectId(userId) : userId;
+
+    let itemsPayload = updatedData;
+    
+    if (Array.isArray(updatedData)) {
+        itemsPayload = updatedData;
+    } else if (updatedData && Array.isArray(updatedData.items)) {
+        itemsPayload = updatedData.items;
+    } else {
+        itemsPayload = [];
+    }
+
+    const sanitizedItems = itemsPayload.filter(item => item !== null && item !== undefined);
+
     return await Cart.findOneAndUpdate(
-        { userId },
-        { $set: updatedData }, 
+        { userId: id },
+        { $set: { items: sanitizedItems } }, 
         { 
-            new: true, 
             upsert: true, 
             returnDocument: 'after' 
         }
@@ -33,3 +47,4 @@ export const updateCart = async (userId, updatedData) => {
     })
     .lean(); 
 };
+

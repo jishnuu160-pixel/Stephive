@@ -20,12 +20,20 @@ export const findReturnById = async (id) => {
     return await Return.findOne({ returnId: id }).populate('productId');
 };
 
-export const findAllReturns = async () => {
-    return await Return.find()
+export const findAllReturns = async (skip, limit, query = {}) => {
+    const returns = await Return.find(query)
         .populate('userId', 'fullName email')
-        .populate('orderId', 'orderId')
         .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean(); 
+
+    const totalReturns = await Return.countDocuments(query);
+
+    return {
+        returns,
+        totalReturns
+    };
 };
 
 

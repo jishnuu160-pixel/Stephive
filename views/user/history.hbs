@@ -51,32 +51,37 @@
          </div>
            </div>
               </div>
+              {{else}}
+
+<div class="no-orders">
+    <h3>No Orders Yet</h3>
+    <p>You haven't placed any orders yet.</p>
+    <a href="/shop" class="shop-btn">Start Shopping</a>
+</div>
                 {{/each}}
             </main>
         </div>
+{{#if hasOrders}}
 <nav class="pagination-container" aria-label="Order history navigation">
-        
-        {{#if hasPrevPage}}
-           
-                <a href="/history?page={{prevPage}}&sort={{currentSort}}&search={{searchQuery}}" class="page-btn">
-                    « Previous
-                </a>
-      
-        {{/if}}
 
-      
-            <span class="current-page">Page {{currentPage}} of {{totalPages}}</span>
-  
+    {{#if hasPrevPage}}
+        <a href="/history?page={{prevPage}}&sort={{currentSort}}&search={{searchQuery}}" class="page-btn">
+            « Previous
+        </a>
+    {{/if}}
 
-        {{#if hasNextPage}}
-           
-                <a href="/history?page={{nextPage}}&sort={{currentSort}}&search={{searchQuery}}" class="page-btn">
-                    Next »
-                </a>
-            
-        {{/if}}
+    <span class="current-page">
+        Page {{currentPage}} of {{totalPages}}
+    </span>
+
+    {{#if hasNextPage}}
+        <a href="/history?page={{nextPage}}&sort={{currentSort}}&search={{searchQuery}}" class="page-btn">
+            Next »
+        </a>
+    {{/if}}
 
 </nav>
+{{/if}}
     </div> 
     </div>
 </div>

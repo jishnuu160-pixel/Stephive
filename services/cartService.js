@@ -2,9 +2,16 @@ import * as cartRepo from '../repositories/cartRepository.js';
 import * as productRepo from '../repositories/productRepository.js';
 
 const calculateCartTotals = (items) => {
+    const totalUnitsCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
     
-    const totalUnitsCount =items.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = items.reduce((sum, item) => {
+        const priceToUse = Number(item.currentPrice) !== undefined && !isNaN(Number(item.currentPrice)) 
+            ? Number(item.currentPrice) 
+            : (Number(item.price) || 0);
+            
+        return sum + (priceToUse * (Number(item.quantity) || 0));
+    }, 0);
+
     const taxEstimate = Math.floor(subtotal * 0.1);
     const totalAmount = subtotal + taxEstimate;
     
@@ -21,7 +28,8 @@ export const getCartPageData = async (userId, page) => {
     if (!cart) return { cart: { items: [] }, totalUnitsCount: 0, subtotal: 0, totalAmount: 0, hasCheckoutRestrictions: false };
 
     let hasCheckoutRestrictions = false;
- 
+    let cartModified = false;
+    let adjustmentNotice = null;
 
     cart.items = cart.items.map(item => {
         let isOutOfStock = false;
@@ -29,17 +37,33 @@ export const getCartPageData = async (userId, page) => {
         let isUnlisted = false;
         let availableStock = 0; 
         let sizeDetails = null; 
-
+        
+        let currentPrice = Number(item.price) || 0;
         const productDoc = item.productId; 
+
         if (productDoc) {
             isUnlisted = productDoc.isListed === false;
-            const targetVariant = productDoc.variants?.find(v => v._id.toString() === item.variantId?.toString());
             
+            currentPrice = Number(
+                productDoc.salePrice ?? 
+                productDoc.regularPrice ?? 
+                productDoc.price ?? 
+                item.price ?? 
+                0
+            );
+
+            const targetVariant = productDoc.variants?.find(v => v._id.toString() === item.variantId?.toString());
             sizeDetails = targetVariant?.sizes?.find(s => s.size.toString() === item.size.toString());
 
             if (sizeDetails) {
                 availableStock = sizeDetails.stock;
                 isOutOfStock = availableStock <= 0;
+
+                if (item.quantity > availableStock && availableStock > 0) {
+                    item.quantity = availableStock; 
+                    cartModified = true;
+                }
+
                 hasInsufficientStock = item.quantity > availableStock;
             } else {
                 isOutOfStock = true; 
@@ -50,11 +74,11 @@ export const getCartPageData = async (userId, page) => {
 
         if (hasInsufficientStock || isOutOfStock || isUnlisted) hasCheckoutRestrictions = true;
         
-        const itemSubtotal = item.quantity * item.price;
+        const itemSubtotal = item.quantity * currentPrice;
         
         return { 
             ...item, 
-           
+            currentPrice, 
             itemSubtotal, 
             isOutOfStock, 
             hasInsufficientStock, 
@@ -63,22 +87,44 @@ export const getCartPageData = async (userId, page) => {
         };
     }).reverse();
 
-    const totals = calculateCartTotals(cart.items);
+    if (cartModified) {
+        const itemsToSave = cart.items
+            .filter(i => i && i.productId)
+            .map(i => ({
+                productId: i.productId._id || i.productId,
+                variantId: i.variantId,
+                size: i.size,
+                quantity: Number(i.quantity) || 1,
+                price: Number(i.currentPrice || i.price) || 0
+            }));
+
+        await cartRepo.updateCart(userId, { items: itemsToSave });
+        adjustmentNotice = "Some item quantities in your cart were automatically adjusted due to limited stock availability.";
+    }
+
+    const validCartItemsForTotals = cart.items.filter(item => 
+        !item.isOutOfStock && !item.hasInsufficientStock && !item.isUnlisted
+    );
+
+    hasCheckoutRestrictions = (cart.items.length === 0 || validCartItemsForTotals.length === 0);
+
+    const totals = calculateCartTotals(validCartItemsForTotals);
     const limit = 4;
     const skip = (page - 1) * limit;
     const totalPages = Math.ceil(cart.items.length / limit);
     const paginatedItems = cart.items.slice(skip, skip + limit);
 
     return { 
-        cart: { ...cart, subtotal: totals.subtotal, totalAmount:totals.totalAmount, taxEstimate: totals.taxEstimate,items:paginatedItems},
+        cart: { ...cart, subtotal: totals.subtotal, totalAmount: totals.totalAmount, taxEstimate: totals.taxEstimate, items: paginatedItems },
         totalUnitsCount: totals.totalUnitsCount,
         hasCheckoutRestrictions,
-        currentPage:page,
+        adjustmentNotice,
+        currentPage: page,
         totalPages,
-        hasPrevPage:page>1,
-        hasNextPage:page<totalPages
+        hasPrevPage: page > 1,
+        hasNextPage: page < totalPages
     };
-};
+};    
 
 export const addToCart = async (userId, itemData) => {
     const product = await productRepo.findProductById(itemData.productId);

@@ -9,6 +9,10 @@ export const findByPhone = async (phoneNumber) => {
     return await User.findOne({ phoneNumber: phoneNumber }).lean();
 };
 
+export const findByEmailWithPassword = async (email) => {
+    return await User.findOne({ email }).select('+password');
+};
+
 
 export const createUser = async (data) => {
     try {

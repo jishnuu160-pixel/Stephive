@@ -6,6 +6,7 @@ import nodemailer from 'nodemailer';
 import { generateReferralCode } from '../utils/idGenerator.js';
 
 
+
 export const signup = async (data) => {
     const existingUser = await userRepo.findByEmail(data.email);
     if (existingUser) {
@@ -94,11 +95,12 @@ export const login = async (data) => {
     return user;
 };
 
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'stephive3@gmail.com', 
-        pass: 'cyit nike essc orls'  
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS
     }
 });
 
@@ -115,6 +117,7 @@ export const sendOTP = async (email) => {
     console.log(`\n=========================================`);
     console.log(` OTP for ${email} is [ ${otp} ]`);
     console.log(`=========================================\n`);
+    // ------------------------------------------
 
     const mailOptions = {
         from: '"StepHive Support" <stephive3@gmail.com>',
@@ -150,6 +153,39 @@ export const sendOTP = async (email) => {
     return otp; 
 };
 
+export const sendSignupOTP = async (email) => {
+  
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 60 * 1000); 
+
+    console.log(`\n=========================================`);
+    console.log(`🔑 Signup OTP for ${email} is [ ${otp} ]`);
+    console.log(`=========================================\n`);
+
+    const mailOptions = {
+        from: '"StepHive Support" <stephive3@gmail.com>',
+        to: email, 
+        subject: 'StepHive - Your Verification Code',
+        html: `
+            <div style="font-family: Arial; padding:20px;">
+                <h2>StepHive Verification</h2>
+                <p>Your OTP code is:</p>
+                <h1 style="letter-spacing:5px; color:#2563eb;">${otp}</h1>
+                <p>This OTP will expire in 1 minute.</p>
+            </div>
+        `
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Email successfully delivered to ${email}`);
+    } catch (error) {
+        console.error("Email failed to send, check your App Password.");
+    }
+
+    return otp; 
+};
+
 export const verifyOTP = async (email, otp) => {
     const user = await userRepo.findByEmail(email);
     
@@ -170,6 +206,36 @@ export const verifyOTP = async (email, otp) => {
     return true;
 };
 
+export const changePasswordWithOld = async (email, oldPassword, newPassword) => {
+    const user = await userRepo.findByEmailWithPassword(email);
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+        throw new Error("Incorrect old password");
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    return await userRepo.updateUser(email, { password: hashedPassword });
+};
+
+export const verifySignupSession = (session, submittedOtp) => {
+    if (!session.signupData || !session.otp) {
+        throw new Error("Session expired. Please sign up again.");
+    }
+    if (Date.now() > session.otpExpiryTime) {
+        throw new Error("OTP has expired.");
+    }
+    if (String(session.otp).trim() !== String(submittedOtp).trim()) {
+        throw new Error("Invalid OTP code.");
+    }
+    return true;
+};
+
 
 export const resetPassword = async (email, newPassword) => {
     if (!newPassword) {
@@ -179,15 +245,12 @@ export const resetPassword = async (email, newPassword) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-    const updatedUser = await userRepo.findOneAndUpdate(
-        { email: email },
-        { $set: { password: hashedPassword } },
-        { new: true }
-    );
+    const updatedUser = await userRepo.updateUser(email, { password: hashedPassword });
 
     if (!updatedUser) {
         throw new Error("User not found during password reset");
     }
+    
     return updatedUser;
 };
 

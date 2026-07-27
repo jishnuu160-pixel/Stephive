@@ -123,8 +123,8 @@ body.login-page {
 }
 
 .login-card {
-    width: 100%;
-    max-width: 300px;
+    width: 90%;
+    max-width:260px;
     background-color: #e5e5e5; 
     padding: 55px 30px;
     border-radius: 25px; 
@@ -167,15 +167,13 @@ body.login-page {
     padding: 0 25px 0 18px;
     border-radius: 6px;
     border: none;
-    background-color: #bcbcbc; 
+    background-color: #bcafaf4d; 
     font-size: 13px;
     color: #000;
     outline: none;
 }
 
-.form-group input::placeholder { 
-    color: #666; 
-}
+
 
 .password-box {
     position: relative;
@@ -184,13 +182,14 @@ body.login-page {
     align-items: center;
 }
 
+
 .eye {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: rgba(0,0,0,0.3);
+    color: rgba(27, 26, 26, 0.896);
     font-size: 12px;
 }
 
@@ -715,4 +714,9 @@ body.login-page {
 
 .brand-table th,.category-table th,.product-table th{
     text-align: center;
+}
+
+.eye {
+    color: #666;
+    cursor: pointer;
 }

@@ -8,11 +8,17 @@
         <div class="row">
             <div class="col">
                 <label>Coupon NAME</label>
-                <input type="text" name="name" placeholder="SummerSale" required>
+                <input type="text" name="name" placeholder="SummerSale" >
+                 {{#if errors.name}}
+        <small class="error">{{errors.name}}</small>
+    {{/if}}
             </div>
             <div class="col">
                 <label>Coupon CODE</label>
-                <input type="text" name="couponCode" placeholder="SUMMER121" required>
+                <input type="text" name="couponCode" placeholder="SUMMER121" >
+                 {{#if errors.couponCode}}
+        <small class="error">{{errors.couponCode}}</small>
+    {{/if}}
             </div>
         </div>
 
@@ -20,7 +26,7 @@
         <label>DISCOUNT TYPE</label>
         <div class="radio-group">
             <label class="radio-card">
-                <input type="radio" name="discountType" value="percentage" > Percentage
+                <input type="radio" name="discountType" value="percentage" checked> Percentage
             </label>
             <label class="radio-card">
                 <input type="radio" name="discountType" value="fixed"> Flat Amount
@@ -28,24 +34,33 @@
         </div>
 
         <div class="row">
-            <div class="col"><label>DISCOUNT VALUE</label><input type="number" name="discountValue" placeholder="eg: 10" required></div>
-            <div class="col"><label>MAX ORDER AMOUNT</label><input type="number" name="maxOrderAmount" placeholder="eg: 5000"></div>
+            <div class="col"><label>DISCOUNT VALUE</label><input type="number" name="discountValue" placeholder="eg: 10" >{{#if errors.discountValue}}
+        <small class="error">{{errors.discountValue}}</small>
+    {{/if}}</div>
+          <div class="col" id="maxDiscountContainer"><label>MAX DISCOUNT</label> <input type="number" name="maxDiscountAmount" placeholder="eg: 500">{{#if errors.maxDiscountAmount}}
+        <small class="error">{{errors.maxDiscountAmount}}</small>
+    {{/if}}</div>
         </div>
         <div class="row">
-            <div class="col"><label>MIN ORDER AMOUNT</label><input type="number" name="min_orderAmount" placeholder="eg: 500" required></div>
+            <div class="col"><label>MIN PURCHASE AMOUNT</label><input type="number" name="min_orderAmount" placeholder="eg: 500" > {{#if errors.min_orderAmount}}
+        <small class="error">{{errors.min_orderAmount}}</small>
+    {{/if}}</div>
         </div>
 
         <div class="section-divider">Expiry & usage</div>
         <div class="row">
-            <div class="col"><label>EXPIRY DATE</label><input type="date" name="expiryDate" required></div>
-            <div class="col"><label>MAX USE COUNT</label><input type="number" name="maxUseCount" placeholder="eg: 100"></div>
+            <div class="col"><label>EXPIRY DATE</label><input type="date" name="expiryDate" >  {{#if errors.expiryDate}}
+        <small class="error">{{errors.expiryDate}}</small>
+    {{/if}}</div>
+            <div class="col"><label>MAX USE COUNT</label><input type="number" name="maxUseCount" placeholder="eg: 100"> {{#if errors.maxUseCount}}
+        <small class="error">{{errors.maxUseCount}}</small>
+    {{/if}}</div>
         </div>
 
         <div class="section-divider">Visibility</div>
         <label>WHO CAN SEE THIS COUPON?</label>
         <div class="radio-group visibility-box">
-            <label><input type="radio" name="visibility" value="public" checked> Public</label>
-            <label><input type="radio" name="visibility" value="private"> Private</label>
+            <label><input type="radio" name="visibility" value="public"> Public</label>
         </div>
 
         <div class="footer-actions">
@@ -54,3 +69,22 @@
         </div>
     </form>
 </div>
+
+<script>
+const percentage = document.querySelector('input[value="percentage"]');
+const fixed = document.querySelector('input[value="fixed"]');
+const maxDiscountContainer = document.getElementById("maxDiscountContainer");
+
+function toggleMaxDiscount() {
+    if (percentage.checked) {
+        maxDiscountContainer.style.display = "block";
+    } else {
+        maxDiscountContainer.style.display = "none";
+    }
+}
+
+percentage.addEventListener("change", toggleMaxDiscount);
+fixed.addEventListener("change", toggleMaxDiscount);
+
+toggleMaxDiscount();
+</script>

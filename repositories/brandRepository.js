@@ -6,6 +6,10 @@ export const countBrands = async (filter) => {
     return await Brand.countDocuments(filter);
 };
 
+export const getAllBrands = async () => {
+    return await Brand.find({}).sort({ name: 1 }).lean();
+};
+
 
 export const findBrands = async (filter, skip, limit) => {
     return await Brand.find(filter)
@@ -73,6 +77,11 @@ export const createBrand = async (brandData) => {
 
 export const getTopSellingBrandsFromDB = async () => {
     return await Order.aggregate([
+        { 
+            $match: { 
+                status: { $nin: ['returned', 'Returned',"cancelled",'Cancelled'] } 
+            } 
+        },
         { $unwind: "$items" },
         {
             $lookup: {
@@ -82,7 +91,12 @@ export const getTopSellingBrandsFromDB = async () => {
                 as: "productDetails"
             }
         },
-        { $unwind: "$productDetails" },
+        { 
+            $unwind: {
+                path: "$productDetails",
+                preserveNullAndEmptyArrays: true
+            } 
+        },
         {
             $group: {
                 _id: "$productDetails.brand",
@@ -95,7 +109,7 @@ export const getTopSellingBrandsFromDB = async () => {
         {
             $project: {
                 _id: 0,
-                brandName: "$_id",
+                brandName: { $ifNull: ["$_id", "Unknown Brand"] },
                 unitsSold: 1,
                 revenue: 1
             }

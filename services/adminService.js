@@ -168,12 +168,48 @@ export const getOrderById = async (orderId) => {
 
 
 export const updateOrderStatus = async (orderId, newStatus) => {
-    const validStatuses = [ 'Processing', 'Shipped','Out of delivery' ,'Delivered', 'Cancelled'];
-    const Order = await OrderRepo.findOrderById(orderId);
-    console.log(`DEBUG: Attempting to update Order ${orderId} from ${Order?.status} to ${newStatus}`);
+    const validStatuses = [ 'Processing', 'Shipped', 'Out of delivery', 'Delivered', 'Cancelled'];
+    const order = await OrderRepo.findOrderById(orderId);
+    
+    if (!order) throw new Error("Order not found");
+    
+    console.log(`DEBUG: Attempting to update Order ${orderId} from ${order?.status} to ${newStatus}`);
+    
     if (!validStatuses.includes(newStatus)) {
         throw new Error("Invalid status update");
     }  
+
+    if (newStatus.toLowerCase() === 'cancelled' && order.status.toLowerCase() !== 'cancelled') {
+        
+        if (order.items) {
+            for (const item of order.items) {
+                await productRepo.increaseStock(
+                    item.productId, 
+                    item.variantId, 
+                    item.size, 
+                    item.quantity
+                );
+            }
+        }
+
+        const method = order.paymentMethod ? order.paymentMethod.trim().toLowerCase() : '';
+        const paidMethods = ['razorpay', 'wallet'];
+
+        if (paidMethods.includes(method)) {
+            const refundAmount = Number(order.finalAmount) || 0;
+            if (refundAmount > 0) {
+                console.log(`DEBUG: Refunding ₹${refundAmount} to user ${order.user_id} for order ${order._id}`);
+                await WalletRepo.updateWallet(
+                    order.user_id, 
+                    refundAmount, 
+                    'credit', 
+                    `Refund for cancelled Order #${order.orderId || order._id}`,
+                    order._id
+                );
+            }
+        }
+    }
+
     return await OrderRepo.updateStatus(orderId, newStatus);
 };
 

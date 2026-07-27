@@ -48,13 +48,13 @@
 
 <div class="dashboard-card">
   <div class="dashboard-header">
-    <h2>Report for this week</h2>
+    <h2 id="report-title">Report for this week</h2>
     
     <!-- Filter Buttons -->
     <div class="filter-buttons">
       <button class="filter-btn active" data-filter="week">This week</button>
       <button class="filter-btn" data-filter="month">This Month</button>
-      <button class="filter-btn" data-filter="year">Yearly</button>
+      <button class="filter-btn" data-filter="year">This Year</button>
     </div>
   </div>
 
@@ -212,12 +212,24 @@
     renderChart(initialData.labels, initialData.values);
   }
 
+  const titleMap = {
+    week: "Report for this week",
+    month: "Report for this month",
+    year: "Report for this year"
+  };
+
+  const reportTitle = document.getElementById('report-title');
+
   document.querySelectorAll('.filter-btn').forEach(button => {
     button.addEventListener('click', async function() {
       document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
       this.classList.add('active');
 
       const filterType = this.getAttribute('data-filter');
+
+      if (titleMap[filterType]) {
+        reportTitle.textContent = titleMap[filterType];
+      }
 
       try {
         const response = await fetch(`/admin/api/sales-chart?filter=${filterType}`);
@@ -229,7 +241,7 @@
       }
     });
   });
-
+  
   async function loadTopProducts() {
     try {
       const response = await fetch('/admin/api/top-products');

@@ -148,7 +148,13 @@ if (saveBtn) {
 
 
 function showToast(message, type = "success") {
+    const existingToast = document.querySelector(".custom-toast");
+    if (existingToast) {
+        existingToast.remove();
+    }
+
     const toast = document.createElement("div");
+    toast.className = "custom-toast"; 
 
     toast.innerText = message;
 
