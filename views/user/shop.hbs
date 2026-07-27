@@ -1,60 +1,64 @@
 <div class="shop-container">
     {{#if searchValue}}
-        <!-- SEARCH RESULTS VIEW -->
-        <div class="search-results-page">
-            <a href="/shop">Back to Shop</a>
-            <h2>Search Results For "{{searchValue}}"</h2>
-            
-            <div class="products-wrapper-grid-search">
-                {{#each products}}
-                    {{> product-card}}
-                {{else}}
-                    <div class="no-products">
-                        <p>No sneakers found matching "{{searchValue}}"</p>
-                    </div>
-                {{/each}}
+        <header class="hero-section">
+            <div class="hero-content">
+                <h1>Search Results For "{{searchValue}}"</h1>
+                <p><a href="/shop">Back to Shop</a></p>
             </div>
-            
-            {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage queryParams=queryParams}}
-        </div>
-
+        </header>
     {{else}}
-        <!-- NORMAL SHOP PAGE VIEW -->
         <header class="hero-section">
             <div class="hero-content">
                 <h1>Shop the latest Sneakers</h1>
                 <p>Discover Your Next Favorite Pair</p>
             </div>
         </header>
+    {{/if}}
 
-        <div class="shop-main-layout">
-            <aside class="sidebar-wrapper">
-                {{> filter-sidebar}}
-            </aside>
+    <div class="shop-main-layout">
+        <aside class="sidebar-wrapper">
+            {{> filter-sidebar}}
+        </aside>
 
-            <main class="products-main">
+        <main class="products-main">
+            {{#if searchValue}}
+                <div class="search-results-page">
+                    <div class="products-wrapper-grid-search">
+                        {{#each products}}
+                            {{> product-card}}
+                        {{else}}
+                            <div class="no-products">
+                                <p>No sneakers found matching "{{searchValue}}"</p>
+                            </div>
+                        {{/each}}
+                    </div>
+                    {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage queryParams=queryParams}}
+                </div>
+            {{else}}
                 <div class="products-wrapper-grid-shop">
                     {{#each products}}
                         {{> product-card}}
                     {{else}}
-                        <p>No products available.</p>
+                        <p class="no-products">No products available.</p>
                     {{/each}}
                 </div>
                 {{> pagination currentPage=currentPage totalPages=totalPages hasPrevPage=hasPrevPage hasNextPage=hasNextPage queryParams=queryParams}}
-            </main>
-        </div>
+            {{/if}}
+        </main>
+    </div>
 
+    {{#unless searchValue}}
         <section class="best-sellers">
             <h3>Latest Shoes</h3>
             <div class="best-sellers-shelf-grid">
-                {{#each bestSellers}}
+                {{#each latestSellers}}
                     {{> product-card}}
                 {{else}}
                     <p>No products available right now.</p>
                 {{/each}}
-            </div>      
+            </div>       
         </section>
-    {{/if}}
+    {{/unless}}
 </div>
 
 <script>
@@ -104,8 +108,3 @@ document.addEventListener("click", async function (event) {
     }
 });
 </script>
-
-
-
-
-
