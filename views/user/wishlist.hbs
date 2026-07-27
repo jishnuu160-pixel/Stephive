@@ -131,7 +131,7 @@
 let selectedProductData = null;
 let chosenVariantId = null;
 let chosenSize = null;
-let maxAllowedLimit = 5; // Global max limit per addition
+let maxAllowedLimit = 5; 
 let currentMaxStockLimit = 1;
 
 function openSizeSelector(buttonElement) {
@@ -149,7 +149,7 @@ function openSizeSelector(buttonElement) {
     const container = document.getElementById("modalSizesContainer");
     container.innerHTML = "";
     
-    // Reset state
+   
     chosenVariantId = null;
     chosenSize = null;
     currentMaxStockLimit = 1;
@@ -180,10 +180,8 @@ function openSizeSelector(buttonElement) {
                             chosenVariantId = variant._id;
                             chosenSize = sizeObj.size;
                             
-                            // Take the lower of actual stock or the maximum cart addition limit (5)
                             currentMaxStockLimit = Math.min(sizeObj.stock, maxAllowedLimit);
 
-                            // Reset quantity input and show wrapper
                             document.getElementById("modalQtyInput").value = 1;
                             document.getElementById("maxStockHint").innerText = `(Max allowed: ${currentMaxStockLimit})`;
                             document.getElementById("modalQtyWrapper").style.display = "block";
@@ -219,7 +217,6 @@ function closeSizeModal() {
     document.getElementById("sizeSelectorModal").style.display = "none";
 }
 
-// Confirm and Add to Cart from the Modal (with chosen Quantity)
 document.getElementById("confirmAddToCartBtn").addEventListener("click", async () => {
     if (!selectedProductData || !chosenVariantId || !chosenSize) return;
 
@@ -274,7 +271,6 @@ document.getElementById("confirmAddToCartBtn").addEventListener("click", async (
     }
 });
 
-// Delete Item Handler
 document.querySelectorAll(".delete-btn").forEach(button => {
     button.addEventListener("click", async function () {
         const productId = this.dataset.id;
