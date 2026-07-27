@@ -63,9 +63,11 @@
                         <i class="fa-solid fa-eye"></i>
                     </a>
 
-                    <button type="button"  class="btn-secondary-cart"  onclick="addToCart('{{this.productId._id}}', '{{this.productId.variants.[0]._id}}', '{{this.productId.variants.[0].sizes.[0].size}}')">
-                       <i class="fa-solid fa-cart-shopping"></i>
-                    </button>
+                    <button type="button" class="btn-secondary-cart" 
+    data-product="{{json this.productId}}" 
+    onclick="openSizeSelector(this)" title="Select Size & Add">
+    <i class="fa-solid fa-cart-shopping"></i>
+</button>
 
                     <button class="delete-btn" data-id="{{this.productId._id}}">
                         <i class="fa-solid fa-trash"></i>
@@ -92,7 +94,187 @@
     {{/if}}
 </section>
 
+
+<!-- Size & Quantity Selector Modal -->
+<div id="sizeSelectorModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: #fff; padding: 25px; border-radius: 8px; width: 380px; max-width: 90%; text-align: center;">
+        <h4 id="modalProductName" style="margin-bottom: 15px;">Select Size & Quantity</h4>
+        
+        <!-- Sizes Container -->
+        <div style="margin-bottom: 15px; text-align: left;">
+            <label style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Available Sizes:</label>
+            <div id="modalSizesContainer" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <!-- Dynamic sizes injected here -->
+            </div>
+        </div>
+
+        <!-- Quantity Selector Container (Hidden until a size is picked) -->
+        <div id="modalQtyWrapper" style="display: none; margin-bottom: 20px; text-align: left;">
+            <label for="modalQtyInput" style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Quantity:</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" onclick="adjustModalQty(-1)" style="padding: 6px 12px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">-</button>
+                <input type="number" id="modalQtyInput" value="1" min="1" readonly style="width: 60px; text-align: center; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px;">
+                <button type="button" onclick="adjustModalQty(1)" style="padding: 6px 12px; background: #e2e8f0; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">+</button>
+                <span id="maxStockHint" style="font-size: 12px; color: #64748b;"></span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+            <button type="button" onclick="closeSizeModal()" style="padding: 8px 15px; cursor: pointer; background: #6c757d; color: #fff; border: none; border-radius: 4px;">Cancel</button>
+            <button type="button" id="confirmAddToCartBtn" style="padding: 8px 15px; cursor: pointer; background: #0f172a; color: #fff; border: none; border-radius: 4px;" disabled>Add to Cart</button>
+        </div>
+    </div>
+</div>
+
 <script>
+let selectedProductData = null;
+let chosenVariantId = null;
+let chosenSize = null;
+let maxAllowedLimit = 5; // Global max limit per addition
+let currentMaxStockLimit = 1;
+
+function openSizeSelector(buttonElement) {
+    try {
+        const productDataStr = buttonElement.getAttribute('data-product');
+        selectedProductData = JSON.parse(productDataStr);
+    } catch (e) {
+        console.error("Failed to parse product data", e);
+        showToast("Could not load product details", "error");
+        return;
+    }
+
+    document.getElementById("modalProductName").innerText = selectedProductData.productName || "Select Size & Quantity";
+    
+    const container = document.getElementById("modalSizesContainer");
+    container.innerHTML = "";
+    
+    // Reset state
+    chosenVariantId = null;
+    chosenSize = null;
+    currentMaxStockLimit = 1;
+    document.getElementById("modalQtyInput").value = 1;
+    document.getElementById("modalQtyWrapper").style.display = "none";
+    document.getElementById("confirmAddToCartBtn").disabled = true;
+
+    if (selectedProductData.variants && selectedProductData.variants.length > 0) {
+        selectedProductData.variants.forEach(variant => {
+            if (variant.sizes && variant.sizes.length > 0) {
+                variant.sizes.forEach(sizeObj => {
+                    const btn = document.createElement("button");
+                    const isOutOfStock = sizeObj.stock <= 0;
+                    
+                    btn.type = "button";
+                    btn.innerText = `${sizeObj.size} ${isOutOfStock ? '(Sold Out)' : `(${sizeObj.stock} left)`}`;
+                    btn.style.cssText = `padding: 6px 12px; border: 1px solid ${isOutOfStock ? '#cbd5e1' : '#0f172a'}; background: ${isOutOfStock ? '#f1f5f9' : '#fff'}; color: ${isOutOfStock ? '#94a3b8' : '#0f172a'}; border-radius: 4px; cursor: ${isOutOfStock ? 'not-allowed' : 'pointer'}; font-size: 13px;`;
+                    
+                    if (!isOutOfStock) {
+                        btn.onclick = () => {
+                            container.querySelectorAll("button").forEach(b => {
+                                b.style.background = "#fff";
+                                b.style.color = "#0f172a";
+                            });
+                            btn.style.background = "#0f172a";
+                            btn.style.color = "#fff";
+                            
+                            chosenVariantId = variant._id;
+                            chosenSize = sizeObj.size;
+                            
+                            // Take the lower of actual stock or the maximum cart addition limit (5)
+                            currentMaxStockLimit = Math.min(sizeObj.stock, maxAllowedLimit);
+
+                            // Reset quantity input and show wrapper
+                            document.getElementById("modalQtyInput").value = 1;
+                            document.getElementById("maxStockHint").innerText = `(Max allowed: ${currentMaxStockLimit})`;
+                            document.getElementById("modalQtyWrapper").style.display = "block";
+                            document.getElementById("confirmAddToCartBtn").disabled = false;
+                        };
+                    } else {
+                        btn.disabled = true;
+                    }
+                    container.appendChild(btn);
+                });
+            }
+        });
+    }
+
+    if (container.children.length === 0) {
+        container.innerHTML = "<p style='color: #dc2626; font-size: 13px;'>No sizes available for this product.</p>";
+    }
+
+    document.getElementById("sizeSelectorModal").style.display = "flex";
+}
+
+function adjustModalQty(amount) {
+    const qtyInput = document.getElementById("modalQtyInput");
+    let currentQty = parseInt(qtyInput.value) || 1;
+    let newQty = currentQty + amount;
+
+    if (newQty >= 1 && newQty <= currentMaxStockLimit) {
+        qtyInput.value = newQty;
+    }
+}
+
+function closeSizeModal() {
+    document.getElementById("sizeSelectorModal").style.display = "none";
+}
+
+// Confirm and Add to Cart from the Modal (with chosen Quantity)
+document.getElementById("confirmAddToCartBtn").addEventListener("click", async () => {
+    if (!selectedProductData || !chosenVariantId || !chosenSize) return;
+
+    const chosenQuantity = parseInt(document.getElementById("modalQtyInput").value) || 1;
+
+    try {
+        const productId = selectedProductData._id;
+
+        const cartResponse = await fetch("/cart/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                productId, 
+                variantId: chosenVariantId, 
+                size: chosenSize, 
+                quantity: chosenQuantity 
+            })
+        });
+        const cartData = await cartResponse.json();
+
+        if (cartData.success) {
+            const wishlistResponse = await fetch("/wishlist/toggle", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
+            });
+            const wishlistData = await wishlistResponse.json();
+
+            showToast("Added to cart successfully", "success");
+            closeSizeModal();
+
+            if (wishlistData.success) {
+                const button = document.querySelector(`button[data-product*="${productId}"]`);
+                if (button) {
+                    button.closest("tr").remove();
+                }
+
+                const headerP = document.querySelector(".wishlist-header p");
+                let currentCount = parseInt(headerP.innerText);
+                let newCount = currentCount - 1;
+                headerP.innerText = `${newCount >= 0 ? newCount : 0} items saved`;
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        } else {
+            throw new Error(cartData.message || "Failed to add to cart");
+        }
+    } catch (err) {
+        showToast(err.message || "Something went wrong", "error");
+    }
+});
+
+// Delete Item Handler
 document.querySelectorAll(".delete-btn").forEach(button => {
     button.addEventListener("click", async function () {
         const productId = this.dataset.id;
@@ -145,46 +327,4 @@ document.querySelectorAll(".delete-btn").forEach(button => {
         }
     });
 });
-
-async function addToCart(productId, variantId, size) {
-    try {
-        const cartResponse = await fetch("/cart/add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId, variantId, size, quantity: 1 })
-        });
-        const cartData = await cartResponse.json();
-
-        if (cartData.success) {
-            const wishlistResponse = await fetch("/wishlist/toggle", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId })
-            });
-            const wishlistData = await wishlistResponse.json();
-
-            showToast("Added to cart successfully", "success");
-
-            if (wishlistData.success) {
-                const button = document.querySelector(`button[onclick*="${productId}"]`);
-                if (button) {
-                    button.closest("tr").remove();
-                }
-
-                const headerP = document.querySelector(".wishlist-header p");
-                let currentCount = parseInt(headerP.innerText);
-                let newCount = currentCount - 1;
-                headerP.innerText = `${newCount >= 0 ? newCount : 0} items saved`;
-
-                setTimeout(() => {
-                window.location.reload();
-            }, 1500);
-            }
-        } else {
-            throw new Error(cartData.message || "Failed to add to cart");
-        }
-    } catch (err) {
-        showToast(err.message || "Something went wrong", "error");
-    }
-}
 </script>

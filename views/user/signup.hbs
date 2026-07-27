@@ -5,35 +5,38 @@
       <h2>Create Your Account</h2>
       <p class="subtitle">Experience the future of technology today.</p>
 
-         {{#if error}}
-      <p class="server-error" style="color: #ff4d4d; text-align: center; margin-bottom: 10px;">{{error}}</p>
-  {{/if}}
+      {{#if error}}
+        <p class="server-error" style="color: #ff4d4d; text-align: center; margin-bottom: 10px;">{{error}}</p>
+      {{/if}}
 
-  <div id="js-error-message" style="color: #ff4d4d; text-align: center; margin-bottom: 10px; display: none; font-size: 0.9rem;"></div>
+      <div id="js-error-message" style="color: #ff4d4d; text-align: center; margin-bottom: 10px; display: none; font-size: 0.9rem;"></div>
 
       <form action="/user/signup" id="signupForm" method="post" novalidate>
 
         <div class="form-row-s">
           <div class="form-group-s">
             <label>Full Name <span class="star">*</span></label>
-            <input type="text" id="fullName" name="fullName" required>
+            <input type="text" id="fullName" name="fullName" value="{{formData.fullName}}">
+            <small id="fullNameError" class="field-error" style="color: #ff4d4d; font-size: 0.8rem; display: none;"></small>
           </div>
 
           <div class="form-group-s">
             <label>Email Address <span class="star">*</span></label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" value="{{formData.email}}">
+            <small id="emailError" class="field-error" style="color: #ff4d4d; font-size: 0.8rem; display: none;"></small>
           </div>
         </div>
 
         <div class="form-row-s">
           <div class="form-group-s">
             <label>Phone Number <span class="star">*</span> </label>
-            <input type="text" id="phoneNumber" name="phoneNumber" required>
+            <input type="text" id="phoneNumber" name="phoneNumber" value="{{formData.phoneNumber}}">
+            <small id="phoneError" class="field-error" style="color: #ff4d4d; font-size: 0.8rem; display: none;"></small>
           </div>
 
           <div class="form-group-s">
             <label>Referral Code</label>
-            <input type="text" name="referralCode">
+            <input type="text" name="referralCode" value="{{formData.referralCode}}">
           </div>
         </div>
 
@@ -41,17 +44,19 @@
           <div class="form-group-s">
             <label>Password <span class="star">*</span></label>
             <div class="password-containers">
-            <input type="password" id="password" name="password" required>
-             <i class="fas fa-eye" id="togglePassword"></i>
-             </div>
+              <input type="password" id="password" name="password">
+              <i class="fas fa-eye" id="togglePassword1"></i>
+            </div>
+            <small id="passwordError" class="field-error" style="color: #ff4d4d; font-size: 0.8rem; display: none;"></small>
           </div>
 
           <div class="form-group-s">
             <label>Confirm Password <span class="star">*</span></label>
             <div class="password-containers">
-            <input type="password" id="confirmPassword" name="confirmPassword" required>
-               <i class="fas fa-eye" id="togglePassword"></i>
-               </div>
+              <input type="password" id="confirmPassword" name="confirmPassword">
+              <i class="fas fa-eye" id="togglePassword2"></i>
+            </div>
+            <small id="confirmPasswordError" class="field-error" style="color: #ff4d4d; font-size: 0.8rem; display: none;"></small>
           </div>
         </div>
 
@@ -61,9 +66,9 @@
 
         <div class="divider">OR CONTINUE WITH</div>
 
-          <a href="/user/auth/google" class="google-btn">
-               <img src="/images/google.png" alt="Google"> Google
-             </a>
+        <a href="/user/auth/google" class="google-btn">
+          <img src="/images/google.png" alt="Google"> Google
+        </a>
 
         <p class="login-text">
           Already have an account? <a href="/user/login">Login</a>
@@ -79,5 +84,3 @@
 
   </div>
 </section>
-
-<div id="toast-container"></div>
