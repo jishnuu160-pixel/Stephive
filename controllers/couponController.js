@@ -10,6 +10,7 @@ export const getCouponPage = async (req, res) => {
         const { coupons, total, totalPages } = await couponService.getAllCoupons(page, limit, search);
 
         res.render('admin/coupons', {
+            hasCoupons:coupons.length>0,
             coupons,
             currentPage: page,
             totalPages,
@@ -38,10 +39,16 @@ export const addCoupon = async (req, res) => {
         await couponService.createNewCoupon(req.body);
         req.flash("success","New Coupon Added");
         return res.redirect('/admin/coupons');
-    } catch (error) {
-        console.error("addCoupon Error:", error.message);
-        res.status(400).send("Error: " + error.message);
-    }
+    }catch (error) {
+    console.error("addCoupon Error:", error);
+
+    res.status(400).render("admin/add-coupon", {
+        layout: "admin-layout",
+        activePage: "coupons",
+        errors: error.errors || {},
+        formData: req.body
+    });
+}
 }
 
 export const getEditCouponPage = async (req, res) => {
