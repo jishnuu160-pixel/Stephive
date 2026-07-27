@@ -62,3 +62,25 @@ export const getReturnDetails = async (req, res) => {
         res.status(500).send("Unable to load return details");
     }
 };
+
+
+export const getAllReturns = async (req, res) => {
+    try {
+        const { page = 1, limit = 10, search = '' } = req.query;
+        const paginatedData = await ReturnService.getAllReturnsPaginated(page, limit, search);
+
+        res.render('admin/returns', { 
+            ...paginatedData,
+            layout: 'admin-layout',
+            pageTitle: 'Return Requests',
+            activePage: 'return',
+            currentPage: paginatedData.currentPage,
+            hasPrevPage: paginatedData.currentPage > 1,
+            hasNextPage: paginatedData.currentPage < paginatedData.totalPages,
+            totalPages: paginatedData.totalPages 
+        });
+    } catch (error) {
+        console.log("Error Return:", error);
+        res.status(500).send("Error loading returns");
+    }
+};

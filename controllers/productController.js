@@ -15,9 +15,9 @@ export const getShop = async (req, res) => {
         const activeSort = req.query.sort || null;
         const activeMaterial = req.query.material || null;
 
-        const [shopData, bestSellersRaw] = await Promise.all([
+        const [shopData, latestSellersRaw] = await Promise.all([
             productService.getShopProducts(req, null, page),
-            productService.getBestSellers()
+            productService.getLatestSellers()
         ]);
 
         let activeProducts = [];
@@ -65,14 +65,14 @@ export const getShop = async (req, res) => {
         };
 
         const productsWithWishlist = activeProducts.map(attachOfferPricing);
-        const bestSellersWithWishlist = bestSellersRaw.map(attachOfferPricing);
+        const latestSellersWithWishlist = latestSellersRaw.map(attachOfferPricing);
 
         const subcategoriesOnly = shopData.categories.filter(cat => cat.parentCategory !== null);
 
         return res.render('user/shop', {
             ...shopData,      
             products: productsWithWishlist, 
-            bestSellers: bestSellersWithWishlist,      
+            latestSellers: latestSellersWithWishlist,      
             searchValue: req.query.search || "",
             categories: subcategoriesOnly,  
             brands: shopData.brands,        
@@ -166,7 +166,6 @@ export const getProductId = async (req, res) => {
             );
         }
 
-        console.log("Product controller details:",result);
 
         return res.render('user/productPage', {
             ...result,

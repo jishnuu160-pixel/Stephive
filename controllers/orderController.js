@@ -29,6 +29,7 @@ export const getUserOrders = async (req, res) => {
       
 
         res.render('user/history', {
+           hasOrders: orderData.orders.length > 0,
            orders: orderData.orders,
            user: user ? user.toObject() : null,
            currentPage: orderData.pagination.currentPage,
@@ -259,11 +260,21 @@ export const placeOrder = async (req, res) => {
             
             req.flash('success', 'Order placed successfully');
 
-            if (couponId) await CouponRepo.decrementUseCount(couponId);
-            req.session.directPurchase = null;
-            req.session.appliedCouponCode = null;
+           if (couponId) await CouponRepo.decrementUseCount(couponId);
 
-            return res.status(200).json({ success: true, orderId: newOrder._id });
+req.session.directPurchase = null;
+req.session.appliedCouponCode = null;
+
+req.session.save((err) => {
+    if (err) {
+        return res.status(500).json({ success: false, message: "Session error" });
+    }
+
+    return res.status(200).json({
+        success: true,
+        orderId: newOrder._id
+    });
+});
 
         }else if (paymentMethod === 'wallet') {
     const wallet = await WalletService.getWalletDetails(userId);
@@ -284,11 +295,21 @@ export const placeOrder = async (req, res) => {
         newOrder._id
     );
 
-    if (couponId) await CouponRepo.decrementUseCount(couponId);
-    req.session.directPurchase = null;
-    req.session.appliedCouponCode = null;
+   if (couponId) await CouponRepo.decrementUseCount(couponId);
 
-    return res.status(200).json({ success: true, orderId: newOrder._id });
+req.session.directPurchase = null;
+req.session.appliedCouponCode = null;
+
+req.session.save((err) => {
+    if (err) {
+        return res.status(500).json({ success: false, message: "Session error" });
+    }
+
+    return res.status(200).json({
+        success: true,
+        orderId: newOrder._id
+    });
+});
 } else {
             const options = {
                 amount: Math.round(finalTotal * 100),
