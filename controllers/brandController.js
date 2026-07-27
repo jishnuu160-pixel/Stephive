@@ -68,7 +68,16 @@ export const updateBrand = async (req, res) => {
         res.redirect('/admin/brands');
     } catch (error) {
         console.error("Update Error:", error);
-        req.flash('error', 'Brand updated failed!');
+        
+        const { id } = req.params;
+
+        if (error.code === 11000 || error.message.includes('already exists')) {
+            req.flash('error', 'A brand with this name already exists.');
+        } else {
+            req.flash('error', error.message || 'Brand update failed!');
+        }
+
+        res.redirect(`/admin/brands/edit/${id}`);
     }
 };
 
@@ -88,7 +97,13 @@ export const postAddBrand = async (req, res) => {
         res.redirect('/admin/brands');
     } catch (error) {
         console.error("Add Brand Error:", error);
-        req.flash('error', 'Failed to add brand.');
+        
+        if (error.code === 11000 || error.message.includes('already exists')) {
+            req.flash('error', 'A brand with this name already exists.');
+        } else {
+            req.flash('error', error.message || 'Failed to add brand.');
+        }
+
         res.redirect('/admin/brands/add');
     }
 };

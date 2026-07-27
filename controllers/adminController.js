@@ -31,11 +31,15 @@ export const postAdminLogin = async (req, res) => {
             res.redirect('/admin/dashboard');
         });
     } catch (error) {
-        res.render('admin/login', {
-            isAdmin: true,
-            isAdminLogin: true,
-            error: error.message
-        });
+    res.render('admin/login', {
+        title: 'Admin Login',
+        layout: 'auth-layout',
+        isAdmin: true,
+        isAdminLogin: true,
+        isLogin: true,
+        error: error.message
+    });
+
     }
 };
 
@@ -208,18 +212,7 @@ export const updateOrderStatus = async (req, res) => {
 };
 
 
-export const getAllReturns = async (req, res) => {
-    try {
-        const returns = await adminService.fetchAllReturns();
-        res.render('admin/returns', { 
-            returns, 
-            layout: 'admin-layout',
-            activePage:'return' });
-    } catch (error) {
-        console.log("Error Return:",error);
-        res.status(500).send("Error loading returns");
-    }
-};
+
 
 export const updateReturnStatus = async (req, res) => {
     try {
