@@ -168,20 +168,50 @@ export const getOrderById = async (orderId) => {
 
 
 export const updateOrderStatus = async (orderId, newStatus) => {
-    const validStatuses = [ 'Processing', 'Shipped', 'Out of delivery', 'Delivered', 'Cancelled'];
+    const validStatuses = ['Processing', 'Shipped', 'Out of delivery', 'Delivered', 'Cancelled'];
     const order = await OrderRepo.findOrderById(orderId);
     
     if (!order) throw new Error("Order not found");
     
     console.log(`DEBUG: Attempting to update Order ${orderId} from ${order?.status} to ${newStatus}`);
     
-    if (!validStatuses.includes(newStatus)) {
+    const normalizedNewStatus = newStatus.trim().toLowerCase();
+    const isValid = validStatuses.some(status => status.toLowerCase() === normalizedNewStatus);
+    
+    if (!isValid) {
         throw new Error("Invalid status update");
     }  
 
-    if (newStatus.toLowerCase() === 'cancelled' && order.status.toLowerCase() !== 'cancelled') {
+    const currentOrderStatus = order.status ? order.status.trim().toLowerCase() : '';
+
+    const linearSequence = ['processing', 'shipped', 'out of delivery', 'delivered'];
+
+    if (currentOrderStatus === normalizedNewStatus) {
+        throw new Error(`Order is already in "${newStatus}" status.`);
+    }
+
+    if (currentOrderStatus === 'cancelled') {
+        throw new Error("Cannot change status of a cancelled order.");
+    }
+
+    if (normalizedNewStatus === 'cancelled') {
+        if (currentOrderStatus === 'delivered') {
+            throw new Error("Cannot cancel an order that has already been delivered.");
+        }
+    } else {
+        const currentIndex = linearSequence.indexOf(currentOrderStatus);
+        const newIndex = linearSequence.indexOf(normalizedNewStatus);
+
+        if (currentIndex !== -1 && newIndex !== -1) {
+            if (newIndex <= currentIndex) {
+                throw new Error("Orders can only move forward in status progression.");
+            }
+        }
+    }
+
+    if (normalizedNewStatus === 'cancelled' && currentOrderStatus !== 'cancelled') {
         
-        if (order.items) {
+        if (order.items && Array.isArray(order.items)) {
             for (const item of order.items) {
                 await productRepo.increaseStock(
                     item.productId, 
@@ -293,26 +323,107 @@ export const getDashboardMetrics = async () => {
 
 
 export const getSalesChartData = async (filter) => {
-    let groupFormat;
     let startDate = new Date();
+    let endDate = null;
+    let groupFormat;
 
     if (filter === 'week') {
-        startDate.setDate(startDate.getDate() - 7);
+        const now = new Date();
+        const dayOfWeek = now.getDay();
+        const distanceToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - distanceToMonday);
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate = new Date(now);
+        endDate.setHours(23, 59, 59, 999); 
+
         groupFormat = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
-    } else if (filter === 'month') {
-        startDate.setMonth(startDate.getMonth() - 1);
-        groupFormat = { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } };
-    } else if (filter === 'year') {
-        startDate.setFullYear(startDate.getFullYear() - 1);
-        groupFormat = { $dateToString: { format: "%Y-%m", date: "$createdAt" } };
+    } 
+    else if (filter === 'month') {
+        const year = startDate.getFullYear();
+        const month = startDate.getMonth(); 
+        
+        startDate = new Date(year, month, 1, 0, 0, 0, 0);
+        endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
+        
+        groupFormat = { $dayOfMonth: "$createdAt" }; 
+    } 
+    else if (filter === 'year') {
+        const currentYear = startDate.getFullYear();
+        startDate = new Date(`${currentYear}-01-01T00:00:00.000Z`);
+        endDate = new Date(`${currentYear}-12-31T23:59:59.999Z`);
+        groupFormat = { $month: "$createdAt" }; 
     }
 
-    const salesData = await salesRepo.getSalesChartDataFromDB(startDate, groupFormat);
+    const salesData = await salesRepo.getSalesChartDataFromDB(startDate, groupFormat, endDate);
 
-    const labels = salesData.map(item => item._id);
-    const values = salesData.map(item => item.totalSales);
+    if (filter === 'year') {
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const monthlyRevenueMap = new Array(12).fill(0);
 
-    return { labels, values };
+        salesData.forEach(item => {
+            const monthIndex = item._id - 1;
+            if (monthIndex >= 0 && monthIndex < 12) {
+                monthlyRevenueMap[monthIndex] = item.totalSales;
+            }
+        });
+        return { labels: monthNames, values: monthlyRevenueMap };
+    }
+
+    if (filter === 'month') {
+        const year = startDate.getFullYear();
+        const month = startDate.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+        const monthShortName = startDate.toLocaleString('default', { month: 'short' }); 
+
+        const labels = [];
+        const dailyRevenueMap = new Array(daysInMonth).fill(0);
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            labels.push(`${monthShortName} ${i}`); 
+        }
+
+        salesData.forEach(item => {
+            const dayIndex = item._id - 1; 
+            if (dayIndex >= 0 && dayIndex < daysInMonth) {
+                dailyRevenueMap[dayIndex] = item.totalSales;
+            }
+        });
+
+        return { labels, values: dailyRevenueMap };
+    }
+
+    if (filter === 'week') {
+        const weekDays = [];
+        const weeklyRevenueMap = new Array(7).fill(0);
+        
+        for (let i = 0; i < 7; i++) {
+            const currentDay = new Date(startDate);
+            currentDay.setDate(startDate.getDate() + i);
+            
+            const dayName = currentDay.toLocaleDateString('default', { weekday: 'short' }); 
+            const monthName = currentDay.toLocaleDateString('default', { month: 'short' }); 
+            const dateNum = currentDay.getDate(); 
+            
+            weekDays.push(`${dayName} ${monthName} ${dateNum}`); 
+        }
+
+        salesData.forEach(item => {
+            const itemDate = new Date(item._id);
+            let dayIndex = itemDate.getDay() - 1; 
+            if (dayIndex === -1) dayIndex = 6; 
+
+            if (dayIndex >= 0 && dayIndex < 7) {
+                weeklyRevenueMap[dayIndex] = item.totalSales;
+            }
+        });
+
+        return { labels: weekDays, values: weeklyRevenueMap };
+    }
+
+    return { labels: [], values: [] };
 };
 
 
@@ -334,3 +445,4 @@ export const getTopCategoriesService = async () => {
         throw new Error(`Error fetching top categories: ${error.message}`);
     }
 };
+
