@@ -79,7 +79,7 @@ export const getTopSellingBrandsFromDB = async () => {
     return await Order.aggregate([
         { 
             $match: { 
-                status: { $nin: ['returned', 'Returned',"cancelled",'Cancelled'] } 
+                status: { $nin: ["returned","cancelled"] } 
             } 
         },
         { $unwind: "$items" },
