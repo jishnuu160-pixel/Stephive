@@ -6,7 +6,7 @@
         <h1>Payment Failed</h1>
         <p>Your payment could not be completed. Please try again or use a different payment method.</p>
 
-        <div class="order-details">
+        <div class="order-details" id="orderInfo" data-order-id="{{orderId}}">
             <div class="detail-row"><span>ORDER ID</span> <strong>{{orderId}}</strong></div>
             <div class="detail-row"><span>ATTEMPTED AMOUNT</span> <strong>₹{{amount}}</strong></div>
             <div class="detail-row"><span>PAYMENT METHOD</span> <span>{{paymentMethod}}</span></div>
@@ -18,3 +18,87 @@
         <p class="refund-note">If the amount was deducted from your account, it will be automatically refunded within 3-5 business days.</p>
     </div>
 </div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    async function retryPayment() {
+        const orderInfoEl = document.getElementById('orderInfo');
+        const orderId = orderInfoEl ? orderInfoEl.getAttribute('data-order-id') : null;
+        
+        const retryButton = document.querySelector('.btn-retry');
+
+        if (!orderId) {
+            alert("Order ID not found.");
+            return;
+        }
+
+        try {
+            if (retryButton) {
+                retryButton.disabled = true;
+                retryButton.textContent = "Processing...";
+            }
+
+            const response = await fetch('/payment/retry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId: orderId })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                alert(data.message || "Could not initialize payment retry.");
+                resetButton(retryButton);
+                return;
+            }
+
+            const options = {
+                key: data.key,
+                amount: data.amount,
+                currency: data.currency || "INR",
+                order_id: data.razorpayOrderId,
+                handler: async function (response) {
+                    const verifyRes = await fetch('/payment/verify-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature,
+                            orderId: orderId
+                        })
+                    });
+
+                    const verifyData = await verifyRes.json();
+                    if (verifyData.success) {
+                        window.location.href = `/order-confirmation/${verifyData.orderId}`;
+                    } else {
+                        alert(verifyData.message || "Payment verification failed.");
+                        resetButton(retryButton);
+                    }
+                },
+                modal: {
+                    ondismiss: function () {
+                        resetButton(retryButton);
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+        } catch (error) {
+            console.error("Error retrying payment:", error);
+            alert("A network error occurred. Please check your connection.");
+            resetButton(retryButton);
+        }
+    }
+
+    function resetButton(buttonElement) {
+        if (buttonElement) {
+            buttonElement.disabled = false;
+            buttonElement.textContent = "Retry Payment";
+        }
+    }
+</script>
