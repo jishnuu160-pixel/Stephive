@@ -8,46 +8,52 @@
 
     <form action="/admin/products/edit/{{product._id}}" 
           method="POST" 
-          enctype="multipart/form-data" 
+          enumerable="multipart/form-data" 
           class="modal-form-body">
 
       <div class="form-row split-row4">
         <div class="form-group">
           <label>Product Name</label>
-          <input type="text" name="productName" value="{{product.productName}}" >
+          <input type="text" name="productName" value="{{product.productName}}">
+          <small class="field-error"></small>
         </div>
 
        <div class="form-group">
           <label>Brand</label>
-          <select name="brand" class="form-control" required>
+          <select name="brand" class="form-control">
             <option value="" disabled>Select Brand</option>
             {{#each brands}}
               <option value="{{this}}" {{#if (eq this ../product.brand)}}selected{{/if}}>{{this}}</option>
             {{/each}}
           </select>
+          <small class="field-error"></small>
         </div>
 
         <div class="form-group">
           <label>Base Price</label>
-          <input type="number" name="regularPrice" min="1" value="{{product.regularPrice}}" >
+          <input type="number" name="regularPrice" min="1" value="{{product.regularPrice}}">
+          <small class="field-error"></small>
         </div>
       </div>
 
       <div class="form-group">
         <label>Description</label>
         <textarea name="description" class="form-control" rows="3">{{product.description}}</textarea>
+        <small class="field-error"></small>
       </div>
 
       <div class="form-row split-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
         <div class="form-group">
           <label>Category</label>
           <select name="parentCategory" id="parentCategory">
+            <option value="">Select Parent Category</option>
             {{#each parentCategories}}
               <option value="{{this._id}}" {{#if (eq this._id ../selectedParentId)}}selected{{/if}}>
                 {{this.name}}
               </option>
             {{/each}}
           </select>
+          <small class="field-error"></small>
         </div>
 
         <div class="form-group">
@@ -60,6 +66,7 @@
               </option>
             {{/each}}
           </select>
+          <small class="field-error"></small>
         </div>
       </div>
 
@@ -75,6 +82,7 @@
               <div class="form-group">
                 <label>Color Name</label>
                 <input type="text" name="colorNames[]" value="{{this.colorName}}" placeholder="Color Name">
+                <small class="field-error"></small>
 
                 <div class="color-picker" style="margin-top: 10px; display:flex; align-items:center; gap:10px;">
                   <input type="color" name="colorHex[]" value="{{this.colorHex}}">
@@ -120,20 +128,27 @@
                 
                 <div class="cropped-files-container" id="croppedFilesContainer_{{@index}}"></div>
                 <div class="images-preview-gallery-variant" id="thumbnailsContainer_{{@index}}" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+                <small class="field-error image-error"></small>
               </div>
 
               <div class="sizes-container" style="margin-top:15px;">
                 <label style="font-weight:500; display:block; margin-bottom:5px;">Sizes & Stock</label>
                 
                 {{#each this.sizes}}
-                  <div class="size-row" style="display:flex; gap:10px; margin-bottom:5px;">
-                    <input type="number" name="sizes_{{@../index}}[]" value="{{this.size}}" placeholder="Size">
-                    <input type="number" name="stocks_{{@../index}}[]" value="{{this.stock}}" placeholder="Stock">
-                    <button type="button" class="remove-size" style="background:#ef4444; color:white; border:none; border-radius:4px; padding:0 10px; cursor:pointer;">X</button>
+                  <div class="size-row" style="display:flex; gap:10px; margin-bottom:10px; align-items:flex-start;">
+                    <div style="flex:1;">
+                      <input type="number" name="sizes_{{@../index}}[]" value="{{this.size}}" placeholder="Size">
+                      <small class="field-error"></small>
+                    </div>
+                    <div style="flex:1;">
+                      <input type="number" name="stocks_{{@../index}}[]" value="{{this.stock}}" placeholder="Stock">
+                      <small class="field-error"></small>
+                    </div>
+                    <button type="button" class="remove-size" style="background:#ef4444; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;">X</button>
                   </div>
                 {{/each}}
 
-                <button type="button" class="edit-size" style="margin-top:5px;">+ Add size</button>
+                <button type="button" class="edit-size add-size" style="margin-top:5px;">+ Add size</button>
               </div>
 
               <button type="button" class="remove-variant" style="margin-top:15px; background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px;">
@@ -154,26 +169,31 @@
         <div class="form-group">
           <label>Material</label>
           <input type="text" name="material" value="{{product.material}}">
+          <small class="field-error"></small>
         </div>
 
         <div class="form-group">
           <label>Closure Type</label>
           <input type="text" name="closureType" value="{{product.closureType}}">
+          <small class="field-error"></small>
         </div>
 
         <div class="form-group">
           <label>Sole Type</label>
           <input type="text" name="soleType" value="{{product.soleType}}">
+          <small class="field-error"></small>
         </div>
 
         <div class="form-group">
           <label>Weight</label>
           <input type="text" name="weight" value="{{product.weight}}">
+          <small class="field-error"></small>
         </div>
 
         <div class="form-group">
           <label>Country of Origin</label>
           <input type="text" name="countryOfOrigin" value="{{product.countryOfOrigin}}">
+          <small class="field-error"></small>
         </div>
       </div>
 
@@ -191,6 +211,7 @@
     <div class="form-group">
       <label>Color Name</label>
       <input type="text" name="colorNames[]" placeholder="Color Name">
+      <small class="field-error"></small>
 
       <div class="color-picker" style="margin-top: 10px; display:flex; align-items:center; gap:10px;">
         <input type="color" name="colorHex[]" value="#000000">
@@ -219,16 +240,23 @@
         </div>
         <div class="cropped-files-container" id="croppedFilesContainer_TEMPLATE_INDEX"></div>
         <div class="images-preview-gallery-variant" id="thumbnailsContainer_TEMPLATE_INDEX" style="display: flex; flex-wrap: wrap; margin-top: 10px;"></div>
+        <small class="field-error image-error"></small>
     </div>
 
     <div class="sizes-container" style="margin-top:15px;">
       <label style="font-weight:500; display:block; margin-bottom:5px;">Sizes & Stock</label>
-      <div class="size-row" style="display:flex; gap:10px; margin-bottom:5px;">
-        <input type="number" name="sizes_TEMPLATE_INDEX[]" placeholder="Size">
-        <input type="number" name="stocks_TEMPLATE_INDEX[]" placeholder="Stock">
-        <button type="button" class="remove-size" style="background:#ef4444; color:white; border:none; border-radius:4px; padding:0 10px; cursor:pointer;">X</button>
+      <div class="size-row" style="display:flex; gap:10px; margin-bottom:10px; align-items:flex-start;">
+        <div style="flex:1;">
+          <input type="number" name="sizes_TEMPLATE_INDEX[]" placeholder="Size">
+          <small class="field-error"></small>
+        </div>
+        <div style="flex:1;">
+          <input type="number" name="stocks_TEMPLATE_INDEX[]" placeholder="Stock">
+          <small class="field-error"></small>
+        </div>
+        <button type="button" class="remove-size" style="background:#ef4444; color:white; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;">X</button>
       </div>
-      <button type="button" class="add-size">+ Add size</button>
+      <button type="button" class="add-size" style="margin-top: 5px;">+ Add size</button>
     </div>
 
     <button type="button" class="remove-variant" style="margin-top:15px; background:#fee2e2; color:#ef4444; border:1px solid #fca5a5; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:13px;">
@@ -611,75 +639,167 @@ document.querySelector('form').addEventListener('submit', function(e) {
     let formIsValid = true;
     let textBody = "";
 
+    function showFieldError(input, message) {
+        if (!input) return;
+        input.classList.add("input-error");
+        const wrapper = input.closest('.form-group') || input.parentElement;
+        const errorBox = wrapper ? wrapper.querySelector('.field-error') : null;
+        if (errorBox) errorBox.textContent = message;
+    }
+
+    function clearFieldError(input) {
+        if (!input) return;
+        input.classList.remove("input-error");
+        const wrapper = input.closest('.form-group') || input.parentElement;
+        const errorBox = wrapper ? wrapper.querySelector('.field-error') : null;
+        if (errorBox) errorBox.textContent = "";
+    }
+
+    const productNameInput = document.querySelector('[name="productName"]');
+    const brandInput = document.querySelector('[name="brand"]');
+    const priceInput = document.querySelector('[name="regularPrice"]');
+    const descriptionInput = document.querySelector('[name="description"]');
+    const parentCategoryInput = document.querySelector('[name="parentCategory"]');
+    const subcategoryInput = document.querySelector('[name="category"]');
+    
+    const materialInput = document.querySelector('[name="material"]');
+    const closureTypeInput = document.querySelector('[name="closureType"]');
+    const soleTypeInput = document.querySelector('[name="soleType"]');
+    const weightInput = document.querySelector('[name="weight"]');
+    const countryInput = document.querySelector('[name="countryOfOrigin"]');
+
+    const mainInputs = [
+        productNameInput, brandInput, priceInput, descriptionInput, 
+        parentCategoryInput, subcategoryInput, materialInput, 
+        closureTypeInput, soleTypeInput, weightInput, countryInput
+    ];
+
+    mainInputs.forEach(clearFieldError);
+
+    if (!productNameInput || !productNameInput.value.trim()) {
+        showFieldError(productNameInput, "Product name is required.");
+        formIsValid = false;
+    }
+    if (!brandInput || !brandInput.value.trim()) {
+        showFieldError(brandInput, "Please select a brand.");
+        formIsValid = false;
+    }
+    if (!priceInput || !priceInput.value.trim() || Number(priceInput.value.trim()) <= 500) {
+    showFieldError(priceInput, "Price must be greater than 500");
+    formIsValid = false;
+    }
+    if (!descriptionInput || !descriptionInput.value.trim()) {
+        showFieldError(descriptionInput, "Description is required.");
+        formIsValid = false;
+    }
+    if (!parentCategoryInput || !parentCategoryInput.value.trim()) {
+        showFieldError(parentCategoryInput, "Please select a parent category.");
+        formIsValid = false;
+    }
+    if (!subcategoryInput || !subcategoryInput.value.trim()) {
+        showFieldError(subcategoryInput, "Please select a subcategory.");
+        formIsValid = false;
+    }
+    if (materialInput && !materialInput.value.trim()) {
+        showFieldError(materialInput, "Material is required.");
+        formIsValid = false;
+    }
+    if (closureTypeInput && !closureTypeInput.value.trim()) {
+        showFieldError(closureTypeInput, "Closure type is required.");
+        formIsValid = false;
+    }
+    if (soleTypeInput && !soleTypeInput.value.trim()) {
+        showFieldError(soleTypeInput, "Sole type is required.");
+        formIsValid = false;
+    }
+    if (weightInput && !weightInput.value.trim()) {
+        showFieldError(weightInput, "Weight is required.");
+        formIsValid = false;
+    }
+    if (countryInput && !countryInput.value.trim()) {
+        showFieldError(countryInput, "Country of origin is required.");
+        formIsValid = false;
+    }
+
     const cards = document.querySelectorAll('#variantsContainer .variant-card');
     
-    for (const card of cards) {
-        const variantIdx = card.getAttribute('data-variant-index');
-        const colorNameInput = card.querySelector('input[name="colorNames[]"]');
-        const colorTitle = colorNameInput ? colorNameInput.value.trim() : `Variant #${parseInt(variantIdx) + 1}`;
+    if (cards.length === 0) {
+        formIsValid = false;
+        textBody = "Please add at least one color variant configuration.";
+    } else {
+        for (const card of cards) {
+            const variantIdx = card.getAttribute('data-variant-index');
+            const colorNameInput = card.querySelector('input[name="colorNames[]"]');
+            const colorTitle = colorNameInput && colorNameInput.value.trim() ? colorNameInput.value.trim() : `Variant #${parseInt(variantIdx) + 1}`;
 
-        const remainingExistingImages = card.querySelectorAll('.edit-images-grid .img-box').length;
-        const newUploadedImages = variantFilesMap[variantIdx] ? variantFilesMap[variantIdx].length : 0;
-        const totalImagesCount = remainingExistingImages + newUploadedImages;
-
-        if (totalImagesCount < 3) {
-            formIsValid = false;
-            textBody = `The color variant "${colorTitle}" must have at least 3 images.`;
-            break; 
-        }
-
-        const sizeRows = card.querySelectorAll('.sizes-container .size-row');
-        
-        if (sizeRows.length === 0) {
-            formIsValid = false;
-            textBody = `The color variant "${colorTitle}" must have at least one size row added.`;
-            break;
-        }
-
-        for (const row of sizeRows) {
-            const sizeInput = row.querySelector(`input[name^="sizes_"]`);
-            const stockInput = row.querySelector(`input[name^="stocks_"]`);
-
-            const sizeValue = sizeInput ? sizeInput.value.trim() : "";
-            const stockValue = stockInput ? stockInput.value.trim() : "";
-
-            if (sizeValue === "" || stockValue === "") {
+            clearFieldError(colorNameInput);
+            if (!colorNameInput || !colorNameInput.value.trim()) {
+                showFieldError(colorNameInput, "Color name is required.");
                 formIsValid = false;
-                textBody = `Please fill out all Size and Stock fields for "${colorTitle}".`;
-                
-                if (sizeValue === "" && sizeInput) sizeInput.style.borderColor = "#ef4444";
-                if (stockValue === "" && stockInput) stockInput.style.borderColor = "#ef4444";
-                
-                break;
             }
 
-            if (parseFloat(sizeValue) < 0 || parseInt(stockValue) < 0) {
+            const remainingExistingImages = card.querySelectorAll('.edit-images-grid .img-box').length;
+            const newUploadedImages = (typeof variantFilesMap !== 'undefined' && variantFilesMap[variantIdx]) ? variantFilesMap[variantIdx].length : 0;
+            const totalImagesCount = remainingExistingImages + newUploadedImages;
+            const imageErrorBox = card.querySelector('.image-error');
+
+            if (imageErrorBox) imageErrorBox.textContent = "";
+
+            if (totalImagesCount < 1) { 
                 formIsValid = false;
-                textBody = `Size and Stock values cannot be negative numbers in "${colorTitle}".`;
-                break;
+                if (imageErrorBox) imageErrorBox.textContent = `Please upload at least one image for "${colorTitle}".`;
+                textBody = `The color variant "${colorTitle}" must have at least one image.`;
             }
+
+            const sizeRows = card.querySelectorAll('.sizes-container .size-row');
             
-            if (sizeInput) sizeInput.style.borderColor = "";
-            if (stockInput) stockInput.style.borderColor = "";
-        }
+            if (sizeRows.length === 0) {
+                formIsValid = false;
+                textBody = `The color variant "${colorTitle}" must have at least one size row added.`;
+                continue;
+            }
 
-        if (!formIsValid) break; 
+            for (const row of sizeRows) {
+                const sizeInput = row.querySelector(`input[name^="sizes_"]`);
+                const stockInput = row.querySelector(`input[name^="stocks_"]`);
+
+                clearFieldError(sizeInput);
+                clearFieldError(stockInput);
+
+                const sizeValue = sizeInput ? sizeInput.value.trim() : "";
+                const stockValue = stockInput ? stockInput.value.trim() : "";
+
+                if (sizeValue === "" || stockValue === "") {
+                    formIsValid = false;
+                    if (sizeValue === "") showFieldError(sizeInput, "Size required");
+                    if (stockValue === "") showFieldError(stockInput, "Stock required");
+                    textBody = `Please fill out all Size and Stock fields for "${colorTitle}".`;
+                }
+
+                if (parseFloat(sizeValue) < 0 || parseInt(stockValue) < 0) {
+                    formIsValid = false;
+                    if (parseFloat(sizeValue) < 0) showFieldError(sizeInput, "Cannot be negative");
+                    if (parseInt(stockValue) < 0) showFieldError(stockInput, "Cannot be negative");
+                    textBody = `Size and Stock values cannot be negative numbers in "${colorTitle}".`;
+                }
+            }
+        }
     }
 
     if (!formIsValid) {
         e.preventDefault(); 
         
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
         const oldToast = document.querySelector('.custom-validation-toast');
         if (oldToast) oldToast.remove();
 
         const toast = document.createElement('div');
         toast.className = 'custom-validation-toast';
-        toast.innerText = textBody;
+        toast.innerText = textBody || "Please correct the highlighted errors before submitting.";
 
         document.body.appendChild(toast);
-
         setTimeout(() => toast.classList.add('show'), 10);
-
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
@@ -688,11 +808,12 @@ document.querySelector('form').addEventListener('submit', function(e) {
         return false;
     }
 
-    Object.keys(variantFilesMap).forEach(variantIdx => {
-        finalizeVariantFilesInput(variantIdx);
-    });
+    if (typeof variantFilesMap !== 'undefined') {
+        Object.keys(variantFilesMap).forEach(variantIdx => {
+            finalizeVariantFilesInput(variantIdx);
+        });
+    }
 });
-
 
 btnCancelCrop.addEventListener('click', () => {
     cropperModal.style.display = 'none';
