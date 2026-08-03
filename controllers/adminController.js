@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as adminService from '../services/adminService.js';
 
 export const getAdminLogin = (req, res) => {
@@ -63,7 +64,7 @@ export const getDashboard = async (req, res) => {
         });
     } catch (error) {
         console.error("Dashboard Error:", error);
-        res.status(500).send("Server Error");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Server Error");
     }
 };
 
@@ -75,7 +76,7 @@ export const getChartData = async (req, res) => {
         res.json(chartData); 
     } catch (error) {
         console.error("Chart Data Controller Error:", error);
-        res.status(500).json({ error: 'Failed to fetch chart metrics' });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Failed to fetch chart metrics' });
     }
 };
 
@@ -84,13 +85,13 @@ export const getTopProductsApi = async (req, res) => {
     try {
         const topProducts = await adminService.getTopSellingProducts();
         
-        return res.status(200).json({
+        return res.status(HTTP_STATUS.OK).json({
             success: true,
             products: topProducts
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Internal Server Error'
         });
@@ -101,31 +102,28 @@ export const getTopProductsApi = async (req, res) => {
 export const getTopCategories = async (req, res) => {
     try {
         const topCategories = await adminService.getTopCategoriesService();
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
             success: true,
             data: topCategories
         });
     } catch (error) {
-        res.status(500).json({
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: error.message
         });
     }
 };
 
-
-//Get User data
 export const getCustomers = async (req, res) => {
    try {
       const data =  await adminService.getCustomersPage(req.query);
 
       res.render('admin/customers', data);
    } catch (error) {
-      res.status(500).send("Internal Server Error");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
    }
 };
 
-//Toggle User
 export const toggleUserStatus = async (req, res) => {
    try {
       const result =
@@ -172,7 +170,7 @@ export const getOrders = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching orders:", error);
-        res.status(500).send("Internal Server Error");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
 };
 
@@ -183,7 +181,7 @@ export const getOrderDetails = async (req, res) => {
         const { id } = req.params;
         const order = await adminService.getOrderById(id);
         
-        if (!order) return res.status(404).send("Order not found");
+        if (!order) return res.status(HTTP_STATUS.NOT_FOUND).send("Order not found");
 
        res.render('admin/orders-details', { order: order ,
             ...order, 
@@ -192,7 +190,7 @@ export const getOrderDetails = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Server Error");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Server Error");
     }
 };
 
@@ -203,14 +201,14 @@ export const updateOrderStatus = async (req, res) => {
         const { status } = req.body;
         
         await adminService.updateOrderStatus(id, status);
-        req.flash("success","Order Status updated");
-        res.redirect(`/admin/orders/${id}`); 
+        req.flash("success", "Order Status updated");
+        return res.redirect(`/admin/orders/${id}`); 
     } catch (error) {
-        console.error("Update failed:", error);
-        res.status(500).send("Error updating order status");
+        console.error("Update failed:", error.message);
+        req.flash("error", error.message || "Error updating order status");
+        return res.redirect(`/admin/orders/${req.params.id}`);
     }
 };
-
 
 
 
