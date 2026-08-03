@@ -10,12 +10,25 @@ export const getOfferPageData = async () => {
         OfferRepo.findActiveCategories()
     ]);
 
+    const now = new Date();
+
     const subCategories = allCategories.filter(
         category => category.parentCategory !== null && category.parentCategory !== undefined
     );
 
-    const productOffers = allProducts.filter(product => product.offer?.isActive);
-    const categoryOffers = allCategories.filter(category => category.offer?.isActive);
+    const productOffers = allProducts.filter(product => {
+        const offer = product.offer;
+        if (!offer || !offer.isActive) return false;
+        if (offer.expiryDate && now > new Date(offer.expiryDate)) return false;
+        return true;
+    });
+
+    const categoryOffers = allCategories.filter(category => {
+        const offer = category.offer;
+        if (!offer || !offer.isActive) return false;
+        if (offer.expiryDate && now > new Date(offer.expiryDate)) return false;
+        return true;
+    });
 
     return {
         allProducts,
@@ -26,29 +39,71 @@ export const getOfferPageData = async () => {
     };
 };
 
+export const applyProductOffer = async (productId, discountValue, startDate, expiryDate) => {
+    if (!productId) throw new Error("Please select a target product.");
+    if (!discountValue) throw new Error("Please enter a discount value.");
+    if (!startDate) throw new Error("Please select a start date.");
+    if (!expiryDate) throw new Error("Please select an expiry date.");
 
-export const applyProductOffer = async (productId, discountValue) => {
-    if (!productId || !discountValue) throw new Error("Missing required product parameters");
-    if (discountValue <= 0 || discountValue > 100) throw new Error("Invalid discount percentage");
+    const numericDiscount = Number(discountValue);
+    if (isNaN(numericDiscount) || numericDiscount <= 0 || numericDiscount > 100) {
+        throw new Error("Discount percentage must be between 1 and 99.");
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const expiry = new Date(expiryDate);
+    expiry.setHours(0, 0, 0, 0);
+
+    if (start < today) {
+        throw new Error("Start date cannot be in the past.");
+    }
+
+    if (expiry <= start) {
+        throw new Error("Expiry date must be strictly later than the start date.");
+    }
 
     const updatePayload = {
-        "offer.discountValue": Number(discountValue),
+        "offer.discountValue": numericDiscount,
         "offer.isActive": true,
-        "offer.offerType": "Percentage"
+        "offer.offerType": "Percentage",
+        "offer.startDate": new Date(startDate),
+        "offer.expiryDate": new Date(expiryDate)
     };
 
     return await OfferRepo.updateProductOffer(productId, updatePayload);
 };
 
-
-export const applyCategoryOffer = async (subCategoryName, parentCategories, discountValue) => {
-    if (!subCategoryName) {
-        throw new Error("Missing required subcategory parameter");
-    }
+export const applyCategoryOffer = async (subCategoryName, parentCategories, discountValue, startDate, expiryDate) => {
+    if (!subCategoryName) throw new Error("Please select a target subcategory.");
+    if (!discountValue) throw new Error("Please enter a discount rate.");
+    if (!startDate) throw new Error("Please select a start date.");
+    if (!expiryDate) throw new Error("Please select an expiry date.");
 
     const numericDiscount = Number(discountValue);
-    if (!numericDiscount || numericDiscount <= 0 || numericDiscount > 100) {
-        throw new Error("Invalid discount percentage");
+    if (isNaN(numericDiscount) || numericDiscount <= 0 || numericDiscount > 100) {
+        throw new Error("Discount rate must be between 1 and 99.");
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const expiry = new Date(expiryDate);
+    expiry.setHours(0, 0, 0, 0);
+
+    if (start < today) {
+        throw new Error("Start date cannot be in the past.");
+    }
+
+    if (expiry <= start) {
+        throw new Error("Expiry date must be strictly later than the start date.");
     }
 
     const parentsArray = Array.isArray(parentCategories) 
@@ -77,31 +132,35 @@ export const applyCategoryOffer = async (subCategoryName, parentCategories, disc
     const updatePayload = {
         "offer.discountValue": numericDiscount,
         "offer.isActive": true,
-        "offer.offerType": "Percentage"
+        "offer.offerType": "Percentage",
+        "offer.startDate": new Date(startDate),
+        "offer.expiryDate": new Date(expiryDate)
     };
 
     return await OfferRepo.updateManyCategoriesByIds(targetIds, updatePayload);
 };
-
 
 export const removeProductOffer = async (productId) => {
     if (!productId) throw new Error("Product ID is required");
 
     const resetPayload = { 
         "offer.discountValue": 0, 
-        "offer.isActive": false 
+        "offer.isActive": false,
+        "offer.startDate": null,
+        "offer.expiryDate": null
     };
     
     return await OfferRepo.updateProductOffer(productId, resetPayload);
 };
-
 
 export const removeCategoryOffer = async (categoryId) => {
     if (!categoryId) throw new Error("Category ID is required");
 
     const resetPayload = { 
         "offer.discountValue": 0, 
-        "offer.isActive": false 
+        "offer.isActive": false,
+        "offer.startDate": null,
+        "offer.expiryDate": null
     };
     
     return await OfferRepo.updateCategoryOffer(categoryId, resetPayload);
