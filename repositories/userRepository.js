@@ -165,3 +165,24 @@ export const createReferral = async (referralData) => {
     const newReferral = new Referral(referralData);
     return await newReferral.save();
 };
+
+export const findByIdAndUpdate = async (userId, updateQuery, options = { new: true }) => {
+    return await User.findByIdAndUpdate(userId, updateQuery, options).lean();
+};
+
+export const removeAddressFromDb = async (userId, addressId) => {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { 
+                $pull: { addresses: { _id: addressId } } 
+            },
+            { new: true } 
+        );
+
+        return updatedUser;
+    } catch (error) {
+        console.error("Repo Error (removeAddressFromDb):", error);
+        throw error;
+    }
+};
