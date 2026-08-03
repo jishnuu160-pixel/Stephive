@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 import Category from "./categoryModel.js";
 
 const productSchema = new mongoose.Schema({
+    productId: {
+    type: String,
+    unique: true,
+    default: () => 'PRD-' + Math.random().toString(36).substring(2, 8).toUpperCase()
+},
     productName: {
         type: String,
         required: true,
@@ -26,22 +31,29 @@ const productSchema = new mongoose.Schema({
         ref: 'Category',
         required: true
     },
-    offer: {
-        discountValue: { 
-            type: String, 
-            default: 0,
-            min: 0,
-            max: 99
-        },
-        isActive: { 
-            type: Boolean, 
-            default: false 
-        },
-        offerType: { 
-            type: String, 
-            default: 'Percentage' 
-        }
+  offer: {
+    discountValue: { 
+        type: Number, 
+        min: 0,
+        max: 99
     },
+    isActive: { 
+        type: Boolean, 
+        default: false 
+    },
+    offerType: { 
+        type: String, 
+        default: 'Percentage' 
+    },
+    startDate: { 
+        type: Date, 
+        default: null 
+    },
+    expiryDate: { 
+        type: Date, 
+        default: null 
+    }
+},
     regularPrice: {
         type: Number,
         required: true
