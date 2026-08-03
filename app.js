@@ -24,7 +24,7 @@ import passport  from './config/passport.js';
 import * as wishlistService from './services/wishlistService.js';
 import * as cartService from './services/cartService.js';
 import { type } from 'os';
-
+import { initCouponExpiryCron,initOfferExpiryCron } from './utils/cronHelper.js';
 
 const app = express();
 
@@ -257,5 +257,8 @@ app.use('/admin/coupons',couponRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/',walletRoutes);
 app.use('/',referralRoutes);
+
+initCouponExpiryCron();
+initOfferExpiryCron();
 
 export default app;
