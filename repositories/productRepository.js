@@ -190,7 +190,7 @@ export const findTopProducts = async () => {
     return await Order.aggregate([
         { 
             $match: { 
-                status: { $nin: ['Cancelled','cancelled','returned', 'Returned','delivered', 'Delivered'] } 
+                status: { $nin: ['cancelled','returned', 'delivered'] } 
             } 
         },
         { $unwind: '$items' },
@@ -253,7 +253,7 @@ export const getBestSellers = async () => {
     return await Order.aggregate([
         { 
             $match: { 
-                status: { $nin: ['Cancelled', 'cancelled', 'returned', 'Returned'] } 
+                status: { $nin: [ 'cancelled', 'returned'] } 
             } 
         },
         { $unwind: '$items' },
@@ -299,3 +299,5 @@ export const getBestSellers = async () => {
         }
     ]);
 };
+
+
