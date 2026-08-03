@@ -70,7 +70,7 @@ export const processCheckout = async (userId, orderData, isDirect = false) => {
         items: orderData.items,
         deliveryAddress: orderData.deliveryAddress,
         paymentMethod: orderData.paymentMethod,
-        status: orderData.status || 'pending', 
+        status: orderData.status || 'placed', 
         subtotal, tax, discount, 
         total: calculatedTotal,
         finalAmount: calculatedTotal,
@@ -286,10 +286,85 @@ export const getOrderForInvoice = async (orderId) => {
 };
 
 
-export const cancelItemInOrder = async (orderId, itemId, userId) => { 
-    const order = await OrderRepo.findOrderById(orderId);
+export const cancelItemInOrder = async (orderId, itemId, userId) => {
+    const order = await OrderRepo.findUserOrderById(orderId, userId);
+    if (!order) throw new Error("Order not found or access denied");
 
-  return order;
+    if (['cancelled', 'delivered', 'shipped', 'out of delivery'].includes(order.status.toLowerCase())) {
+        throw new Error("Item cannot be cancelled at this stage.");
+    }
+
+    const item = order.items.find(i => i._id.toString() === itemId.toString());
+    if (!item) throw new Error("Item not found in order");
+
+    if (item.status === 'cancelled') {
+        throw new Error("Item is already cancelled");
+    }
+
+    await ProductRepo.increaseStock(
+        item.productId._id || item.productId, 
+        item.variantId, 
+        item.size, 
+        item.quantity
+    );
+
+    const activeItems = order.items.filter(i => i._id.toString() !== itemId.toString() && i.status !== 'cancelled');
+    const isLastItem = activeItems.length === 0;
+
+    const itemSubtotal = item.price * item.quantity;
+    const taxShare = itemSubtotal * 0.10; 
+    const itemTotalRefund = itemSubtotal + taxShare;
+
+    const method = order.paymentMethod ? order.paymentMethod.trim().toLowerCase() : '';
+    const paidMethods = ['razorpay', 'wallet'];
+
+    if (paidMethods.includes(method) && order.status !== 'pending') {
+        const refundAmount = isLastItem ? (Number(order.finalAmount) || 0) : Number(itemTotalRefund.toFixed(2));
+
+        if (refundAmount > 0) {
+            await WalletRepo.updateWallet(
+                userId, 
+                refundAmount, 
+                'credit', 
+                isLastItem ? `Refund for cancelled Order #${order.orderId || order._id}` : `Refund for cancelled item in Order #${order.orderId || order._id}`,
+                order._id
+            );
+        }
+    }
+
+    if (isLastItem) {
+        await mongoose.model('Order').updateOne(
+            { _id: orderId, 'items._id': itemId },
+            {
+                $set: {
+                    status: 'cancelled',
+                    previousStatus: order.status,
+                    cancelledAt: new Date(),
+                    'items.$.status': 'cancelled'
+                }
+            }
+        );
+    } else {
+        const newSubtotal = Math.max(0, order.subtotal - itemSubtotal);
+        const newTax = Math.max(0, order.tax - taxShare);
+        const discountToSubtract = order.discount ? (order.discount / order.items.length) : 0;
+        const newFinalAmount = Math.max(0, (newSubtotal - discountToSubtract) + newTax);
+
+        await mongoose.model('Order').updateOne(
+            { _id: orderId, 'items._id': itemId },
+            { 
+                $set: { 
+                    'items.$.status': 'cancelled',
+                    subtotal: newSubtotal,
+                    tax: Number(newTax.toFixed(2)),
+                    finalAmount: Number(newFinalAmount.toFixed(2)),
+                    total: Number(newFinalAmount.toFixed(2))
+                } 
+            }
+        );
+    }
+
+    return { success: true, message: isLastItem ? "Order cancelled as last item was removed." : "Item cancelled successfully." };
 };
 
 
@@ -318,4 +393,9 @@ export const getSelectedAddress = async (userId, addressId) => {
     }
 
     return address;
+};
+
+
+export const fetchOrderByCustomId = async (orderId) => {
+    return await OrderRepo.findByCustomOrderId(orderId);
 };
