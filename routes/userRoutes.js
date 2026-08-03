@@ -15,11 +15,14 @@ import {
     getVerifyPasswordOTP,getResendOTP,
     postChangePassword,postVerifyPasswordOTP,
     sendEmailChangeOTP,googleAuthSuccess
-    ,updateAvatar,
-    getAbout
+    ,updateAvatar,resendSignupOTP,
+    getAbout, deleteCheckoutAddress,
+    getPrivacy,handleEditAddress,
+    getTerms,getAddressForEdit,
+    getContact,postCheckoutAddAddress
 } from '../controllers/userController.js';
 import { addToCart } from '../controllers/cartController.js';
-import { getAvailableCouponsAjax,applyCoupon} from '../controllers/couponController.js';
+import { getAvailableCouponsAjax,applyCoupon, removeCoupon} from '../controllers/couponController.js';
 import { isUserAuthenticated, isUserLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
 import {uploadAvatar} from '../middleware/upload.middleware.js';
 import {handleUploadError} from '../middleware/uploadError.middleware.js';
@@ -53,6 +56,7 @@ router.get('/reset-password', getResetPassword);
 router.post('/reset-password', postResetPassword);
 
 router.get('/resend-otp', getResendOTP);
+router.get('/resend-signup-otp', resendSignupOTP);
 
 router.get('/auth/google', isUserLoggedOut, passport.authenticate('google', { 
     scope: ['profile', 'email'] 
@@ -83,6 +87,9 @@ router.get('/auth/google/callback',
 
 
 router.get('/about',getAbout);
+router.get('/terms',getTerms);
+router.get('/privacy',getPrivacy);
+router.get('/contact',getContact);
 
 router.use(isUserAuthenticated);
 
@@ -129,5 +136,11 @@ router.post(
 
 router.get('/get-available-coupons', isUserAuthenticated,getAvailableCouponsAjax);
 router.post('/apply-coupon', isUserAuthenticated,applyCoupon);
+router.post('/remove-coupon',isUserAuthenticated,removeCoupon);
+router.post('/checkout/add-address',isUserAuthenticated,postCheckoutAddAddress);
+
+router.get('/checkout/address/:id', isUserAuthenticated, getAddressForEdit);
+router.put('/checkout/edit-address/:id', isUserAuthenticated, handleEditAddress);
+router.delete('/checkout/address/:id', isUserAuthenticated, deleteCheckoutAddress);
 
 export default router;
