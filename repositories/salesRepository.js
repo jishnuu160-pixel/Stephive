@@ -5,30 +5,32 @@ export const getOrdersByDate = async (startDate, endDate) => {
     return await Order.find({
         createdAt: { $gte: startDate, $lte: endDate },
         status: { 
-            $nin: ['Cancelled', 'cancelled', 'Returned', 'returned','delivered','Delivered'] 
+            $nin: ['Cancelled', 'cancelled', 'Returned', 'returned'] 
         }
     })
    .populate('user_id', 'fullName')
     .sort({ createdAt: -1 });
 };
 
-export const getSalesChartDataFromDB = async (startDate, groupFormat) => {
+export const getSalesChartDataFromDB = async (startDate, groupFormat, endDate = null) => {
+    const matchQuery = {
+        createdAt: { $gte: startDate },
+        status: { $nin: [ 'cancelled', 'returned'] }
+    };
+
+    if (endDate) {
+        matchQuery.createdAt.$lte = endDate;
+    }
+
     return await Order.aggregate([
-        {
-            $match: {
-                createdAt: { $gte: startDate },
-                status: { $nin: ['Cancelled', 'cancelled', 'Returned', 'returned','delivered','Delivered'] }
-            }
-        },
+        { $match: matchQuery },
         {
             $group: {
                 _id: groupFormat,
                 totalSales: { $sum: "$finalAmount" }
             }
         },
-        {
-            $sort: { _id: 1 }
-        }
+        { $sort: { _id: 1 } }
     ]);
 };
 
@@ -37,7 +39,7 @@ export const findTopCategories = async () => {
     return await Order.aggregate([
         { 
             $match: { 
-                status: { $nin: ['Cancelled','cancelled','returned', 'Returned','delivered', 'Delivered'] } 
+                status: { $nin: ['cancelled','returned','delivered'] } 
             } 
         },
         { $unwind: '$items' },
