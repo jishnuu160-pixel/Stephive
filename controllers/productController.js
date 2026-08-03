@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as productService from '../services/productService.js';
 import * as wishlistService from "../services/wishlistService.js";
 
@@ -86,55 +87,9 @@ export const getShop = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).render('error', { 
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).render('error', { 
             message: "We encountered an issue loading the shop. Please try again later." 
         });
-    }
-};
-
-/* ---------------- WOMEN ---------------- */
-
-export const getWomenShopPage = async (req, res) => {
-    try {
-        const result = await productService.getGenderPage('women', req);
-        
-        if (result.noProductsFound) {
-            req.flash('error', 'No products found in Women\'s section');
-            return res.redirect('/shop');
-        }
-
-        if (result.products && Array.isArray(result.products)) {
-            result.products = result.products.filter(p => p.isListed !== false && p.isBlocked !== true);
-        }
-        
-        return res.render('user/gender', result);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).send(error.message);
-    }
-};
-
-/* ---------------- MEN ---------------- */
-
-export const getMenShopPage = async (req, res) => {
-    try {
-        const result = await productService.getGenderPage('men', req);
-        
-        if (result.noProductsFound) {
-            req.flash('error', 'No products found in Men\'s section');
-            return res.redirect('/shop');
-        }
-
-        if (result.products && Array.isArray(result.products)) {
-            result.products = result.products.filter(p => p.isListed !== false && p.isBlocked !== true);
-        }
-        
-        return res.render('user/gender', result);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).send(error.message);
     }
 };
 
@@ -160,12 +115,14 @@ export const getProductId = async (req, res) => {
         let isWishlisted = false;
 
         if (req.session.user) {
-            isWishlisted = await wishlistService.isInWishlist(
-                req.session.user.id,
-                result.product._id
-            );
+            const userWishlist = await wishlistService.getWishlist(req.session.user.id);
+            if (userWishlist && userWishlist.items) {
+                isWishlisted = userWishlist.items.some(item => {
+                    const pId = item.productId?._id || item.productId;
+                    return pId && pId.toString() === result.product._id.toString();
+                });
+            }
         }
-
 
         return res.render('user/productPage', {
             ...result,
@@ -175,7 +132,7 @@ export const getProductId = async (req, res) => {
 
     } catch (error) {
         console.error("Product Details routing error:", error);
-        return res.status(500).send("Internal Server Error");
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
 };
 
@@ -187,7 +144,7 @@ export const getAddProduct = async (req, res) => {
       res.render('admin/add-product', data);
    } catch (error) {
       console.error(error);
-      return res.status(500).send(`Add Product Page Error: ${error.message}`);
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(`Add Product Page Error: ${error.message}`);
    }
 };
 
@@ -203,7 +160,7 @@ export const getEditProduct = async (req, res) => {
 
    } catch (error) {
       console.error(error);
-      res.status(500).send("Internal Server Error");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
    }
 };
 
@@ -286,7 +243,7 @@ export const getProducts = async (req, res) => {
       res.render('admin/product', data);
    } catch (error) {
       console.error(error);
-      res.status(500).send("Internal Server Error");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
    }
 };
 

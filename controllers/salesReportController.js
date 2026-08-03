@@ -1,5 +1,6 @@
 import { Parser } from 'json2csv';
 import PDFDocument from 'pdfkit';
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as salesService from '../services/salesReportService.js';
 
 const getDateRangeFromQuery = (query) => {
@@ -51,7 +52,7 @@ export const viewSalesReport = async (req, res) => {
         });
     } catch (error) {
         console.error("Error in viewSalesReport:", error);
-        res.status(500).send('Server Error');
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send('Server Error');
     }
 };
 
@@ -76,10 +77,10 @@ export const downloadCSV = async (req, res) => {
 
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename=sales-report.csv');
-        res.status(200).end(csv);
+        res.status(HTTP_STATUS.OK).end(csv);
     } catch (error) {
         console.error("Error generating CSV:", error);
-        res.status(500).send("Error generating CSV file");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error generating CSV file");
     }
 };
 
@@ -160,6 +161,6 @@ export const downloadPDF = async (req, res) => {
         doc.end();
     } catch (error) {
         console.error("Error generating PDF:", error);
-        res.status(500).send("Error generating PDF file");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error generating PDF file");
     }
 };

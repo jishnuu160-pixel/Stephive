@@ -1,5 +1,7 @@
+import { HTTPRequest } from 'puppeteer';
 import * as cartService from '../services/cartService.js';
 import * as wishlistService from '../services/wishlistService.js';
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 
 export const loadCart = async (req, res) => {
     try {
@@ -11,7 +13,7 @@ export const loadCart = async (req, res) => {
 
     } catch (error) {
         console.error("Error Load Cart:",error);
-        res.status(500).send(error.message);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(error.message);
     }
 };
 
@@ -21,17 +23,17 @@ export const addToCart = async (req, res) => {
         const { productId, variantId, size, quantity } = req.body;
 
         if (!productId || !variantId || !size) {
-            return res.status(400).json({ success: false, message: "Missing required product details" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Missing required product details" });
         }
 
         const result = await cartService.addToCart(userId, req.body);
         
-        await wishlistService.removeFromWishlist(userId, productId);
+        await wishlistService.removeFromWishlist(userId, productId, variantId, size);
         
-        return res.json({ success: true, message: "Added to cart", cart: result });
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: "Added to cart", cart: result });
     } catch (error) {
         console.error("DEBUG CONTROLLER ERROR:", error.message);
-        return res.status(500).json({ success: false, message: error.message });
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
 
@@ -47,14 +49,14 @@ export const updateQuantity = async (req, res) => {
             targetQuantity
         });
 
-        res.json({
+        res.status(HTTP_STATUS.OK).json({
             success: true,
             ...cartMetrics 
         });
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
 
@@ -69,7 +71,7 @@ export const removeFromCart = async (req, res) => {
             color
         });
 
-        return res.json({ 
+        return res.status(HTTP_STATUS.OK).json({ 
             success: true, 
             message: "Removed from cart", 
             ...result 
@@ -77,6 +79,6 @@ export const removeFromCart = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };

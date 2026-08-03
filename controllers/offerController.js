@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as OfferService from '../services/offerService.js';
 
 
@@ -11,37 +12,38 @@ export const loadOffersPage = async (req, res) => {
          });
     } catch (error) {
         console.error("Failed to load offers panel:", error);
-        res.status(500).render("admin/error", { message: "Internal Server Error" });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).render("admin/error", { message: "Internal Server Error" });
     }
 };
 
 
 export const processProductOffer = async (req, res) => {
     try {
-        const { targetProduct, discountValue } = req.body;
-        await OfferService.applyProductOffer(targetProduct, discountValue);
-        req.flash('success',"Product offer added successfully");
+        const { targetProduct, discountValue, startDate, expiryDate } = req.body;
+        await OfferService.applyProductOffer(targetProduct, discountValue, startDate, expiryDate);
+        
+        req.flash('success', "Product offer added successfully");
         res.redirect("/admin/offer");
     } catch (error) {
         console.error("Failed to apply product offer:", error);
-        res.status(400).json({ success: false, error: error.message });
+        res.redirect(`/admin/offer?productError=${encodeURIComponent(error.message)}`);
     }
 };
 
-
 export const processCategoryOffer = async (req, res) => {
     try {
-        const { targetSubCategoryName, targetParentCategories, discountValue } = req.body;
-        
-        await OfferService.applyCategoryOffer(targetSubCategoryName, targetParentCategories, discountValue);
+        const { subCategoryName, targetParentCategories, discountValue, startDate, expiryDate } = req.body;
+        await OfferService.applyCategoryOffer(subCategoryName, targetParentCategories, discountValue, startDate, expiryDate);
         
         req.flash('success', "Category offer added successfully");
         res.redirect("/admin/offer");
     } catch (error) {
         console.error("Failed to apply category offer:", error);
-        res.status(400).json({ success: false, error: error.message });
+        res.redirect(`/admin/offer?categoryError=${encodeURIComponent(error.message)}`);
     }
 };
+
+
 
 
 export const deleteProductOffer = async (req, res) => {
@@ -52,7 +54,7 @@ export const deleteProductOffer = async (req, res) => {
         res.redirect("/admin/offer");
     } catch (error) {
         console.error("Failed to remove product offer:", error);
-        res.status(400).json({ success: false, error: error.message });
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: error.message });
     }
 };
 
@@ -65,6 +67,6 @@ export const deleteCategoryOffer = async (req, res) => {
         res.redirect("/admin/offer");
     } catch (error) {
         console.error("Failed to remove category offer:", error);
-        res.status(400).json({ success: false, error: error.message });
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: error.message });
     }
 };

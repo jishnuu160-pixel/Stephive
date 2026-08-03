@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as ReturnService from '../services/ReturnService.js';
 
 export const handleReturnRequest = async (req, res) => {
@@ -43,7 +44,7 @@ export const handleReturnRequest = async (req, res) => {
             return res.redirect(`/orders/${req.params.id}`);
         }
         console.error("Return Request Error:", error);
-        res.status(500).send("Failed to process return request due to a server error.");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Failed to process return request due to a server error.");
     }
 };
 
@@ -59,7 +60,7 @@ export const getReturnDetails = async (req, res) => {
         });
     } catch (error) {
         console.error("Error loading return details:", error);
-        res.status(500).send("Unable to load return details");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Unable to load return details");
     }
 };
 
@@ -81,6 +82,6 @@ export const getAllReturns = async (req, res) => {
         });
     } catch (error) {
         console.log("Error Return:", error);
-        res.status(500).send("Error loading returns");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading returns");
     }
 };

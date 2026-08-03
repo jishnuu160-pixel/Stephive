@@ -1,4 +1,5 @@
 import * as WalletService from '../services/walletService.js';
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 
 export const getWallet = async (req, res) => {
     try {
@@ -18,7 +19,7 @@ export const getWallet = async (req, res) => {
         });
     } catch (error) {
         console.error("Error loading wallet:", error);
-        res.status(500).send("Internal Server Error");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
 };
 
@@ -28,8 +29,8 @@ export const addMoneyToWallet = async (req, res) => {
         const { amount } = req.body;
         const userId = req.session.user.id;
         await WalletService.addFunds(userId, parseFloat(amount), 'Add Money');
-        res.status(200).json({ success: true });
+        res.status(HTTP_STATUS.OK).json({ success: true });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };

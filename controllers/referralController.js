@@ -1,4 +1,5 @@
 import * as referralService from '../services/referralService.js';
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 
 export const getReferralPage = async (req, res) => {
     try {
@@ -18,7 +19,7 @@ export const getReferralPage = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error loading referral page");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading referral page");
     }
 };
 
@@ -35,6 +36,6 @@ export const getAllReferralHistory = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error loading referral history");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading referral history");
     }
 };

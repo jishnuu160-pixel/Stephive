@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as productService from '../services/productService.js';
 import * as wishlistService from '../services/wishlistService.js';
 
@@ -45,7 +46,7 @@ export const getHome = async (req, res) => {
         const latestSellers = latestSellersRaw.map(attachOfferPricing);
         const bestSellers = bestSellersRaw.map(attachOfferPricing); 
 
-        return res.render('home', {
+        return res.status(HTTP_STATUS.OK).render('home', {
             isHome: true,
             activePage: 'home',
             user: req.session.user || null,
@@ -55,7 +56,7 @@ export const getHome = async (req, res) => {
 
     } catch (error) {
         console.error("Home page error:", error);
-        return res.status(500).render('error', { 
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).render('error', { 
             message: "We encountered an issue loading the home page. Please try again later." 
         });
     }

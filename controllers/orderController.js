@@ -6,6 +6,7 @@ import * as OrderRepo from '../repositories/orderRepository.js';
 import * as CouponRepo from '../repositories/couponRepository.js';
 import * as CouponService from '../services/couponService.js';
 import Order from '../models/orderModel.js';
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 
 import Razorpay from 'razorpay';
 import puppeteer from 'puppeteer';
@@ -44,7 +45,7 @@ export const getUserOrders = async (req, res) => {
     });
     } catch (error) {
        console.error("Error:",error);
-    res.status(500).send(`<pre>${error.stack}</pre>`); 
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(`<pre>${error.stack}</pre>`); 
     }
 };
 
@@ -69,7 +70,7 @@ export const cancelOrder = async (req, res) => {
         const orderId = order._id; 
 
         if (!orderId) {
-            return res.status(400).json({ success: false, message: "Order ID is missing from request" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Order ID is missing from request" });
         }
 
         await OrderService.cancelUserOrder(orderId, userId);
@@ -84,10 +85,10 @@ export const cancelOrder = async (req, res) => {
             );
         }
 
-        return res.status(200).json({ success: true, message: "Order cancelled successfully" });
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: "Order cancelled successfully" });
     } catch (error) {
         console.error("Cancellation Error:", error.message);
-        return res.status(500).json({ success: false, message: error.message });
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
 
@@ -150,7 +151,7 @@ export const renderCheckoutPage = async (req, res) => {
             addresses: checkoutData.addresses || req.user?.addresses || [],
             isDirect: checkoutData.isDirect,
             coupons: availableCoupons,
-            appliedCoupon: req.session.appliedCouponCode
+            appliedCoupon: req.session.appliedCouponCode || ''
         });
     } catch (error) {
         console.error("DEBUG: Render Error:", error);
@@ -164,17 +165,17 @@ export const handleCheckoutData = (req, res) => {
 
         if (!productId) {
             req.session.directPurchase = null; 
-            return res.status(200).json({ success: true });
+            return res.status(HTTP_STATUS.OK).json({ success: true });
         }
 
         if (!variantId || !size) {
-            return res.status(400).json({ message: "Missing required fields" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Missing required fields" });
         }
 
         req.session.directPurchase = { productId, variantId, size, quantity };
-        res.status(200).json({ success: true });
+        res.status(HTTP_STATUS.OK).json({ success: true });
     } catch (error) {
-        res.status(500).json({ message: "Failed to process checkout" });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to process checkout" });
     }
 };
 
@@ -183,7 +184,7 @@ export const placeOrder = async (req, res) => {
        const user = req.session?.user || req.user; 
 
         if (!user || !user.id) {
-            return res.status(401).json({ message: "User not authenticated" });
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: "User not authenticated" });
         }
         const userId = user.id;
         const { addressId, paymentMethod } = req.body;
@@ -252,7 +253,7 @@ export const placeOrder = async (req, res) => {
             total: finalTotal,
             finalAmount: finalTotal,
             paymentMethod,
-            status: 'pending'
+            status: 'placed'
         };
 
         if (paymentMethod === 'cod') {
@@ -267,10 +268,10 @@ req.session.appliedCouponCode = null;
 
 req.session.save((err) => {
     if (err) {
-        return res.status(500).json({ success: false, message: "Session error" });
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Session error" });
     }
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
         success: true,
         orderId: newOrder._id
     });
@@ -280,7 +281,7 @@ req.session.save((err) => {
     const wallet = await WalletService.getWalletDetails(userId);
     
     if (!wallet || wallet.balance < finalTotal) {
-        return res.status(400).json({ 
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ 
             success: false, 
             message: "Insufficient wallet balance." 
         });
@@ -302,10 +303,10 @@ req.session.appliedCouponCode = null;
 
 req.session.save((err) => {
     if (err) {
-        return res.status(500).json({ success: false, message: "Session error" });
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Session error" });
     }
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
         success: true,
         orderId: newOrder._id
     });
@@ -327,7 +328,7 @@ req.session.save((err) => {
 };
 
 
-          return res.status(200).json({
+          return res.status(HTTP_STATUS.OK).json({
             success: true,
             razorpayOrderId: rzpOrder.id,
             amount: rzpOrder.amount,
@@ -337,7 +338,7 @@ req.session.save((err) => {
 
     } catch (error) {
         console.error("Order Placement Error:", error);
-        res.status(500).json({ message: "Failed to place order: " + error.message });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to place order: " + error.message });
     }
 };
 
@@ -352,7 +353,7 @@ export const getOrderConfirmation = async (req, res) => {
         });
     } catch (error) {
         console.error("DEBUG: Confirmation Page Error:", error);
-        res.status(404).send("Order confirmation not found.");
+        res.status(HTTP_STATUS.NOT_FOUND).send("Order confirmation not found.");
     }
 };
 
@@ -363,13 +364,13 @@ export const getOrderDetails = async (req, res) => {
         const order = await OrderService.getUserOrderDetails(req.params.id, userId);
         
         const status = order.status.toLowerCase();
-        const statusOrder = ['pending', 'processing', 'shipped', 'out of delivery', 'delivered'];
+        const statusOrder = ['placed', 'processing', 'shipped', 'out of delivery', 'delivered'];
         const currentStep = statusOrder.indexOf(status);
         
         
         const isCancelled = status === 'cancelled';
         
-        const isReturnable = currentStep >= 2 && !isCancelled;
+        const isReturnable = currentStep ===4;
         
         const showCancelButton = !isCancelled && currentStep >= 0 && currentStep < 2;
 
@@ -383,21 +384,26 @@ export const getOrderDetails = async (req, res) => {
             activePage: 'orders'
         });
     } catch (error) {
-        res.status(404).render('error', { message: error.message });
+        res.status(HTTP_STATUS.NOT_FOUND).render('error', { message: error.message });
     }
 };
 
 export const cancelOrderItem = async (req, res) => {
-    const orderId = req.params.orderId; 
+    const { orderId, itemId } = req.params;
     
     try {
-        const { itemId } = req.params;
         const userId = req.session.user.id;
-
-        await OrderService.cancelItemInOrder(orderId, itemId, userId);
-        res.redirect(`/orders/${orderId}?canceled=true`);
+        const result = await OrderService.cancelItemInOrder(orderId, itemId, userId);
+        return res.status(HTTP_STATUS.OK).json({ 
+            success: true, 
+            message: result.message || "Item cancelled successfully" 
+        });
     } catch (error) {
-        res.redirect(`/orders/${orderId}?error=true&msg=${encodeURIComponent(error.message)}`);
+        console.error("Error cancelling order item:", error.message);
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ 
+            success: false, 
+            message: error.message || "Failed to cancel item" 
+        });
     }
 };
 
@@ -408,7 +414,7 @@ export const getReturnForm = async (req, res) => {
         
         const order = await OrderService.getUserOrderDetails(orderId, req.session.user.id); 
         if (!order) {
-            return res.status(404).send("Order not found");
+            return res.status(HTTP_STATUS.NOT_FOUND).send("Order not found");
         }
 
         res.render('user/return-form', { order });
@@ -449,7 +455,7 @@ export const downloadInvoice = async (req, res) => {
         res.send(pdf);
     } catch (error) {
         console.error("Invoice Error:", error);
-        res.status(500).send("Could not generate invoice.");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Could not generate invoice.");
     }
 };
 
@@ -457,20 +463,21 @@ export const downloadInvoice = async (req, res) => {
 export const renderPaymentFailurePage = async (req, res) => {
     try {
         const { orderId } = req.query;
-        
-        const order = await Order.findById(orderId).populate('items.productId');
-        
-        if (!order) {
-            return res.status(404).send("Order not found");
-        }
+        const { totalAmount, paymentMethod } = req.session.pendingCheckout || {};
+
+        req.session.failedPayment = {
+            orderId: orderId,
+            amount: totalAmount || 4400, 
+            paymentMethod: paymentMethod || 'razorpay'
+        };
 
         res.render('payment-failed', { 
-            orderId: order._id, 
-            amount: order.finalAmount, 
-            paymentMethod: order.paymentMethod 
+            orderId: orderId, 
+            amount: req.session.failedPayment.amount, 
+            paymentMethod: req.session.failedPayment.paymentMethod 
         });
     } catch (error) {
         console.error("Error rendering failure page:", error);
-        res.status(500).send("Server Error");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Server Error");
     }
 };

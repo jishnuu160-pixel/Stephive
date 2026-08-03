@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as couponService from '../services/couponService.js';
 import * as OrderService from '../services/orderService.js';
 
@@ -23,7 +24,7 @@ export const getCouponPage = async (req, res) => {
         });
     } catch (error) {
         console.error("Error loading coupons:", error);
-        res.status(500).send("Error loading coupons");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading coupons");
     }
 };
 
@@ -42,7 +43,7 @@ export const addCoupon = async (req, res) => {
     }catch (error) {
     console.error("addCoupon Error:", error);
 
-    res.status(400).render("admin/add-coupon", {
+    res.status(HTTP_STATUS.BAD_REQUEST).render("admin/add-coupon", {
         layout: "admin-layout",
         activePage: "coupons",
         errors: error.errors || {},
@@ -59,7 +60,7 @@ export const getEditCouponPage = async (req, res) => {
         const couponDoc = await couponService.getCouponById(id);
         
         if (!couponDoc) {
-            return res.status(404).send("Coupon not found.");
+            return res.status(HTTP_STATUS.NOT_FOUND).send("Coupon not found.");
         }
 
         const coupon = couponDoc.toObject();
@@ -72,7 +73,7 @@ export const getEditCouponPage = async (req, res) => {
         res.render('admin/edit-coupon', { coupon ,activePage:'coupons'});
     } catch (error) {
         console.error("DEBUG: Error in getEditCouponPage:", error);
-        res.status(500).send("Error loading edit page");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading edit page");
     }
 };
 
@@ -83,7 +84,7 @@ export const updateCoupon = async (req, res) => {
         res.redirect('/admin/coupons');
     } catch (error) {
         console.log("error:",error);
-        res.status(500).send("Error updating coupon");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error updating coupon");
     }
 };
 
@@ -96,7 +97,7 @@ export const toggleCouponStatus = async (req, res) => {
         res.redirect('/admin/coupons');
     } catch (error) {
         console.error("Error toggling status:", error.message);
-        res.status(500).send("Error updating coupon status");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error updating coupon status");
     }
 };
 
@@ -104,7 +105,7 @@ export const applyCoupon = async (req, res) => {
     try {
         const { code, subtotal } = req.body;
         
-        if (subtotal === undefined) return res.status(400).json({ success: false, message: "Subtotal is missing" });
+        if (subtotal === undefined) return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Subtotal is missing" });
 
         const sub = parseFloat(subtotal);
         const rawDiscount = await couponService.validate(code, sub);
@@ -117,31 +118,48 @@ export const applyCoupon = async (req, res) => {
         req.session.save((err) => {
             if (err) {
                 console.error("Session Save Error:", err);
-                return res.status(500).json({ success: false, message: "Session save failed" });
+                return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Session save failed" });
             }
             
-            res.json({ success: true, discount: discount, tax: tax, total: total });
+            res.status(HTTP_STATUS.OK).json({ success: true, discount: discount, tax: tax, total: total });
         });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: error.message });
     }
 };
 
 export const getAvailableCoupons = async (req, res) => {
     try {
         const coupons = await couponService.getActiveCoupons();
-        res.status(200).json(coupons);
+        res.status(HTTP_STATUS.OK).json(coupons);
     } catch (error) {
-        res.status(500).json({ message: "Error fetching coupons" });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Error fetching coupons" });
     }
 };
 
 export const getAvailableCouponsAjax = async (req, res) => {
     try {
         const data = await couponService.fetchAvailableCoupons();
-        res.status(200).json(data);
+        res.status(HTTP_STATUS.OK).json(data);
     } catch (error) {
         console.error("TRACE [Controller]: Error:", error);
-        res.status(500).json({ message: "Error" });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Error" });
+    }
+};
+
+
+export const removeCoupon = async (req, res) => {
+    try {
+        req.session.appliedCouponCode = null;
+        
+        req.session.save((err) => {
+            if (err) {
+                return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Session error" });
+            }
+            return res.status(HTTP_STATUS.OK).json({ success: true, message: "Coupon removed successfully" });
+        });
+    } catch (error) {
+        console.error("Remove Coupon Error:", error);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to remove coupon" });
     }
 };

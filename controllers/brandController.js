@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as brandService from '../services/brandService.js';
 
 export const getBrand = async (req, res) => {
@@ -10,7 +11,7 @@ export const getBrand = async (req, res) => {
         });
     } catch (error) {
         console.error("Controller Error loading brands:", error);
-        res.status(500).send("Internal Server Error: Could not display brands table.");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error: Could not display brands table.");
     }
 };
 
@@ -44,7 +45,7 @@ export const toggleBrandStatus = async (req, res) => {
 export const getEditBrandPage = async (req, res) => {
     try {
         const brand = await brandService.findBrandById(req.params.id);
-        if (!brand) return res.status(404).send("Brand not found.");
+        if (!brand) return res.status(HTTP_STATUS.NOT_FOUND).send("Brand not found.");
 
         res.render('admin/edit-brand', { 
             name: brand.name,
@@ -54,7 +55,7 @@ export const getEditBrandPage = async (req, res) => {
             activePage: 'brands' 
         });
     } catch (error) {
-        res.status(500).send("Error loading brand.");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading brand.");
     }
 };
 
@@ -85,7 +86,7 @@ export const getAddBrandPage = async (req, res) => {
     try {
         res.render('admin/add-brand', { activePage: 'brands' });
     } catch (error) {
-        res.status(500).send("Error loading add brand page.");
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading add brand page.");
     }
 };
 
@@ -111,9 +112,9 @@ export const postAddBrand = async (req, res) => {
 export const getTopSellingBrands = async (req, res) => {
     try {
         const topBrands = await brandService.getTopBrandsService();
-        res.status(200).json(topBrands);
+        res.status(HTTP_STATUS.OK).json(topBrands);
     } catch (error) {
         console.error("Error fetching top brands analytics:", error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };

@@ -1,27 +1,27 @@
 import * as userService from '../services/userServices.js';
-import * as userRepo from '../repositories/userRepository.js';
 import { error, profile } from 'console';
 import { title } from 'process';
 import { generateOTP } from '../utils/otpUtils.js';
 import { sendOtpEmail } from '../utils/sendOtpEmail.js';
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 
 export const updateAvatar = async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ success: false, message: "No file uploaded" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "No file uploaded" });
         }
 
         const cloudinaryUrl = await userService.updateAvatar(req.session.user.id, req.file.buffer);
         req.session.user.profileImage = cloudinaryUrl;
 
-        return res.status(200).json({
+        return res.status(HTTP_STATUS.OK).json({
             success: true,
             message: "Profile image updated successfully"
         });
 
     } catch (err) {
         console.error("Avatar Update Error:", err);
-        return res.status(500).json({ success: false, message: "Internal server error" });
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
     }
 };
 
@@ -33,50 +33,37 @@ export const getLogin = (req, res) => {
 };
 
 export const getSignup = (req, res) => {
-    res.render('user/signup');
+    const formData = req.session.signupData || {};
+    const error = req.query.error || null;
+
+    res.render('user/signup', {
+        formData,
+        error
+    });
 };
 
 export const postSignup = async (req, res, next) => {
     try {
-        const { password, confirmPassword, email, phoneNumber, referralCode } = req.body;
+        const { email, phoneNumber } = req.body;
 
-        if (password !== confirmPassword) {
-            return res.redirect('/user/signup?error=' + encodeURIComponent("Passwords do not match!"));
-        }
-
-        const existingEmail = await userRepo.findByEmail(email);
-        if (existingEmail) {
-            return res.redirect('/user/signup?error=' + encodeURIComponent("Email already exists"));
-        }
-
-        const existingPhone = await userRepo.findByPhone(phoneNumber);
-        if (existingPhone) {
-            return res.redirect('/user/signup?error=' + encodeURIComponent("Phone already registered"));
-        }
-      
-        req.session.signupData = {
-            ...req.body,
-            phoneNumber
-        };
+        req.session.signupData = req.body;
 
         const otp = await userService.sendSignupOTP(email);
 
         req.session.otp = otp;
-        req.session.otpExpiryTime = Date.now() + 60 * 1000;
+        req.session.otpExpiryTime = Date.now() + 60 * 1000; 
 
         req.session.save((err) => {
-            if (err) {
-                console.error("Session Save Error:", err);
-                return res.redirect(
-                    '/user/signup?error=' +
-                    encodeURIComponent("Session error, please try again.")
-                );
-            }
-
-            res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=email`);
-        });
-
-    } catch (err) {
+        if (err) {
+        console.error("Session Save Error:", err);
+        return res.redirect(
+            '/user/signup?error=' +
+            encodeURIComponent("Session error, please try again.")
+        );
+    }
+    res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup`);
+});
+} catch (err) {
         console.error("Signup Error:", err.message);
         res.redirect('/user/signup?error=' + encodeURIComponent(err.message));
     }
@@ -91,13 +78,8 @@ export const postVerifyOTP = async (req, res, next) => {
     console.log("==================================================\n");
 
     try {
-        if (req.session.signupData) {
-            delete req.body.target;
-            delete req.query.target;
-        }
-
         const email = req.query.email || req.body.email;
-        const target = req.query.target || req.body.target;
+        const target = req.query.target || req.body.target || (req.session.signupData ? 'signup' : '');
         
         let otp = req.body.otp;
         if (Array.isArray(otp)) {
@@ -111,14 +93,14 @@ export const postVerifyOTP = async (req, res, next) => {
 
         if (req.session.signupData) {
             if (!req.session.otp) {
-                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&error=` + encodeURIComponent("Session expired. Please sign up again."));
+                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("Session expired. Please sign up again."));
             }
             if (Date.now() > req.session.otpExpiryTime) {
-                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&error=` + encodeURIComponent("OTP has expired."));
+                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("OTP has expired."));
             }
 
             if (String(req.session.otp).trim() !== String(otp).trim()) {
-                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&error=` + encodeURIComponent("Invalid OTP code."));
+                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("Invalid OTP code."));
             }
 
             const newUser = await userService.signup(req.session.signupData);
@@ -134,18 +116,11 @@ export const postVerifyOTP = async (req, res, next) => {
                 phoneNumber: newUser.phoneNumber
             };
             
-
             delete req.session.otp;
             delete req.session.otpExpiryTime;
             delete req.session.signupData;
 
-            return req.session.save((err) => {
-                if (err) {
-                    console.error("Session save error:", err);
-                    return next(err);
-                }
-                return res.redirect('/shop?success=' + encodeURIComponent("Account created successfully!"));
-            });
+            return res.redirect('/shop?success=' + encodeURIComponent("Account created successfully!"));
         } 
         
         else {
@@ -163,18 +138,16 @@ export const postVerifyOTP = async (req, res, next) => {
     } catch (err) {
         console.error("Verification Error:", err.message);
         const email = req.query.email || req.body.email;
-        const target = req.query.target || req.body.target;
-        return res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${encodeURIComponent(email || '')}&target=${encodeURIComponent(target || '')}`);
+        const target = req.query.target || req.body.target || (req.session.signupData ? 'signup' : '');
+        return res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${encodeURIComponent(email || '')}&target=${encodeURIComponent(target)}`);
     }
 };
 
 export const postLogin = async (req, res) => {
     try {
-
         const user = await userService.login(req.body);
 
-        if (user.isBlocked) {
-            
+        if (user.isBlocked) {  
             req.flash('error', "Your account has been blocked by admin.");
             return res.redirect('/user/login');
         }
@@ -192,34 +165,28 @@ export const postLogin = async (req, res) => {
             res.redirect('/shop'); 
         });
     } catch (err) {
-       
         req.flash('error', err.message);
-        res.redirect('/user/login');
-       
+        res.redirect('/user/login');      
     }
 };
 
 export const postForgot = async (req, res) => {
     try {
         const { email } = req.body;
-
-        
+ 
         if (!email || email.trim() === "") {
             return res.redirect('/user/forgot-password?error=' + encodeURIComponent("Please enter your email address."));
         }
-
         await userService.sendOTP(email);
-
-        
+  
         req.session.otpExpiryTime=Date.now() + 60000;
 
-        res.redirect(`/user/verify-otp?email=${email}`);
+       res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=forgot`);
     } catch (err) {
         console.log("ERROR:", err.message);
         res.redirect('/user/forgot-password?error=' + encodeURIComponent(err.message));
     }
 };
-
 
 
 export const postResetPassword = async (req, res) => {
@@ -232,13 +199,9 @@ export const postResetPassword = async (req, res) => {
                 email 
             });
         }
-
         await userService.resetPassword(email, password);
 
-        
-        res.redirect('/user/login?success=Password updated successfully');
-        
-        
+        res.redirect('/user/login?success=Password updated successfully');   
     } catch (err) {
         console.error("Forgot Password Reset Error:", err.message);
         res.render('user/reset-password', { 
@@ -260,25 +223,45 @@ export const getVerifyOTP = (req, res) => {
 
 export const getResendOTP = async (req, res) => {
     try {
-        const { email, isPasswordUpdate,target } = req.query;
+        const { isPasswordUpdate } = req.query;
+        const target = req.query.target || (req.session.signupData ? 'signup' : '');
+        const email = req.query.email || req.session.signupData?.email;
 
-        if (!email) {
-            return res.redirect('/user/login?error=Email missing, please try again.');
+        if (!email && target !== 'signup') {
+            return res.redirect('/user/login?error=' + encodeURIComponent('Email missing, please try again.'));
         }
 
-        await userService.sendOTP(email);
-
-        req.session.otpExpiryTime=Date.now() + 60000;
+        if (target === 'signup') {
+            if (!req.session.signupData || !req.session.signupData.email) {
+                return res.redirect('/user/signup?error=' + encodeURIComponent('Session expired. Please sign up again.'));
+            }
+            const signupEmail = req.session.signupData.email;
+            const newOtp = await userService.sendSignupOTP(signupEmail);
+            req.session.otp = newOtp;
+            req.session.otpExpiryTime = Date.now() + 60 * 1000;
+        } else {
+            await userService.sendOTP(email);
+            req.session.otpExpiryTime = Date.now() + 60000;
+        }
 
         const redirectPath = (isPasswordUpdate === 'true') 
             ? '/user/verify-password-otp' 
             : '/user/verify-otp';
 
-        req.flash('success', 'A new OTP code has been sent!');    
-        res.redirect(`${redirectPath}?email=${email}&target=${target}&success=A new OTP has been sent!`);
+        const activeEmail = target === 'signup' ? req.session.signupData.email : email;
+
+        req.session.save((err) => {
+            if (err) console.error("Session Save Error on Resend:", err);
+            
+            res.redirect(`${redirectPath}?email=${encodeURIComponent(activeEmail)}&target=${encodeURIComponent(target)}&success=` + encodeURIComponent('A new OTP code has been sent!'));
+        });
+
     } catch (err) {
         console.error("Resend Error:", err);
-        res.redirect(`/user/verify-otp?email&target=${req.query.email}&error=Failed to resend OTP`);
+        const target = req.query.target || (req.session.signupData ? 'signup' : '');
+        const email = req.query.email || req.session.signupData?.email || '';
+        
+        return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=${encodeURIComponent(target)}&error=` + encodeURIComponent(err.message || 'Failed to resend OTP'));
     }
 };
 
@@ -289,8 +272,7 @@ export const getForgot = (req, res) => {
     });
 };
 
-export const getResetPassword = (req, res) => {
-   
+export const getResetPassword = (req, res) => { 
     const { email } = req.query;
 
     if (!email) {
@@ -341,7 +323,7 @@ export const getProfile = async (req, res) => {
     } catch (error) {
        
         console.error("Profile Error:", error);
-        res.status(500).send(error.message);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(error.message);
     }
 };
 
@@ -574,17 +556,30 @@ export const getVerifyPasswordOTP = (req, res) => {
 
 export const postVerifyPasswordOTP = async (req, res) => {
     try {
-        const { email, otp } = req.body;
-        const finalOtp = Array.isArray(otp) ? otp.join('') : otp;
+        const email = req.query.email || req.body.email;
+        const target = req.query.target || req.body.target || 'updatepassword';
 
-        await userService.verifyOTP(email, finalOtp);
+        let otp = req.body.otp;
+        if (Array.isArray(otp)) {
+            otp = otp.join('');
+        }
+        if (!otp && typeof req.body === 'object') {
+            otp = Object.values(req.body)
+                .filter(val => typeof val === 'string' && val.trim().length === 1)
+                .join('');
+        }
 
-    
-        res.redirect(`/user/changepass?email=${email}&verified=true`);
+        await userService.verifyOTP(email, otp);
+
+        res.redirect(`/user/changepass?email=${encodeURIComponent(email)}&verified=true&target=${encodeURIComponent(target)}`);
 
     } catch (err) {
         console.error("Verification Error:", err.message);
-        res.redirect(`/user/verify-password-otp?error=${encodeURIComponent(err.message)}&email=${req.body.email}`);
+        
+        const email = req.query.email || req.body.email || '';
+        const target = req.query.target || req.body.target || 'updatepassword';
+
+        res.redirect(`/user/verify-password-otp?error=${encodeURIComponent(err.message)}&email=${encodeURIComponent(email)}&target=${encodeURIComponent(target)}&isPasswordUpdate=true`);
     }
 };
 
@@ -601,28 +596,10 @@ export const postChangeEmail = async (req, res) => {
         const userId = req.session.user.id;
         const currentEmail = req.session.user.email;
 
-        const sanitizedEmail = newEmail.trim().toLowerCase();
+        await userService.changeEmailService(userId, currentEmail, newEmail);
 
-        if (sanitizedEmail === currentEmail.toLowerCase()) {
-            return res.render('user/change-email', { 
-                error: "New email must be different from your current one.",
-                user: req.session.user 
-            });
-        }
-
-        const existingUser = await userRepo.findByEmail(sanitizedEmail);
-        if (existingUser) {
-            return res.render('user/change-email', { 
-                error: "This email is already registered to another account.",
-                user: req.session.user 
-            });
-        }
-
-        await userService.updateUserInfo(userId, { email: sanitizedEmail });
-
-        req.session.user.email = sanitizedEmail;
-
-        req.flash('success',"Email updated successfully!");
+        req.session.user.email = newEmail.trim().toLowerCase();
+        req.flash('success', "Email updated successfully!");
 
         req.session.save((err) => {
             if (err) return res.redirect('/user/profile?error=Session sync failed');
@@ -631,6 +608,15 @@ export const postChangeEmail = async (req, res) => {
 
     } catch (error) {
         console.error("Change Email Error:", error);
+
+        if (error.isValidation) {
+            return res.render('user/change-email', { 
+                error: error.message, 
+                user: req.session.user,
+                title: "Change Email"
+            });
+        }
+
         res.redirect('/user/profile?error=Something went wrong. Please try again.');
     }
 };
@@ -656,6 +642,7 @@ export const postChangePassword = async (req, res) => {
             return res.render('user/reset-password', { 
                 error: "New passwords do not match", 
                 email, 
+                oldPassword: oldPassword || '', 
                 isLoggedIn: true 
             });
         }
@@ -670,6 +657,7 @@ export const postChangePassword = async (req, res) => {
         res.render('user/reset-password', { 
             error: err.message, 
             email, 
+            oldPassword: oldPassword || '', 
             isLoggedIn: true 
         });
     }
@@ -698,9 +686,7 @@ export const googleAuthSuccess = (req, res) => {
             delete req.session.passport.user; 
         }
 
-    
         req.user = null; 
-
 
         return req.session.save((err) => {
             if (err) console.error("Session save error:", err);
@@ -717,8 +703,6 @@ export const googleAuthSuccess = (req, res) => {
         profileImage: user.profileImage,
         gender: user.gender 
     };
-
-    
         if(adminData){
             req.session.admin= adminData;
         }
@@ -742,5 +726,142 @@ export const getAbout = async (req, res) => {
 };
 
 
+export const getTerms= async(req,res)=>{
+    try{
+       res.render('user/terms');
+    }catch(error){
+       res.redirect('/');
+    }
+};
+
+export const getPrivacy= async(req,res)=>{
+    try{
+       res.render('user/privacy');
+    }catch(error){
+       res.redirect('/');
+    }
+};
+
+export const getContact= async(req,res)=>{
+    try{
+        res.render('user/contactUs');
+    }catch(error){
+        res.redirect('/');
+    }
+}
 
 
+export const removeCoupon = async (req, res) => {
+    try {
+        req.session.appliedCouponCode = null;
+        
+        req.session.save((err) => {
+            if (err) {
+                return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Session error" });
+            }
+            return res.status(HTTP_STATUS.OK).json({ success: true, message: "Coupon removed successfully" });
+        });
+    } catch (error) {
+        console.error("Remove Coupon Error:", error);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to remove coupon" });
+    }
+};
+
+export const postCheckoutAddAddress = async (req, res) => {
+    console.log("=== DEBUG ADD ADDRESS ===");
+    console.log("Session User:", req.session.user);
+    console.log("Request Body:", req.body);
+    
+    try {
+        const userId = req.session.user?.id || req.session.user?._id;
+        console.log("Resolved User ID:", userId);
+
+        await userService.addAddress(userId, {
+            ...req.body,
+            isDefault: req.body.isDefault === 'on' || req.body.isDefault === true
+        });
+
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: "Address added successfully" });
+    } catch (error) {
+        console.error("Controller Error:", error);
+        if (error.validationErrors) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, errors: error.validationErrors });
+        }
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
+    }
+};
+
+export const getAddressForEdit = async (req, res) => {
+    try {
+        let sessionUser = req.session.userId || req.session.user;
+        const userId = typeof sessionUser === 'object' ? (sessionUser.id || sessionUser._id) : sessionUser;
+        
+        const addressId = req.params.id;
+
+        const address = await userService.getAddressByIdService(userId, addressId);
+        
+        if (!address) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Address not found" });
+        }
+
+        res.status(HTTP_STATUS.OK).json({ success: true, address });
+    } catch (err) {
+        console.error("getAddressForEdit error:", err);
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: err.message || "Could not retrieve address" });
+    }
+};
+
+export const handleEditAddress = async (req, res) => {
+    try {
+        let sessionUser = req.session.userId || req.session.user;
+        const userId = typeof sessionUser === 'object' ? (sessionUser.id || sessionUser._id) : sessionUser;
+        const addressId = req.params.id;
+
+        const updatedAddress = await userService.editAddressCheckout(userId, addressId, req.body);
+        res.status(HTTP_STATUS.OK).json({ success: true, message: "Address updated successfully", address: updatedAddress });
+    } catch (err) {
+        if (err.validationErrors) {
+            return res.status(HTTP_STATUS.OK).json({ success: false, errors: err.validationErrors });
+        }
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: err.message || "Internal server error" });
+    }
+};
+
+export const deleteCheckoutAddress = async (req, res) => {
+    try {
+        let sessionUser = req.session.userId || req.session.user;
+        const userId = typeof sessionUser === 'object' ? (sessionUser.id || sessionUser._id) : sessionUser;
+        const addressId = req.params.id;
+
+        await userService.deleteAddressService(userId, addressId); 
+        res.status(HTTP_STATUS.OK).json({ success: true, message: "Address deleted successfully" });
+    } catch (err) {
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: err.message || "Internal server error" });
+    }
+};
+
+export const resendSignupOTP = async (req, res) => {
+    try {
+        if (!req.session.signupData || !req.session.signupData.email) {
+            return res.redirect('/user/signup?error=' + encodeURIComponent("Session expired. Please sign up again."));
+        }
+
+        const email = req.session.signupData.email;
+        const newOtp = await userService.sendSignupOTP(email);
+
+        req.session.otp = newOtp;
+        req.session.otpExpiryTime = Date.now() + 60 * 1000;
+
+        req.session.save((err) => {
+            if (err) {
+                console.error("Session Save Error on Resend:", err);
+            }
+            return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&success=` + encodeURIComponent("A new OTP has been sent to your email."));
+        });
+
+    } catch (err) {
+        console.error("Resend Signup OTP Error:", err.message);
+        const email = req.session.signupData?.email || '';
+        return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("Failed to resend OTP. Please try again."));
+    }
+};

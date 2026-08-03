@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 import * as OrderService from '../services/OrderService.js';
 import * as WalletService from '../services/walletService.js'; 
+import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 
 import Razorpay from 'razorpay';
 import dotenv from 'dotenv';
@@ -19,7 +20,7 @@ export const createOrder = async (req, res) => {
         const { amount, isWalletRecharge, orderData } = req.body;
 
         if (!amount || amount <= 0) {
-            return res.status(400).json({ success: false, message: "Invalid amount" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Invalid amount" });
         }
 
         if (isWalletRecharge) {
@@ -40,7 +41,7 @@ export const createOrder = async (req, res) => {
 
         const order = await razorpay.orders.create(options);
 
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
             success: true,
             id: order.id,
             amount: order.amount,
@@ -49,7 +50,7 @@ export const createOrder = async (req, res) => {
 
     } catch (error) {
         console.error("Create Order Error:", error);
-        res.status(500).json({ success: false, message: "Failed to create Razorpay order" });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to create Razorpay order" });
     }
 };
 
@@ -62,7 +63,7 @@ export const verifyPayment = async (req, res) => {
         } = req.body;
         
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-            return res.status(400).json({ success: false, message: "Missing payment response fields" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Missing payment response fields" });
         }
         
         const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
@@ -70,7 +71,7 @@ export const verifyPayment = async (req, res) => {
         const generated_signature = hmac.digest('hex');
 
         if (generated_signature !== razorpay_signature) {
-            return res.status(400).json({ success: false, message: "Invalid signature" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Invalid signature" });
         }
 
         const userId = req.session.user.id;
@@ -83,12 +84,12 @@ export const verifyPayment = async (req, res) => {
             delete req.session.isWalletRecharge;
             delete req.session.rechargeAmount;
 
-            return res.status(200).json({ success: true, message: "Wallet updated successfully" });
+            return res.status(HTTP_STATUS.OK).json({ success: true, message: "Wallet updated successfully" });
         }
 
         const orderData = req.session.pendingOrder;
         if (!orderData) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 message: "Pending order not found or session expired"
             });
@@ -101,7 +102,7 @@ export const verifyPayment = async (req, res) => {
         );
         
         if (!newOrder || !newOrder._id) {
-            return res.status(500).json({ success: false, message: "Order creation failed" });
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Order creation failed" });
         }
 
         await OrderService.updatePaymentStatus(newOrder._id, razorpay_payment_id, 'placed');
@@ -110,7 +111,7 @@ export const verifyPayment = async (req, res) => {
         req.session.directPurchase = null;
         req.session.appliedCouponCode = null;
 
-        return res.status(200).json({ 
+        return res.status(HTTP_STATUS.OK).json({ 
             success: true, 
             orderId: newOrder._id, 
             message: "Payment verified and order created" 
@@ -118,7 +119,7 @@ export const verifyPayment = async (req, res) => {
 
     } catch (error) {
         console.error("Payment Verification Error:", error);
-        return res.status(500).json({ 
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
             message: error.message || "Internal server error" 
         });
@@ -136,4 +137,47 @@ export const paymentFailed = (req, res) => {
         amount: payment?.amount || 0,
         paymentMethod: payment?.paymentMethod || "Razorpay"
     });
+};
+
+
+export const retryPayment = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+
+        if (!orderId) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Order ID is required" });
+        }
+
+        const failedPayment = req.session.failedPayment;
+
+        if (!failedPayment || failedPayment.orderId !== orderId) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({ 
+                success: false, 
+                message: "Payment session expired. Please go back to your cart and place the order again." 
+            });
+        }
+
+        const options = {
+            amount: Math.round(failedPayment.amount * 100), 
+            currency: "INR",
+            receipt: `retry_${orderId}_${Date.now()}`
+        };
+
+        const razorpayOrder = await razorpay.orders.create(options);
+
+        return res.status(HTTP_STATUS.OK).json({
+            success: true,
+            key: process.env.RAZORPAY_KEY_ID,
+            amount: razorpayOrder.amount,
+            currency: razorpayOrder.currency,
+            razorpayOrderId: razorpayOrder.id
+        });
+
+    } catch (error) {
+        console.error("Payment Retry Error:", error);
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
+            success: false, 
+            message: "Failed to initialize payment retry" 
+        });
+    }
 };
