@@ -230,14 +230,14 @@ export const removeFromCart = async (userId, itemData) => {
     const cart = await cartRepo.findCartByUserId(userId);
     if (!cart) return { totalUnitsCount: 0 };
 
-    cart.items = cart.items.filter(i => {
-        const iPid = (i.productId?._id ? i.productId._id : i.productId)?.toString();
-        const dPid = itemData.productId.toString();
+    cart.items = cart.items.filter(cartItem => {
+        const existingProductId = (cartItem.productId?._id ? cartItem.productId._id : cartItem.productId)?.toString();
+        const requestedProductId = itemData.productId.toString();
 
-        const iSize = i.size?.toString().trim();
-        const dSize = itemData.size?.toString().trim();
+        const existingSize = cartItem.size?.toString().trim();
+        const requestedSize = itemData.size?.toString().trim();
 
-        const isMatch = iPid === dPid && iSize === dSize;
+        const isMatch = existingProductId === requestedProductId && existingSize === requestedSize;
         
         return !isMatch; 
     });
