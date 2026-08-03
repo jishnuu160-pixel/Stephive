@@ -1,154 +1,150 @@
-<div class="cart-container">
-    <header class="cart-header">
-        <div class="header-left">
-            <nav class="breadcrumbs"><a class="cart-link" href="/">HOME</a> / <a class="cart-link" href="/shop">SHOP</a>/ <span style="font-weight: 600;color:black">CART</span></nav>
-          <h1> Your Cart <span class="item-count" id="cart-item-count">({{totalUnitsCount}} Items)</span></h1>
-        </div>
-        <a class="continue-shopping-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
-    </header>
-    <div class="cart-content">
-        
-        <section class="cart-items-list">
-            {{#if cart.items.length}}
 
-            {{#each cart.items}}
-            <div class="cart-card 
-    {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} 
-    {{#if this.hasInsufficientStock}}stock-error-border{{/if}} 
-    {{#if this.isUnlisted}}disabled-item-opacity{{/if}}" 
-   data-product-id="{{this.productId._id}}" 
-    data-size="{{#if this.size}}{{this.size}}{{else}}default{{/if}}" 
-    data-color="{{#if this.color}}{{this.color}}{{else}}default{{/if}}">
-    
+<div class="cart-page-scope">
+    <div class="cart-container">
+        <header class="cart-header">
+            <div class="header-left">
+                <nav class="breadcrumbs">
+                    <a class="cart-link" href="/">HOME</a> / 
+                    <a class="cart-link" href="/shop">SHOP</a> / 
+                    <span style="font-weight: 600; color: black;">CART</span>
+                </nav>
+                <h1>Your Cart <span class="item-count" id="cart-item-count">({{totalUnitsCount}} Items)</span></h1>
+            </div>
+            <a class="continue-shopping-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
+        </header>
 
-                <div class="item-image-wrapper">
-            {{#if this.productId.variants.[0].images.[0]}}
-                <img src="{{this.productId.variants.[0].images.[0]}}" 
-                     alt="{{this.productId.productName}}">
-            {{else}}
-                <div class="no-image-placeholder">No Image</div>
-            {{/if}}
-        </div>
+<div class="cart-content">
+            <div class="cart-layout-grid">
                 
-                <div class="item-details">
-                    <h2 class="item-title">{{this.productId.productName}}</h2>
-                    <p class="item-specs">MATERIAL: {{#if this.productId.material}} {{toUpperCase this.productId.material}}{{else}}LEATHER{{/if}}| COLOR: {{toUpperCase this.color}} | SIZE: {{this.size}}</p>
-                    
+                <section class="cart-items-list" {{#unless cart.items.length}}style="grid-column: 1 / -1; width: 100%; display: flex; justify-content: center;"{{/unless}}>
+                    {{#if cart.items.length}}
+                        {{#each cart.items}}
+                        <div class="cart-card 
+                            {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} 
+                            {{#if this.hasInsufficientStock}}stock-error-border{{/if}} 
+                            {{#if this.isUnlisted}}disabled-item-opacity{{/if}}" 
+                            data-product-id="{{this.productId._id}}" 
+                            data-size="{{#if this.size}}{{this.size}}{{else}}default{{/if}}" 
+                            data-color="{{#if this.color}}{{this.color}}{{else}}default{{/if}}">
+                            
+                            <div class="item-image-wrapper">
+                                {{#if this.productId.variants.[0].images.[0]}}
+                                    <img src="{{this.productId.variants.[0].images.[0]}}" alt="{{this.productId.productName}}">
+                                {{else}}
+                                    <div class="no-image-placeholder">No Image</div>
+                                {{/if}}
+                            </div>
+                            
+                            <div class="item-details">
+                                <h2 class="item-title">{{this.productId.productName}}</h2>
+                                <p class="item-specs">
+                                    MATERIAL: {{#if this.productId.material}}{{toUpperCase this.productId.material}}{{else}}LEATHER{{/if}} | 
+                                    COLOR: {{toUpperCase this.color}} | 
+                                    SIZE: {{this.size}}
+                                </p>
+                                
+                                {{#if this.isOutOfStock}}
+                                    <span class="cart-error-badge">OUT OF STOCK</span>
+                                {{else if this.hasInsufficientStock}}
+                                    <span class="cart-error-badge">EXCEEDS STOCK (Only {{this.availableStock}} left)</span>
+                                {{/if}}
+                                
+                                {{#if this.isUnlisted}}
+                                    <span class="cart-error-badge">PRODUCT UNAVAILABLE</span>
+                                {{/if}}
 
-                   {{#if this.isOutOfStock}}
-                         <span class="cart-error-badge">OUT OF STOCK</span>
-                   {{else if this.hasInsufficientStock}}
-                         <span class="cart-error-badge"> EXCEEDS STOCK (Only {{this.availableStock}} left)</span>
-                   {{/if}}
-                    
-                    {{#if this.isUnlisted}}
-                        <span class="cart-error-badge">PRODUCT UNAVAILABLE</span>
+                                <div class="item-pricing-row">
+                                    <span class="item-price" data-base-price="{{this.currentPrice}}">₹{{this.currentPrice}}</span>
+                                    <div class="quantity-selector">
+                                        <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
+                                        <span class="qty-val" data-max="{{this.availableStock}}">{{this.quantity}}</span>
+                                        <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="item-actions-subtotal">
+                                <button class="delete-btn" onclick="removeCartRow(this)" aria-label="Delete item">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                                <div class="subtotal-box">
+                                    <span class="subtotal-label">SUBTOTAL</span>
+                                    <span class="subtotal-price">₹{{this.itemSubtotal}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+
+                        {{#if totalPages}}
+                        <div class="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 30px 0;">
+                            {{#if hasPrevPage}}
+                                <a href="/cart?page={{subtract currentPage 1}}" class="page-btn">« Previous</a>
+                            {{/if}}
+                            <span class="page-info" style="font-weight: 600; color: #475569;">
+                                Page {{currentPage}} of {{totalPages}}
+                            </span>
+                            {{#if hasNextPage}}
+                                <a href="/cart?page={{add currentPage 1}}" class="page-btn">Next »</a>
+                            {{/if}}
+                        </div>
+                        {{/if}}
+                    {{else}}
+                        <div class="empty-cart-state">
+                            <p>Your StepHyve cart is empty..</p>
+                        </div>
                     {{/if}}
+                </section>
 
-                   <div class="item-pricing-row">
-    <!-- Changed from {{this.price}} to {{this.currentPrice}} -->
-    <span class="item-price" data-base-price="{{this.currentPrice}}">₹{{this.currentPrice}}</span>
-    
-    <div class="quantity-selector">
-        <button class="qty-btn" onclick="adjustCartQuantity(this, -1)">-</button>
-        <span class="qty-val" data-max="{{this.availableStock}}">{{this.quantity}}</span>
-        <button class="qty-btn" onclick="adjustCartQuantity(this, 1)">+</button>
-    </div>
-</div>
-                </div>
-                
-                <div class="item-actions-subtotal">
-                    <button class="delete-btn" onclick="removeCartRow(this)" aria-label="Delete item">
-                        <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                    <div class="subtotal-box">
-                        <span class="subtotal-label">SUBTOTAL</span>
-                        <span class="subtotal-price">₹{{this.itemSubtotal}}</span>
+                {{#if cart.items.length}}
+                <section class="summary-wrapper">
+                    <div class="summary-card">
+                        <h3>Order Summary</h3>
+                        
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="summary-subtotal">₹{{cart.subtotal}}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping estimate</span>
+                            <span class="free-text">Free</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax estimate (10%)</span>
+                            <span id="summary-tax">₹{{cart.taxEstimate}}</span>
+                        </div>
+
+                        <hr class="summary-divider">
+
+                        <div class="total-row">
+                            <div class="total-label-box">
+                                <span class="total-title">Total Amount</span>
+                                <span class="total-subtitle">INCLUDING ALL TAXES</span>
+                            </div>
+                            <span class="total-price" id="summary-total">₹{{cart.totalAmount}}</span>
+                        </div>
+
+                        {{#if hasCheckoutRestrictions}}
+                            <div class="checkout-restriction-notice" style="background: #fef2f2; border: 1px solid #fca5a5; padding: 15px; border-radius: 6px; margin-bottom: 15px; color: #991b1b; font-size: 13px; font-weight: 500;">
+                                ⚠️ Checkout is unavailable because items in your cart are out of stock or no longer available. Please resolve these issues to proceed.
+                            </div>
+                            <button class="checkout-btn" style="background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none;" disabled>
+                                Checkout Disabled
+                            </button>
+                        {{else}}
+                            <button type="button" class="checkout-btn" onclick="prepareAndGoToCheckout()">
+                                Proceed to Checkout
+                            </button>
+                        {{/if}}
+                        
+                        <p class="security-text">Secure SSL Encryption & 2-Year Warranty</p>
                     </div>
-                  
-                </div>
-                
-            </div>
-
-
-{{/each}}
-{{#if totalPages}}
-            <div class="pagination-controls" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 30px 0;">
-                
-                {{#if hasPrevPage}}
-                    <a href="/cart?page={{subtract currentPage 1}}" class="page-btn">« Previous</a>
+                </section>
                 {{/if}}
 
-                <span class="page-info" style="font-weight: 600; color: #475569;">
-                    Page {{currentPage}} of {{totalPages}}
-                </span>
-
-                {{#if hasNextPage}}
-                   <a href="/cart?page={{add currentPage 1}}" class="page-btn"> Next »</a>
-                {{/if}}
             </div>
-        {{/if}}
-
-    {{else}}
-        <div class="empty-cart-state">
-            <p>Your StepHyve cart is empty.</p>
         </div>
-    {{/if}}
-</section>
-        {{#if cart.items.length}}
-        <section class="summary-wrapper">
-            <div class="summary-card">
-                <h3>Order Summary</h3>
-                
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span id="summary-subtotal">₹{{cart.subtotal}}</span>
-                </div>
-                <div class="summary-row">
-                    <span>Shipping estimate</span>
-                    <span class="free-text">Free</span>
-                </div>
-                <div class="summary-row">
-                    <span>Tax estimate (10%)</span>
-                    <span id="summary-tax">₹{{cart.taxEstimate}}</span>
-                </div>
-                <div class="summary-row">
-                    <span>Discount</span>
-                    <span id="summary-discount">-₹0.00</span>
-                </div>
-
-                <hr class="summary-divider">
-
-                <div class="total-row">
-                    <div class="total-label-box">
-                        <span class="total-title">Total Amount</span>
-                        <span class="total-subtitle">INCLUDING ALL TAXES</span>
-                    </div>
-                    <span class="total-price" id="summary-total">₹{{cart.totalAmount}}</span>
-                </div>
-
-                {{#if hasCheckoutRestrictions}}
-                    <div class="checkout-restriction-notice" style="background: #fef2f2; border: 1px solid #fca5a5; padding: 15px; border-radius: 6px; margin-bottom: 15px; color: #991b1b; font-size: 13px; font-weight: 500;">
-                        ⚠️ Checkout is unavailable because items in your cart are out of stock or no longer available. Please resolve these issues to proceed.
-                    </div>
-                    <button class="checkout-btn" style="background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none;" disabled>
-                        Checkout Disabled
-                    </button>
-                {{else}}
-                    
-<button type="button" class="checkout-btn" onclick="prepareAndGoToCheckout()">
-    Proceed to Checkout
-</button>
-                {{/if}}
-                
-                <p class="security-text">Secure SSL Encryption & 2-Year Warranty</p>
-            </div>
-        </section>
-        {{/if}}
-
     </div>
 </div>
-
 
 <script>
 
@@ -295,8 +291,10 @@ async function removeCartRow(buttonElement) {
         confirmButtonText: 'Remove',
         cancelButtonText: 'Cancel',
         reverseButtons: true,
-        customClass: {
-            popup: 'small-swal'
+       customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
         }
     });
 

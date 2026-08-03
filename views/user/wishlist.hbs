@@ -47,7 +47,6 @@
                 <span>Material: <strong>{{this.productId.material}}</strong></span>
             {{/if}}
 
-            <!-- Display the exact stored variant color and size -->
             {{#if this.variantId}}
                 <span style="display: flex; align-items: center; gap: 6px;">
                     Color: <strong>{{this.variantId.colorName}}</strong>
@@ -120,7 +119,6 @@
         <div style="margin-bottom: 15px; text-align: left;">
             <label style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Available Sizes:</label>
             <div id="modalSizesContainer" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <!-- Dynamic sizes injected here -->
             </div>
         </div>
 
