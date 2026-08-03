@@ -24,10 +24,13 @@
             <input type="radio" name="discountType" value="fixed" {{#if (eq coupon.discountType 'fixed')}}checked{{/if}}>Flat Amount    </label>
         </div>
 
-        <div class="row">
-            <div class="col"><label>DISCOUNT VALUE</label><input type="number" name="discountValue" value="{{coupon.discountValue}}" required></div>
-            <div class="col"><label>MAX DISCOUNT</label><input type="number" name="maxDiscountAmount" value="{{coupon.maxDiscountAmount}}"></div>
-        </div>
+       <div class="row">
+        <div class="col"><label>DISCOUNT VALUE</label><input type="number" name="discountValue" value="{{coupon.discountValue}}" required></div>
+        <div class="col" id="maxDiscountField" style="display: {{#if (eq coupon.discountType 'fixed')}}none{{else}}block{{/if}};">
+        <label>MAX DISCOUNT</label>
+        <input type="number" name="maxDiscountAmount" value="{{coupon.maxDiscountAmount}}">
+       </div>
+      </div>
         <div class="row">
             <div class="col"><label>MIN ORDER AMOUNT</label><input type="number" name="min_orderAmount" value="{{coupon.min_orderAmount}}" required></div>
             <div class="col"><label>EXPIRY DATE</label><input type="date" name="expiryDate" value="{{coupon.expiryDate}}" required></div>
@@ -40,3 +43,27 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const radioButtons = document.querySelectorAll('input[name="discountType"]');
+    const maxDiscountField = document.getElementById("maxDiscountField");
+
+    function toggleMaxDiscountField() {
+        const selectedType = document.querySelector('input[name="discountType"]:checked');
+        if (selectedType && selectedType.value === "fixed") {
+            maxDiscountField.style.display = "none";
+            const input = maxDiscountField.querySelector('input');
+            if (input) input.value = ''; 
+        } else {
+            maxDiscountField.style.display = "block";
+        }
+    }
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener("change", toggleMaxDiscountField);
+    });
+
+    toggleMaxDiscountField();
+});
+</script>
