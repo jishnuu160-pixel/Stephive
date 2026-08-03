@@ -19,13 +19,9 @@
 
         <div class="hero-image-wrapper" style="flex: 1; position: relative;">
 
-        <button class="wishlist-btn {{#if isWishlisted}}active{{/if}}" data-product-id="{{product._id}}">
-              {{#if isWishlisted}}
-                   <i class="fa-solid fa-heart"></i>
-              {{else}}
-                   <i class="fa-regular fa-heart"></i>
-              {{/if}}
-           </button>
+<button class="wishlist-btn {{#if isWishlisted}}active{{/if}}" data-product-id="{{product._id}}">
+    <i class="{{#if isWishlisted}}fa-solid{{else}}fa-regular{{/if}} fa-heart"></i>
+</button>
 
             <div class="product-card">
     {{#if product.variants.[0].images.[0]}}
@@ -81,47 +77,49 @@
 
     <div class="config-group">
       <span class="config-label">SIZE: <strong id="selectedSizeIndicator">SELECT A SIZE</strong></span>
-      <div class="size-chips-grid" id="sizeChipsGrid">
-        {{#each product.variants.[0].sizes}}
-          <div class="size-option-card">
-            <button 
-              type="button" 
-              class="size-chip {{#if (eq this.stock 0)}}out-of-stock{{/if}}" 
-              {{#if (eq this.stock 0)}}disabled{{/if}}
-              onclick="updateSelectedSize('{{this.size}}', this)">
-              {{this.size}}
-            </button>
+<div class="size-chips-grid" id="sizeChipsGrid">
+  {{#each product.variants.[0].sizes}}
+    <div class="size-option-card">
+      <button 
+        type="button" 
+        class="size-chip {{#if (eq this.stock 0)}}out-of-stock{{/if}}" 
+        {{#if (eq this.stock 0)}}disabled{{/if}}
+        onclick="updateSelectedSize('{{this.size}}', this)">
+        {{this.size}}
+      </button>
 
-            <div class="stock-status">
-              {{#if (eq this.stock 0)}}
-                <small class="sold-out">(Sold Out)</small>
-              {{else if (lt this.stock 5)}}
-                <small class="low-stock">(Only {{this.stock}} left)</small>
-              {{/if}}
-            </div>
-          </div>
-        {{/each}}
+      <div class="stock-status">
+        {{#if (eq this.stock 0)}}
+          <small class="sold-out">(Sold Out)</small>
+        {{else if (lt this.stock 5)}}
+          <small class="low-stock">(Only {{this.stock}} left)</small>
+        {{else}}
+          <small class="in-stock">Stock: {{this.stock}}</small>
+        {{/if}}
       </div>
     </div>
+  {{/each}}
+</div>
+    </div>
 
-      <div class="purchase-action-matrix">
-        <div class="quantity-stepper">
-          <button type="button" onclick="updateQty(-1)">-</button>
-          <input type="text" id="purchaseQty" value="1" readonly>
-          <button type="button" onclick="updateQty(1)">+</button>
-        </div>
-        
-        <button type="button" class="btn-secondary-cart" 
-          onclick="addToCart('{{product._id}}', activeVariantId, chosenSize)">
-          <img class="nav-icons" src="/icons/cart.png">
-          Add to Cart
-        </button>
-        
-        <button type="button" class="btn-primary-buy" onclick="buyNow('{{product._id}}')">
-          <img class="nav-icons" src="/icons/shopping-bag.png">
-          Buy Now
-        </button>
-      </div>
+<div class="purchase-action-matrix" id="purchaseActionMatrix" style="display: {{#if product.variants}}{{#if product.variants.length}}none{{else}}flex{{/if}}{{else}}flex{{/if}};">
+    <div class="quantity-stepper">
+        <button type="button" onclick="updateQty(-1)">-</button>
+        <input type="text" id="purchaseQty" value="1" readonly>
+        <button type="button" onclick="updateQty(1)">+</button>
+    </div>
+    
+    <button type="button" class="btn-secondary-cart" 
+        onclick="addToCart('{{product._id}}', activeVariantId, chosenSize)">
+        <img class="nav-icons" src="/icons/cart.png">
+        Add to Cart
+    </button>
+    
+    <button type="button" class="btn-primary-buy" onclick="buyNow('{{product._id}}')">
+        <img class="nav-icons" src="/icons/shopping-bag.png">
+        Buy Now
+    </button>
+</div>
 
 </div>
   </div>
@@ -250,10 +248,12 @@
         if (element) element.classList.add('active-thumb');
     }
 
-    function updateSelectedColor(colorName, variantId, variantIndex, buttonElement) {
+function updateSelectedColor(colorName, variantId, variantIndex, buttonElement) {
         chosenColor = colorName;
         activeVariantId = variantId;
         chosenSize = null;
+        
+        document.getElementById("purchaseActionMatrix").style.display = "none";
         
         document.getElementById("selectedSizeIndicator").innerText = "SELECT A SIZE";
         document.getElementById("selectedColorLabel").innerText = colorName;
@@ -307,6 +307,8 @@
                 statusDiv.innerHTML = '<small class="sold-out">(Sold Out)</small>';
             } else if (isLowStock) {
                 statusDiv.innerHTML = `<small class="low-stock">(Only ${sizeObj.stock} left)</small>`;
+            } else {
+                statusDiv.innerHTML = `<small class="in-stock">Stock: ${sizeObj.stock}</small>`;
             }
 
             container.appendChild(sizeButton);
@@ -315,17 +317,20 @@
             sizeChipsGrid.appendChild(container);
         });
     }
-
-    function updateSelectedSize(sizeValue, buttonElement) {
+       
+function updateSelectedSize(sizeValue, buttonElement) {
         chosenSize = sizeValue;
-        document.getElementById("selectedSizeIndicator").innerText = sizeValue;
+        const indicator = document.getElementById("selectedSizeIndicator");
+        indicator.innerText = sizeValue;
+        indicator.style.color = "#10b981"; 
         
         document.querySelectorAll('.size-chip').forEach(el => el.classList.remove('active-size'));
         buttonElement.classList.add('active-size');
 
         document.getElementById("purchaseQty").value = 1;
-    }
 
+        document.getElementById("purchaseActionMatrix").style.display = "flex";
+    }
    function updateQty(change) {
     if (!chosenSize) {
         return showToast("Please select a size first", "error");
@@ -354,7 +359,9 @@
 }
 
 async function addToCart(productId, variantId, size) {
-    console.log("Frontend values:", { productId, variantId, size });
+    if (!chosenSize) {
+        return showToast("Please select a size before adding to cart!", "error");
+    }
 
     if (!variantId || !size) {
         return showToast("Please select a color and size first!", "error");
@@ -410,51 +417,63 @@ async function addToCart(productId, variantId, size) {
         setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 2500);
     }
 
-  document.querySelector(".wishlist-btn").addEventListener("click", async function(){
+document.querySelector(".wishlist-btn").addEventListener("click", async function(){
     const btn = this;
+    const isCurrentlyActive = btn.classList.contains("active");
+
+    if (!isCurrentlyActive && !chosenSize) {
+        return showToast("Please select a size first before saving to wishlist", "error");
+    }
+
     const productId = btn.dataset.productId;
 
     try {
         const response = await fetch("/wishlist/toggle", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId })
+            body: JSON.stringify({ 
+                productId: productId, 
+                variantId: activeVariantId || null, 
+                size: chosenSize || null
+            })
         });
 
         const data = await response.json();
 
-        if (data.success) {
-            btn.classList.toggle("active");
+if (data.success) {
             const icon = btn.querySelector("i");
-            const isNowActive = btn.classList.contains("active");
 
-            if (isNowActive) {
-                icon.classList.replace("fa-regular", "fa-solid");
+            if (data.isWishlisted === true) {
+                btn.classList.add("active");
+                if (icon) {
+                    icon.classList.remove("fa-regular");
+                    icon.classList.add("fa-solid");
+                }
                 showToast("Added to wishlist", "success");
             } else {
-                icon.classList.replace("fa-solid", "fa-regular");
+                btn.classList.remove("active");
+                if (icon) {
+                    icon.classList.remove("fa-solid");
+                    icon.classList.add("fa-regular");
+                }
                 showToast("Removed from wishlist", "info");
             }
 
             if (window.updateGlobalWishlistCount) {
                 window.updateGlobalWishlistCount(data.newCount);
             }
-        }else{
-            if(response.status=401){
-               if (typeof showToast === "function") showToast("Please log in to manage wishlist",'info');
-            }else{
-                if(typeof showToast === "function") showToast("Failed to add to wishlist","error");
-            }
         }
     } catch (err) {
-        console.error(err);
+        console.error("Wishlist Error:", err);
         showToast("Something went wrong", "error");
     }
 });
 
 
 async function buyNow(productId) {
-    if (!chosenSize) return showToast("Please select a size", "error");
+    if (!chosenSize) {
+        return showToast("Please select a size before proceeding to checkout", "error");
+    }
     
     const btn = document.querySelector('.btn-primary-buy');
     btn.disabled = true;
@@ -484,18 +503,5 @@ async function buyNow(productId) {
     }
 }
 
-function updateStockUI(selectedVariant, selectedSize) {
-    const sizeObj = selectedVariant.sizes.find(s => s.size == selectedSize);
-    const buyBtn = document.getElementById("buyNowBtn");
 
-    if (sizeObj.stock <= 0) {
-        buyBtn.disabled = true;
-        buyBtn.innerText = "Out of Stock";
-        buyBtn.classList.add("btn-disabled");
-    } else {
-        buyBtn.disabled = false;
-        buyBtn.innerText = "Buy Now";
-        buyBtn.classList.remove("btn-disabled");
-    }
-}
 </script>
