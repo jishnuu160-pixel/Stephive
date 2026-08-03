@@ -16,7 +16,6 @@ const transporter = nodemailer.createTransport({
  * @param {string|number} otp - The One-Time Password to send
  */
 export const sendOtpEmail = async (email, otp) => {
-    // 👇 This will print the OTP directly to your terminal console
     console.log(`====================================`);
     console.log(`🔑 DEV MODE - OTP for ${email}: ${otp}`);
     console.log(`====================================`);
