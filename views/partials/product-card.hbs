@@ -1,11 +1,4 @@
 <div class="product-card-gender">      
-     <button class="wishlist-btn {{#if isWishlisted}}active{{/if}}" data-product-id="{{this._id}}">
-           {{#if isWishlisted}}
-                <i class="fa-solid fa-heart"></i>
-           {{else}}
-                <i class="fa-regular fa-heart"></i>
-           {{/if}}
-        </button>
     <div class="product-image">
         {{#if this.variants.[0].images.[0]}}
             <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}">
@@ -41,42 +34,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.querySelector(".wishlist-btn").addEventListener("click", async function(){
-    const btn = this;
-    const productId = btn.dataset.productId;
-
-    try {
-        const response = await fetch("/wishlist/toggle", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            btn.classList.toggle("active");
-            const icon = btn.querySelector("i");
-            const isNowActive = btn.classList.contains("active");
-
-            if (isNowActive) {
-                icon.classList.replace("fa-regular", "fa-solid");
-                showToast("Added to wishlist", "success");
-            } else {
-                icon.classList.replace("fa-solid", "fa-regular");
-                showToast("Removed from wishlist", "info");
-            }
-
-            if (window.updateGlobalWishlistCount) {
-                window.updateGlobalWishlistCount(data.newCount);
-            }
-        }
-    } catch (err) {
-        console.error(err);
-        showToast("Something went wrong", "error");
-    }
-});
- 
-</script>
