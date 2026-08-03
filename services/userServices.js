@@ -8,17 +8,62 @@ import { generateReferralCode } from '../utils/idGenerator.js';
 
 
 export const signup = async (data) => {
-    const existingUser = await userRepo.findByEmail(data.email);
+    const { fullName, email, phoneNumber, password, confirmPassword, referralCode } = data;
+    const errors = {};
+
+    if (!fullName || !fullName.trim()) {
+        errors.fullName = "Full Name is required";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !email.trim()) {
+        errors.email = "Email Address is required";
+    } else if (!emailRegex.test(email.trim())) {
+        errors.email = "Please enter a valid email address";
+    }
+
+    const phoneStr = phoneNumber ? phoneNumber.toString().trim() : "";
+    if (!phoneStr) {
+        errors.phoneNumber = "Phone Number is required";
+    } else if (!/^\d{10}$/.test(phoneStr)) {
+        errors.phoneNumber = "Phone number must be exactly 10 digits";
+    }
+
+    if (!password) {
+        errors.password = "Password is required";
+    } else if (password.length < 6) {
+        errors.password = "Password must be at least 6 characters long";
+    }
+
+    if (password !== confirmPassword) {
+        errors.confirmPassword = "Passwords do not match";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        const validationError = new Error("Validation Failed");
+        validationError.validationErrors = errors;
+        throw validationError;
+    }
+
+    const existingUser = await userRepo.findByEmail(email.trim());
     if (existingUser) {
         throw new Error('User already exists');
     }
-   
-    const myCode = generateReferralCode(data.fullName);
+
+    const existingPhone = await userRepo.findByPhone(phoneStr);
+    if (existingPhone) {
+        throw new Error('Phone number already registered');
+    }
+
+    const myCode = generateReferralCode(fullName.trim());
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const userData = {
         ...data,
+        fullName: fullName.trim(),
+        email: email.trim(),
+        phoneNumber: phoneStr,
         password: hashedPassword,
         referralCode: myCode,
         isBlocked: false, 
@@ -28,12 +73,13 @@ export const signup = async (data) => {
 
     let referrer = null;
 
-    if (data.referralCode && data.referralCode.trim() !== '') {
-        if (data.referralCode.toUpperCase() === myCode.toUpperCase()) {
+    if (referralCode && referralCode.trim() !== '') {
+        const cleanRefCode = referralCode.trim().toUpperCase();
+        if (cleanRefCode === myCode.toUpperCase()) {
             throw new Error("You cannot use your own referral code.");
         }
 
-        referrer = await userRepo.findByReferralCode(data.referralCode.toUpperCase());
+        referrer = await userRepo.findByReferralCode(cleanRefCode);
         
         if (!referrer) {
             throw new Error("Invalid referral code.");
@@ -59,8 +105,8 @@ export const signup = async (data) => {
             referrer_user_id: referrer._id,
             referred_user_id: newUser._id, 
             status: 'completed', 
-            rewardAmount: REFERRAL_BONUS ,
-            referralCode: data.referralCode.toUpperCase()
+            rewardAmount: REFERRAL_BONUS,
+            referralCode: referralCode.trim().toUpperCase()
         });
 
         await walletRepo.updateWallet(
@@ -117,7 +163,6 @@ export const sendOTP = async (email) => {
     console.log(`\n=========================================`);
     console.log(` OTP for ${email} is [ ${otp} ]`);
     console.log(`=========================================\n`);
-    // ------------------------------------------
 
     const mailOptions = {
         from: '"StepHive Support" <stephive3@gmail.com>',
@@ -277,8 +322,8 @@ export const updateProfile = async (userId, data) => {
     const phoneStr = phoneNumber ? phoneNumber.toString().trim() : "";
     if (!phoneStr) {
         errors.phone = "*Mobile Number is required";
-    } else if (!/^\d{11,12}$/.test(phoneStr)) {
-        errors.phone = "*Phone number must be 11 or 12 digits";
+    } else if (!/^\d{10}$/.test(phoneStr)) {
+        errors.phone = "*Phone number must be 10 digits";
     }
 
     if (Object.keys(errors).length > 0) {
@@ -390,8 +435,8 @@ export const editAddress = async (
 
     if (!phoneStr) {
         errors.phone = "*Mobile Number is required";
-    } else if (!/^\d{11,12}$/.test(phoneStr)) {
-        errors.phone = "Phone number must be exactly 11 or 12 digits and contain only numbers";
+    } else if (!/^\d{10}$/.test(phoneStr)) {
+        errors.phone = "Phone number must be exactly 10 digits and contain only numbers";
     }  
 
     if (!street?.trim()) {
@@ -457,3 +502,170 @@ export const editAddress = async (
     );
 };
 
+export const addAddressCheckout = async (userId, addressData) => {
+    const { fullName, phone, street, city, state, pincode } = addressData;
+    const errors = {};
+
+    if (!fullName || !fullName.trim()) {
+        errors.fullName = "Full name is required.";
+    }
+
+    if (!phone || !phone.trim()) {
+        errors.phone = "Mobile number is required.";
+    } else if (!/^\d{10}$/.test(phone.trim())) {
+        errors.phone = "Enter a valid 10-digit mobile number.";
+    }
+
+    if (!street || !street.trim()) {
+        errors.street = "Street address is required.";
+    }
+
+    if (!city || !city.trim()) {
+        errors.city = "City is required.";
+    }
+
+    if (!state || !state.trim()) {
+        errors.state = "State is required.";
+    }
+
+    if (!pincode || !pincode.trim()) {
+        errors.pincode = "Pincode is required.";
+    } else if (!/^\d{6}$/.test(pincode.trim())) {
+        errors.pincode = "Enter a valid 6-digit pincode.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        const validationError = new Error("Validation failed");
+        validationError.validationErrors = errors;
+        throw validationError;
+    }
+
+    const sanitizedData = {
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        street: street.trim(),
+        apartment: addressData.apartment?.trim() || '',
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim(),
+        label: addressData.label?.trim() || 'Home',
+        isDefault: addressData.isDefault || false
+    };
+
+    if (sanitizedData.isDefault) {
+        await userRepo.clearDefaultAddresses(userId);
+    }
+
+    return await userRepo.addAddress(userId, sanitizedData);
+};
+
+export const clearDefaultAddresses = async (userId) => {
+    return await User.updateOne(
+        { _id: userId },
+        { $set: { "addresses.$[].isDefault": false } }
+    );
+};
+
+
+export const getAddressByIdService = async (userId, addressId) => {
+    const address = await userRepo.getAddressById(userId, addressId);
+    if (!address) {
+        throw new Error("Address not found");
+    }
+    return address;
+};
+
+
+export const editAddressCheckout = async (userId, addressId, addressData) => {
+    const { fullName, phone, street, city, state, pincode } = addressData;
+    const errors = {};
+
+    if (!fullName || !fullName.trim()) {
+        errors.fullName = "Full name is required.";
+    }
+
+    if (!phone || !phone.trim()) {
+        errors.phone = "Mobile number is required.";
+    } else if (!/^\d{10}$/.test(phone.trim())) {
+        errors.phone = "Enter a valid 10-digit mobile number.";
+    }
+
+    if (!street || !street.trim()) {
+        errors.street = "Street address is required.";
+    }
+
+    if (!city || !city.trim()) {
+        errors.city = "City is required.";
+    }
+
+    if (!state || !state.trim()) {
+        errors.state = "State is required.";
+    }
+
+    if (!pincode || !pincode.trim()) {
+        errors.pincode = "Pincode is required.";
+    } else if (!/^\d{6}$/.test(pincode.trim())) {
+        errors.pincode = "Enter a valid 6-digit pincode.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        const validationError = new Error("Validation failed");
+        validationError.validationErrors = errors;
+        throw validationError;
+    }
+
+    const sanitizedData = {
+        fullName: fullName.trim(),
+        phone: phone.trim(),
+        street: street.trim(),
+        apartment: addressData.apartment?.trim() || '',
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim(),
+        label: addressData.label?.trim() || 'Home',
+        isDefault: addressData.isDefault || false
+    };
+
+    if (sanitizedData.isDefault) {
+        await userRepo.clearDefaultAddresses(userId);
+    }
+
+    return await userRepo.updateAddress(userId, addressId, sanitizedData);
+};
+
+export const deleteAddressService = async (userId, addressId) => {
+    if (!addressId) {
+        throw new Error("Address ID is required.");
+    }
+
+    const updatedUser = await userRepo.removeAddressFromDb(userId, addressId);
+
+    if (!updatedUser) {
+        throw new Error("User or address not found.");
+    }
+
+    return updatedUser;
+};
+
+export const changeEmailService = async (userId, currentEmail, newEmail) => {
+    if (!newEmail || !newEmail.trim()) {
+        throw new Error("New email is required.");
+    }
+
+    const sanitizedEmail = newEmail.trim().toLowerCase();
+
+    if (sanitizedEmail === currentEmail.toLowerCase()) {
+        const error = new Error("New email must be different from your current one.");
+        error.isValidation = true;
+        throw error;
+    }
+
+    const existingUser = await userRepo.findByEmail(sanitizedEmail);
+    if (existingUser) {
+        const error = new Error("This email is already registered to another account.");
+        error.isValidation = true;
+        throw error;
+    }
+
+    return await userRepo.updateUserInfo(userId, { email: sanitizedEmail });
+};
