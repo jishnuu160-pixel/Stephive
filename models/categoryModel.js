@@ -17,9 +17,9 @@ const categorySchema = new mongoose.Schema({
         default: null 
     },
 
-    offer: {
+ offer: {
         discountValue: { 
-            type: String, 
+            type: Number, 
             default: 0,
             min: 0,
             max: 99
@@ -31,6 +31,14 @@ const categorySchema = new mongoose.Schema({
         offerType: { 
             type: String, 
             default: 'Percentage' 
+        },
+        startDate: { 
+            type: Date, 
+            default: null 
+        },
+        expiryDate: { 
+            type: Date, 
+            default: null 
         }
     },
     isListed: {
