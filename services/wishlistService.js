@@ -7,6 +7,7 @@ export const getWishlist = async (userId) => {
     }
 
     let wishlist = await wishlistRepo.findByUserId(userId);
+    console.log("Details of service:",wishlist);
     
     if (!wishlist) {
         wishlist = await wishlistRepo.createWishlist(userId);
@@ -17,21 +18,18 @@ export const getWishlist = async (userId) => {
     return wishlist;
 };
 
-export const toggleWishlist=async(userId,productId)=>{
-    
-    return await wishlistRepo.toggleWishlist(userId,productId);
+export const toggleWishlist = async (userId, productId, variantId, size) => {
+    return await wishlistRepo.toggleWishlist(userId, productId, variantId, size);
 };
 
-export const isInWishlist = async (userId, productId) => {
-
-    return await wishlistRepo.isInWishlist(userId, productId);
+export const isInWishlist = async (userId, productId, variantId, size) => {
+    return await wishlistRepo.isInWishlist(userId, productId, variantId, size);
 };
 
-export const getWishlistCount= async(userId)=>{
-
+export const getWishlistCount = async (userId) => {
     return await wishlistRepo.findWishlistCount(userId);
 }
 
-export const removeFromWishlist = async (userId, productId) => {
-    return await wishlistRepo.removeFromWishlist(userId, productId);
+export const removeFromWishlist = async (userId, productId, variantId, size) => {
+    return await wishlistRepo.removeFromWishlist(userId, productId, variantId, size);
 };
