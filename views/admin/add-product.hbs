@@ -581,8 +581,8 @@ if (!category) {
     clearFieldError(categoryInput);
 }
 
-if (!price || Number(price) <= 0) {
-    showFieldError(priceInput, "Enter valid price");
+if (!price || Number(price) <= 500) {
+    showFieldError(priceInput, "Price should be at least 500");
     hasError = true;
 } else {
     clearFieldError(priceInput);
@@ -626,10 +626,22 @@ if (!countryInput.value.trim()) {
 
 if (hasError) return;
    
-   const totalCards = document.querySelectorAll('#variantsContainer .variant-card');
-   if (totalCards.length === 0) {
-       return showValidationError("Please add at least one color variant configuration");
-   }
+  const totalCards = document.querySelectorAll('#variantsContainer .variant-card');
+    
+    if (totalCards.length === 0) {
+        if (typeof Toastify === "function") {
+            Toastify({
+                text: "Please add at least one color variant configuration",
+                duration: 4000,
+                gravity: "top",
+                position: "right",
+                style: { background: "#ef4444", borderRadius: "8px" }
+            }).showToast();
+        } else {
+            alert("Please add at least one color variant configuration");
+        }
+        return; 
+    }
 
    let validationPassed = true;
    let errorMessage = "";
