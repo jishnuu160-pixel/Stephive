@@ -63,7 +63,8 @@
                         </div>
                     </td>
                 </tr>
-                {{/each}} 
+                {{/each}}
+               
             </tbody>
         </table>
 
@@ -106,25 +107,23 @@
 
                 <div class="form-group">
                     <label class="checkbox-label">
-                        <!-- Added 'checked' attribute here -->
                         <input type="checkbox" id="isParentCheckboxAdd" checked onchange="toggleParentField(this.checked, 'parentCategoryWrapperAdd', 'addParentSelect')">
                         <span class="checkbox-text">Set as Parent Category</span>
                     </label>
                 </div>
 
-                <!-- Added style="display: none;" so it's hidden initially when checked -->
-                <div id="parentCategoryWrapperAdd" class="parent-wrapper-add" style="display: none;">
-                    <div class="parent-inner-grid">
-                        <div class="form-group">
-                            <label class="form-label">Parent Category</label>
-                           <select id="addParentSelect" name="parentCategory" class="form-select cursor-pointer">
-                             {{#each @root.parentCategories}}
-                              <option value="{{this._id}}">{{this.name}}</option>
-                             {{/each}}
-                           </select>
-                        </div>
-                    </div>
-                </div>
+               <div id="parentCategoryWrapperAdd" class="parent-wrapper-add" style="display: none;">
+             <div class="parent-inner-grid">
+              <div class="form-group">
+                <label class="form-label">Parent Category</label>
+                <select id="addParentSelect" name="parentCategory" class="form-select cursor-pointer" disabled>
+               {{#each @root.parentCategories}}
+               <option value="{{this._id}}">{{this.name}}</option>
+               {{/each}}
+            </select>
+            </div>
+          </div>
+         </div>
             </div>
 
             <div class="modal-footer">
@@ -188,15 +187,38 @@
     // --- 1. MODAL CONTROLS ---
     const showModal = (id) => {
         const modal = document.getElementById(id);
-        if (modal) modal.style.display = 'flex';
+        if (modal) {
+            modal.style.display = 'flex';
+            const errorContainer = modal.querySelector('.error-container');
+            if (errorContainer) {
+                errorContainer.textContent = '';
+                errorContainer.style.display = 'none';
+            }
+        }
     };
 
     const closeCategoryModal = () => {
-        document.getElementById('addCategoryModal').style.display = 'none';
+        const modal = document.getElementById('addCategoryModal');
+        if (modal) modal.style.display = 'none';
+        
+        const errorContainer = document.getElementById('addErrorContainer');
+        if (errorContainer) {
+            errorContainer.textContent = '';
+            errorContainer.style.display = 'none';
+        }
+        const form = document.getElementById('addCategoryForm');
+        if (form) form.reset();
     };
 
     const closeEditModal = () => {
-        document.getElementById('editCategoryModal').style.display = 'none';
+        const modal = document.getElementById('editCategoryModal');
+        if (modal) modal.style.display = 'none';
+        
+        const errorContainer = document.getElementById('editErrorContainer');
+        if (errorContainer) {
+            errorContainer.textContent = '';
+            errorContainer.style.display = 'none';
+        }
     };
 
     // --- 2. UNIFIED FORM SUBMISSION ---
@@ -260,9 +282,15 @@
         const wrapper = document.getElementById(wrapperId);
         const select = document.getElementById(selectId);
         
-        
         wrapper.style.display = isParent ? 'none' : 'block';
-        if (isParent && select) select.value = "";
+        if(select){
+            if(isParent){
+                select.value = "";
+                select.disabled = true;
+            } else {
+                select.disabled = false;
+            }
+        }
     }
 
     // --- 4. GLOBAL EVENT LISTENERS & HELPERS ---

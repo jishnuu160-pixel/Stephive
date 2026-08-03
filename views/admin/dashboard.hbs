@@ -1,6 +1,5 @@
 <div class="dashboard-container">
     <main class="main-content">
-     
 
         <div class="stats-container">
             <div class="stat-card">
@@ -39,6 +38,7 @@
                 <div class="stat-details">
                     <p>Cancelled Orders</p>
                     <h3>{{cancelledOrder}}</h3>
+
                 </div>
             </div>
         </div>
@@ -46,11 +46,12 @@
 </div>
 
 
+
+
 <div class="dashboard-card">
   <div class="dashboard-header">
     <h2 id="report-title">Report for this week</h2>
     
-    <!-- Filter Buttons -->
     <div class="filter-buttons">
       <button class="filter-btn active" data-filter="week">This week</button>
       <button class="filter-btn" data-filter="month">This Month</button>
@@ -58,7 +59,6 @@
     </div>
   </div>
 
-  <!-- Chart Canvas -->
   <div class="chart-container" style="position: relative; height:350px;">
     <canvas id="salesTrendChart"></canvas>
   </div>
