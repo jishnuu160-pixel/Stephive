@@ -13,7 +13,13 @@ const orderSchema = new mongoose.Schema({
     price: Number,
     quantity: Number,
     size: String,
-    color: String
+    color: String,
+    status: { 
+      type: String, 
+      enum: ['placed', 'processing', 'shipped', 'out of delivery', 'delivered', 'cancelled', 'Returned'],
+      default: 'placed',
+      lowercase: true,
+    }
   }],
 
   deliveryAddress: {
@@ -36,8 +42,9 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['razorpay', 'cod', 'wallet'] },
   status: { 
     type: String, 
-    enum: ['pending', 'processing', 'shipped', 'out of delivery', 'delivered', 'cancelled', 'Returned'],
-    default: 'pending'
+    enum: ['placed', 'processing', 'shipped', 'out of delivery', 'delivered', 'cancelled', 'Returned'],
+    default: 'placed',
+    lowercase: true,
   },
   expectedDeliveryDate: { type: Date },
   couponId: { type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' },
@@ -45,7 +52,6 @@ const orderSchema = new mongoose.Schema({
   cancelReason: String,
   cancelledAt: Date
 }, { timestamps: true }); 
-
 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 
