@@ -13,66 +13,61 @@ export const createWishlist = async (userId) => {
     });
 };
 
-export const toggleWishlist=async(userId,productId)=>{
+export const toggleWishlist = async (userId, productId, variantId, size) => {
+    const wishlist = await Wishlist.findOne({ user_id: userId });
 
-    let wishlist=await Wishlist.findOne({user_id:userId});
-
-    if(!wishlist){
-
-        wishlist=new Wishlist({
-
-            user_id:userId,
-
-            items:[{productId}]
-
+    if (!wishlist) {
+        return await Wishlist.create({
+            user_id: userId,
+            items: [{ productId, variantId, size }]
         });
-
-        await wishlist.save();
-
-        return;
-
     }
 
-    const index=wishlist.items.findIndex(item=>
-
-        item.productId.toString()===productId
-
+    const exists = wishlist.items.some(item => 
+        item.productId && item.productId.toString() === productId &&
+        item.variantId && item.variantId.toString() === variantId &&
+        item.size === size
     );
 
-    if(index>-1){
-
-        wishlist.items.splice(index,1);
-
-    }else{
-
-        wishlist.items.push({productId});
-
+    if (exists) {
+        return await Wishlist.findOneAndUpdate(
+            { user_id: userId },
+            { $pull: { items: { productId, variantId, size } } },
+            { new: true }
+        );
+    } else {
+        return await Wishlist.findOneAndUpdate(
+            { user_id: userId },
+            { $addToSet: { items: { productId, variantId, size } } },
+            { new: true }
+        );
     }
-
-    await wishlist.save();
-
 };
 
-export const isInWishlist = async (userId, productId) => {
+export const isInWishlist = async (userId, productId, variantId, size) => {
     const wishlist = await Wishlist.findOne({
         user_id: userId,
-        "items.productId": productId
+        items: {
+            $elemMatch: {
+                productId: productId,
+                variantId: variantId,
+                size: size
+            }
+        }
     });
 
     return !!wishlist;
 };
 
-export const findWishlistCount= async(userId)=>{
-    const wishlist= await Wishlist.findOne({user_id:userId});
+export const findWishlistCount = async (userId) => {
+    const wishlist = await Wishlist.findOne({ user_id: userId });
+    return wishlist ? wishlist.items.length : 0;
+};
 
-    return wishlist? wishlist.items.length:0;
-}
-
-
-export const removeFromWishlist = async (userId, productId) => {
+export const removeFromWishlist = async (userId, productId, variantId, size) => {
     return await Wishlist.findOneAndUpdate(
-        { userId: userId },
-        { $pull: { items: { productId: productId } } },
+        { user_id: userId },
+        { $pull: { items: { productId, variantId, size } } },
         { new: true } 
     );
 };
