@@ -40,15 +40,17 @@
 </a>
             </p>
 
-            <a href="{{#if target}}/user/profile{{else}}/user/forgot-password{{/if}}" class="back-link">
-            {{#if (eq target 'email')}}
-             ← BACK TO PROFILE
-             {{else if (eq target 'updatepassword')}}
-             ← BACK TO PROFILE 
-          {{else}}
-              ← BACK TO FORGOT PASSWORD
-           {{/if}}
-          </a>
+<a href="{{#if (eq target 'signup')}}/user/signup{{else if (eq target 'email')}}/user/profile{{else if (eq target 'updatepassword')}}/user/profile{{else}}/user/forgot-password{{/if}}" class="back-link">
+    {{#if (eq target 'email')}}
+        ← BACK TO PROFILE
+    {{else if (eq target 'updatepassword')}}
+        ← BACK TO PROFILE 
+    {{else if (eq target 'signup')}}
+        ← BACK TO SIGNUP
+    {{else}}
+        ← BACK TO FORGOT PASSWORD
+    {{/if}}
+</a>
         </form>
     </div>
 </section>
@@ -78,7 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
     inputs.forEach((input, index) => {
         input.addEventListener("input", (e) => {
             if (e.inputType === "deleteContentBackward") return; 
-
             if (input.value && index < inputs.length - 1) {
                 inputs[index + 1].focus();
             }
@@ -104,17 +105,41 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", (e) => {
         if (hiddenOtp.value.length !== 6) {
             e.preventDefault();
-            
             if (jsErrorBox) {
                 jsErrorBox.innerText = "Please enter the full 6-digit code!";
                 jsErrorBox.style.display = "block";
-
                 setTimeout(() => {
                     jsErrorBox.style.display = "none";
                 }, 3000);
             }
         }
     });
+
+    const timerDisplay = document.getElementById("timer");
+    const timerContainer = document.getElementById("timer-container");
+    const resendLink = document.getElementById("resend-link");
+    const serverExpiryInput = document.getElementById("serverExpiryTime");
+
+    if (serverExpiryInput && timerDisplay && timerContainer && resendLink) {
+        const expiryTime = parseInt(serverExpiryInput.value, 10) || (Date.now() + 60000);
+
+        const updateTimer = () => {
+            const timeLeft = Math.max(0, Math.floor((expiryTime - Date.now()) / 1000));
+            const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+            const seconds = String(timeLeft % 60).padStart(2, '0');
+
+            timerDisplay.innerText = `${minutes}:${seconds}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                timerContainer.style.display = "none";
+                resendLink.style.display = "inline"; 
+            }
+        };
+
+        updateTimer();
+        const countdownInterval = setInterval(updateTimer, 1000);
+    }
 });
 </script>
 
