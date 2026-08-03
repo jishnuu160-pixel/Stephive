@@ -50,11 +50,11 @@ export const findOrderById = async (orderId, options = {}) => {
 };
 
 
-export const updateOrder = async (orderId, updateData, session = null) => {
+export const updateOrder = async (orderId, updateData, options = {}) => {
     return await Order.findByIdAndUpdate(
         orderId, 
-        { $set: updateData }, 
-        { session, new: true }
+        updateData, 
+        { returnDocument: 'after', ...options }
     );
 };
 
@@ -156,7 +156,7 @@ export const aggregateTotalSales = async () => {
     const result = await Order.aggregate([
         {
             $match: {
-                status: { $nin: ['Cancelled', 'cancelled', 'Returned', 'returned','delivered','Delivered'] }
+                status: { $nin: ['Cancelled', 'cancelled', 'Returned', 'returned'] }
             }
         },
         {
@@ -167,4 +167,8 @@ export const aggregateTotalSales = async () => {
         }
     ]);
     return result.length > 0 ? result[0].totalSales : 0;
+};
+
+export const findByCustomOrderId = async (orderId, options = {}) => {
+    return await Order.findOne({ orderId: orderId }, null, options).lean();
 };
