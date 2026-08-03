@@ -2,7 +2,7 @@
   <header class="order-header">
     <div class="header-left">
       <h1>Order #{{orderId}}</h1>
-      <p>Placed on {{createdAt}}</p>
+      <p>Placed on {{formattedDate createdAt}} at {{formattedTime createdAt}}</p>
     </div>
     <span class="status-badge">{{status}}</span>
   </header>
@@ -32,7 +32,7 @@
         <span>Discount</span> <span>-₹ {{discount}}</span>
         <span>Tax</span> <span>₹ {{tax}}</span>
         <span>Shipping</span> <span>Free</span>
-        <strong>Total</strong> <strong>₹{{total}}</strong>
+        <strong>Total</strong>  <span>₹{{total}}</span>
         <span>Payment Method</span> <span>{{paymentMethod}}</span>
       </div>
     </aside>
@@ -42,7 +42,6 @@
     <div class="customer-info">
       <h2 >CUSTOMER INFO</h2>
       <p><strong>Name:</strong> {{this.deliveryAddress.fullName}}<br>
-         <strong>Email:</strong> {{order.user_id.email}}<br>
          <strong>Mobile:</strong> {{this.deliveryAddress.mobileNumber}}</p>
       <h3>Delivery Address</h3>
       <p>{{this.deliveryAddress.addressLine1}},<br> {{this.deliveryAddress.city}},<br>{{this.deliveryAddress.state}}, {{this.deliveryAddress.pincode}}</p>
@@ -53,14 +52,31 @@
       <form action="/admin/orders/update/{{order._id}}" method="POST">
         <label>CURRENT STATUS:</label>
         <select name="status">
-          <option value="Processing" {{#if (eq order.status "Processing")}}selected{{/if}}>Processing</option>
-          <option value="Shipped" {{#if (eq order.status "Shipped")}}selected{{/if}}>Shipped</option>
-          <option value="Out of delivery" {{#if (eq order.status "Out of delivery")}}selected{{/if}}>Out of Delivery</option>
-          <option value="Delivered" {{#if (eq order.status "Delivered")}}selected{{/if}}>Delivered</option>
-          <option value="Cancelled" {{#if (eq order.status "Cancelled")}}selected{{/if}}>Cancelled</option>
-        </select>
+        <option value="placed" {{#if (eq status "placed")}}selected{{/if}}>Placed</option>
+        <option value="processing" {{#if (eq status "processing")}}selected{{/if}}>Processing</option>
+        <option value="shipped" {{#if (eq status "shipped")}}selected{{/if}}>Shipped</option>
+        <option value="out of delivery" {{#if (eq status "out of delivery")}}selected{{/if}}>Out of Delivery</option>
+        <option value="delivered" {{#if (eq status "delivered")}}selected{{/if}}>Delivered</option>
+        <option value="cancelled" {{#if (eq status "cancelled")}}selected{{/if}}>Cancelled</option>
+       </select>
         <button type="submit" class="save-btn">Save changes</button>
       </form>
     </div>
   </footer>
 </div>
+
+{{#if errorMessage}}
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        showToast('{{errorMessage}}', 'error');
+    });
+</script>
+{{/if}}
+
+{{#if successMessage}}
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        showToast('{{successMessage}}', 'success');
+    });
+</script>
+{{/if}}
