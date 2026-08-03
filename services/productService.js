@@ -62,10 +62,23 @@ export const getShopProducts = async (req) => {
         const startIndex = skip;
 
         const allCategories = await findAllCategories();
-        const activeCategoryObjectIds = allCategories
-            .filter(cat => !cat.isUnlisted)
-            .map(cat => new mongoose.Types.ObjectId(cat._id));  
 
+        const isCategoryActive = (cat) => {
+            if (cat.isUnlisted === true || cat.isUnlisted === 'true') return false;
+            if (cat.isListed === false || cat.isListed === 'false') return false;
+            
+            if (cat.parentCategory) {
+                const parent = allCategories.find(c => c._id.toString() === (cat.parentCategory._id || cat.parentCategory).toString());
+                if (parent && (parent.isUnlisted === true || parent.isUnlisted === 'true' || parent.isListed === false || parent.isListed === 'false')) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        const activeCategoryObjectIds = allCategories
+            .filter(cat => cat.parentCategory !== null && isCategoryActive(cat))
+            .map(cat => new mongoose.Types.ObjectId(cat._id));  
 
         let searchFilter = { 
             isListed: true,
@@ -81,15 +94,15 @@ export const getShopProducts = async (req) => {
         }
 
         if (req.query.category) {
-        const selectedNames = Array.isArray(req.query.category) ? req.query.category : [req.query.category];
-    
-        const matchingCategories = await productRepo.getCategoryIdsByNames(selectedNames);
-        const targetIds = matchingCategories.map(c => c._id);
-    
-        if (targetIds.length > 0) {
-        searchFilter.Category = { $in: targetIds };
+            const selectedNames = Array.isArray(req.query.category) ? req.query.category : [req.query.category];
+        
+            const matchingCategories = await productRepo.getCategoryIdsByNames(selectedNames);
+            const targetIds = matchingCategories.map(c => c._id);
+        
+            if (targetIds.length > 0) {
+                searchFilter.Category = { $in: targetIds };
+            }
         }
-      }
 
         if (req.query.brand) {
             const brandIds = Array.isArray(req.query.brand) ? req.query.brand : [req.query.brand];
@@ -97,34 +110,60 @@ export const getShopProducts = async (req) => {
         }
 
         if (req.query.price && req.query.price !== 'all') {
-        if (req.query.price === 'under5k') searchFilter.regularPrice = { $lt: 5000 };
-        else if (req.query.price === '5k-10k') searchFilter.regularPrice = { $gte: 5000, $lte: 10000 };
-        else if (req.query.price === 'above10k') searchFilter.regularPrice = { $gt: 10000 };
-       }
-
-
-        if (req.query.material) {
-         searchFilter.material = { $regex: new RegExp(`^${req.query.material}$`, 'i') };
+            if (req.query.price === 'under5k') searchFilter.regularPrice = { $lt: 5000 };
+            else if (req.query.price === '5k-10k') searchFilter.regularPrice = { $gte: 5000, $lte: 10000 };
+            else if (req.query.price === 'above10k') searchFilter.regularPrice = { $gt: 10000 };
         }
 
-       const [products, totalProducts, rawBrands, rawMaterials] = await Promise.all([
-         productRepo.findProducts(searchFilter, getSort(req.query.sort), skip, limit), 
-         productRepo.countProducts(searchFilter),
-         productRepo.distinctBrands(),
-         productRepo.distinctMaterials({}) 
-         ]);
+        if (req.query.material) {
+            searchFilter.material = { $regex: new RegExp(`^${req.query.material}$`, 'i') };
+        }
 
-       const brands = rawBrands.map(brandName => ({
-        name: brandName,
-        isSelected: req.query.brand === brandName 
-       }));
+        const filterForOptions = { ...searchFilter };
+        delete filterForOptions.brand;
+        delete filterForOptions.material;
+
+        const [products, totalProducts, rawBrands, rawMaterials] = await Promise.all([
+            productRepo.findProducts(searchFilter, getSort(req.query.sort), skip, limit), 
+            productRepo.countProducts(searchFilter),
+            productRepo.distinctBrandsByQuery(filterForOptions),
+            productRepo.distinctMaterials(filterForOptions)      
+        ]);
+
+        const brands = rawBrands.map(brandName => ({
+            name: brandName,
+            isSelected: Array.isArray(req.query.brand) 
+                ? req.query.brand.includes(brandName) 
+                : req.query.brand === brandName 
+        }));
 
         const materials = rawMaterials.map(m => ({
-        name: m,
-        isSelected: req.query.material === m
-        }));  
+            name: m,
+            isSelected: req.query.material === m
+        }));   
 
         const totalPages = Math.ceil(totalProducts / limit);
+
+        const categoryMap = {};
+        allCategories.forEach(cat => {
+            if (cat.parentCategory !== null) {
+                if (!categoryMap[cat.name]) {
+                    categoryMap[cat.name] = false;
+                }
+                if (isCategoryActive(cat)) {
+                    categoryMap[cat.name] = true;
+                }
+            }
+        });
+
+        const filteredCategoriesForUI = Object.keys(categoryMap)
+            .filter(catName => categoryMap[catName]) 
+            .map(catName => ({
+                name: catName,
+                isSelected: req.query.category 
+                    ? (Array.isArray(req.query.category) ? req.query.category.includes(catName) : req.query.category === catName) 
+                    : false
+            }));
 
         return {
             products,
@@ -138,19 +177,7 @@ export const getShopProducts = async (req) => {
             nextPage: page + 1,
             prevPage: page - 1,
             searchValue: req.query.search || "",
-            categories: allCategories
-        .filter(cat => !cat.isUnlisted && cat.parentCategory !== null)
-        .reduce((acc, cat) => {
-            if (!acc.find(c => c.name === cat.name)) {
-                acc.push({
-                    name: cat.name,
-                    isSelected: req.query.category 
-                        ? (Array.isArray(req.query.category) ? req.query.category.includes(cat.name) : req.query.category === cat.name) 
-                        : false
-                });
-            }
-            return acc;
-        }, [])
+            categories: filteredCategoriesForUI
         };
     } catch (error) {
         console.error("Error inside getShopProducts:", error);
