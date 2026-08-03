@@ -45,8 +45,12 @@ export const updateCouponData = async (id, updatedData) => {
 
 
 export const getActiveCoupons = async () => {
-    const data = await Coupon.find({ status: 'Active' });
-    return data;
+    const currentDate = new Date();
+    return await Coupon.find({
+        status: 'Active',
+        startDate: { $lte: currentDate },
+        expiryDate: { $gte: currentDate }
+    });
 };
 
 
@@ -76,4 +80,5 @@ export const decrementUseCount = async (couponId) => {
         throw error;
     }
 };
+
 
