@@ -122,12 +122,30 @@
             <p class="description">Size: {{this.size}}</p>
             <div class="labels">
                 <span class="qty">Quantity: {{this.quantity}}</span>
-                <span class="processing">{{../order.status}}</span>
+                
+                <span class="processing {{#if (eq this.status 'cancelled')}}cancelled{{else if this.status}}{{toLowerCase this.status}}{{else}}{{toLowerCase ../order.status}}{{/if}}">
+                    {{#if (eq this.status 'cancelled')}}
+                        Cancelled
+                    {{else if this.status}}
+                        {{this.status}}
+                    {{else}}
+                        {{../order.status}}
+                    {{/if}}
+                </span>
             </div> 
-      <p class="cancel-item">cancel item 🗙</p>
+            
+            {{#if (eq this.status 'cancelled')}}
+                <p class="cancelled-label" style="color: #dc2626; font-size: 13px; font-weight: 500;">Item Cancelled</p>
+            {{else}}
+                {{#if (or (eq ../order.status 'placed') (eq ../order.status 'processing'))}}
+                    <p class="cancel-item" onclick="confirmCancelItem('{{../order._id}}', '{{this._id}}')" style="cursor: pointer; color: #dc2626;">
+                        cancel item 🗙
+                    </p>
+                {{/if}}
+            {{/if}}
         </div>
         <div class="price">
-           Price: ₹{{this.price}}
+            Price: ₹{{this.price}}
         </div>
     </div>
     {{/each}}
@@ -159,33 +177,23 @@
                     <span class="paid-badge">{{order.paymentStatus}}</span>
                 </div>
             </div>
-      <div class="card">
-      {{#unless (eq order.status 'cancelled')}}
+  <div class="card">
+    {{#unless (eq order.status 'cancelled')}}
         <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
             <i class="fa-solid fa-download"></i> Download Invoice
         </a>
-      {{/unless}}
+    {{/unless}}
 
-      {{#if isReturnable}}
+    {{#if isReturnable}}
         <a href="/orders/return/{{order._id}}" class="return-order-btn">
             <i class="fa-solid fa-rotate-left"></i> Return Order
         </a>
-      {{else if showCancelButton}}
+    {{else if showCancelButton}}
         <button type="button" class="cancel-order-btn" onclick="confirmCancel('{{order._id}}')">
             <i class="fa-solid fa-circle-xmark"></i> Cancel Order
         </button>
-      {{/if}}
+    {{/if}}
 </div>
-
-{{#if isDelivered}}
-   <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
-    <i class="fa-solid fa-download"></i> Download Invoice
-   </a>
-<a href="/orders/return/{{order._id}}" class="return-order-btn">
- <i class="fa-solid fa-rotate-left"></i> Return Order
-</a>  
-
-{{/if}}
 </div> 
 </section>
 
@@ -218,7 +226,12 @@ async function confirmCancel(orderId) {
         showCancelButton: true,
         confirmButtonColor: '#dc2626',
         cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Yes, cancel it!'
+        confirmButtonText: 'Yes, cancel it!',
+        customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
+        }
     });
 
     if (result.isConfirmed) {
@@ -236,6 +249,43 @@ async function confirmCancel(orderId) {
             }
         } catch (error) {
             Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+    }
+}
+
+async function confirmCancelItem(orderId, itemId) {
+    const result = await Swal.fire({
+        title: 'Are you sure you want to cancel this item?',
+        text: "If this is the only active item, the entire order will be cancelled.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, cancel it!',
+        customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
+        }
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch(`/orders/${orderId}/cancel-item/${itemId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                Swal.fire('Cancelled!', data.message || 'Item has been cancelled.', 'success')
+                    .then(() => window.location.reload());
+            } else {
+                throw new Error(data.message || 'Failed to cancel item');
+            }
+        } catch (error) {
+            Swal.fire('Error!', error.message || 'Something went wrong.', 'error');
         }
     }
 }
