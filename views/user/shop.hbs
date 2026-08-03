@@ -1,9 +1,10 @@
 <div class="shop-container">
     {{#if searchValue}}
+     <p><a href="/shop" class="back-to-shop">⬅ Back to Shop</a></p>
         <header class="hero-section">
             <div class="hero-content">
                 <h1>Search Results For "{{searchValue}}"</h1>
-                <p><a href="/shop">Back to Shop</a></p>
+              
             </div>
         </header>
     {{else}}
@@ -61,50 +62,3 @@
     {{/unless}}
 </div>
 
-<script>
-document.addEventListener("click", async function (event) {
-    const btn = event.target.closest(".wishlist-btn");
-    if (!btn) return; 
-
-    event.preventDefault();
-    const productId = btn.dataset.productId;
-    if (!productId) return;
-
-    try {
-        const response = await fetch("/wishlist/toggle", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            btn.classList.toggle("active");
-            const icon = btn.querySelector("i");
-            const isNowActive = btn.classList.contains("active");
-
-            if (isNowActive) {
-                icon.classList.replace("fa-regular", "fa-solid");
-                if (typeof showToast === "function") showToast("Added to wishlist", "success");
-            } else {
-                icon.classList.replace("fa-solid", "fa-regular");
-                if (typeof showToast === "function") showToast("Removed from wishlist", "info");
-            }
-
-            if (window.updateGlobalWishlistCount) {
-                window.updateGlobalWishlistCount(data.newCount);
-            }
-        } else {
-            if (response.status === 401) {
-                if (typeof showToast === "function") showToast("Please log in to manage wishlist", "warning");
-            } else {
-                if (typeof showToast === "function") showToast("Failed to update wishlist", "error");
-            }
-        }
-    } catch (err) {
-        console.error("Wishlist sync error:", err);
-        if (typeof showToast === "function") showToast("Something went wrong", "error");
-    }
-});
-</script>
