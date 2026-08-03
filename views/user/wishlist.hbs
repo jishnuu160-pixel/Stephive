@@ -36,16 +36,31 @@
 
             <tr>
                  
-                <td class="product-col">
+<td class="product-col">
+    <img src="{{this.productId.variants.[0].images.[0]}}" alt="{{this.productId.productName}}">
 
-                    <img src="{{this.productId.variants.[0].images.[0]}}" alt="{{this.productId.productName}}">
+    <div class="product-info">
+        <h5>{{this.productId.productName}}</h5>
+        
+        <div class="product-meta" style="font-size: 13px; color: #64748b; display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            {{#if this.productId.material}}
+                <span>Material: <strong>{{this.productId.material}}</strong></span>
+            {{/if}}
 
-                    <div class="product-info">
-                        <h5>{{this.productId.productName}}</h5>
-                        <h6>{{this.productId.material}}</h6> 
-                    </div>
+            <!-- Display the exact stored variant color and size -->
+            {{#if this.variantId}}
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    Color: <strong>{{this.variantId.colorName}}</strong>
+                    <span style="width: 12px; height: 12px; border-radius: 50%; background-color: {{this.variantId.colorHex}}; display: inline-block; border: 1px solid #cbd5e1;"></span>
+                </span>
+            {{/if}}
 
-                </td>
+            {{#if this.size}}
+                <span>Size: <strong>{{this.size}}</strong></span>
+            {{/if}}
+        </div>
+    </div>
+</td>
 
                 <td class="price-col">
 
@@ -57,23 +72,26 @@
 
                 </td>
 
-                <td class="action-col">
+<td class="action-col">
+<a href="/details/{{this.productId._id}}?variant={{this.variantId}}&size={{this.size}}" class="view-btn">
+    <i class="fa-solid fa-eye"></i>
+</a>
 
-                    <a href="/details/{{this.productId._id}}" class="view-btn">
-                        <i class="fa-solid fa-eye"></i>
-                    </a>
-
-                    <button type="button" class="btn-secondary-cart" 
+<button type="button" class="btn-secondary-cart" 
     data-product="{{json this.productId}}" 
+    data-variant-id="{{this.variantId._id}}" 
+    data-size="{{this.size}}"
     onclick="openSizeSelector(this)" title="Select Size & Add">
     <i class="fa-solid fa-cart-shopping"></i>
 </button>
 
-                    <button class="delete-btn" data-id="{{this.productId._id}}">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-
-                </td>
+   <button class="delete-btn" 
+        data-id="{{this.productId._id}}" 
+        data-variant-id="{{this.variantId._id}}" 
+        data-size="{{this.size}}">
+    <i class="fa-solid fa-trash"></i>
+</button>
+</td>
 
             </tr>
 
@@ -95,12 +113,10 @@
 </section>
 
 
-<!-- Size & Quantity Selector Modal -->
 <div id="sizeSelectorModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
     <div style="background: #fff; padding: 25px; border-radius: 8px; width: 380px; max-width: 90%; text-align: center;">
         <h4 id="modalProductName" style="margin-bottom: 15px;">Select Size & Quantity</h4>
         
-        <!-- Sizes Container -->
         <div style="margin-bottom: 15px; text-align: left;">
             <label style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Available Sizes:</label>
             <div id="modalSizesContainer" style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -108,7 +124,6 @@
             </div>
         </div>
 
-        <!-- Quantity Selector Container (Hidden until a size is picked) -->
         <div id="modalQtyWrapper" style="display: none; margin-bottom: 20px; text-align: left;">
             <label for="modalQtyInput" style="font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px;">Quantity:</label>
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -119,7 +134,6 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
         <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
             <button type="button" onclick="closeSizeModal()" style="padding: 8px 15px; cursor: pointer; background: #6c757d; color: #fff; border: none; border-radius: 4px;">Cancel</button>
             <button type="button" id="confirmAddToCartBtn" style="padding: 8px 15px; cursor: pointer; background: #0f172a; color: #fff; border: none; border-radius: 4px;" disabled>Add to Cart</button>
@@ -238,31 +252,29 @@ document.getElementById("confirmAddToCartBtn").addEventListener("click", async (
         const cartData = await cartResponse.json();
 
         if (cartData.success) {
-            const wishlistResponse = await fetch("/wishlist/toggle", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId })
-            });
-            const wishlistData = await wishlistResponse.json();
-
             showToast("Added to cart successfully", "success");
             closeSizeModal();
 
-            if (wishlistData.success) {
-                const button = document.querySelector(`button[data-product*="${productId}"]`);
-                if (button) {
+            const buttons = document.querySelectorAll(".btn-secondary-cart");
+            buttons.forEach(button => {
+                const productAttr = button.getAttribute('data-product');
+                const rowVariantId = button.getAttribute('data-variant-id');
+                const rowSize = button.getAttribute('data-size');
+                
+                if (productAttr && productAttr.includes(productId) && rowVariantId === chosenVariantId && rowSize === chosenSize) {
                     button.closest("tr").remove();
                 }
+            });
 
-                const headerP = document.querySelector(".wishlist-header p");
-                let currentCount = parseInt(headerP.innerText);
-                let newCount = currentCount - 1;
-                headerP.innerText = `${newCount >= 0 ? newCount : 0} items saved`;
+            const headerP = document.querySelector(".wishlist-header p");
+            let currentCount = parseInt(headerP.innerText) || 1;
+            let newCount = currentCount - 1;
+            headerP.innerText = `${newCount >= 0 ? newCount : 0} items saved`;
 
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            }
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+
         } else {
             throw new Error(cartData.message || "Failed to add to cart");
         }
@@ -274,6 +286,8 @@ document.getElementById("confirmAddToCartBtn").addEventListener("click", async (
 document.querySelectorAll(".delete-btn").forEach(button => {
     button.addEventListener("click", async function () {
         const productId = this.dataset.id;
+        const variantId = this.dataset.variantId; 
+        const size = this.dataset.size;          
         const row = this.closest("tr");
 
         const result = await Swal.fire({
@@ -283,16 +297,21 @@ document.querySelectorAll(".delete-btn").forEach(button => {
             showCancelButton: true,
             confirmButtonText: "Yes, Remove",
             cancelButtonColor: "#6c757d",
-            confirmButtonColor: "#ef4444"
+            confirmButtonColor: "#ef4444",
+            customClass: {
+                popup: 'small-swal-popup',
+                title: 'small-swal-title',
+                htmlContainer: 'small-swal-text'
+            }
         });
-
+        
         if (!result.isConfirmed) return;
 
         try {
             const response = await fetch("/wishlist/toggle", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId })
+                body: JSON.stringify({ productId, variantId, size }) 
             });
 
             const data = await response.json();
