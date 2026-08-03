@@ -1,64 +1,205 @@
+/* ==========================================================================
+   PROFILE SIDEBAR
+   ========================================================================== */
+
 /* Sidebar Container */
 .profile-sidebar {
-    width: 260px;
-    background: white;
-    border-radius: 15px;
-    padding: 15px 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    height: fit-content;
-    flex-shrink: 0;
+  width: 260px;
+  background: white;
+  border-radius: 15px;
+  padding: 15px 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  height: fit-content;
+  flex-shrink: 0;
 }
 
-/* Nav Items */
+/* User header */
+.sidebar-user-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.user-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Navigation */
 .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 15px;
-    text-decoration: none;
-    color: #718096;
-    border-radius: 12px;
-    transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #718096;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.nav-item:hover {
+  background: #f7fafc;
+  color: #2d3748;
 }
 
 .nav-item.active {
-    background: #eef2ff; /* Your primary-blue */
+  background: #eef2ff;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+/* Icons */
+.nav-icon {
+  width: 11px;
+  height: 11px;
+}
+
+.sidebar-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logout {
+  color: red;
+}
+
+/* ==========================================================================
+   RESPONSIVE SIDEBAR
+   ========================================================================== */
+
+/* Tablets & Small Laptops */
+@media screen and (max-width: 1024px) {
+
+  .profile-sidebar {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .profile-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide profile info on smaller screens */
+  .sidebar-user-header {
+    display: none;
+  }
+
+  .nav-item {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+    gap: 8px;
+  }
+
+  .nav-item.active {
+    width: auto;
+    padding: 10px 14px;
+  }
+
+  .sidebar-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Mobile Devices */
+@media screen and (max-width: 768px) {
+
+  .profile-sidebar {
+    padding: 10px 12px;
+    border-radius: 12px;
+    gap: 8px;
+  }
+
+  .nav-item {
+    padding: 9px 12px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .nav-item.active {
+    width: auto;
+    padding: 9px 12px;
+  }
+
+  .sidebar-icon {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+
+  .profile-sidebar {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sidebar-user-header {
+    display: none;
+  }
+
+  .nav-item {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13px;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  /* Keep the text visible */
+  .nav-item span {
+    display: inline;
+  }
+
+  .nav-item.active {
+    background: #eef2ff;
     color: #4a5568;
     font-weight: 600;
     width: 100%;
-    padding-right: 120px;
-    border: none;
-   box-shadow: none;
-   border-radius: 12px;
-    
+  }
+
+  .sidebar-icon {
+    width: 16px;
+    height: 16px;
+  }
 }
 
-.nav-icon {
-    width: 11px;
-    height: 11px;
-}
+/* Very Small Devices */
+@media screen and (max-width: 360px) {
 
-/* Targeting the icons directly */
-.sidebar-icon {
-    width: 16px;          /* THIS is the standard small dashboard size */
-    height: 16px;         /* Forces both dimensions to match */
-    object-fit: contain;  /* Essential: ensures the icon aspect ratio isn't distorted */
-    flex-shrink: 0;       /* Prevents the icon from getting squashed if the text is long */
-}
+  .profile-sidebar {
+    padding: 6px 8px;
+  }
 
-.user-icon{
-    height: 40px;
-    width: 40px;
-    border-radius: 50px;
-}
+  .nav-item {
+    padding: 8px;
+  }
 
-.logout{
-    color: red;
-}
-
-.sidebar-user-header{
-    gap: 20px;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 6px;
+  .sidebar-icon {
+    width: 16px;
+    height: 16px;
+  }
 }

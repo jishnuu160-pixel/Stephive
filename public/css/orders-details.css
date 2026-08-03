@@ -118,21 +118,21 @@
 
 /* Processing - Yellow / Orange */
 
-.status-badge-order.Processing {
+.status-badge-order.processing {
     background-color: #fef3c7;
     color: #b45309;
 }
 
 /* Shipped - Purple */
-.status-badge-order.Shipped {
+.status-badge-order.shipped {
     background-color: #ede9fe;
     color: #6d28d9;
 }
 
 /* Delivered - Green */
-.status-badge-order.Delivered {
+.status-badge-order.delivered {
     background-color: #dcfce7;
-    color: #15803d;
+    color: #14e561;
 }
 
 .status-badge-order.cancelled,
@@ -142,7 +142,7 @@
 }
 
 /* Color for Returned (Soft Orange / Amber) */
-.status-badge-order.Returned {
+.status-badge-order.returned {
     background-color: #ffedd5;
     color: #ff4c05;
 }
@@ -153,7 +153,7 @@
 }
 
 /* Color for Out of delivery */
-.status-badge-order[class*="Out of delivery"] {
+.status-badge-order[class*="out of delivery"] {
     background-color: #ccfbf1;
     color: #0f766e;
 }
@@ -251,7 +251,7 @@
 .order-details-container .item-card {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   padding: 20px 0;
   border-bottom: 1px solid #f1f5f9;
 }
@@ -300,7 +300,7 @@
 /* --- Order Summary Sidebar --- */
 .order-details-container .order-summary {
   background: #ffffff;
-  padding: 32px;
+  padding: 22px;
   border-radius: 14px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
@@ -431,21 +431,341 @@
   transform: scale(0.98);
 }
 
-/* --- Responsive Layout for Mobile Devices --- */
-@media (max-width: 768px) {
-  .order-details-container .order-main,
-  .order-details-container .order-footer {
-    grid-template-columns: 1fr;
-  }
-  
-  .order-details-container {
-    padding: 16px;
-    margin: 16px;
-  }
-  
-  .order-details-container .order-header {
-    flex-direction: column;
-    align-items: flex-start;
+/* ==========================================================================
+   📱 COMPACT & MINIATURIZED ORDER DETAILS PAGE STYLING & MEDIA QUERIES
+   ========================================================================== */
+
+/* --- Base Reduced Sizing Adjustments --- */
+.table-card-order {
+    padding: 8px;
+    background: #fff;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    overflow: hidden;
+}
+
+.order-details-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f8fafc;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.03);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    box-sizing: border-box;
+    border: 1px solid #f1f5f9;
+}
+
+.order-details-container *, 
+.order-details-container *::before, 
+.order-details-container *::after {
+    box-sizing: inherit;
+}
+
+/* --- Header Section --- */
+.order-details-container .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 16px 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+}
+
+.order-details-container .header-left h1 {
+    padding: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+}
+
+.order-details-container .header-left p {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0;
+}
+
+.order-details-container .status-badge {
+    background-color: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    padding: 6px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+
+/* --- Main Layout Grid --- */
+.order-details-container .order-main {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr;
     gap: 16px;
-  }
+    margin-bottom: 16px;
+}
+
+.order-details-container h2 {
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    margin-top: 0;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+/* --- Ordered Items Section --- */
+.order-details-container .ordered-items {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.order-details-container .item-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.order-details-container .item-card:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.order-details-container .item-card:first-of-type {
+    padding-top: 0;
+}
+
+.order-details-container .item-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+}
+
+.order-details-container .item-details {
+    flex-grow: 1;
+    padding: 0;
+}
+
+.order-details-container .item-details h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+}
+
+.order-details-container .item-details p {
+    font-size: 11px;
+    color: #64748b;
+    margin: 0;
+}
+
+.order-details-container .item-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* --- Order Summary Sidebar --- */
+.order-details-container .order-summary {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    height: fit-content;
+}
+
+.order-details-container .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.order-details-container .summary-grid span:nth-child(even) {
+    text-align: right;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.order-details-container .summary-grid strong {
+    font-size: 13px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.order-details-container .summary-grid strong:nth-of-type(1) {
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 10px;
+    margin-top: 2px;
+    font-size: 14px;
+}
+
+/* --- Footer Section (Customer Info & Status Update) --- */
+.order-details-container .order-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.order-details-container .customer-info p {
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.4;
+    margin: 0 0 8px 0;
+}
+
+.order-details-container .customer-info h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    margin: 10px 0 4px 0;
+    text-transform: uppercase;
+}
+
+/* --- Status Update Form --- */
+.order-details-container .status-update form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #f8fafc;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.order-details-container .status-update label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.order-details-container .status-update select {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    color: #0f172a;
+    outline: none;
+    cursor: pointer;
+}
+
+.order-details-container .save-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   📱 COMPACT RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+
+@media screen and (max-width: 968px) {
+    .order-details-container {
+        max-width: 100%;
+        margin: 15px 10px;
+        padding: 16px;
+    }
+    .order-details-container .order-main {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .order-details-container .order-footer {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 16px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .order-details-container {
+        padding: 10px;
+        margin: 8px;
+        border-radius: 10px;
+    }
+    .order-details-container .order-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    .order-details-container .header-left h1 {
+        font-size: 15px;
+    }
+    .order-details-container .ordered-items,
+    .order-details-container .order-summary,
+    .order-details-container .order-footer {
+        padding: 12px;
+        border-radius: 8px;
+    }
+    .order-details-container .item-card img {
+        width: 48px;
+        height: 48px;
+    }
+    .order-details-container .item-details h3 {
+        font-size: 12px;
+    }
+    .order-details-container .item-details p {
+        font-size: 10px;
+    }
+    .order-details-container .item-price {
+        font-size: 12px;
+    }
+    .order-details-container .summary-grid {
+        font-size: 11px;
+    }
+    .order-details-container .status-update form {
+        padding: 10px;
+    }
+    .order-details-container .save-btn {
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .order-details-container {
+        padding: 8px;
+        margin: 4px;
+    }
+    .order-details-container .order-header {
+        padding: 10px;
+    }
+    .order-details-container .header-left h1 {
+        font-size: 14px;
+    }
+    .order-details-container .item-card img {
+        width: 40px;
+        height: 40px;
+    }
+    .order-details-container .summary-grid {
+        font-size: 10px;
+    }
 }

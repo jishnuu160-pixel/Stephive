@@ -1,0 +1,116 @@
+/* Scoped entirely inside .contact-page to prevent bleeding */
+.contact-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-image: url('/images/contact1.jpg');
+   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #1a1a1a;
+  box-sizing: border-box;
+}
+
+.contact-page *, 
+.contact-page *::before, 
+.contact-page *::after {
+  box-sizing: inherit;
+}
+
+.contact-page .contact-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.contact-page .contact-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #000000;
+}
+
+.contact-page .contact-header p {
+  font-size: 14px;
+  color: #000000;
+  margin: 0;
+}
+
+.contact-page .contact-card {
+  background-color: #90929670;
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 540px;
+}
+
+.contact-page .contact-card h3 {
+  font-size: 20px;
+  font-weight: 500;
+  color: #151313;
+  margin: 0 0 35px 0;
+}
+
+.contact-page .contact-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.contact-page .contact-item:last-child {
+  margin-bottom: 0;
+}
+
+.contact-page .icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.contact-page .email-icon {
+  background-color: #e2f0f9;
+  color: #2b7a9f;
+}
+
+.contact-page .phone-icon {
+  background-color: #e6e8eb;
+  color: #555555;
+}
+
+.contact-page .contact-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-page .label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #222222;
+  margin-bottom: 4px;
+}
+
+.contact-page .value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+
+.contact-page .value:hover {
+  text-decoration: underline;
+}
+
+.contact-page .subtext {
+  font-size: 12px;
+  color: #372e2e;
+}

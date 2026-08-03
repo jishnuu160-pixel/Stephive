@@ -202,3 +202,125 @@
 .password-containers i:hover {
   color: #69737c;
 }
+
+
+/* ==========================================
+   RESPONSIVE MEDIA QUERIES FOR SIGNUP SECTION
+   ========================================== */
+
+/* Tablets and medium screens (900px and down) */
+@media screen and (max-width: 900px) {
+    .signup-section {
+        padding: 30px 20px;
+        min-height: 100vh;
+    }
+
+    .signup-container {
+        flex-direction: column;
+        gap: 25px;
+        width: 100%;
+        max-width: 380px; /* Reduced to make the container compact */
+    }
+
+    .signup-card {
+        width: 100%;
+        max-width: 100%;
+        padding: 20px; /* Reduced padding for a smaller look */
+        border-radius: 14px;
+    }
+
+    .signup-image {
+        display: none; 
+    }
+}
+
+/* Mobile phones and small viewports (480px and down) - Extra Compact */
+@media screen and (max-width: 480px) {
+    .signup-section {
+        padding: 15px 8px;
+    }
+
+    .signup-container {
+        max-width: 72%;
+        width: 72%;
+    }
+
+    .signup-card {
+        padding: 12px 10px;
+        border-radius: 10px;
+    }
+
+    .signup-card h2 {
+        font-size: 15px;
+        margin-bottom: 2px;
+    }
+
+    .subtitle {
+        font-size: 9px;
+        margin-bottom: 8px;
+    }
+
+    .form-row-s {
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 0px;
+    }
+
+    .form-group-s {
+        width: 100%;
+    }
+
+    .form-group-s label {
+        font-size: 9px;
+        margin-bottom: 1px;
+    }
+
+    .form-group-s input,
+    .password-containers input {
+        padding: 6px 8px;
+        font-size: 11px;
+        border-radius: 6px;
+    }
+
+    .password-containers input {
+        padding-right: 30px !important;
+    }
+
+    .password-containers i {
+        font-size: 11px;
+    }
+
+    .btn-primary,
+    .google-btn {
+        padding: 7px;
+        font-size: 11px;
+        margin-top: 5px;
+        border-radius: 6px;
+    }
+
+    .google-btn img {
+        width: 13px;
+    }
+
+    .divider {
+        margin: 6px 0;
+        font-size: 8px;
+    }
+
+    .login-text {
+        margin-top: 6px;
+        font-size: 9px;
+    }
+
+    #toast-container {
+        top: 8px;
+        right: 8px;
+        left: 8px;
+    }
+
+    .toast {
+        padding: 8px 12px;
+        font-size: 11px;
+        text-align: center;
+    }
+}

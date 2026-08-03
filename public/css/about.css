@@ -1,65 +1,82 @@
+/* ===== ABOUT PAGE GLOBAL ===== */
 .about-page {
+    position: relative;
     color: #fff;
     font-family: 'Inter', sans-serif;
-    background-image: url('/images/about_bg.jpg');
-    background-size: cover;        /* Scales image to fill the container without distortion */
-    background-position: center;   /* Keeps the center of the image focused */
-    background-repeat: no-repeat;  /* Prevents the image from tiling */
-    background-attachment: fixed;  /* Keeps the image fixed while scrolling (premium feel) */
-    min-height: 100vh;
-}
-
-.hero-about { 
+    background-color: #000; /* Fallback color behind video/image */
+    background-image: url('/images/contact2.jpg');
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden; /* Prevents horizontal scroll on all devices */
+}
+
+/* ===== BACKGROUND VIDEO ===== */
+.bg-video {
+    position: fixed; /* Changed to fixed so it fills the screen during scroll */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ===== HERO SECTION ===== */
+.hero-about { 
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
+    padding: 80px 20px 40px 20px;
 }
 
-.hero-content{
+.hero-content {
     margin-top: 20px;
+    width: 100%;
 }
 
-.story { max-width: 700px; margin: 60px auto; text-align: center; color: #ccc; padding: 0 10px; }
+.hero-content h1 {
+    font-size: clamp(20px, 5vw, 32px); /* Fluid typography scaling */
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+/* ===== STORY SECTION ===== */
+.story { 
+    max-width: 700px; 
+    margin: 40px auto; 
+    text-align: center; 
+    color: #ccc; 
+    padding: 0 20px; 
+    line-height: 1.6;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+}
+
+/* ===== FEATURES & GLASS GRID ===== */
+.features h2 {
+    margin-left: 70px;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+}
 
 .glass-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
     max-width: 1000px;
-    margin: 40px auto;
+    margin: 30px auto;
     padding: 0 20px;
 }
 
 .glass-card {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-}
-
-.cta { text-align: center; padding: 80px 20px; }
-.btn-shop {
-    display: inline-block;
-    padding: 15px 40px;
-    background: #fff;
-    color: #000;
-    text-decoration: none;
-    border-radius: 30px;
-    font-weight: 700;
-    margin-top: 20px;
-}
-
-
-.glass-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 30px;
+    padding: 30px 20px;
     border-radius: 15px;
     text-align: center;
     transition: transform 0.3s ease, background 0.3s ease, border 0.3s ease;
@@ -67,11 +84,112 @@
 }
 
 .glass-card:hover {
-    transform: translateY(-10px); /* Lifts the card up by 10px */
-    background: rgba(255, 255, 255, 0.1); /* Slightly brighter on hover */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Slightly brighter border */
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.features h2{
-    margin-left: 70px;
+/* ===== CTA SECTION ===== */
+.cta { 
+    text-align: center; 
+    padding: 60px 20px; 
+}
+
+.btn-shop {
+    display: inline-block;
+    padding: 14px 35px;
+    background: #fff;
+    color: #000;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 700;
+    margin-top: 15px;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.btn-shop:hover {
+    background: #f0f0f0;
+    transform: scale(1.05);
+}
+
+
+/* ==========================================
+   Responsive Media Queries for Small Screens
+   ========================================== */
+
+/* Tablets and Below (Max 768px) */
+@media (max-width: 768px) {
+    .features h2 {
+        margin-left: 0;
+        text-align: center;
+        padding: 0 20px;
+    }
+
+    .story {
+        margin: 30px auto;
+    }
+
+    .cta {
+        padding: 50px 20px;
+    }
+}
+
+/* Standard Mobile Phones (Max 480px) */
+@media (max-width: 480px) {
+    .about-page {
+        background-attachment: scroll; /* Fixes mobile background lag */
+    }
+
+    .hero-about {
+        padding: 50px 15px 20px 15px;
+    }
+
+    .glass-grid {
+        grid-template-columns: 1fr; /* Forces 1 clean card per row */
+        gap: 15px;
+        padding: 0 15px;
+    }
+
+    .glass-card {
+        padding: 22px 15px; 
+    }
+
+    .cta {
+        padding: 40px 15px;
+    }
+
+    .btn-shop {
+        display: block;
+        width: 100%;
+        max-width: 280px; /* Keeps button from stretching too wide on wide phones */
+        margin: 15px auto 0 auto;
+        padding: 13px 20px;
+        box-sizing: border-box;
+    }
+}
+
+/* Extra Small Mobile Phones (Max 360px & below) */
+@media (max-width: 360px) {
+    .hero-about {
+        padding: 40px 10px 10px 10px;
+    }
+
+    .story {
+        padding: 0 10px;
+        margin: 20px auto;
+    }
+
+    .glass-grid {
+        padding: 0 10px;
+        gap: 12px;
+    }
+
+    .glass-card {
+        padding: 18px 12px;
+    }
+
+    .btn-shop {
+        font-size: 0.9rem;
+        padding: 12px 15px;
+    }
 }

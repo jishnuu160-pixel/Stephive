@@ -1,34 +1,19 @@
-/* In profile.css */
-
-.profile-layout {
-    display: flex;
-    gap: 30px;
-    align-items: flex-start; /* Keeps the sidebar and card at the top */
-}
-
-.profile-sidebar {
-    width: 260px;
-    flex-shrink: 0; /* Prevents the sidebar from getting squashed */
-}
-
-.profile-main {
-    flex: 1;           /* Takes up the remaining space */
-    max-width: 800px;  /* THIS keeps the details card from getting too big */
-}
-
-/* profile.css */
+/* ==========================================================================
+   👤 PROFILE PAGE - COMPLETE & UNIFIED CSS STYLESHEET
+   ========================================================================== */
 
 /* 1. Page Container & Breadcrumbs */
 .profile-page-container {
-    background-color: #f8fafc; /* Light grey background for the whole area */
+    background-color: #f8fafc;
     min-height: 100vh;
     padding-bottom: 50px;
 }
 
 .profile-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
 }
 
 .breadcrumb-container {
@@ -43,18 +28,36 @@
 
 /* 2. Side-by-Side Layout */
 .profile-layout {
-    display: flex;
-    gap: 30px;
-    align-items: flex-start; /* Keeps sidebar and main at the top */
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 30px !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
-/* 3. Main Content Area (The "Small" Card Logic) */
+.profile-sidebar {
+    background: #ffffff !important;
+    flex: 0 0 260px !important;
+    width: 260px !important;
+    border-radius: 20px !important;
+    padding: 30px 20px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
+    box-sizing: border-box !important;
+    position: sticky !important;
+    top: 20px !important;
+    flex-shrink: 0 !important;
+}
+
+/* 3. Main Content Area */
 .profile-main {
-    flex: 1;
-    max-width: 850px; /* This prevents the cards from stretching too wide */
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
+    flex: 1 !important;
+    min-width: 0 !important;
+    max-width: 850px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 25px !important;
+    box-sizing: border-box !important;
 }
 
 /* 4. Common Card Styling */
@@ -63,6 +66,7 @@
     border-radius: 16px;
     padding: 30px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-sizing: border-box;
 }
 
 /* 5. Avatar Summary Card */
@@ -107,31 +111,20 @@
 /* 6. Form Grid Styling */
 .form-grid {
     display: grid;
-    /* Create a 6-column hidden track to allow for easy 2-column and 3-column mixing */
     grid-template-columns: repeat(6, 1fr); 
     gap: 20px;
     margin-top: 20px;
 }
 
-/* Name and Email take up 3 slots each (50% each) */
 .form-grid .input-group:nth-child(1),
 .form-grid .input-group:nth-child(2) {
     grid-column: span 3;
 }
 
-/* Phone, Gender, and Referral take up 2 slots each (33% each) */
 .form-grid .input-group:nth-child(3),
 .form-grid .input-group:nth-child(4),
 .form-grid .input-group:nth-child(5) {
     grid-column: span 2;
-}
-
-/* Form Footer spans the whole width */
-.form-footer {
-    grid-column: span 6;
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
 }
 
 .input-group {
@@ -155,6 +148,7 @@
     border-radius: 10px;
     font-size: 14px;
     transition: border-color 0.2s;
+    box-sizing: border-box;
 }
 
 .input-group input:focus {
@@ -169,7 +163,12 @@
 }
 
 /* 7. Buttons / Actions */
-
+.form-footer {
+    grid-column: span 6;
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
 
 .btn-save {
     background: #4f46e5;
@@ -186,18 +185,9 @@
     background: #4338ca;
 }
 
-
-/* 7. Buttons / Actions - Updated for Black Style */
-.form-footer {
-    grid-column: span 6; /* Changed to 6 to match the grid width */
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-}
-
 .btn-outline {
-    background-color: #000000; /* Solid Black */
-    color: #ffffff !important; /* White Text */
+    background-color: #000000;
+    color: #ffffff !important;
     padding: 12px 25px;
     border: none;
     border-radius: 10px;
@@ -207,25 +197,22 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px; /* Space between icon and text */
+    gap: 10px;
     transition: background 0.3s ease;
 }
 
 .btn-outline:hover {
-    background-color: #333333; /* Dark Grey on hover */
+    background-color: #333333;
     color: #ffffff !important;
 }
 
-/* Icon scaling and color inversion */
 .edit-profile {
-    height: 12px; /* Slightly larger for better visibility */
+    height: 12px;
     width: 12px;
     object-fit: contain;
-    /* This makes a black icon white */
     filter: brightness(0) invert(1); 
 }
 
-/* Referral Wrapper fix (for consistency) */
 .referral-wrapper {
     display: flex;
     align-items: center;
@@ -235,15 +222,9 @@
     flex: 1;
 }
 
-.section-icon{
-     height: 12px;
-     width: 12px;
-     
-}
-
-.crop-modal-overlay{
-    width: 300px;
-    height: 200px;
+.section-icon {
+    height: 12px;
+    width: 12px;
 }
 
 /* 🟢 Modal Background Overlay */
@@ -253,23 +234,24 @@
     left: 0; 
     width: 100%; 
     height: 100%;
-    background: rgba(0, 0, 0, 0.75) !important; /* Slightly darker glass effect */
+    background: rgba(0, 0, 0, 0.75) !important;
     display: flex; 
     align-items: center; 
     justify-content: center;
-    z-index: 99999 !important; /* Keep it above all headers/sidebars */
+    z-index: 99999 !important;
 }
 
 /* 🟢 Modal Content Box Card */
 .crop-modal-content {
-    background: #ffffff !important; /* Strict solid white background card */
-    color: #1e293b !important;    /* Dark slate text color for readability */
+    background: #ffffff !important;
+    color: #1e293b !important;
     padding: 20px; 
     border-radius: 12px;
     max-width: 400px; 
     height: 430px;
     width: 90%; 
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box;
 }
 
 .crop-modal-content h3 {
@@ -280,13 +262,13 @@
     color: #0f172a !important;
 }
 
-/* 🟢 The Canvas Frame Container where the photo sits */
+/* 🟢 The Canvas Frame Container */
 .crop-area { 
     max-height: 280px; 
     height: 280px;
     width: 100%; 
     overflow: hidden; 
-    background: #f8fafc !important; /* Ultra-light grey inside background mesh */
+    background: #f8fafc !important;
     border: 1px solid #e2e8f0;
     border-radius: 8px; 
     display: flex;
@@ -294,14 +276,12 @@
     align-items: center;
 }
 
-/* Ensure the image scales neatly within the layout grid */
 .crop-area img { 
     max-width: 100%; 
     max-height: 100%; 
     display: block; 
 }
 
-/* Action Control Buttons Layout */
 .crop-modal-actions { 
     display: flex; 
     justify-content: flex-end; 
@@ -320,12 +300,13 @@
     cursor: pointer; 
     transition: background 0.2s;
 }
+
 .btn-cancel:hover {
     background: #e2e8f0 !important;
 }
 
-.btn-save { 
-    background: #004d40 !important; /* Premium dark teal branding theme */
+.crop-modal-actions .btn-save { 
+    background: #004d40 !important;
     color: #ffffff !important; 
     border: none !important; 
     padding: 8px 10px; 
@@ -335,6 +316,97 @@
     cursor: pointer; 
     transition: background 0.2s;
 }
-.btn-save:hover {
+
+.crop-modal-actions .btn-save:hover {
     background: #00332c !important;
+}
+
+
+/* ==========================================
+   RESPONSIVE MEDIA QUERIES (ALWAYS SIDE-BY-SIDE)
+   ========================================== */
+
+@media screen and (max-width: 1024px) {
+    .profile-wrapper {
+        padding: 10px !important;
+    }
+
+    /* Force row layout on every screen size */
+    .profile-layout {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 12px !important;
+    }
+
+    /* Shrink sidebar to fit smaller screens alongside the content */
+    .profile-sidebar {
+        flex: 0 0 50px !important;
+        width: 50px !important;
+        padding: 15px 8px !important;
+        position: sticky !important;
+        top: 10px !important;
+    }
+
+    /* Adjust main content to take remaining space */
+    .profile-main {
+        flex: 1 !important;
+        max-width: calc(100% - 122px) !important;
+        min-width: 0 !important;
+    }
+
+    .profile-card {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    /* Collapse the form grid to single column on tight screens for readability */
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .form-grid .input-group:nth-child(1),
+    .form-grid .input-group:nth-child(2),
+    .form-grid .input-group:nth-child(3),
+    .form-grid .input-group:nth-child(4),
+    .form-grid .input-group:nth-child(5) {
+        grid-column: span 1;
+    }
+
+    .form-footer {
+        grid-column: span 1;
+        flex-direction: column;
+    }
+
+    .form-footer .btn-save,
+    .form-footer .btn-outline {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .crop-modal-content {
+        padding: 15px;
+        height: auto;
+        max-height: 85vh;
+        width: 95%;
+    }
+
+    .crop-area {
+        height: 200px;
+    }
+
+    .crop-modal-actions {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .btn-cancel,
+    .crop-modal-actions .btn-save {
+        width: 100%;
+        padding: 10px;
+        text-align: center;
+    }
 }

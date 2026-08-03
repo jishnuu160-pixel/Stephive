@@ -248,3 +248,101 @@
   font-weight: 600;
 }
 
+/* ==========================================
+   RESPONSIVE MEDIA QUERIES FOR LOGIN PAGE
+   ========================================== */
+
+/* Tablets and small laptops (1024px and down) */
+@media screen and (max-width: 1024px) {
+    .login-page .hero {
+        height: auto;
+        min-height: 100vh;
+        padding: 40px;
+        gap: 30px;
+    }
+
+    .right h1 {
+        font-size: 34px;
+    }
+
+    .right p {
+        font-size: 15px;
+    }
+}
+
+/* Mobile phones & tablets in portrait (768px and down) */
+@media screen and (max-width: 768px) {
+    .login-page .hero {
+        flex-direction: column-reverse;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        text-align: center;
+        height: auto;
+        min-height: 100vh;
+        gap: 40px;
+    }
+
+    .right {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .right h1 {
+        font-size: 28px;
+    }
+
+    .right p {
+        font-size: 14px;
+    }
+
+    .signin-box {
+        width: 90%;
+        max-width: 360px;
+        padding: 20px;
+    }
+
+    .toast-error {
+        top: 20px;
+        right: 10px;
+        left: 10px;
+        min-width: unset;
+    }
+}
+
+/* Very small screens (400px and down) */
+@media screen and (max-width: 400px) {
+    .login-page .hero {
+        padding: 30px 15px;
+        gap: 25px;
+    }
+
+    .right h1 {
+        font-size: 24px;
+    }
+
+    .right p {
+        font-size: 13px;
+    }
+
+    .signin-box {
+        width: 70%;
+        padding: 18px 15px;
+        border-radius: 15px;
+    }
+
+    .signin-box h2 {
+        font-size: 13px;
+    }
+
+    .signin-box input {
+        padding: 7px 10px;
+        font-size: 11px;
+    }
+
+    .signin-box button, 
+    .google-btn {
+        padding: 9px;
+        font-size: 12px;
+    }
+}

@@ -421,3 +421,200 @@
     }
   }
 }
+
+/* ==========================================================================
+   📱 COMPACT & RESPONSIVE MEDIA QUERIES FOR ORDER CONFIRMATION VIEW
+   ========================================================================== */
+
+#order-confirmation-view-scoped {
+    /* Tablet & Smaller Laptops (Max Width: 968px) */
+    @media screen and (max-width: 968px) {
+        padding: 20px 15px;
+
+        .main-layout {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            padding: 20px;
+            border-radius: 16px;
+        }
+    }
+
+    /* Mobile Devices (Max Width: 768px) */
+    @media screen and (max-width: 768px) {
+        padding: 12px 8px;
+
+        .stepper {
+            margin-bottom: 20px;
+            overflow-x: auto;
+            justify-content: flex-start;
+            padding-bottom: 4px;
+        }
+
+        .step-line {
+            width: 25px;
+            margin: 0 6px;
+        }
+
+        .success-banner-card {
+            padding: 24px 14px;
+        }
+
+        .success-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 14px;
+        }
+
+        .main-title {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .order-id-badge {
+            font-size: 11px;
+            padding: 8px 16px;
+            margin-bottom: 12px;
+        }
+
+        .card {
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            margin-bottom: 14px;
+        }
+
+        .item-row {
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .item-img-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+        }
+
+        .item-info .item-name {
+            font-size: 13px;
+        }
+
+        .item-qty-price {
+            gap: 16px;
+        }
+
+        .item-qty-price .item-price {
+            font-size: 13px;
+            min-width: 50px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .gap-blocks {
+            gap: 16px;
+        }
+
+        .price-breakdown {
+            gap: 10px;
+            padding-bottom: 14px;
+            margin-bottom: 14px;
+        }
+
+        .price-row, .total-row span:first-child {
+            font-size: 12px;
+        }
+
+        .total-row {
+            margin-bottom: 20px;
+        }
+
+        .total-price {
+            font-size: 18px;
+        }
+
+        .action-group {
+            gap: 10px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .btn-track-order, 
+        .btn-continue-shopping {
+            padding: 12px;
+            font-size: 13px;
+            border-radius: 10px;
+        }
+    }
+
+    /* Extra Small Mobile Devices (Max Width: 480px) */
+    @media screen and (max-width: 480px) {
+        padding: 8px 4px;
+
+        .success-banner-card {
+            padding: 18px 10px;
+        }
+
+        .success-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-width: 2px;
+            margin-bottom: 10px;
+        }
+
+        .main-title {
+            font-size: 18px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card {
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .step-label {
+            font-size: 10px;
+        }
+
+        .step-num {
+            width: 20px;
+            height: 20px;
+            font-size: 9px;
+        }
+
+        .item-img-wrapper {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+        }
+
+        .item-info .item-name {
+            font-size: 12px;
+        }
+
+        .item-info .item-ref {
+            font-size: 10px;
+        }
+
+        .total-price {
+            font-size: 16px;
+        }
+    }
+}

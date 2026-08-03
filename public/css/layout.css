@@ -19,13 +19,11 @@ body {
     align-items: center;
     padding: 10px 20px;
     background: rgba(255, 255, 255, 0.873);
-   border: 2px ;
 }
 
 .logo {
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-size: 24px;
-    
     color: #000000;
     font-weight: 600;
 }
@@ -39,7 +37,7 @@ body {
     text-decoration: none;
     color: black;
     font-size: 12px;
-   font-style: bold;
+    font-weight: bold;
 }
 
 .icons {
@@ -53,7 +51,7 @@ body {
     height: 14px;
 }
 
-
+/* ===== FOOTER STYLES ===== */
 .footer {
     background: #111;
     color: white;
@@ -67,6 +65,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
     height: 100%;
 }
 
@@ -77,29 +76,127 @@ body {
 }
 
 html, body {
-  height: 100%;
-  margin: 0;
+    height: 100%;
+    margin: 0;
 }
 
 .page-wrapper {
- display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.page-main-container{
+.page-main-container {
     flex: 1 0 auto;
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
-.footer-center a{
+.footer-center a {
     color: white;
     text-decoration: none;
     font-weight: 600;
-
 }
 
 
+/* ===== RESPONSIVE MEDIA QUERIES ===== */
 
+/* Tablets and small laptops (1024px and below) */
+@media screen and (max-width: 1024px) {
+    .navbar {
+        padding: 15px 20px;
+    }
+
+    .nav-links {
+        gap: 20px;
+    }
+
+    .nav-links a {
+        font-size: 11px;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+}
+
+/* Mobile phones (768px and below) - Horizontal Footer Kept */
+@media screen and (max-width: 768px) {
+    .navbar {
+        padding: 10px 15px;
+    }
+
+    .logo {
+        font-size: 16px;
+    }
+
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        font-size: 10px;
+    }
+
+    .icons {
+        gap: 10px;
+    }
+
+    .nav-icons {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* Keeps footer horizontal, adjusts padding and font-size to prevent wrapping */
+    .footer {
+        padding: 15px 10px;
+    }
+
+    .footer-container {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .footer-left a, 
+    .footer-center, 
+    .footer-right {
+        font-size: 9px; /* Scaled down slightly to fit side-by-side on smaller screens */
+    }
+}
+
+/* Very small screens (400px and below) */
+@media screen and (max-width: 400px) {
+    .navbar {
+        padding: 8px 10px;
+    }
+
+    .logo {
+        font-size: 14px;
+    }
+
+    .nav-links {
+        gap: 8px;
+    }
+
+    .nav-links a {
+        font-size: 9px;
+    }
+
+    .icons {
+        gap: 8px;
+    }
+
+    /* Ultra-small horizontal adjustments */
+    .footer {
+        padding: 12px 8px;
+    }
+
+    .footer-left a, 
+    .footer-center, 
+    .footer-right {
+        font-size: 5px; /* Compact size to ensure horizontal alignment without breaking */
+        gap: 10px;
+    }
+}

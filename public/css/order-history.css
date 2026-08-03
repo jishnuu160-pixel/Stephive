@@ -1,11 +1,17 @@
+/* ==========================================================================
+   📱 FULL PROFILE PAGE CSS (WITH RIGHT SIDEBAR & MOBILE RESPONSIVENESS)
+   ========================================================================== */
+
 /* --- Page Layout --- */
-.order-history-page {
+.profile-page-container {
     background-color: #f8f8f8;
     padding: 20px 40px;
+    box-sizing: border-box;
 }
 
 .dashboard-layout {
     display: flex;
+    flex-direction: row-reverse; /* Places sidebar on the right side */
     gap: 40px;
     margin-top: 30px;
 }
@@ -15,6 +21,7 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-width: 0; /* Prevents flex items from overflowing */
 }
 
 /* --- Content Header & Sort --- */
@@ -89,7 +96,7 @@
 }
 
 /* Specific colors for each status */
-.status-pill.pending { background-color: #fef3c7; color: #92400e; }
+.status-pill.placed { background-color: #fef3c7; color: #92400e; }
 .status-pill.processing { background-color: #dbeafe; color: #1e40af; }
 .status-pill.shipped { background-color: #e0f2fe; color: #0369a1; }
 .status-pill.out-of-delivery { background-color: #fef9c3; color: #854d0e; }
@@ -123,14 +130,173 @@
 .action-link {
     background-color: #c42e2e;
     border-radius: 24px;
-    padding: 8px;
+    padding: 8px 16px;
     font-size: 12px;
     font-weight: 600;
     color: #eff4ff;
     text-decoration: none;
-    transition: color 0.2s;
+    transition: background-color 0.2s;
+    display: inline-block;
+    text-align: center;
 }
 
 .action-link:hover {
     background-color: #e97e1b;
+}
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES (ALWAYS SIDE-BY-SIDE + COMPACT MOBILE STYLING)
+   ========================================================================== */
+
+@media screen and (max-width: 1024px) {
+    .profile-wrapper {
+        padding: 10px !important;
+    }
+
+    /* Force side-by-side row behavior across all device previews */
+    .profile-layout {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 12px !important;
+    }
+
+    .profile-sidebar {
+        flex: 0 0 110px !important;
+        width: 110px !important;
+        padding: 15px 8px !important;
+        position: sticky !important;
+        top: 10px !important;
+    }
+
+    .profile-main {
+        flex: 1 !important;
+        max-width: calc(100% - 122px) !important;
+        min-width: 0 !important;
+    }
+
+    .profile-card {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    /* Keep inputs fully readable */
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .form-grid .input-group:nth-child(1),
+    .form-grid .input-group:nth-child(2),
+    .form-grid .input-group:nth-child(3),
+    .form-grid .input-group:nth-child(4) {
+        grid-column: span 1;
+    }
+
+    .form-footer {
+        grid-column: span 1;
+        flex-direction: column;
+    }
+
+    .form-footer .btn-outline {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* ==========================================
+   COMPACT FORM & SUMMARY STYLES FOR SMALLER SCREENS
+   ========================================== */
+
+@media screen and (max-width: 768px) {
+    /* 1. Details Card & Form Spacing */
+    .profile-card.profile-details {
+        padding: 15px !important;
+    }
+
+    .card-header h3 {
+        font-size: 14px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .form-grid {
+        gap: 12px !important;
+        margin-top: 10px !important;
+    }
+
+    .input-group label {
+        font-size: 10px !important;
+        letter-spacing: 0.03em !important;
+        margin-bottom: 2px !important;
+    }
+
+    .input-group input, 
+    .input-group select {
+        padding: 9px 12px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+    }
+
+    .form-footer {
+        gap: 10px !important;
+        margin-top: 5px !important;
+    }
+
+    .form-footer .btn-outline {
+        padding: 10px 16px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+    }
+
+    /* 2. Profile Summary Card Scaling */
+    .profile-card.profile-info-summary {
+        padding: 15px !important;
+        gap: 12px !important;
+    }
+
+    .avatar-border {
+        width: 60px !important;
+        height: 60px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .camera-btn {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 10px !important;
+    }
+
+    .summary-text h2 {
+        font-size: 16px !important;
+        margin: 0 0 3px 0 !important;
+    }
+
+    .user-email-label {
+        font-size: 12px !important;
+    }
+}
+
+/* ==========================================
+   EXTRA TIGHT RULES FOR VERY SMALL SCREENS (UNDER 480px)
+   ========================================== */
+
+@media screen and (max-width: 480px) {
+    .profile-card.profile-details,
+    .profile-card.profile-info-summary {
+        padding: 12px !important;
+    }
+
+    .input-group input, 
+    .input-group select {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .summary-text h2 {
+        font-size: 14px !important;
+    }
+
+    .user-email-label {
+        font-size: 11px !important;
+    }
 }

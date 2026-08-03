@@ -238,7 +238,17 @@
     color: #dcdfe5;
     padding:2px 10px ;
     border-radius: 12px;
+    border: none;
+  }
 
+    .btn-delete{
+    text-decoration: none;
+    font-size: 10px;
+    background-color: #dc0715;
+    color: #dcdfe5;
+    padding:2px 10px ;
+    border-radius: 12px;
+    border: none;
   }
   /* --- Summary Row Elements --- */
   .cart-items {
@@ -1080,6 +1090,36 @@
     background: #2563eb;
 }
 
+/* Container for the applied coupon state */
+.applied-coupon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #166534;
+}
+
+/* Style for the remove button */
+.btn-remove-coupon {
+    background-color: #ef4444;
+    color: #f7f5f5;
+    padding: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover state for the remove button */
+.btn-remove-coupon:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
 /* ==========================================
    ANIMATIONS
    ================================---------- */
@@ -1091,4 +1131,166 @@
 @keyframes slideUp {
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+}
+
+
+/* ==========================================================================
+   📱 COMPACT & FULLY RESPONSIVE MEDIA QUERIES FOR CHECKOUT & COUPON MODAL
+   ========================================================================== */
+
+/* Tablet & Smaller Laptops (Max Width: 968px) */
+@media screen and (max-width: 968px) {
+    #checkout-view-scoped {
+        padding: 16px 10px;
+    }
+    #checkout-view-scoped .main-layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    #checkout-view-scoped .card {
+        padding: 16px;
+        border-radius: 14px;
+    }
+}
+
+/* Mobile Devices (Max Width: 768px) */
+@media screen and (max-width: 768px) {
+    #checkout-view-scoped {
+        padding: 10px 6px;
+    }
+    #checkout-view-scoped .stepper {
+        margin-bottom: 16px;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 4px;
+    }
+    #checkout-view-scoped .step-line {
+        width: 20px;
+        margin: 0 4px;
+    }
+    #checkout-view-scoped .card {
+        padding: 14px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+    }
+    #checkout-view-scoped .card-title {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    #checkout-view-scoped .address-box {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+    }
+    #checkout-view-scoped .btn-add-address-checkout {
+        width: 100%;
+        padding: 6px;
+        font-size: 11px;
+        justify-content: center;
+        margin-top: 12px;
+        border-radius: 8px;
+    }
+    #checkout-view-scoped .coupon-input-group {
+        flex-direction: column;
+        gap: 6px;
+    }
+    #checkout-view-scoped .coupon-input {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    #checkout-view-scoped .btn-apply {
+        width: 100%;
+        padding: 8px;
+        font-size: 11px;
+    }
+    #checkout-view-scoped .total-price {
+        font-size: 16px;
+    }
+    #checkout-view-scoped .btn-place-order {
+        padding: 12px;
+        font-size: 13px;
+        border-radius: 20px;
+    }
+
+    /* Modal Compact Adjustments */
+    .modal {
+        padding: 10px;
+    }
+    .modal-content-coupon {
+        width: 95%;
+        max-width: 340px;
+        padding: 14px;
+        gap: 10px;
+        border-radius: 10px;
+    }
+    .modal-content-coupon h3 {
+        font-size: 13px;
+        margin: 4px;
+        padding-bottom: 4px;
+    }
+    #couponList {
+        padding: 4px;
+        max-height: 160px;
+        gap: 8px;
+    }
+    .coupon-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 6px;
+    }
+    .coupon-item button {
+        width: 100%;
+        padding: 6px;
+        font-size: 11px;
+    }
+    .modal-content-coupon > button {
+        padding: 8px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+}
+
+/* Extra Small Mobile Devices (Max Width: 480px) */
+@media screen and (max-width: 480px) {
+    #checkout-view-scoped {
+        padding: 6px 4px;
+    }
+    #checkout-view-scoped .card {
+        padding: 10px;
+        border-radius: 10px;
+    }
+    #checkout-view-scoped .step-label {
+        font-size: 9px;
+    }
+    #checkout-view-scoped .step-num {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+    }
+    #checkout-view-scoped .item-img-wrapper {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+    }
+    #checkout-view-scoped .item-name {
+        font-size: 11px;
+    }
+    #checkout-view-scoped .item-price {
+        font-size: 11px;
+    }
+    .modal-content-coupon {
+        max-width: 300px;
+        padding: 12px;
+    }
+    .coupon-code {
+        font-size: 13px;
+    }
+    .coupon-discount {
+        font-size: 12px;
+    }
+    .coupon-text {
+        font-size: 11px;
+    }
 }

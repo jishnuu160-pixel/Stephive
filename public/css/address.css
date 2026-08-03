@@ -1,9 +1,4 @@
 /* Container & Background */
-.profile-page-container {
-    background-color: #f8f8f8; /* The very light background from pic */
-    padding:  20px 40px;
-  
-}
 
 .profile-layout {
     display: flex;
@@ -503,3 +498,70 @@
     opacity: .9;
 }
 
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+
+/* ==========================================
+   1. Tablet & Smaller Laptops (Max Width: 1024px)
+   ========================================== */
+@media screen and (max-width: 1024px) {
+  .profile-layout {
+    gap: 20px;
+    margin-top: 15px;
+  }
+
+  .profile-sidebar {
+    width: 200px;
+    padding: 20px 15px;
+  }
+
+  .address-form-wrapper {
+    padding: 25px;
+  }
+}
+
+/* ==========================================
+   2. Mobile & Portrait Tablets (Max Width: 768px)
+   ========================================== */
+@media screen and (max-width: 768px) {
+  /* Stack the layout vertically on smaller screens */
+  .profile-layout {
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  /* Sidebar takes full width and transforms into a horizontal or block menu */
+  .profile-sidebar {
+    width: 100%;
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  /* Main content / form wrapper takes full width */
+  .address-form-wrapper {
+    width: 100%;
+    padding: 20px 15px;
+  }
+}
+
+/* ==========================================
+   3. Small Mobile Phones (Max Width: 480px)
+   ========================================== */
+@media screen and (max-width: 480px) {
+  .profile-layout {
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  .profile-sidebar {
+    padding: 12px 10px;
+    border-radius: 8px;
+  }
+
+  .address-form-wrapper {
+    padding: 15px 10px;
+    border-radius: 8px;
+  }
+}

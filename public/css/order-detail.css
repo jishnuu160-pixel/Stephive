@@ -533,3 +533,107 @@
     text-decoration: none;
     border-radius: 5px;
 }
+
+/* ==========================================================================
+   📱 RESPONSIVE MEDIA QUERIES FOR ORDER DETAILS PAGE
+   ========================================================================== */
+
+/* Tablet & Smaller Laptops (Max Width: 968px) */
+@media screen and (max-width: 968px) {
+    .order-details-page {
+        padding: 20px 15px;
+    }
+    .order-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .left-column,
+    .right-column {
+        flex: 1;
+        width: 100%;
+    }
+    .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        margin: 10px 0 20px 0;
+    }
+    .search-wrapper {
+        max-width: 100%;
+        margin: 10px 0 0 0;
+    }
+}
+
+/* Mobile Devices (Max Width: 768px) */
+@media screen and (max-width: 768px) {
+    .order-details-page {
+        padding: 15px 10px;
+    }
+    .card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+    .order-header h1 {
+        font-size: 20px;
+        gap: 8px;
+    }
+    .order-header p {
+        font-size: 12px;
+    }
+    .back-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+    .order-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+    .order-item .image img {
+        width: 80px;
+        height: 80px;
+    }
+    .order-item .details h4 {
+        font-size: 14px;
+    }
+    .order-item .price {
+        font-size: 16px;
+    }
+    .summary-card .row {
+        font-size: 13px;
+    }
+    .summary-card .row.total {
+        font-size: 16px;
+    }
+    .invoice-btn,
+    .return-order-btn,
+    .cancel-order-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+        width: 50%;
+        text-align: center;
+    }
+}
+
+/* Extra Small Mobile Devices (Max Width: 480px) */
+@media screen and (max-width: 480px) {
+    .order-details-page {
+        padding: 10px 6px;
+    }
+    .card {
+        padding: 12px;
+        border-radius: 10px;
+    }
+    .order-header h1 {
+        font-size: 18px;
+    }
+    .timeline {
+        padding-left: 15px;
+    }
+    .timeline-item .content h4 {
+        font-size: 13px;
+    }
+    .timeline-item .content p {
+        font-size: 12px;
+    }
+}

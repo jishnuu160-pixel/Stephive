@@ -1,4 +1,6 @@
-/* --- Refer & Earn Page Styles --- */
+/* ==========================================================================
+   📱 FULLY RESPONSIVE REFER & EARN PAGE & SIDEBAR STYLES (ALL DEVICES)
+   ========================================================================== */
 
 .order-history-page {
   background-color: #f8f9fa;
@@ -6,11 +8,21 @@
   padding: 40px 20px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #1a1a1a;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.order-history-page *, 
+.order-history-page *::before, 
+.order-history-page *::after {
+  box-sizing: inherit;
 }
 
 .profile-wrapper {
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
 }
 
 /* Breadcrumb */
@@ -22,6 +34,9 @@
   font-size: 14px;
   color: #6c757d;
   margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .breadcrumb span {
@@ -34,24 +49,21 @@
   font-weight: 600;
 }
 
-/* Layout */
+/* Layout - Automatically wraps before squeezing sidebar */
 .profile-layout {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 32px;
   align-items: start;
-}
-
-@media (max-width: 992px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
+  width: 100%;
 }
 
 .main-content-referal {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
+  width: 100%;
 }
 
 /* Referral Hero Section */
@@ -66,6 +78,8 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  gap: 20px;
+  width: 100%;
 }
 
 .hero-content {
@@ -107,24 +121,13 @@
   z-index: 1;
 }
 
-@media (max-width: 768px) {
-  .referral-hero {
-    flex-direction: column;
-    text-align: center;
-    padding: 30px 20px;
-  }
-  .referral-hero img {
-    margin-top: 20px;
-    max-width: 150px;
-  }
-}
-
 /* Referral Code Section */
 .referral-code-section {
   background: #ffffff;
   border-radius: 16px;
   padding: 24px 32px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 .referral-code-section h3 {
@@ -137,6 +140,7 @@
   display: flex;
   gap: 12px;
   margin-bottom: 8px;
+  width: 100%;
 }
 
 .code-box input {
@@ -150,6 +154,7 @@
   color: #374151;
   letter-spacing: 1px;
   outline: none;
+  min-width: 0;
 }
 
 .code-box input:focus {
@@ -167,6 +172,9 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
+  white-space: nowrap;
+  min-height: 44px;
+  flex-shrink: 0;
 }
 
 .btn-copy:hover {
@@ -188,12 +196,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-}
-
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
+  width: 100%;
 }
 
 .stat-card {
@@ -205,6 +208,7 @@
   flex-direction: column;
   gap: 8px;
   border: 1px solid #f0f0f0;
+  min-width: 0;
 }
 
 .stat-card small {
@@ -236,6 +240,7 @@
   flex-direction: column;
   gap: 20px;
   border: 1px solid #f0f0f0;
+  width: 100%;
 }
 
 .history-header-flex {
@@ -244,6 +249,7 @@
   align-items: center;
   border-bottom: 1px solid #f1f3f5;
   padding-bottom: 12px;
+  gap: 12px;
 }
 
 .history-header-flex h3 {
@@ -257,6 +263,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
 }
 
 /* --- Row Card Base Styles --- */
@@ -268,6 +275,7 @@
   border-radius: 8px;
   border: 1px solid #e9ecef;
   transition: all 0.2s ease;
+  width: 100%;
 }
 
 .history-row-card:hover {
@@ -281,7 +289,6 @@
 }
 
 /* --- Full list layout (5 columns: User, Email, Date, Status, Reward) --- */
-/* Expanded columns for text items and allocated stable space for status & reward */
 #fullHistoryList .history-row-card {
   grid-template-columns: 1fr 1.6fr 1fr 1.2fr 0.9fr;
   gap: 12px;
@@ -292,10 +299,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 0; /* Crucial for text-overflow to work inside CSS Grid */
+  min-width: 0; 
 }
 
-/* Push the final reward column cleanly to the right */
 #limitedHistoryList .history-row-card .history-info:last-child,
 #fullHistoryList .history-row-card .history-info:last-child {
   justify-content: flex-end;
@@ -306,6 +312,7 @@
   font-size: 13px;
   font-weight: 500;
   flex-shrink: 0;
+  display: none; 
 }
 
 .referred-user-name,
@@ -338,6 +345,7 @@
   font-weight: 700;
   letter-spacing: 0.5px;
   white-space: nowrap;
+  display: inline-block;
 }
 
 .status-badge.completed, 
@@ -362,6 +370,8 @@
   font-weight: 500;
   font-size: 13px;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  min-height: 36px;
 }
 
 .btn-view-all:hover {
@@ -374,6 +384,8 @@
   color: #868e96;
   font-style: italic;
   margin: 0;
+  text-align: center;
+  padding: 20px;
 }
 
 .text-muted {
@@ -381,28 +393,222 @@
   font-size: 13px;
 }
 
-/* --- Responsive Media Query for Mobile Screens --- */
-@media (max-width: 768px) {
+
+/* ==========================================================================
+   📱 RESPONSIVE MEDIA QUERIES (BREAKPOINT EXTENDED TO 1024px TO PREVENT SIDEBAR CRUSHING)
+   ========================================================================== */
+
+/* Tablets, Smaller Laptops & Mobile (Max Width: 1024px) */
+@media screen and (max-width: 1024px) {
+  .order-history-page {
+    padding: 24px 15px;
+  }
+
+  /* Stack layout vertically so sidebar never gets congested */
+  .profile-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  /* Switch sidebar into a clean scrollable horizontal layout */
+  .profile-sidebar {
+    width: 100%;
+    max-width: 100%;
+    flex: unset;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    gap: 8px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .profile-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide user header on horizontal strip layout */
+  .sidebar-user-header {
+    display: none;
+  }
+
+  .nav-item {
+    padding: 8px 12px;
+    font-size: 13px;
+    gap: 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .nav-item.active {
+    width: auto;
+    background: #eef2ff;
+    color: #3730a3;
+    font-weight: 600;
+    box-shadow: none;
+  }
+
+  .sidebar-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .referral-hero {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 30px 24px;
+  }
+
+  .referral-hero img {
+    max-width: 150px;
+    align-self: center;
+  }
+
+  .hero-content {
+    max-width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+}
+
+/* Mobile Devices (Max Width: 768px) */
+@media screen and (max-width: 768px) {
+  .order-history-page {
+    padding: 16px 10px;
+  }
+
+  .referral-hero {
+    padding: 24px 20px;
+    border-radius: 12px;
+  }
+
+  .referral-hero h2 {
+    font-size: 22px;
+  }
+
+  .referral-hero p {
+    font-size: 14px;
+  }
+
+  .referral-code-section {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .code-box {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-copy {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 18px 20px;
+    border-radius: 12px;
+  }
+
+  .history-section {
+    padding: 18px 16px;
+    border-radius: 12px;
+  }
+
+  /* Transition multi-column lists into clean stacked card rows on mobile */
+  #limitedHistoryList .history-row-card,
+  #fullHistoryList .history-row-card {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 14px 16px;
+  }
+
+  /* Reveal inline column labels on mobile views for clarity */
+  .history-label {
+    display: inline-block;
+  }
+
+  .history-info {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .referred-user-name,
+  .history-date {
+    white-space: normal;
+  }
+}
+
+/* Extra Small Mobile Devices (Max Width: 480px) */
+@media screen and (max-width: 480px) {
+  .referral-hero {
+    padding: 20px 16px;
+    font-size: 10px;
+  }
+
+  .referral-hero h2 {
+    font-size: 10px;
+  }
+
+  .referral-code-section {
+    padding: 16px 14px;
+  }
+
+  .code-box input {
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+
   .history-header-flex {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
   }
-  
+
   .btn-view-all {
     width: 100%;
     text-align: center;
   }
+}
 
-  #fullHistoryList .history-row-card,
-  #limitedHistoryList .history-row-card {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 12px 16px;
+/* Tiny Devices / Foldables (Max Width: 360px) */
+@media screen and (max-width: 360px) {
+  .order-history-page {
+    padding: 12px 6px;
   }
 
-  #limitedHistoryList .history-row-card .history-info:last-child,
-  #fullHistoryList .history-row-card .history-info:last-child {
-    justify-content: flex-start;
+  .referral-hero h2 {
+    font-size: 10px;
+  }
+
+  .referral-hero p {
+    font-size: 8px;
+  }
+
+  .stat-card {
+    padding: 14px 16px;
+  }
+
+  .stat-card h3 {
+    font-size: 10px;
+  }
+
+  .history-row-card {
+    padding: 10px 12px;
   }
 }
