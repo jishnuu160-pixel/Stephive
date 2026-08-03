@@ -11,7 +11,6 @@ export const generateReport = async (startDate, endDate) => {
     let totalDiscount = 0;
 
     const formattedOrders = orders.map(order => {
-        console.log("DEBUG user_id field:", order.user_id);
         totalRevenue += order.finalAmount || 0;
         totalDiscount += order.discount || 0;
 
