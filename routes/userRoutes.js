@@ -21,11 +21,9 @@ import {
     getTerms,getAddressForEdit,
     getContact,postCheckoutAddAddress
 } from '../controllers/userController.js';
-import { addToCart } from '../controllers/cartController.js';
 import { getAvailableCouponsAjax,applyCoupon, removeCoupon} from '../controllers/couponController.js';
 import { isUserAuthenticated, isUserLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
 import {uploadAvatar} from '../middleware/upload.middleware.js';
-import {handleUploadError} from '../middleware/uploadError.middleware.js';
 import multer from 'multer';
 const upload = multer({ storage: multer.memoryStorage() });
 
