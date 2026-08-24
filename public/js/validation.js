@@ -96,11 +96,11 @@ if (signupForm) {
         const confirmPasswordValue = confirmPasswordInput?.value;
         const referralCodeValue = referralCodeInput?.value.trim();
 
-        if (!fullNameValue && !emailAddressValue && !phoneNumberValue && !passwordValue && !confirmPasswordValue) {
+        if (!fullNameValue || !emailAddressValue || !phoneNumberValue || !passwordValue || !confirmPasswordValue) {
             submitEvent.preventDefault();
 
             if (jsErrorBox) {
-                jsErrorBox.innerText = "All fields are required!";
+                jsErrorBox.innerText = "Please fill in all required fields.";
                 jsErrorBox.style.display = "block";
             }
 
@@ -212,10 +212,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     const serverError = document.querySelector(".server-error");
+
     if (serverError) {
-        setTimeout(() => {
-            serverError.style.display = "none";
-        }, 3000);
+        serverError.style.display = "block";
     }
 });
 
