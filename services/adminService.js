@@ -1,4 +1,4 @@
-import  adminRepo from '../repositories/adminRepository.js';
+import adminRepo from '../repositories/adminRepository.js';
 import * as OrderRepo from '../repositories/orderRepository.js';
 import * as returnRepo from '../repositories/returnRepository.js';
 import * as productRepo from "../repositories/productRepository.js";
@@ -7,9 +7,7 @@ import * as salesRepo from "../repositories/salesRepository.js";
 
 
 import Return from '../models/ReturnModel.js';
-
 import bcrypt from 'bcrypt';
-import Order from '../models/OrderModel.js';
 
 export const login = async (
    email,
@@ -54,7 +52,7 @@ export const getCustomersPage = async (queryParams) => {
 
    const search = queryParams.search || '';
    const page = parseInt(queryParams.page) || 1;
-   const limit = 4;
+   const limit = 8;
    const skip = (page - 1) * limit;
 
    let query = {
@@ -137,7 +135,7 @@ export const toggleUserStatus = async (userId) => {
 export const getAllOrders = async (queryParams) => {
     const search = queryParams.search || '';
     const page = parseInt(queryParams.page) || 1;
-    const limit = 5;
+    const limit = 10;
     const skip = (page - 1) * limit;
 
     const orders = await OrderRepo.findOrdersWithSearch(search, limit, skip);
@@ -146,6 +144,7 @@ export const getAllOrders = async (queryParams) => {
    
     return {
         orders,
+        startIndex: skip,
         pagination: {
             currentPage: page,
             totalPages,
@@ -172,9 +171,7 @@ export const updateOrderStatus = async (orderId, newStatus) => {
     const order = await OrderRepo.findOrderById(orderId);
     
     if (!order) throw new Error("Order not found");
-    
-    console.log(`DEBUG: Attempting to update Order ${orderId} from ${order?.status} to ${newStatus}`);
-    
+        
     const normalizedNewStatus = newStatus.trim().toLowerCase();
     const isValid = validStatuses.some(status => status.toLowerCase() === normalizedNewStatus);
     
@@ -183,7 +180,6 @@ export const updateOrderStatus = async (orderId, newStatus) => {
     }  
 
     const currentOrderStatus = order.status ? order.status.trim().toLowerCase() : '';
-
     const linearSequence = ['processing', 'shipped', 'out of delivery', 'delivered'];
 
     if (currentOrderStatus === normalizedNewStatus) {
@@ -213,6 +209,8 @@ export const updateOrderStatus = async (orderId, newStatus) => {
         
         if (order.items && Array.isArray(order.items)) {
             for (const item of order.items) {
+                item.status = 'Cancelled';
+
                 await productRepo.increaseStock(
                     item.productId, 
                     item.variantId, 
@@ -228,18 +226,34 @@ export const updateOrderStatus = async (orderId, newStatus) => {
         if (paidMethods.includes(method)) {
             const refundAmount = Number(order.finalAmount) || 0;
             if (refundAmount > 0) {
-                console.log(`DEBUG: Refunding ₹${refundAmount} to user ${order.user_id} for order ${order._id}`);
+                
+                const orderIdentifier = order.orderId || order._id;
+                let description = `Refund for cancelled Order #${orderIdentifier}`;
+
+                if (order.items && order.items.length === 1) {
+                    const singleItem = order.items[0];
+                    const itemName = singleItem.productName || singleItem.productId?.productName || 'Item';
+                    const itemSize = singleItem.size ? ` (Size: ${singleItem.size})` : '';
+                    description = `Refund for cancelled Order(Order #${orderIdentifier}) ${itemName}${itemSize} `;
+                    
+                } else if (order.items && order.items.length > 1) {
+                    const firstItem = order.items[0];
+                    const itemName = firstItem.productName || firstItem.productId?.productName || 'Item';
+                    const itemSize = firstItem.size ? ` (Size: ${firstItem.size})` : '';
+                    const extraCount = order.items.length - 1;
+                    description = `Refund for cancelled Order ${itemName}${itemSize} +${extraCount} more (Order #${orderIdentifier})`;
+                }
+
                 await WalletRepo.updateWallet(
                     order.user_id, 
                     refundAmount, 
                     'credit', 
-                    `Refund for cancelled Order #${order.orderId || order._id}`,
+                    description, 
                     order._id
                 );
             }
         }
     }
-
     return await OrderRepo.updateStatus(orderId, newStatus);
 };
 
@@ -254,57 +268,80 @@ export const fetchAllReturns = async () => {
 
 export const changeReturnStatus = async (returnId, newStatus) => {
     try {
-        const updatedReturn = await returnRepo.updateReturnStatusInDb(returnId, newStatus);
+        const updatedReturn = await returnRepo.findReturnById(returnId);
+        if (!updatedReturn) {
+            const err = new Error("Return request not found");
+            err.name = 'NotFoundError';
+            throw err;
+        }
 
-        if (!updatedReturn) throw new Error("Return request not found");
+        const currentStatus = (updatedReturn.status || '').trim();
+        const normalizedNewStatus = (newStatus || '').trim();
 
-        if (newStatus === "Picked Up") {
-            updatedReturn.pickedUpAt = new Date();
-            await updatedReturn.save();
+        if (currentStatus === 'Rejected') {
+            throw new Error("Cannot modify a return request that has already been rejected.");
+        }
+
+        if (currentStatus === 'Refunded') {
+            throw new Error("Cannot modify a return request that has already been refunded.");
+        }
+
+        const updateData = { status: normalizedNewStatus };
+
+        if (normalizedNewStatus === "Picked Up") {
+            updateData.pickedUpAt = new Date();
         } 
-       else if (newStatus === "Refunded") {
+        else if (normalizedNewStatus === "Refunded") {
+            const prodId = updatedReturn.productId?._id || updatedReturn.productId;
+            const returnQty = Number(updatedReturn.quantity) || 1;
 
-    const order = await returnRepo.getOrderById(updatedReturn.orderId);
+            if (prodId && updatedReturn.size) {
+                await productRepo.increaseStock(
+                    prodId,
+                    updatedReturn.variantId, 
+                    updatedReturn.size,
+                    returnQty
+                );
+            }
 
-    if (order && order.items) {
-        for (const item of order.items) {
-            await productRepo.increaseStock(
-                item.productId,
-                item.variantId,
-                item.size,
-                item.quantity
+            if (updatedReturn.userId && updatedReturn.refundAmount) {
+                const itemName = updatedReturn.productName || 'Item';
+                const itemSize = updatedReturn.size ? ` (Size: ${updatedReturn.size})` : '';
+                const orderIdentifier = updatedReturn.orderId || '';
+
+                const walletDescription = `Refund for returned item: ${itemName}${itemSize} (Order #${orderIdentifier})`;
+
+                await WalletRepo.updateWallet(
+                    updatedReturn.userId,
+                    Number(updatedReturn.refundAmount), 
+                    'credit',
+                    walletDescription,
+                    updatedReturn.orderId
+                );
+            }
+
+            await returnRepo.updateSpecificOrderItemStatus(
+                updatedReturn.orderId, 
+                updatedReturn.itemId, 
+                'Returned'
+            );
+        } 
+        else if (normalizedNewStatus === "Rejected") {
+            await returnRepo.updateSpecificOrderItemStatus(
+                updatedReturn.orderId, 
+                updatedReturn.itemId, 
+                'Delivered'
             );
         }
-    }
 
-    console.log("Attempting wallet update for user:", updatedReturn.userId);
-    
-    if (updatedReturn.userId && updatedReturn.refundAmount) {
-        await WalletRepo.updateWallet(
-            updatedReturn.userId,
-            Number(updatedReturn.refundAmount), 
-            'credit',
-            `Refund for return ${updatedReturn.returnId}`,
-            updatedReturn.orderId
-        );
-    } else {
-        console.error("Wallet update skipped: Missing userId or refundAmount");
-    }
+        await Return.findByIdAndUpdate(returnId, updateData);
 
-    await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, "Returned");
-} 
-        else if (newStatus === "Rejected") {
-            await returnRepo.updateOrderStatusInDb(updatedReturn.orderId, "Delivered");
-        }
-
-        return updatedReturn;
+        return await returnRepo.findReturnById(returnId);
 
     } catch (error) {
-        console.error("Change Status Error:", error);
         throw error;
     }
 };
-
 
 export const getDashboardMetrics = async () => {
     const totalOrders = await OrderRepo.countActiveOrders();
@@ -314,7 +351,6 @@ export const getDashboardMetrics = async () => {
         maximumFractionDigits: 0,
         minimumFractionDigits: 0
     });
-
     return {
         totalOrders,
         totalSales: formattedSales

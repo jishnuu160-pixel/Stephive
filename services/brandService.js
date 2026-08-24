@@ -103,7 +103,6 @@ export const updateBrand = async (id, data) => {
 
         updateData.logo = uploadResult.secure_url;
     }
-
     return await brandRepo.updateBrand(id, updateData);
 };
 

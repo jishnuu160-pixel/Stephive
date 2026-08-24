@@ -1,5 +1,13 @@
 import * as cartRepo from '../repositories/cartRepository.js';
 import * as productRepo from '../repositories/productRepository.js';
+import { attachOfferPricing } from './productService.js';
+
+
+const getBestProductPrice = async (productDoc) => {
+    if (!productDoc) return 0;
+    const enrichedProduct = await attachOfferPricing(productDoc);
+    return enrichedProduct.salePrice;
+};
 
 const calculateCartTotals = (items) => {
     const totalUnitsCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
@@ -31,7 +39,7 @@ export const getCartPageData = async (userId, page) => {
     let cartModified = false;
     let adjustmentNotice = null;
 
-    cart.items = cart.items.map(item => {
+    const processedItems = await Promise.all(cart.items.map(async (item) => {
         let isOutOfStock = false;
         let hasInsufficientStock = false;
         let isUnlisted = false;
@@ -44,13 +52,7 @@ export const getCartPageData = async (userId, page) => {
         if (productDoc) {
             isUnlisted = productDoc.isListed === false;
             
-            currentPrice = Number(
-                productDoc.salePrice ?? 
-                productDoc.regularPrice ?? 
-                productDoc.price ?? 
-                item.price ?? 
-                0
-            );
+            currentPrice = await getBestProductPrice(productDoc);
 
             const targetVariant = productDoc.variants?.find(v => v._id.toString() === item.variantId?.toString());
             sizeDetails = targetVariant?.sizes?.find(s => s.size.toString() === item.size.toString());
@@ -85,7 +87,9 @@ export const getCartPageData = async (userId, page) => {
             isUnlisted, 
             availableStock 
         };
-    }).reverse();
+    }));
+
+    cart.items = processedItems.reverse();
 
     if (cartModified) {
         const itemsToSave = cart.items
@@ -124,10 +128,11 @@ export const getCartPageData = async (userId, page) => {
         hasPrevPage: page > 1,
         hasNextPage: page < totalPages
     };
-};    
+};   
 
 export const addToCart = async (userId, itemData) => {
     const product = await productRepo.findProductById(itemData.productId);
+    
     if (!product) throw new Error("Product not found");
 
     const targetVariant = product.variants.find(v => v._id.toString() === itemData.variantId.toString());
@@ -139,6 +144,8 @@ export const addToCart = async (userId, itemData) => {
     if (!cart) {
         cart = { userId: userId, items: [] };
     }
+
+    const resolvedPrice = await getBestProductPrice(product);
 
     const existingItem = cart.items.find(i => {
         const iPid = (i.productId?._id ? i.productId._id : i.productId)?.toString();
@@ -171,13 +178,16 @@ export const addToCart = async (userId, itemData) => {
 
     if (existingItem) {
         existingItem.quantity = combinedTotalQty;
+        existingItem.color = targetVariant.colorName;
+        existingItem.price = resolvedPrice;
     } else {
         cart.items.push({ 
             productId: itemData.productId, 
             variantId: itemData.variantId,
             size: itemData.size.toString(),
+            color: targetVariant.colorName,
             quantity: newAdditionQty,
-            price: product.salePrice || product.regularPrice 
+            price: resolvedPrice 
         });
     }
 
