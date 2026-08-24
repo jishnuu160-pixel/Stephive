@@ -7,9 +7,15 @@ export const findCartByUserId = async (userId) => {
     return await Cart.findOne({ userId: id })
         .populate({
             path: 'items.productId',
-            model: 'Product'
-        })
-        .lean();
+            model: 'Product',
+            populate: {
+                path: 'Category',
+                populate: {
+                    path: 'parentCategory',
+                    model: 'Category'
+                }
+            }
+        }).lean();
 };
 
 
