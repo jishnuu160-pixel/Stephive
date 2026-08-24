@@ -10,7 +10,6 @@ export const getBrand = async (req, res) => {
             activePage: 'brands',
         });
     } catch (error) {
-        console.error("Controller Error loading brands:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error: Could not display brands table.");
     }
 };
@@ -35,7 +34,6 @@ export const toggleBrandStatus = async (req, res) => {
         
         res.redirect(redirectUrl);
     } catch (error) {
-        console.error("Controller Error:", error);
         req.flash('error', "Failed to update brand status.");
         res.redirect('/admin/brands');
     }
@@ -96,15 +94,12 @@ export const postAddBrand = async (req, res) => {
         
         req.flash('success', 'Brand added successfully!');
         res.redirect('/admin/brands');
-    } catch (error) {
-        console.error("Add Brand Error:", error);
-        
+    } catch (error) {        
         if (error.code === 11000 || error.message.includes('already exists')) {
             req.flash('error', 'A brand with this name already exists.');
         } else {
             req.flash('error', error.message || 'Failed to add brand.');
         }
-
         res.redirect('/admin/brands/add');
     }
 };
@@ -114,7 +109,6 @@ export const getTopSellingBrands = async (req, res) => {
         const topBrands = await brandService.getTopBrandsService();
         res.status(HTTP_STATUS.OK).json(topBrands);
     } catch (error) {
-        console.error("Error fetching top brands analytics:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
