@@ -1,97 +1,118 @@
-<div class="customers-page">
-    <div class="table-card">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Coupons</h2>
-        <div class="controls">
-             <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
-          <form id="searchForm" action="/admin/coupons" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
-            <i class="fas fa-search" style="margin-right: 10px;"></i>
-                 <input type="text" name="search" id="searchInput"value="{{search}}" placeholder="Search by name or code..."oninput="autoSearch(this)">
-                 {{#if search}}
-                  <a href="/admin/coupons" class="search-clear-btn" >
-                   <i class="fas fa-times-circle"></i>
-                 </a>
-                 {{/if}}
-          </form>
-        </div>
-            <a href="/admin/coupons/add" class="btn-cat" >Add coupon</a>    
-        </div>
-    </div>
+<div class="admin-dashboard-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Discount</th>
-                    <th>Minimum Amount</th>
-                    <th>Maximum Discount</th>
-                    <th>Start Date</th>
-                    <th>Expiration Date</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each coupons}}
-                <tr>
-                    <td class="font-coupon">{{this.code}}</td>
-                    <td class="font-coupon">{{this.discountValue}}%</td>
-                    <td class="font-coupon">{{this.min_orderAmount}}</td>
-                    <td class="font-coupon">{{this.maxDiscountAmount}}</td>
-                    <td class="font-coupon">{{formattedDate this.startDate}}</td>
-                    <td class="font-coupon">{{formattedDate this.expiryDate}}</td>
-                    <td>
-                        {{#if (eq this.status 'Active')}}
-                            <span class="status-active">Active</span>
-                        {{else}}
-                            <span class="status-inactive">Inactive</span>
-                        {{/if}}
-                    </td>
-                  <td>
-    <div style="display: flex; gap: 8px; text-decoration: none; align-items: center;">
-        <a href="/admin/coupons/edit/{{this._id}}" class="btn-edit-small">Edit</a>
+    <div class="dashboard-container">
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
         
-        <form action="/admin/coupons/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
-            <button type="button" 
-                    class="btn-unlist-small {{#if (eq this.status 'Active')}}active{{else}}inactive{{/if}}"
-                    onclick="confirmToggle(this, '{{this.name}}', {{#if (eq this.status 'Inactive')}}true{{else}}false{{/if}})">
-                {{#if (eq this.status 'Active')}}Unlist{{else}}List{{/if}}
-            </button>
-        </form>
+        <div class="coupon-page-container">
+            <div class="coupon-table-card wide-table-card">
+                
+                <!-- Card Header & Controls -->
+                <div class="coupon-card-header">
+                    <h2>Coupons</h2>
+                    <div class="coupon-controls">
+                        <div class="coupon-search-wrapper">
+                            <form id="searchForm" action="/admin/coupons" method="GET">
+                                <i class="fas fa-search"></i>
+                                <input type="text" name="search" id="searchInput" value="{{search}}" placeholder="Search by name or code..." oninput="autoSearch(this)">
+                                {{#if search}}
+                                    <a href="/admin/coupons" class="coupon-search-clear-btn">
+                                        <i class="fas fa-times-circle"></i>
+                                    </a>
+                                {{/if}}
+                            </form>
+                        </div>
+                        <a href="/admin/coupons/add" class="btn-add-coupon">Add coupon</a>
+                    </div>
+                </div>
+
+                <!-- Table Container with Screen-Fitting Wrapper -->
+                <div class="coupon-table-container">
+                    <div class="coupon-table-responsive">
+                        <table class="coupon-admin-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-code">Code</th>
+                                    <th class="col-discount">Discount</th>
+                                    <th class="col-amount">Minimum <br>Amount</th>
+                                    <th class="col-amount">Maximum <br>Discount</th>
+                                    <th class="col-date">Expiration Date</th>
+                                    <th class="col-status">Status</th>
+                                    <th class=" col-status">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each coupons}}
+                                <tr>
+                                    <td data-label="Code" class="font-coupon col-code">{{this.code}}</td>
+                                    <td data-label="Discount" class="col-discount">{{this.discountValue}}%</td>
+                                    <td data-label="Minimum Amount" class="col-amount">{{this.min_orderAmount}}</td>
+                                    <td data-label="Maximum Discount" class="col-amount">{{this.maxDiscountAmount}}</td>
+                                    <td data-label="Expiration Date" class="col-date">{{formattedDate this.expiryDate}}</td>
+                                    <td data-label="Status" class="col-status">
+                                        {{#if (eq this.status 'Active')}}
+                                            <span class="coupon-status-active">Active</span>
+                                        {{else}}
+                                            <span class="coupon-status-inactive">Inactive</span>
+                                        {{/if}}
+                                    </td>
+                                    <td data-label="Action" class="action-cell col-action">
+                                        <div class="coupon-action-buttons-cell">
+                                            <a href="/admin/coupons/edit/{{this._id}}" class="btn-coupon-edit-small">Edit</a>
+                                            <form action="/admin/coupons/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
+                                                <button type="button" 
+                                                    class="btn-coupon-unlist-small {{#if (eq this.status 'Active')}}active{{else}}inactive{{/if}}"
+                                                    onclick="confirmToggle(this, '{{this.name}}', {{#if (eq this.status 'Inactive')}}true{{else}}false{{/if}})">
+                                                    {{#if (eq this.status 'Active')}}Unlist{{else}}List{{/if}}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {{else}}
+                                <tr>
+                                    <td colspan="7" class="coupon-no-data-cell">
+                                        No coupons found matching your search.
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                {{#if hasCoupons}}
+                <div class="pagination">
+                    {{#if hasPrevPage}}
+                        <a href="/admin/coupons?page={{prevPage}}&search={{searchQuery}}" class="page-link">« Prev</a>
+                    {{else}}
+                        <span></span>
+                    {{/if}}
+
+                    <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
+
+                    {{#if hasNextPage}}
+                        <a href="/admin/coupons?page={{nextPage}}&search={{searchQuery}}" class="page-link">Next »</a>
+                    {{else}}
+                        <span></span>
+                    {{/if}}
+                </div>
+                {{/if}}
+
+            </div>
+        </div>
     </div>
-</td>
-            </tr>
-            {{else}}
-            <tr>
-                <td colspan="8" style="text-align: center; padding: 30px; color: #666;">
-                    No coupons found matching your search.
-                </td>
-            </tr>
-            {{/each}}
-            </tbody>
-        </table>
-    </div>
-    {{#if hasCoupons}}
-    <div class="pagination">
-   {{#if hasPrevPage}}
-    <a href="/admin/coupons?page={{prevPage}}&search={{search}}" class="page-link">« Prev</a>
-   {{/if}}
-
-   <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
-
-   {{#if hasNextPage}}
-    <a href="/admin/coupons?page={{nextPage}}&search={{search}}"  class="page-link">Next »</a>
-   {{/if}}
-</div>
-{{/if}}
-</div>
 </div>
 
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function confirmToggle(button, name, isCurrentlyInactive) {
     const action = isCurrentlyInactive ? 'list' : 'unlist';
+    const alertWidth = window.innerWidth <= 480 ? '280px' : '320px';
     
     Swal.fire({
         title: 'Are you sure?',
@@ -101,7 +122,7 @@ function confirmToggle(button, name, isCurrentlyInactive) {
         confirmButtonColor: isCurrentlyInactive ? '#28a745' : '#d33',
         cancelButtonColor: '#6c757d',
         confirmButtonText: `Yes, ${action}!`,
-        width: '320px',             
+        width: alertWidth,             
         padding: '1rem',          
         customClass: {
             popup: 'small-swal-popup',
@@ -115,14 +136,12 @@ function confirmToggle(button, name, isCurrentlyInactive) {
     });
 }
 
-    let timeout = null;
+let timeout = null;
 
-    function autoSearch(input) {
-        clearTimeout(timeout);
-
-        timeout = setTimeout(() => {
-            document.getElementById('searchForm').submit();
-        }, 500); 
-    }
-
+function autoSearch(input) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        document.getElementById('searchForm').submit();
+    }, 500); 
+}
 </script>

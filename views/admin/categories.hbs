@@ -1,90 +1,108 @@
-<div class="customers-page">
-    <div class="table-card">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Categories</h2>
-            
-            <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 600px; justify-content: flex-end;">
-                
-                <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
-                    <form action="/admin/categories" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
-                        <i class="fas fa-search"></i>
-                        <input type="text" name="search" placeholder="Search Categories" value="{{searchQuery}}">
-                        {{#if searchQuery}}
-                            <a href="/admin/categories" class="search-clear-btn">
-                                <i class="fas fa-times-circle"></i>
-                            </a>
-                        {{/if}}
-                    </form>
-                </div>
+<div class="admin-dashboard-wrapper">
+    <!-- Dark Backdrop Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-                <button type="button" class="btn-cat" onclick="showModal('addCategoryModal')" style="white-space: nowrap;">Add category</button>
-            </div>
-        </div>
+    <!-- Main Dashboard Flex Container -->
+    <div class="dashboard-container">
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
 
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th>Parent</th> 
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each categories}}
-                <tr>
-                    <td>{{add @root.startIndex @index 1}}</td>
-                    <td><strong>{{this.name}}</strong></td>
-                    <td>{{this.description}}</td>
-                    <td style="color: rgb(45, 42, 42); font-weight: 700;">{{this.parentCategory.name}}</td>
-                    <td>
-                        {{#if this.isListed}}
-                                    <span class="status-badge status-listed">Listed</span>
-                                {{else}}
-                                    <span class="status-badge status-unlisted">Unlisted</span>
-                        {{/if}}
-                    </td>
-                    <td>
-                        <div style="display: flex; gap: 8px; text-decoration: none;">
-                           <button type="button" class="btn-edit-small" onclick="openEditModal(event, '{{this._id}}', '{{this.name}}', '{{this.description}}', '{{this.parentCategory._id}}', '{{this.childCategory}}', '{{this.offer.discountValue}}')">
-                                Edit
-                           </button>
-
-                            <form action="/admin/categories/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
-                                <button 
-                                    type="button"
-                                    class="btn-unlist-small {{#if this.isListed}}active{{else}}inactive{{/if}}" 
-                                    onclick="confirmToggle(this, {{this.isListed}})">
-                                    {{#if this.isListed}}Unlist{{else}}List{{/if}}
-                                </button>
+        <div class="categories-page">
+            <div class="table-card">
+                <div class="category-card-header">
+                    <h2>Categories</h2>
+                    
+                    <div class="category-controls">
+                        <div class="category-search-wrapper">
+                            <form action="/admin/categories" method="GET">
+                                <i class="fas fa-search"></i>
+                                <input type="text" name="search" placeholder="Search Categories" value="{{searchQuery}}" oninput="autoSearch(this)">
+                                {{#if searchQuery}}
+                                    <a href="/admin/categories" class="category-search-clear-btn">
+                                        <i class="fas fa-times-circle"></i>
+                                    </a>
+                                {{/if}}
                             </form>
                         </div>
-                    </td>
-                </tr>
-                {{/each}}
-               
-            </tbody>
-        </table>
 
-        {{#if categories.length}}
-        <div class="pagination">
-            {{#if hasPrevPage}}
-                <a href="/admin/categories?page={{prevPage}}&search={{searchQuery}}" class="page-link">« Prev</a>
-            {{/if}}
+                        <button type="button" class="btn-add-category" onclick="showModal('addCategoryModal')">Add category</button>
+                    </div>
+                </div>
 
-            <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
+                <div class="table-responsive">
+                    <table class="category-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Parent</th> 
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each categories}}
+                            <tr>
+                                <td>{{add @root.startIndex @index 1}}</td>
+                                <td><strong>{{this.name}}</strong></td>
+                                <td>{{this.description}}</td>
+                                <td style="color: rgb(45, 42, 42); font-weight: 700;">{{this.parentCategory.name}}</td>
+                                <td>
+                                    {{#if this.isListed}}
+                                        <span class="status-badge status-listed">Listed</span>
+                                    {{else}}
+                                        <span class="status-badge status-unlisted">Unlisted</span>
+                                    {{/if}}
+                                </td>
+                                <td>
+                                    <div class="prod-action-buttons action-buttons-cell">
+                                         <button type="button" class="btn-edit-small prod-btn-edit" onclick="openEditModal(event, '{{this._id}}', '{{this.name}}', '{{this.description}}', '{{this.parentCategory._id}}', '{{this.childCategory}}', '{{this.offer.discountValue}}')">
+                                             Edit
+                                         </button>
 
-            {{#if hasNextPage}}
-                <a href="/admin/categories?page={{nextPage}}&search={{searchQuery}}" class="page-link">Next »</a>
-            {{/if}}
+                                         <form action="/admin/categories/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
+                                            <button 
+                                                type="button"
+                                                class="btn-unlist-small prod-btn-toggle {{#if this.isListed}}active{{else}}inactive{{/if}}" 
+                                                onclick="confirmToggle(this, {{this.isListed}})">
+                                                {{#if this.isListed}}Unlist{{else}}List{{/if}}
+                                            </button>
+                                         </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td colspan="6" class="no-data-cell">No categories found in the database.</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+
+                {{#if categories.length}}
+                <div class="pagination">
+                    {{#if hasPrevPage}}
+                        <a href="/admin/categories?page={{prevPage}}&search={{searchQuery}}" class="page-link">&laquo; Prev</a>
+                    {{/if}}
+
+                    <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
+
+                    {{#if hasNextPage}}
+                        <a href="/admin/categories?page={{nextPage}}&search={{searchQuery}}" class="page-link">Next &raquo;</a>
+                    {{/if}}
+                </div>
+                {{/if}}
+            </div>
         </div>
-        {{/if}}
     </div>
 </div>
+
 <div class="admin-toast-container"></div>
 
+<!-- Add Category Modal -->
 <div id="addCategoryModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -113,17 +131,17 @@
                 </div>
 
                <div id="parentCategoryWrapperAdd" class="parent-wrapper-add" style="display: none;">
-             <div class="parent-inner-grid">
-              <div class="form-group">
-                <label class="form-label">Parent Category</label>
-                <select id="addParentSelect" name="parentCategory" class="form-select cursor-pointer" disabled>
-               {{#each @root.parentCategories}}
-               <option value="{{this._id}}">{{this.name}}</option>
-               {{/each}}
-            </select>
-            </div>
-          </div>
-         </div>
+                   <div class="parent-inner-grid">
+                       <div class="form-group">
+                           <label class="form-label">Parent Category</label>
+                           <select id="addParentSelect" name="parentCategory" class="form-select cursor-pointer" disabled>
+                               {{#each @root.parentCategories}}
+                               <option value="{{this._id}}">{{this.name}}</option>
+                               {{/each}}
+                           </select>
+                       </div>
+                   </div>
+               </div>
             </div>
 
             <div class="modal-footer">
@@ -134,6 +152,7 @@
     </div>
 </div>
 
+<!-- Edit Category Modal -->
 <div id="editCategoryModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -163,15 +182,15 @@
                 </div>
 
                <div id="parentCategoryWrapper" class="parent-wrapper">
-               <div class="form-group">
-                  <label class="form-label">Parent Category</label>
-                <select id="editParentCategory" name="parentCategory" class="form-select">
-                {{#each @root.parentCategories}}
-                <option value="{{this._id}}">{{this.name}}</option>
-                {{/each}}
-                </select>
-              </div>
-             </div>
+                   <div class="form-group">
+                       <label class="form-label">Parent Category</label>
+                       <select id="editParentCategory" name="parentCategory" class="form-select">
+                           {{#each @root.parentCategories}}
+                           <option value="{{this._id}}">{{this.name}}</option>
+                           {{/each}}
+                       </select>
+                   </div>
+               </div>
             </div>
 
             <div class="modal-footer">
@@ -182,9 +201,17 @@
     </div>
 </div>
 
-
 <script>
-    // --- 1. MODAL CONTROLS ---
+let searchTimeout = null;
+
+function autoSearch(input) {
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        input.form.submit();
+    }, 500);
+}
+
     const showModal = (id) => {
         const modal = document.getElementById(id);
         if (modal) {
@@ -221,7 +248,6 @@
         }
     };
 
-    // --- 2. UNIFIED FORM SUBMISSION ---
     async function submitForm(event, url, errorContainerId) {
         event.preventDefault();
         const form = event.target;
@@ -254,7 +280,6 @@
         }
     }
 
-    // --- 3. DYNAMIC UI LOGIC ---
    function openEditModal(event, id, name, description, parentId, childCat, discount) {
         if (event) event.stopPropagation();
         
@@ -293,7 +318,6 @@
         }
     }
 
-    // --- 4. GLOBAL EVENT LISTENERS & HELPERS ---
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('form').forEach(form => {
             const errorContainer = form.querySelector('[id$="ErrorContainer"]');

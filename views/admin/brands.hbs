@@ -1,4 +1,13 @@
-<div class="customers-page">
+<div class="admin-dashboard-wrapper">
+    <!-- Dark Backdrop Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Dashboard Flex Container -->
+    <div class="dashboard-container">
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
+<div class="brands-page">
     <div class="table-card">
 
         <header class="card-header">
@@ -15,6 +24,7 @@
                                 placeholder="Search brands..."
                                 value="{{searchQuery}}"
                                 class="search-input"
+                                oninput="autoSearch(this)"
                             >
                             {{#if searchQuery}}
                                 <a href="/admin/brands" class="search-clear-btn">
@@ -30,7 +40,7 @@
         </header>
 
         <main class="table-wrapper">
-            <table class="admin-table">
+            <table class="brand-table">
                 <thead>
                     <tr>
                         <th>BRAND</th>
@@ -46,26 +56,23 @@
                         {{#each brands}}
                         <tr>
                             <td>
-                                <div class="brand-cell">
+                                <div class="brand-logo-cell">
                                     <div class="brand-logo-container">
                                         {{#if this.logo}}
-                                            <img
-                                                src="{{this.logo}}"
-                                                alt="{{this.name}}"
-                                                class="brand-logo-img"
-                                            >
+                                            <img src="{{this.logo}}" alt="{{this.name}}" class="brand-logo-img">
                                         {{else}}
                                             <div class="brand-logo-placeholder"></div>
                                         {{/if}}
                                     </div>
-                                   
                                 </div>
                             </td>
-                             <td>
-                                 <span class="brand-names">
+                            <td>
+                                <div class="brand-name-wrapper">
+                                    <span class="brand-names">
                                         {{this.name}}
                                     </span>
-                             </td>
+                                </div>
+                            </td>
                             <td>
                                 <span class="brand-desc">
                                     {{this.description}}
@@ -79,23 +86,23 @@
                                     <span class="status-badge status-unlisted">Unlisted</span>
                                 {{/if}}
                             </td>
-<td>
-    <div style="display: flex; gap: 8px; text-decoration: none; align-items: center;">
-        <a href="/admin/brands/edit/{{this._id}}" class="btn-edit-small">Edit</a>
-        
-        <form action="/admin/brands/toggle-status/{{this._id}}?page={{../currentPage}}&search={{../searchQuery}}" method="POST" class="status-toggle-form" style="margin: 0;">
-            <button type="submit" 
-                    class="btn-unlist-small {{#if this.isListed}}active{{else}}inactive{{/if}}">
-                {{#if this.isListed}}Unlist{{else}}List{{/if}}
-            </button>
-        </form>
-    </div>
-</td>
+                            <td>
+                                <div class="brand-actions-wrapper">
+                                    <a href="/admin/brands/edit/{{this._id}}" class="btn-edit-small">Edit</a>
+                                    
+                                    <form action="/admin/brands/toggle-status/{{this._id}}?page={{../currentPage}}&search={{../searchQuery}}" method="POST" class="status-toggle-form">
+                                        <button type="submit" 
+                                                class="btn-unlist-small {{#if this.isListed}}active{{else}}inactive{{/if}}">
+                                            {{#if this.isListed}}Unlist{{else}}List{{/if}}
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                         {{/each}}
                     {{else}}
                         <tr>
-                            <td colspan="4" class="table-empty-state">
+                            <td colspan="5" class="table-empty-state">
                                 No brand records discovered matching your search context.
                             </td>
                         </tr>
@@ -108,8 +115,6 @@
              <div class="pagination">
                 {{#if hasPrevPage}}
                     <a href="/admin/brands?page={{prevPage}}&search={{searchQuery}}" class="page-link">&laquo; Prev</a>
-                {{else}}
-                    <span class="page-link disabled">&laquo; Prev</span>
                 {{/if}}
 
                 <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
@@ -123,9 +128,20 @@
         {{/if}}
     </div>
 </div>
-
+</div>
+</div>
 
 <script>
+let searchTimeout = null;
+
+function autoSearch(input) {
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        input.form.submit();
+    }, 500);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.status-toggle-form').forEach(form => {
         form.addEventListener('submit', function(e) {
