@@ -11,7 +11,6 @@ export const getWishlist = async (req, res) => {
             activePage: "wishlist"
         });
     } catch (err) {
-        console.error(err);
         res.redirect("/");
     }
 };
@@ -37,7 +36,6 @@ export const toggleWishlist = async (req, res) => {
             newCount
         });
     } catch (err) {
-        console.error("Error toggling wishlist:", err);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
     }
 };
@@ -74,7 +72,6 @@ export const checkWishlistStatus = async (req, res) => {
             isInWishlist
         });
     } catch (err) {
-        console.error("Error checking wishlist status:", err);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" });
     }
 };

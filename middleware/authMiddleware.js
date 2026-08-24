@@ -1,95 +1,232 @@
-import User from '../models/userModel.js';
-import Cart from '../models/cartModel.js'; 
+import { HTTP_STATUS } from "../constants/httpStatusCode.js";
+import User from "../models/userModel.js";
+import Cart from "../models/cartModel.js";
 import * as wishlistService from "../services/wishlistService.js";
 
-export const isUserAuthenticated = async (req, res, next) => {
-    if (req.session && req.session.user) {
-        try {
-            const user = await User.findById(req.session.user.id);
 
-            if (user && user.isBlocked) {
-                delete req.session.user;
-                if (req.session.passport) delete req.session.passport.user;
+/* ---------------- HELPER FUNCTIONS ---------------- */
 
-                return req.session.save(() => {
-                    const isApiRequest = req.xhr || req.headers.accept?.includes("json") || req.headers["content-type"]?.includes("application/json");
-                    if (isApiRequest) {
-                        return res.status(403).json({ success: false, message: "User blocked" });
-                    }
-                    return res.redirect('/user/login?error=blocked');
-                });
-            }
+const isApiRequest = (req) => {
+    return (
+        req.xhr ||
+        req.headers.accept?.includes("json") ||
+        req.headers["content-type"]?.includes("application/json")
+    );
+};
 
-            req.user = user; 
 
-            res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-            return next();
+const clearUserSession = (req) => {
+    delete req.session.user;
 
-        } catch (error) {
-            console.error("Database check failed:", error);
-            return res.status(500).json({ success: false, message: "Internal server error during auth check" });
-        }
-    } else {
-        const isApiRequest = req.xhr || req.headers.accept?.includes("json") || req.headers["content-type"]?.includes("application/json");
-
-        if (isApiRequest) {
-            return res.status(401).json({ success: false, message: "Please login!" });
-        }
-
-        req.flash("error", "Please login first to continue");
-        return res.redirect('/user/login');
+    if (req.session.passport) {
+        delete req.session.passport.user;
     }
 };
+
+
+/* ---------------- USER AUTHENTICATION ---------------- */
+
+export const isUserAuthenticated = async (req, res, next) => {
+    if (!req.session?.user) {
+
+        if (isApiRequest(req)) {
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+                success: false,
+                message: "Please login!"
+            });
+        }
+        req.flash("error", "Please login first to continue");
+        return res.redirect("/user/login");
+    }
+
+    try {
+        const userId =req.session.user.id || req.session.user._id;
+        const user = await User.findById(userId);
+
+        if (!user) {
+
+            clearUserSession(req);
+
+            return req.session.save(() => {
+
+                if (isApiRequest(req)) {
+                    return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+                        success: false,
+                        message: "Please login!"
+                    });
+                }
+
+                req.flash("error", "Please login first to continue");
+                return res.redirect("/user/login");
+            });
+        }
+
+
+        if (user.isBlocked) {
+
+            clearUserSession(req);
+
+            return req.session.save(() => {
+                if (isApiRequest(req)) {
+                    return res.status(HTTP_STATUS.FORBIDDEN).json({
+                        success: false,
+                        message: "Your account has been blocked by the administrator."
+                    });
+                }
+
+               req.flash("error", "Your account has been blocked by admin.");
+               return res.redirect("/user/login");
+            });
+        }
+
+        req.user = user;
+
+        res.setHeader( "Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+
+        return next();
+
+    } catch (error) {
+
+        console.error("Database check failed:", error);
+
+        if (isApiRequest(req)) {
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: "Internal server error during auth check"
+            });
+        }
+
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(
+            "Internal server error"
+        );
+    }
+};
+
+
+/* ---------------- LOGGED OUT USER ---------------- */
 
 export const isUserLoggedOut = (req, res, next) => {
-    if (req.session && req.session.user) {
-        const backURL = req.header('Referer') || '/';
-        return res.redirect(backURL);
-    }  
-    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-    next();
+
+    if (req.session?.user) {
+        return res.redirect("/");
+    }
+
+    res.setHeader(
+        "Cache-Control",
+        "private, no-cache, no-store, must-revalidate"
+    );
+
+    return next();
 };
+
+
+/* ---------------- PREVENT CACHE ---------------- */
 
 export const preventCache = (req, res, next) => {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    next();
+
+    res.setHeader(
+        "Cache-Control",
+        "no-cache, no-store, must-revalidate"
+    );
+
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
+    return next();
 };
 
 
-/* ---------------- GLOBAL NAVBAR DATA MIDDLEWARE ---------------- */
-export const injectNavbarData = async (req, res, next) => {
-    try {
-        res.locals.user = req.session.user || null;
-        res.locals.cartCount = 0;
+/* ---------------- GLOBAL NAVBAR DATA ---------------- */
 
-        if (req.session.user) {
-            const cart = await Cart.findOne({ userId: req.session.user._id || req.session.user.id });
-            if (cart && cart.items && cart.items.length > 0) {
-              
-          res.locals.cartCount = cart.items.reduce((total, item) => total + item.quantity, 0);
-            }
+export const injectNavbarData = async (req, res, next) => {
+    res.locals.user = null;
+    res.locals.cartCount = 0;
+    res.locals.globalWishlistCount = 0;
+
+    if (req.path.startsWith('/admin')) {
+        return next();
+    }
+
+    try {
+        if (!req.session?.user) {
+            return next();
         }
-        next();
+
+        const userId = req.session.user.id || req.session.user._id;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            clearUserSession(req);
+            return req.session.save(() => next());
+        }
+
+        if (user.isBlocked) {
+            clearUserSession(req);
+            return req.session.save(() => {
+                if (isApiRequest(req)) {
+                    return res.status(HTTP_STATUS.FORBIDDEN).json({
+                        success: false,
+                        message: "Your account has been blocked by the administrator."
+                    });
+                }
+                req.flash("error", "Your account has been blocked by admin.");
+                return res.redirect("/user/login");
+            });
+        }
+
+        res.locals.user = req.session.user;
+
+        const [cart, wishlistCount] = await Promise.all([
+            Cart.findOne({ userId }),
+            wishlistService.getWishlistCount(userId)
+        ]);
+
+        if (cart?.items?.length) {
+            res.locals.cartCount = cart.items.reduce(
+                (total, item) => total + item.quantity,
+                0
+            );
+        }
+
+        res.locals.globalWishlistCount = wishlistCount || 0;
+
+        return next();
+
     } catch (error) {
         console.error("Error generating global navbar data:", error);
-        next();
+        res.locals.user = null; 
+        res.locals.cartCount = 0;
+        res.locals.globalWishlistCount = 0;
+        return next();
     }
 };
 
 
+/* ---------------- GLOBAL WISHLIST COUNT ---------------- */
+
 export const wishlistCountMiddleware = async (req, res, next) => {
+
+    if (req.path.startsWith('/admin')) {
+        res.locals.wishlistCount = 0;
+        return next();
+    }
     try {
-        if (req.session?.user?.id) {
-            const count = await wishlistService.getWishlistCount(req.session.user.id);
-            res.locals.globalWishlistCount = count;
-        } else {
-            res.locals.globalWishlistCount = 0;
+        res.locals.wishlistCount = 0;
+
+        if (!req.session?.user) {
+            return next();
         }
-        next();
-    } catch (err) {
-        res.locals.globalWishlistCount = 0;
-        next();
+
+        const userId = req.session.user.id || req.session.user._id;
+        const count = await wishlistService.getWishlistCount(userId);
+
+        res.locals.wishlistCount = count;
+
+        return next();
+    } catch (error) {
+        res.locals.wishlistCount = 0;
+        return next();
     }
 };

@@ -1,12 +1,15 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 import Category from "./categoryModel.js";
+
+const arrayMinSize = (val) => Array.isArray(val) && val.length > 0;
 
 const productSchema = new mongoose.Schema({
     productId: {
-    type: String,
-    unique: true,
-    default: () => 'PRD-' + Math.random().toString(36).substring(2, 8).toUpperCase()
-},
+        type: String,
+        unique: true,
+        default: () => 'PRD-' + crypto.randomBytes(4).toString('hex').toUpperCase()
+    },
     productName: {
         type: String,
         required: true,
@@ -25,35 +28,34 @@ const productSchema = new mongoose.Schema({
         ref: 'Category',
         required: true
     },
-  
     Category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required: true
     },
-  offer: {
-    discountValue: { 
-        type: Number, 
-        min: 0,
-        max: 99
+    offer: {
+        discountValue: { 
+            type: Number, 
+            min: 0,
+            max: 99
+        },
+        isActive: { 
+            type: Boolean, 
+            default: false 
+        },
+        offerType: { 
+            type: String, 
+            default: 'Percentage' 
+        },
+        startDate: { 
+            type: Date, 
+            default: null 
+        },
+        expiryDate: { 
+            type: Date, 
+            default: null 
+        }
     },
-    isActive: { 
-        type: Boolean, 
-        default: false 
-    },
-    offerType: { 
-        type: String, 
-        default: 'Percentage' 
-    },
-    startDate: { 
-        type: Date, 
-        default: null 
-    },
-    expiryDate: { 
-        type: Date, 
-        default: null 
-    }
-},
     regularPrice: {
         type: Number,
         required: true
@@ -103,36 +105,32 @@ const productSchema = new mongoose.Schema({
         enum: ['In Stock', 'Out of Stock', 'Discontinued'],
         default: 'In Stock'
     },
-    countryOfOrigin:{
+    countryOfOrigin: {
         type: String,
         default: 'India',
         trim: true
     },
-    material:{
+    material: {
         type: String,
         default: 'Leather',
         trim: true
     },
-    closureType:{
+    closureType: {
         type: String,
         default: 'Lace Up',
         trim: true
     },
-    soleType:{
+    soleType: {
         type: String,
         default: 'Rubber',
         trim: true
     },
-    weight:{
+    weight: {
         type: String,
         default: '',
         trim: true
     }
 }, { timestamps: true });
-
-function arrayMinSize(val) {
-    return val.length > 0;
-}
 
 const Product = mongoose.model('Product', productSchema);
 export default Product;
