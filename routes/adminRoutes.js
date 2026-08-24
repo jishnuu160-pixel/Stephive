@@ -35,7 +35,7 @@ import {
     toggleListing
 } from '../controllers/categoryController.js';
 
-import {getEditBrandPage,updateBrand,getAddBrandPage,postAddBrand,getTopSellingBrands} from '../controllers/brandController.js';
+import {getTopSellingBrands} from '../controllers/brandController.js';
 import {getReturnDetails,getAllReturns} from '../controllers/returnController.js';
 import brandRoutes from './brandRoutes.js'
 
@@ -60,11 +60,9 @@ router.use((req, res, next) => {
     next();
 });
 
-// --- Admin Login Routes ---
 router.get('/login', isAdminLoggedOut, getAdminLogin);
 router.post('/login', postAdminLogin);
 
-// --- Admin Core Dashboard Routes ---
 router.get('/dashboard', isAdminAuthenticated, getDashboard);
 router.get('/api/sales-chart', isAdminAuthenticated, getChartData);
 router.get('/api/top-products', isAdminAuthenticated, getTopProductsApi);
@@ -73,24 +71,17 @@ router.get('/top-brands',isAdminAuthenticated, getTopSellingBrands);
 router.get('/customers', isAdminAuthenticated, getCustomers);
 router.post('/customers/toggle-status/:id', isAdminAuthenticated, toggleUserStatus);
 
-// --- Admin Order Routes ---
 router.get('/orders',isAdminAuthenticated,getOrders);
 router.get('/orders/:id',isAdminAuthenticated,getOrderDetails);
 router.post('/orders/update/:id',isAdminAuthenticated,updateOrderStatus);
 
 
-// --- Admin Product Management Routes ---
 router.get('/products', isAdminAuthenticated, getProducts);
 router.get('/products/add', isAdminAuthenticated, getAddProduct);
 router.get('/products/edit/:id',isAdminAuthenticated, getEditProduct);
 router.post('/products/add', isAdminAuthenticated, upload.any(), postAddProduct);
 
-router.post(
-  '/products/edit/:id',
-  isAdminAuthenticated,
-  upload.any(),
-  postEditProduct
-);
+router.post('/products/edit/:id',isAdminAuthenticated,upload.any(),postEditProduct);
 
 router.post('/products/toggle-status/:id', isAdminAuthenticated, toggleProductStatus);
 
@@ -117,10 +108,6 @@ router.get('/salesReport/download-pdf',isAdminAuthenticated,downloadPDF);
 
 router.get('/logout', adminLogout);
 
-router.use(
-    '/brands',
-    isAdminAuthenticated,
-    brandRoutes
-);
+router.use('/brands',isAdminAuthenticated,brandRoutes);
 
 export default router;
