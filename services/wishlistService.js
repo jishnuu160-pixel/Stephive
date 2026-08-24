@@ -7,7 +7,6 @@ export const getWishlist = async (userId) => {
     }
 
     let wishlist = await wishlistRepo.findByUserId(userId);
-    console.log("Details of service:",wishlist);
     
     if (!wishlist) {
         wishlist = await wishlistRepo.createWishlist(userId);

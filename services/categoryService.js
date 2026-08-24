@@ -1,13 +1,10 @@
-
-import { error } from 'console';
-import adminRepo from '../repositories/adminRepository.js';
 import * as categoryRepo from '../repositories/categoryRepository.js';
 import * as productRepo from '../repositories/productRepository.js'; 
 
 export const getCategoriesPage = async (queryParams) => {
    const search = queryParams.search || '';
    const page = parseInt(queryParams.page) || 1;
-   const limit = 5;
+   const limit = 8;
    const skip = (page - 1) * limit;
 
    let query = {};

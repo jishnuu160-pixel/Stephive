@@ -40,6 +40,7 @@ export const getOfferPageData = async () => {
 };
 
 export const applyProductOffer = async (productId, discountValue, startDate, expiryDate) => {
+
     if (!productId) throw new Error("Please select a target product.");
     if (!discountValue) throw new Error("Please enter a discount value.");
     if (!startDate) throw new Error("Please select a start date.");

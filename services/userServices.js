@@ -4,56 +4,14 @@ import { uploadToCloudinary } from '../utils/cloudinaryUtils.js';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import { generateReferralCode } from '../utils/idGenerator.js';
+import { generateOTP } from '../utils/otpUtils.js';         
+import { sendOtpEmail } from '../utils/sendOtpEmail.js';
 
 
 
 export const signup = async (data) => {
-    const { fullName, email, phoneNumber, password, confirmPassword, referralCode } = data;
-    const errors = {};
-
-    if (!fullName || !fullName.trim()) {
-        errors.fullName = "Full Name is required";
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !email.trim()) {
-        errors.email = "Email Address is required";
-    } else if (!emailRegex.test(email.trim())) {
-        errors.email = "Please enter a valid email address";
-    }
-
-    const phoneStr = phoneNumber ? phoneNumber.toString().trim() : "";
-    if (!phoneStr) {
-        errors.phoneNumber = "Phone Number is required";
-    } else if (!/^\d{10}$/.test(phoneStr)) {
-        errors.phoneNumber = "Phone number must be exactly 10 digits";
-    }
-
-    if (!password) {
-        errors.password = "Password is required";
-    } else if (password.length < 6) {
-        errors.password = "Password must be at least 6 characters long";
-    }
-
-    if (password !== confirmPassword) {
-        errors.confirmPassword = "Passwords do not match";
-    }
-
-    if (Object.keys(errors).length > 0) {
-        const validationError = new Error("Validation Failed");
-        validationError.validationErrors = errors;
-        throw validationError;
-    }
-
-    const existingUser = await userRepo.findByEmail(email.trim());
-    if (existingUser) {
-        throw new Error('User already exists');
-    }
-
-    const existingPhone = await userRepo.findByPhone(phoneStr);
-    if (existingPhone) {
-        throw new Error('Phone number already registered');
-    }
+    const { fullName, email, phoneNumber, password, referralCode } = data;
+    const phoneStr = phoneNumber ? phoneNumber.toString() : '';
 
     const myCode = generateReferralCode(fullName.trim());
     const saltRounds = 10;
@@ -75,15 +33,9 @@ export const signup = async (data) => {
 
     if (referralCode && referralCode.trim() !== '') {
         const cleanRefCode = referralCode.trim().toUpperCase();
-        if (cleanRefCode === myCode.toUpperCase()) {
-            throw new Error("You cannot use your own referral code.");
-        }
 
         referrer = await userRepo.findByReferralCode(cleanRefCode);
-        
-        if (!referrer) {
-            throw new Error("Invalid referral code.");
-        }
+    
     }
 
     const newUser = await userRepo.createUser(userData);
@@ -116,7 +68,6 @@ export const signup = async (data) => {
             `Referral reward for inviting ${newUser.fullName || 'a user'}`
         );
     }
-
     return newUser;
 };
 
@@ -152,83 +103,28 @@ const transporter = nodemailer.createTransport({
 
 
 export const sendOTP = async (email) => {
-    const user = await userRepo.findByEmail(email);
-    if (!user) throw new Error("No account found with this email address.");
+       const user = await userRepo.findByEmail(email);
+       if (!user) throw new Error("No account found with this email address.");
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
+    const otp = generateOTP();
     await userRepo.saveOTP(email, otp); 
-  
-
+ 
     console.log(`\n=========================================`);
     console.log(` OTP for ${email} is [ ${otp} ]`);
     console.log(`=========================================\n`);
 
-    const mailOptions = {
-        from: '"StepHive Support" <stephive3@gmail.com>',
-        to: email, 
-        subject: 'StepHive - Your Verification Code',
-        html: `
-    <div style="font-family: Arial; padding:20px;">
-        <h2>StepHive Verification</h2>
-
-        <p>Your OTP code is:</p>
-
-        <h1 style="
-            letter-spacing:5px;
-            color:#2563eb;
-        ">
-            ${otp}
-        </h1>
-
-        <p>
-            This OTP will expire in 1 minute.
-        </p>
-    </div>
-`
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log(`Email successfully delivered to ${email}`);
-    } catch (error) {
-        console.error("Email failed to send, check your App Password.");
-    }
-
+    await sendOtpEmail(email, otp);
     return otp; 
 };
 
+
+
 export const sendSignupOTP = async (email) => {
-  
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 60 * 1000); 
+       const otp = generateOTP();
 
-    console.log(`\n=========================================`);
-    console.log(`🔑 Signup OTP for ${email} is [ ${otp} ]`);
-    console.log(`=========================================\n`);
+       await sendOtpEmail(email, otp);
 
-    const mailOptions = {
-        from: '"StepHive Support" <stephive3@gmail.com>',
-        to: email, 
-        subject: 'StepHive - Your Verification Code',
-        html: `
-            <div style="font-family: Arial; padding:20px;">
-                <h2>StepHive Verification</h2>
-                <p>Your OTP code is:</p>
-                <h1 style="letter-spacing:5px; color:#2563eb;">${otp}</h1>
-                <p>This OTP will expire in 1 minute.</p>
-            </div>
-        `
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log(`Email successfully delivered to ${email}`);
-    } catch (error) {
-        console.error("Email failed to send, check your App Password.");
-    }
-
-    return otp; 
+       return otp; 
 };
 
 export const verifyOTP = async (email, otp) => {
@@ -669,3 +565,83 @@ export const changeEmailService = async (userId, currentEmail, newEmail) => {
 
     return await userRepo.updateUserInfo(userId, { email: sanitizedEmail });
 };
+
+
+export const validateSignupInitial = async (data) => {
+    const { fullName, email, phoneNumber, password, confirmPassword, referralCode } = data;
+    const errors = {};
+
+    const allEmpty = !fullName?.trim() && !email?.trim() && !phoneNumber?.toString().trim() && !password && !confirmPassword;
+    if (allEmpty) {
+        const validationError = new Error("Please fill in all required fields");
+        validationError.topError = "Please fill in all required fields"; 
+        throw validationError;
+    }
+
+    const nameRegex = /^[A-Za-z ]{3,50}$/;
+    
+    if (!fullName || !fullName.trim()) {
+        errors.fullName = "Full Name is required";
+    } else if (!nameRegex.test(fullName.trim())) {
+        errors.fullName = "Full Name can only contain letters and spaces";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !email.trim()) {
+        errors.email = "Email Address is required";
+    } else if (!emailRegex.test(email.trim())) {
+        errors.email = "Please enter a valid email address";
+    }
+
+    const phoneStr = phoneNumber ? phoneNumber.toString().trim() : "";
+    if (!phoneStr) {
+        errors.phoneNumber = "Phone Number is required";
+    } else if (!/^\d{10}$/.test(phoneStr)) {
+        errors.phoneNumber = "Phone number must be exactly 10 digits";
+    }
+
+    if (!password) {
+        errors.password = "Password is required";
+    } else if (password.length < 6) {
+        errors.password = "Password must be at least 6 characters long";
+    }
+
+    if (password !== confirmPassword) {
+        errors.confirmPassword = "Passwords do not match";
+    }
+
+    if (Object.keys(errors).length > 0) {
+        const validationError = new Error("Validation Failed");
+        validationError.validationErrors = errors;
+        throw validationError;
+    }
+
+    const existingUser = await userRepo.findByEmail(email.trim());
+    if (existingUser) {
+        throw new Error('User already exists');
+    }
+
+    if (phoneStr) {
+        const existingPhone = await userRepo.findByPhone(phoneStr);
+        if (existingPhone) {
+            throw new Error('Phone number already registered');
+        }
+    }
+
+    if (referralCode && referralCode.trim() !== '') {
+        const myCode = generateReferralCode(fullName.trim());
+        const cleanRefCode = referralCode.trim().toUpperCase();
+        
+        if (cleanRefCode === myCode.toUpperCase()) {
+            throw new Error("You cannot use your own referral code.");
+        }
+
+        const referrer = await userRepo.findByReferralCode(cleanRefCode);
+        if (!referrer) {
+            throw new Error("Invalid referral code."); 
+        }
+    }
+
+    return true;
+};
+

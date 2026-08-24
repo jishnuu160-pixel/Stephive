@@ -1,5 +1,6 @@
 import * as productRepo from '../repositories/productRepository.js';
 import * as brandRepo from '../repositories/brandRepository.js';
+import { isOfferActiveByDate } from '../utils/dateHelper.js';
 import {
     findParentCategory,
     findAllCategories,
@@ -53,6 +54,74 @@ const validateUploadedFile = (file) => {
 };
 
 /* ---------------- SHOP PAGE ---------------- */
+
+export const attachOfferPricing = async (productDoc) => {
+    const product = typeof productDoc.toObject === 'function' ? productDoc.toObject() : { ...productDoc };
+    
+    const regularPrice = Number(product.regularPrice) || 0;
+    let productDiscountAmt = 0;
+    let categoryDiscountAmt = 0;
+    let productDiscountPct = product.discountPercentage || 0;
+    let categoryDiscountPct = 0;
+
+    if (product.offer && isOfferActiveByDate(product.offer)) {
+        const val = parseFloat(product.offer.discountValue) || 0;
+        const offerType = String(product.offer.offerType || '').trim().toLowerCase();
+        
+        if (offerType === 'percentage') {
+            productDiscountAmt = regularPrice * (val / 100);
+            if (val > productDiscountPct) productDiscountPct = val;
+        } else {
+            productDiscountAmt = val;
+            const calcPct = regularPrice > 0 ? (val / regularPrice) * 100 : 0;
+            if (calcPct > productDiscountPct) productDiscountPct = Math.round(calcPct);
+        }
+    }
+
+    const categoryId = product.Category?._id || product.Category;
+    if (categoryId) {
+        const category = await mongoose.model('Category').findById(categoryId).populate('parentCategory');
+        
+        if (category) {
+            if (category.offer && isOfferActiveByDate(category.offer)) {
+                const catVal = parseFloat(category.offer.discountValue) || 0;
+                const catType = String(category.offer.offerType || '').trim().toLowerCase();
+                
+                const catAmt = catType === 'percentage' ? regularPrice * (catVal / 100) : catVal;
+                if (catAmt > categoryDiscountAmt) {
+                    categoryDiscountAmt = catAmt;
+                    categoryDiscountPct = catType === 'percentage' ? catVal : Math.round((catVal / regularPrice) * 100);
+                }
+            }
+
+            const parentCat = category.parentCategory;
+            if (parentCat?.offer && isOfferActiveByDate(parentCat.offer)) {
+                const parentVal = parseFloat(parentCat.offer.discountValue) || 0;
+                const parentType = String(parentCat.offer.offerType || '').trim().toLowerCase();
+                
+                const parentAmt = parentType === 'percentage' ? regularPrice * (parentVal / 100) : parentVal;
+                if (parentAmt > categoryDiscountAmt) {
+                    categoryDiscountAmt = parentAmt;
+                    categoryDiscountPct = parentType === 'percentage' ? parentVal : Math.round((parentVal / regularPrice) * 100);
+                }
+            }
+        }
+    }
+
+    const maxDiscountAmount = Math.max(productDiscountAmt, categoryDiscountAmt);
+    const effectiveDiscount = productDiscountAmt >= categoryDiscountAmt ? productDiscountPct : categoryDiscountPct;
+    const salePrice = Math.max(0, regularPrice - maxDiscountAmount);
+
+    return {
+        ...product,
+        regularPrice,
+        salePrice: Math.round(salePrice),
+        discountAmount: Math.round(maxDiscountAmount),
+        effectiveDiscount: Math.round(effectiveDiscount),
+        hasOffer: maxDiscountAmount > 0
+    };
+};
+
 
 export const getShopProducts = async (req) => {
     try {
@@ -123,12 +192,17 @@ export const getShopProducts = async (req) => {
         delete filterForOptions.brand;
         delete filterForOptions.material;
 
-        const [products, totalProducts, rawBrands, rawMaterials] = await Promise.all([
+        const [rawProducts, totalProducts, rawBrands, rawMaterials] = await Promise.all([
             productRepo.findProducts(searchFilter, getSort(req.query.sort), skip, limit), 
             productRepo.countProducts(searchFilter),
             productRepo.distinctBrandsByQuery(filterForOptions),
             productRepo.distinctMaterials(filterForOptions)      
         ]);
+
+
+        const products = await Promise.all(
+            rawProducts.map(prodDoc => attachOfferPricing(prodDoc))
+        );
 
         const brands = rawBrands.map(brandName => ({
             name: brandName,
@@ -189,42 +263,27 @@ export const getBestSellers = async () => {
     try {
         const bestSellersRaw = await productRepo.getBestSellers(); 
         
-        return bestSellersRaw.map(product => {
-            let productLevelDiscount = product.discountPercentage || 0;
-            if (product.offer && product.offer.isActive) {
-                const subDocDiscount = Number(product.offer.discountValue) || 0;
-                if (subDocDiscount > productLevelDiscount) productLevelDiscount = subDocDiscount;
-            }
-
-            const regularPrice = product.regularPrice || 0;
-            const salePrice = productLevelDiscount > 0 
-                ? Math.round(regularPrice * (1 - productLevelDiscount / 100)) 
-                : regularPrice;
-
-            return {
-                ...product,
-                effectiveDiscount: productLevelDiscount,
-                regularPrice,
-                salePrice,
-                hasOffer: productLevelDiscount > 0
-            };
-        });
+        return await Promise.all(
+            bestSellersRaw.map(productDoc => attachOfferPricing(productDoc))
+        );
     } catch (error) {
         console.error("Error fetching best sellers in service:", error);
         return [];
     }
 };
 
-
 export const getLatestSellers = async () => {
     try {
-        return await productRepo.findProducts({ isListed: true }, { createdAt: -1 }, 0, 4);
+        const latestSellersRaw = await productRepo.findProducts({ isListed: true }, { createdAt: -1 }, 0, 4);
+        
+        return await Promise.all(
+            latestSellersRaw.map(productDoc => attachOfferPricing(productDoc))
+        );
     } catch (error) {
-        console.error("Error fetching best sellers:", error);
+        console.error("Error fetching latest sellers:", error);
         return [];
     }
 };
-
 /* ---------------- GENDER COMPILATION PAGES ---------------- */
 
 const buildGenderQuery = (subIds, filters) => {
@@ -353,86 +412,13 @@ export const getProductDetails = async (id) => {
     const productDoc = await productRepo.findProductById(id);
     if (!productDoc) return null;
 
-    const product = typeof productDoc.toObject === 'function' ? productDoc.toObject() : { ...productDoc };
-
-    let productLevelDiscount = product.discountPercentage || 0;
-    if (product.offer && product.offer.isActive) {
-        const subDocDiscount = Number(product.offer.discountValue) || 0;
-        if (subDocDiscount > productLevelDiscount) productLevelDiscount = subDocDiscount;
-    }
-
-    const categoryIdsToCheck = [
-        product.Category?._id,
-        product.Category,
-        product.Category?.parentCategory?._id,
-        product.Category?.parentCategory,
-        product.parentCategory?._id,
-        product.parentCategory
-    ].filter(Boolean);
-
-    const uniqueCategoryIds = [...new Set(categoryIdsToCheck.map(id => id.toString()))];
-    const categoryDiscount = await productRepo.getHighestCategoryDiscountForIds(uniqueCategoryIds);
-    
-    let effectiveDiscount = Math.max(productLevelDiscount, categoryDiscount);
-
-    const regularPrice = product.regularPrice;
-    let discountAmount = 0;
-    let salePrice = null;
-
-    if (effectiveDiscount > 0) {
-        discountAmount = Math.round((regularPrice * effectiveDiscount) / 100);
-        salePrice = Math.round(regularPrice - discountAmount);
-    } else {
-        effectiveDiscount = 0;
-    }
-
-    product.effectiveDiscount = effectiveDiscount;
-    product.regularPrice = regularPrice;
-    product.discountAmount = discountAmount;
-    product.salePrice = salePrice;
+    const product = await attachOfferPricing(productDoc);
 
     const rawRelatedProducts = await productRepo.findRelatedProducts(product);
 
-    const relatedProducts = await Promise.all(rawRelatedProducts.map(async (relProd) => {
-        let relDiscount = relProd.discountPercentage || 0;
-        if (relProd.offer && relProd.offer.isActive) {
-            const subVal = Number(relProd.offer.discountValue) || 0;
-            if (subVal > relDiscount) relDiscount = subVal;
-        }
-
-        const relCategoryIds = [
-            relProd.Category?._id,
-            relProd.Category,
-            relProd.Category?.parentCategory?._id,
-            relProd.Category?.parentCategory,
-            relProd.parentCategory?._id,
-            relProd.parentCategory
-        ].filter(Boolean);
-
-        const uniqueRelCategoryIds = [...new Set(relCategoryIds.map(id => id.toString()))];
-        const relCatDiscount = await productRepo.getHighestCategoryDiscountForIds(uniqueRelCategoryIds);
-        
-        let finalRelDiscount = Math.max(relDiscount, relCatDiscount);
-
-        const relRegularPrice = relProd.regularPrice;
-        let relDiscountAmount = 0;
-        let relSalePrice = null;
-
-        if (finalRelDiscount > 0) {
-            relDiscountAmount = Math.round((relRegularPrice * finalRelDiscount) / 100);
-            relSalePrice = Math.round(relRegularPrice - relDiscountAmount);
-        } else {
-            finalRelDiscount = 0;
-        }
-
-        return {
-            ...relProd,
-            effectiveDiscount: finalRelDiscount,
-            regularPrice: relRegularPrice,
-            discountAmount: relDiscountAmount,
-            salePrice: relSalePrice
-        };
-    }));
+    const relatedProducts = await Promise.all(
+        rawRelatedProducts.map(relProdDoc => attachOfferPricing(relProdDoc))
+    );
 
     return {
         product,
@@ -618,117 +604,219 @@ export const createProduct = async (body, files) => {
     await productRepo.createProduct(productData);
 };
 
+
 export const updateProduct = async (productId, bodyData, structuredFiles) => {
+    const errors = {};
+
+    const productName = bodyData.productName?.trim();
+    const brand = bodyData.brand?.trim();
+    const regularPrice = bodyData.regularPrice;
+    const description = bodyData.description?.trim();
+    const category = bodyData.category;
+    const parentCategory = bodyData.parentCategory;
+    const material = bodyData.material?.trim();
+    const closureType = bodyData.closureType?.trim();
+    const soleType = bodyData.soleType?.trim();
+    const weight = bodyData.weight?.trim();
+    const countryOfOrigin = bodyData.countryOfOrigin?.trim();
+
+    if (!productName) errors.productName = "Product name is required.";
+    if (!brand) errors.brand = "Brand selection is required.";
+    if (!regularPrice || Number(regularPrice) <= 500) {
+        errors.regularPrice = "Base price must be greater than 500.";
+    }
+    if (!description) errors.description = "Description is required.";
+    if (!category) errors.category = "Subcategory/Category is required.";
+    if (!parentCategory) errors.parentCategory = "Parent category is required.";
+    if (!material) errors.material = "Material is required.";
+    if (!closureType) errors.closureType = "Closure type is required.";
+    if (!soleType) errors.soleType = "Sole type is required.";
+    if (!weight) errors.weight = "Weight is required.";
+    if (!countryOfOrigin) errors.countryOfOrigin = "Country of origin is required.";
+
     const existingProduct = await productRepo.findProductById(productId);
-    if (!existingProduct) throw new Error("Product not found");
+    if (!existingProduct) {
+        throw new Error("Product not found in database.");
+    }
 
-    const {
-        productName, brand, regularPrice, description,
-        category, parentCategory, material, closureType,
-        soleType, weight, countryOfOrigin, colorNames, colorHex
-    } = bodyData;
+    const normalizeArray = (val) => {
+        if (val === undefined || val === null) return [];
+        return Array.isArray(val) ? val : [val];
+    };
 
-    const updatedVariants = [];
-    let globalTotalStockCount = 0;
+    const extractIndexedArray = (body, prefix, index) => {
+        const directKey = `${prefix}_${index}`;
+        const arrayKey = `${prefix}_${index}[]`;
 
-    const colorNamesArr = Array.isArray(colorNames) ? colorNames : [colorNames];
-    const colorHexArr = Array.isArray(colorHex) ? colorHex : [colorHex];
+        if (body[directKey] !== undefined) return normalizeArray(body[directKey]);
+        if (body[arrayKey] !== undefined) return normalizeArray(body[arrayKey]);
+
+        const keys = Object.keys(body).filter(k => 
+            new RegExp(`^${prefix}_${index}\\[\\d+\\]$`).test(k)
+        );
+        if (keys.length > 0) {
+            return keys.map(k => body[k]);
+        }
+        return [];
+    };
+
+    const colorNamesArr = normalizeArray(bodyData.colorNames || bodyData['colorNames[]']);
+    const colorHexArr = normalizeArray(bodyData.colorHex || bodyData['colorHex[]']);
 
     const dbVariantsMap = {};
     if (existingProduct.variants && Array.isArray(existingProduct.variants)) {
         existingProduct.variants.forEach(v => {
-            if (v._id) {
-                dbVariantsMap[v._id.toString()] = v;
-            }
+            if (v._id) dbVariantsMap[v._id.toString()] = v;
         });
     }
 
-    for (let i = 0; i < colorNamesArr.length; i++) {
+    let variantCount = colorNamesArr.length;
+    if (variantCount === 0) {
+        const indexedVariantKeys = Object.keys(bodyData).filter(k => k.startsWith('sizes_') || k.startsWith('variantId_'));
+        const foundIndices = indexedVariantKeys.map(k => parseInt(k.split('_')[1])).filter(n => !isNaN(n));
+        variantCount = foundIndices.length > 0 ? Math.max(...foundIndices) + 1 : 1;
+    }
+
+    const updatedVariants = [];
+    let globalTotalStockCount = 0;
+    const seenColorNames = new Set();
+
+    for (let i = 0; i < variantCount; i++) {
         const colorName = colorNamesArr[i]?.trim();
-        if (!colorName) continue;
+        const hexValue = colorHexArr[i] || '#000000';
+        const variantLabel = colorName ? `"${colorName}"` : `Variant #${i + 1}`;
+
+        if (!colorName) {
+            errors[`colorNames_${i}`] = "Color name is required.";
+        } else {
+            const lowerColorName = colorName.toLowerCase();
+            if (seenColorNames.has(lowerColorName)) {
+                errors[`colorNames_${i}`] = `The color name "${colorName}" is duplicated. Color names must be unique.`;
+            } else {
+                seenColorNames.add(lowerColorName);
+            }
+        }
+
+        const incomingVariantId = bodyData[`variantId_${i}`];
+        let existingVariant = incomingVariantId ? dbVariantsMap[incomingVariantId] : existingProduct.variants?.[i];
 
         let activeImages = [];
+
+        if (existingVariant && Array.isArray(existingVariant.images)) {
+            const removedField = bodyData[`removedImages_${i}`] || bodyData[`removedImages_${i}[]`];
+            const removedImages = normalizeArray(removedField);
+            activeImages = existingVariant.images.filter(img => !removedImages.includes(img));
+        }
 
         if (structuredFiles && structuredFiles[`variantImages_${i}`]) {
             const fieldFiles = structuredFiles[`variantImages_${i}`];
             for (const file of fieldFiles) {
-                
-                validateUploadedFile(file);
-
-                const cloudUrl = await uploadToCloudinary(file.buffer);
-                activeImages.push(cloudUrl);
+                try {
+                    validateUploadedFile(file);
+                    const cloudUrl = await uploadToCloudinary(file.buffer);
+                    activeImages.push(cloudUrl);
+                } catch (uploadErr) {
+                    errors[`variantImages_${i}`] = uploadErr.message;
+                }
             }
         }
 
-        const incomingVariantId = bodyData[`variantId_${i}`]; 
-        let existingVariant = null;
-
-        if (incomingVariantId && dbVariantsMap[incomingVariantId]) {
-            existingVariant = dbVariantsMap[incomingVariantId];
-        } else if (existingProduct.variants && existingProduct.variants[i]) {
-            existingVariant = existingProduct.variants[i];
-        }
-        
-        if (existingVariant) {
-            const removedField = bodyData[`removedImages_${i}`];
-            const removedImages = Array.isArray(removedField) ? removedField : (removedField ? [removedField] : []);
-            
-            const remainingImages = existingVariant.images.filter(img => !removedImages.includes(img));
-            activeImages = [...remainingImages, ...activeImages];
-        }
-
         if (activeImages.length < 3) {
-            throw new Error(`The color variant "${colorName}" must have at least 3 images. Add more files or remove fewer existing images.`);
+            errors[`variantImages_${i}`] = `Variant ${variantLabel} must have at least 3 images (currently has ${activeImages.length}).`;
         }
 
-        const sizesInput = bodyData[`sizes_${i}`] || [];
-        const stocksInput = bodyData[`stocks_${i}`] || [];
-        
-        const sizesArr = Array.isArray(sizesInput) ? sizesInput : [sizesInput];
-        const stocksArr = Array.isArray(stocksInput) ? stocksInput : [stocksInput];
+        const sizesArr = extractIndexedArray(bodyData, 'sizes', i);
+        const stocksArr = extractIndexedArray(bodyData, 'stocks', i);
 
-        const sizesObj = sizesArr.map((size, idx) => {
-            const stockNum = Number(stocksArr[idx] || 0);
-            globalTotalStockCount += stockNum;
-            return {
-                size: Number(size),
-                stock: stockNum
-            };
-        }).filter(s => s.size > 0);
+        const sizesObj = [];
+        const seenSizesInVariant = new Set();
 
-        const variantPayload = {
-            colorName,
-            colorHex: colorHexArr[i] || '#000000',
-            images: activeImages, 
+        if (sizesArr.length === 0) {
+            errors[`sizes_${i}`] = `At least one size and stock entry is required for ${variantLabel}.`;
+        } else {
+            let hasSizeError = false;
+
+            for (let idx = 0; idx < sizesArr.length; idx++) {
+                const rawSize = sizesArr[idx] !== undefined && sizesArr[idx] !== null ? String(sizesArr[idx]).trim() : "";
+                const rawStock = stocksArr[idx] !== undefined && stocksArr[idx] !== null ? String(stocksArr[idx]).trim() : "";
+
+                if (rawSize === "") {
+                    errors[`sizes_${i}`] = `Size value cannot be empty in ${variantLabel}.`;
+                    hasSizeError = true;
+                    break;
+                }
+
+                if (rawStock === "") {
+                    errors[`sizes_${i}`] = `Stock value cannot be empty for size "${rawSize}" in ${variantLabel}.`;
+                    hasSizeError = true;
+                    break;
+                }
+
+                const parsedSize = Number(rawSize);
+                const parsedStock = Number(rawStock);
+
+                if (isNaN(parsedSize) || parsedSize <= 0) {
+                    errors[`sizes_${i}`] = `Invalid size "${rawSize}" in ${variantLabel}. Must be a positive number.`;
+                    hasSizeError = true;
+                    break;
+                }
+
+                if (isNaN(parsedStock) || parsedStock < 0) {
+                    errors[`sizes_${i}`] = `Stock for size ${parsedSize} in ${variantLabel} must be 0 or greater.`;
+                    hasSizeError = true;
+                    break;
+                }
+
+                if (seenSizesInVariant.has(parsedSize)) {
+                    errors[`sizes_${i}`] = `Duplicate size ${parsedSize} found in ${variantLabel}. Sizes must be unique.`;
+                    hasSizeError = true;
+                    break;
+                }
+
+                seenSizesInVariant.add(parsedSize);
+                sizesObj.push({ size: parsedSize, stock: parsedStock });
+            }
+
+            if (!hasSizeError) {
+                sizesObj.forEach(item => {
+                    globalTotalStockCount += item.stock;
+                });
+            }
+        }
+
+        updatedVariants.push({
+            ...(existingVariant?._id && { _id: existingVariant._id }),
+            colorName: colorName || '',
+            colorHex: hexValue,
+            images: activeImages,
             sizes: sizesObj
-        };
+        });
+    }
 
-        if (existingVariant && existingVariant._id) {
-            variantPayload._id = existingVariant._id;
-        }
-
-        updatedVariants.push(variantPayload);
+    if (Object.keys(errors).length > 0) {
+        const validationError = new Error("Validation failed");
+        validationError.fieldErrors = errors;
+        throw validationError;
     }
 
     const updateData = {
-        productName: productName.trim(),
-        brand: brand.trim(),
+        productName,
+        brand,
         regularPrice: Number(regularPrice),
-        description: description?.trim(),
+        description,
         Category: category,
-        parentCategory: parentCategory,
-        material: material?.trim(),
-        closureType: closureType?.trim(),
-        soleType: soleType?.trim(),
-        weight: weight?.trim(),
-        countryOfOrigin: countryOfOrigin?.trim(),
+        parentCategory,
+        material,
+        closureType,
+        soleType,
+        weight,
+        countryOfOrigin,
         variants: updatedVariants,
         totalQuantity: globalTotalStockCount
     };
 
     return await productRepo.updateProduct(productId, updateData);
 };
-
 export const toggleProductStatus = async (productId) => {
     const product = await productRepo.findProductById(productId);
     if (!product) throw new Error('Product not found.');
@@ -740,3 +828,6 @@ export const toggleProductStatus = async (productId) => {
         message: `${product.productName} has been ${nextVisibilityState ? 'listed' : 'unlisted'}.`
     };
 };
+
+
+
