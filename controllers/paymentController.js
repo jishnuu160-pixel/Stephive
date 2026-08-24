@@ -1,9 +1,10 @@
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 
-import * as OrderService from '../services/OrderService.js';
+import * as OrderService from '../services/orderService.js';
 import * as WalletService from '../services/walletService.js'; 
 import { HTTP_STATUS } from '../constants/httpStatusCode.js';
+
 
 import Razorpay from 'razorpay';
 import dotenv from 'dotenv';
@@ -47,9 +48,7 @@ export const createOrder = async (req, res) => {
             amount: order.amount,
             currency: order.currency
         });
-
     } catch (error) {
-        console.error("Create Order Error:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to create Razorpay order" });
     }
 };
@@ -59,7 +58,8 @@ export const verifyPayment = async (req, res) => {
         const { 
             razorpay_order_id, 
             razorpay_payment_id, 
-            razorpay_signature, 
+            razorpay_signature,
+            dbOrderId 
         } = req.body;
         
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -79,7 +79,7 @@ export const verifyPayment = async (req, res) => {
         if (req.session.isWalletRecharge) {
             const amount = req.session.rechargeAmount;
 
-            await WalletService.addFunds(userId, parseFloat(amount), 'Add Money');
+            await WalletService.addFunds(userId, parseFloat(amount), `Added amount ${amount} to wallet`);
 
             delete req.session.isWalletRecharge;
             delete req.session.rechargeAmount;
@@ -87,38 +87,29 @@ export const verifyPayment = async (req, res) => {
             return res.status(HTTP_STATUS.OK).json({ success: true, message: "Wallet updated successfully" });
         }
 
-        const orderData = req.session.pendingOrder;
-        if (!orderData) {
+        const targetOrderId = dbOrderId || req.session.failedPayment?.dbOrderId;
+
+        if (!targetOrderId) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
-                message: "Pending order not found or session expired"
+                message: "Order reference not found or session expired"
             });
         }
 
-        const newOrder = await OrderService.processCheckout(
-            userId,
-            orderData, 
-            !!req.session.directPurchase
-        );
-        
-        if (!newOrder || !newOrder._id) {
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Order creation failed" });
-        }
-
-        await OrderService.updatePaymentStatus(newOrder._id, razorpay_payment_id, 'placed');
+        await OrderService.updatePaymentStatus(targetOrderId, razorpay_payment_id, 'placed');
 
         delete req.session.pendingOrder;
+        delete req.session.failedPayment;
         req.session.directPurchase = null;
         req.session.appliedCouponCode = null;
 
         return res.status(HTTP_STATUS.OK).json({ 
             success: true, 
-            orderId: newOrder._id, 
-            message: "Payment verified and order created" 
+            orderId: targetOrderId, 
+            message: "Payment verified and order placed successfully" 
         });
 
     } catch (error) {
-        console.error("Payment Verification Error:", error);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
             message: error.message || "Internal server error" 
@@ -129,7 +120,6 @@ export const verifyPayment = async (req, res) => {
 
 
 export const paymentFailed = (req, res) => {
-
     const payment = req.session.failedPayment;
 
     res.render('user/payment-failed', {
@@ -143,24 +133,25 @@ export const paymentFailed = (req, res) => {
 export const retryPayment = async (req, res) => {
     try {
         const { orderId } = req.body;
+        const userId = req.session.user?.id;
 
         if (!orderId) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Order ID is required" });
         }
 
-        const failedPayment = req.session.failedPayment;
+        const order = await OrderService.getOrderForRetry(orderId, userId);
 
-        if (!failedPayment || failedPayment.orderId !== orderId) {
+        if (!order) {
             return res.status(HTTP_STATUS.NOT_FOUND).json({ 
                 success: false, 
-                message: "Payment session expired. Please go back to your cart and place the order again." 
+                message: "Order not found." 
             });
         }
 
         const options = {
-            amount: Math.round(failedPayment.amount * 100), 
+            amount: Math.round(order.finalAmount * 100), 
             currency: "INR",
-            receipt: `retry_${orderId}_${Date.now()}`
+            receipt: `rcpt_${orderId.toString().slice(-8)}_${Date.now().toString().slice(-6)}`
         };
 
         const razorpayOrder = await razorpay.orders.create(options);
@@ -170,11 +161,11 @@ export const retryPayment = async (req, res) => {
             key: process.env.RAZORPAY_KEY_ID,
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency,
-            razorpayOrderId: razorpayOrder.id
+            razorpayOrderId: razorpayOrder.id,
+            dbOrderId: order._id
         });
 
     } catch (error) {
-        console.error("Payment Retry Error:", error);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
             success: false, 
             message: "Failed to initialize payment retry" 
