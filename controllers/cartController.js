@@ -1,4 +1,3 @@
-import { HTTPRequest } from 'puppeteer';
 import * as cartService from '../services/cartService.js';
 import * as wishlistService from '../services/wishlistService.js';
 import { HTTP_STATUS } from '../constants/httpStatusCode.js';
@@ -32,7 +31,6 @@ export const addToCart = async (req, res) => {
         
         return res.status(HTTP_STATUS.OK).json({ success: true, message: "Added to cart", cart: result });
     } catch (error) {
-        console.error("DEBUG CONTROLLER ERROR:", error.message);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
@@ -48,14 +46,12 @@ export const updateQuantity = async (req, res) => {
             color,
             targetQuantity
         });
-
         res.status(HTTP_STATUS.OK).json({
             success: true,
             ...cartMetrics 
         });
 
     } catch (error) {
-        console.log(error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
@@ -76,9 +72,7 @@ export const removeFromCart = async (req, res) => {
             message: "Removed from cart", 
             ...result 
         });
-
     } catch (error) {
-        console.log(error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
