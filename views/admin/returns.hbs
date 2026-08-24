@@ -1,116 +1,118 @@
-<div class="customers-page">
-    <div class="table-card">
+<div class="admin-dashboard-wrapper">
+    <!-- Dark Backdrop Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h4>Return Requests</h4>
+    <div class="dashboard-container">
+        
+        <!-- Sidebar Partial Wrapped inside an aside tag -->
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
 
-            <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 500px; justify-content: flex-end;">
+        <main class="ret-main-content">
+            <div class="ret-table-card">
+                
+                <div class="ret-card-header">
+                    <h4>Return Requests</h4>
 
-                <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
-                    <form action="/admin/returns" method="GET" style="display:flex; align-items:center; width:100%; margin:0;">
-                        <i class="fas fa-search"></i>
-
-                        <input
-                            type="text"
-                            name="search"
-                            placeholder="Search Return ID or Order ID"
-                            value="{{searchQuery}}">
-
-                        {{#if searchQuery}}
-                            <a href="/admin/returns" class="search-clear-btn">
-                                <i class="fas fa-times-circle"></i>
-                            </a>
-                        {{/if}}
-                    </form>
+                    <div class="ret-header-actions">
+                        <div class="ret-search-wrapper">
+                            <form action="/admin/returns" method="GET">
+                                <i class="fas fa-search"></i>
+                                <input type="text" name="search" placeholder="Search Return ID or Order ID" value="{{searchQuery}}" oninput="autoSearch(this)">
+                                {{#if searchQuery}}
+                                    <a href="/admin/returns" class="ret-search-clear-btn" title="Clear Search">
+                                        <i class="fas fa-times-circle"></i>
+                                    </a>
+                                {{/if}}
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="ret-table-responsive">
+                    <table class="ret-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Return ID</th>
+                                <th>Order ID</th>
+                                <th>Request Type</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each returns}}
+                            <tr>
+                                <td data-label="No.">{{add @root.startIndex @index 1}}</td>
+                                <td data-label="Return ID" class="ret-badge-bold">{{this.returnId}}</td>
+                                <td data-label="Order ID" class="ret-badge-bold">#{{this.orderId}}</td>
+                                <td data-label="Request Type">
+                                    <span class="ret-badge-type">
+                                        {{this.returnType}}
+                                    </span>
+                                </td>
+                                <td data-label="Status">
+                                    <span class="ret-status-badge 
+                                        {{#ifEquals this.status 'Requested'}}ret-requested{{/ifEquals}}
+                                        {{#ifEquals this.status 'Picked Up'}}ret-pickedup{{/ifEquals}}
+                                        {{#ifEquals this.status 'Refunded'}}ret-refunded{{/ifEquals}}
+                                        {{#ifEquals this.status 'Rejected'}}ret-rejected{{/ifEquals}}">
+                                        {{this.status}}
+                                    </span>
+                                </td>
+                                <td data-label="Action">
+                                    <a href="/admin/returns/{{this.returnId}}" class="ret-btn-view">View</a>
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td colspan="6" class="ret-no-data-cell">
+                                    No return requests found.
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+
+                {{#if returns.length}}
+                <div class="pagination">
+                    {{#if pagination.hasPrevPage}}
+                        <a href="/admin/returns?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">
+                            « Prev
+                        </a>
+                    {{/if}}
+
+                    <span class="page-info">
+                        Page {{pagination.page}} of {{pagination.totalPages}}
+                    </span>
+
+                    {{#if pagination.hasNextPage}}
+                        <a href="/admin/returns?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">
+                            Next »
+                        </a>
+                    {{/if}}
+                </div>
+                {{/if}}
+
             </div>
-        </div>
-
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>Return ID</th>
-                    <th>Order ID</th>
-                    <th>Request Type</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                {{#each returns}}
-
-                <tr>
-
-                    <td>{{add @root.startIndex @index 1}}</td>
-
-                    <td class="badgeBold">{{this.returnId}}</td>
-
-                    <td class="badgeBold">{{this.orderId}}</td>
-
-                    <td>
-                        <span class="badge-type">
-                            {{this.returnType}}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="badge 
-                            {{#ifEquals this.status 'Requested'}}bg-secondary{{/ifEquals}}
-                            {{#ifEquals this.status 'Picked Up'}}bg-primary{{/ifEquals}}
-                            {{#ifEquals this.status 'Refunded'}}bg-success{{/ifEquals}}
-                            {{#ifEquals this.status 'Rejected'}}bg-danger{{/ifEquals}}">
-                            {{this.status}}
-                        </span>
-                      </td>
-
-                    <td>
-                       <a href="/admin/returns/{{this.returnId}}" class="btn-edit-small">View</a>
-       
-                    </td>
-
-                </tr>
-
-                {{else}}
-
-                <tr>
-                    <td colspan="9" style="text-align:center;padding:20px;color:#cbd5e1;">
-                        No return requests found.
-                    </td>
-                </tr>
-
-                {{/each}}
-
-            </tbody>
-        </table>
-
-        {{#if returns.length}}
-        <div class="pagination">
-
-            {{#if pagination.hasPrevPage}}
-                <a href="/admin/returns?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">
-                    « Prev
-                </a>
-            {{/if}}
-
-            <span class="page-info">
-                Page {{pagination.page}} of {{pagination.totalPages}}
-            </span>
-
-            {{#if pagination.hasNextPage}}
-                <a href="/admin/returns?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">
-                    Next »
-                </a>
-            {{/if}}
-
-        </div>
-        {{/if}}
-
+        </main>
     </div>
 </div>
+
 <script>
+let searchTimeout = null;
+
+function autoSearch(input) {
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        input.form.submit();
+    }, 500);
+}
+
 async function updateStatus(id, status) {
     const res = await fetch(`/admin/returns/${id}/status`, {
         method: 'POST',

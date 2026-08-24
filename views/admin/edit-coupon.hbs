@@ -1,3 +1,10 @@
+<div class="admin-dashboard-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="dashboard-container">
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
 <div class="coupon-container">
     <div class="coupon-header">
         <h2>Edit Coupon</h2>
@@ -43,6 +50,9 @@
         </div>
     </form>
 </div>
+</div>
+</div>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -65,5 +75,14 @@
     });
 
     toggleMaxDiscountField();
+
+    const expiryDateInput = document.querySelector('input[name="expiryDate"]');
+        
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+
+        expiryDateInput.setAttribute('min', minDate);
 });
 </script>

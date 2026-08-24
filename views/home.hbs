@@ -1,46 +1,42 @@
-
 <section class="hero">
-  <div class="hero-text">
-    
-{{#if user}}
-  <div id="welcomeToast" class="auth-card logged-in" style="position: absolute; right: 20px; z-index: 1000;">
-    <p class="welcome-text">WELCOME, {{user.name}}</p>
-    <p class="status-text">Ready to upgrade your collection?</p>
+  <div class="hero-text">    
+      {{#if user}}
+        <div id="welcomeToast" class="auth-card logged-in" style="position: absolute; right: 20px; z-index: 1000;">
+        <p class="welcome-text">WELCOME, {{user.name}}</p>
+        <p class="status-text">Ready to upgrade your collection?</p>
   </div>
-    {{else}}
-      <div class="auth-card">
+      {{else}}
+        <div class="auth-card">
         <p class="welcome-text">WELCOME USER</p>
         <a href="/user/login" class="login-btn">Log in</a>
         <a href="/user/signup" class="signup-btn">Create Account</a>
-      </div>
-    {{/if}}
-
-    <h1>
+        </div>
+      {{/if}}
+    <h1 class="animated-title">
       Step into <br>
-      <span>Effortless <br>Style</span>
+      <span class="hero-animated-title">Effortless <br>Style</span>
     </h1>
 
-    <p>
-      Discover sleek sneakers crafted for comfort, confidence, and everyday wear.
-    </p>
+<p>
+  <span class="fade-slide-text">Discover sleek sneakers crafted for comfort, confidence, and everyday wear.</span>
+</p>
     <a href="/shop" class="btn">Shop Now</a>
   </div>
-
 </section>
 
-  <section class="best-sellers">
-        <h3>Latest Shoes</h3>
+<section class="best-sellers">
+    <h3>Latest Shoes</h3>
         <div class="best-sellers-shelf-grid">
             {{#each latestSellers}}
                {{> product-card}}
             {{else}}
                 <p>No products available right now.</p>
             {{/each}}
-        </div>      
-    </section>
+    </div>      
+</section>
 
-      <section class="best-sellers">
-        <h3>BestSeller</h3>
+<section class="best-sellers">
+    <h3>BestSeller</h3>
         <div class="best-sellers-shelf-grid">
             {{#each bestSellers}}
                {{> product-card}}
@@ -48,222 +44,4 @@
                 <p>No products available right now.</p>
             {{/each}}
         </div>      
-    </section>
-
-<script>
-document.addEventListener("click", async function (event) {
-    const btn = event.target.closest(".wishlist-btn");
-    if (!btn) return; 
-
-    event.preventDefault();
-    const productId = btn.dataset.productId;
-    if (!productId) return;
-
-    try {
-        const response = await fetch("/wishlist/toggle", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId })
-        });
-
-        if (response.status === 401) {
-            if (typeof showToast === "function") {
-                showToast("Please log in to manage wishlist", "warning");
-            } else {
-                alert("Please log in to manage wishlist");
-            }
-            return;
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-            btn.classList.toggle("active");
-            const icon = btn.querySelector("i");
-            const isNowActive = btn.classList.contains("active");
-
-            if (isNowActive) {
-                icon.classList.replace("fa-regular", "fa-solid");
-                if (typeof showToast === "function") showToast("Added to wishlist", "success");
-            } else {
-                icon.classList.replace("fa-solid", "fa-regular");
-                if (typeof showToast === "function") showToast("Removed from wishlist", "info");
-            }
-
-            if (window.updateGlobalWishlistCount) {
-                window.updateGlobalWishlistCount(data.newCount);
-            }
-        } else {
-            if (typeof showToast === "function") showToast(data.message || "Failed to update wishlist", "error");
-        }
-    } catch (err) {
-        console.error("Wishlist sync error:", err);
-        if (typeof showToast === "function") showToast("Please log in to manage wishlist", "warning");
-    }
-});
-</script>
-
-<script>
-let selectedProductData = null;
-let chosenVariantId = null;
-let chosenSize = null;
-
-function openSizeSelector(buttonElement) {
-    try {
-        const productDataStr = buttonElement.getAttribute('data-product');
-        selectedProductData = JSON.parse(productDataStr);
-    } catch (e) {
-        console.error("Failed to parse product data", e);
-        showToast("Could not load product details", "error");
-        return;
-    }
-
-    document.getElementById("modalProductName").innerText = selectedProductData.productName || "Select Size";
-    
-    const container = document.getElementById("modalSizesContainer");
-    container.innerHTML = "";
-    
-    chosenVariantId = null;
-    chosenSize = null;
-    document.getElementById("confirmAddToCartBtn").disabled = true;
-
-    if (selectedProductData.variants && selectedProductData.variants.length > 0) {
-        selectedProductData.variants.forEach(variant => {
-            if (variant.sizes && variant.sizes.length > 0) {
-                variant.sizes.forEach(sizeObj => {
-                    const btn = document.createElement("button");
-                    const isOutOfStock = sizeObj.stock <= 0;
-                    
-                    btn.type = "button";
-                    btn.innerText = `${sizeObj.size} ${isOutOfStock ? '(Sold Out)' : `(${sizeObj.stock} left)`}`;
-                    btn.style.cssText = `padding: 8px 12px; border: 1px solid ${isOutOfStock ? '#cbd5e1' : '#0f172a'}; background: ${isOutOfStock ? '#f1f5f9' : '#fff'}; color: ${isOutOfStock ? '#94a3b8' : '#0f172a'}; border-radius: 4px; cursor: ${isOutOfStock ? 'not-allowed' : 'pointer'};`;
-                    
-                    if (!isOutOfStock) {
-                        btn.onclick = () => {
-                            container.querySelectorAll("button").forEach(b => b.style.background = "#fff");
-                            btn.style.background = "#e2e8f0";
-                            
-                            chosenVariantId = variant._id;
-                            chosenSize = sizeObj.size;
-                            document.getElementById("confirmAddToCartBtn").disabled = false;
-                        };
-                    } else {
-                        btn.disabled = true;
-                    }
-                    container.appendChild(btn);
-                });
-            }
-        });
-    }
-
-    if (container.children.length === 0) {
-        container.innerHTML = "<p style='color: #dc2626;'>No sizes available for this product.</p>";
-    }
-
-    document.getElementById("sizeSelectorModal").style.display = "flex";
-}
-
-function closeSizeModal() {
-    document.getElementById("sizeSelectorModal").style.display = "none";
-}
-
-document.getElementById("confirmAddToCartBtn").addEventListener("click", async () => {
-    if (!selectedProductData || !chosenVariantId || !chosenSize) return;
-
-    try {
-        const productId = selectedProductData._id;
-
-        const cartResponse = await fetch("/cart/add", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId, variantId: chosenVariantId, size: chosenSize, quantity: 1 })
-        });
-        const cartData = await cartResponse.json();
-
-        if (cartData.success) {
-            const wishlistResponse = await fetch("/wishlist/toggle", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId })
-            });
-            const wishlistData = await wishlistResponse.json();
-
-            showToast("Added to cart successfully", "success");
-            closeSizeModal();
-
-            if (wishlistData.success) {
-                const button = document.querySelector(`button[data-product*="${productId}"]`);
-                if (button) {
-                    button.closest("tr").remove();
-                }
-
-                const headerP = document.querySelector(".wishlist-header p");
-                let currentCount = parseInt(headerP.innerText);
-                let newCount = currentCount - 1;
-                headerP.innerText = `${newCount >= 0 ? newCount : 0} items saved`;
-
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            }
-        } else {
-            throw new Error(cartData.message || "Failed to add to cart");
-        }
-    } catch (err) {
-        showToast(err.message || "Something went wrong", "error");
-    }
-});
-
-document.querySelectorAll(".delete-btn").forEach(button => {
-    button.addEventListener("click", async function () {
-        const productId = this.dataset.id;
-        const row = this.closest("tr");
-
-        const result = await Swal.fire({
-            title: "Remove from Wishlist?",
-            text: "This item will be removed from your wishlist.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, Remove",
-            cancelButtonColor: "#6c757d",
-            confirmButtonColor: "#ef4444"
-        });
-
-        if (!result.isConfirmed) return;
-
-        try {
-            const response = await fetch("/wishlist/toggle", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                row.remove();
-
-                const headerP = document.querySelector(".wishlist-header p");
-                let count = parseInt(headerP.innerText) - 1;
-                headerP.innerText = `${count} items saved`;
-
-                const badge = document.querySelector(".wishlist-badge-count");
-                if (badge) {
-                    badge.innerText = count;
-                    if (count <= 0) badge.style.display = 'none';
-                }
-
-                showToast("Removed from wishlist", "info");
-
-                if (count <= 0) {
-                    window.location.reload();
-                }
-            } else {
-                throw new Error(data.message || "Failed to remove item");
-            }
-        } catch (err) {
-            showToast(err.message || "Something went wrong", "error");
-        }
-    });
-});
-</script>
+</section>

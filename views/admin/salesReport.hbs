@@ -1,81 +1,147 @@
-<div class="order-dashboard-wrapper">
-  <!-- Filter & Action Section -->
-  <form action="/admin/salesReport" method="GET" class="filter-card">
-    <div class="filter-main-row">
-      
-      <!-- Preset Quick Filters -->
-      <div class="preset-filters">
-        <button type="submit" name="filter" value="daily" class="btn-preset">Daily</button>
-        <button type="submit" name="filter" value="weekly" class="btn-preset">Weekly</button>
-        <button type="submit" name="filter" value="yearly" class="btn-preset">Yearly</button>
-      </div>
+<div class="admin-dashboard-wrapper">
+    <!-- Sidebar Overlay for Mobile View -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-            <div class="action-buttons">
-        <button type="button" class="btn-csv" onclick="downloadFile('csv')">Download CSV</button>
-        <button type="button" class="btn-pdf" onclick="downloadFile('pdf')">Download PDF</button>
-      </div>
+    <div class="dashboard-container">
+        <!-- Sidebar Wrapper -->
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
 
+        <!-- Main Content Area -->
+        <main class="main-content-area">
+            <div class="order-dashboard-wrapper">
+              
+              <!-- Professional Summary Cards Row -->
+              <div class="sales-summary-cards">
+                <div class="card">
+                  <div class="card-icon orders-icon">📦</div>
+                  <div class="card-info">
+                    <span class="card-title">Total Orders</span>
+                    <strong class="card-value">{{summary.totalOrders}}</strong>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-icon sales-icon">📈</div>
+                  <div class="card-info">
+                    <span class="card-title">Gross Sales</span>
+                    <strong class="card-value">₹{{summary.grossSales}}</strong>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-icon discount-icon">🏷️</div>
+                  <div class="card-info">
+                    <span class="card-title">Total Discounts</span>
+                    <strong class="card-value">₹{{summary.totalDiscount}}</strong>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-icon revenue-icon">💰</div>
+                  <div class="card-info">
+                    <span class="card-title">Net Revenue</span>
+                    <p class="card-value">₹{{summary.totalRevenue}}</p>
+                  </div>
+                </div>
+              </div>
 
-      <!-- Date Inputs & Filter Submit -->
-      <div class="filter-inputs">
-        <div class="input-group">
-          <label for="startDate">START DATE</label>
-          <input type="date" id="startDate" name="startDate" value="{{startDate}}" />
-        </div>
-        <div class="input-group">
-          <label for="endDate">END DATE</label>
-          <input type="date" id="endDate" name="endDate" value="{{endDate}}" />
-        </div>
-        <button type="submit" class="btn-filter">Filter</button>
-      </div>
+              <!-- Filter & Action Section -->
+              <form action="/admin/salesReport" method="GET" class="filter-card">
+                <div class="filter-main-row">
+                  
+                  <!-- Preset Quick Filters -->
+                  <div class="preset-filters">
+                    <button type="submit" name="filter" value="daily" class="btn-preset">Daily</button>
+                    <button type="submit" name="filter" value="weekly" class="btn-preset">Weekly</button>
+                    <button type="submit" name="filter" value="yearly" class="btn-preset">Yearly</button>
+                  </div>
 
-      <!-- Action Buttons (CSV & PDF) -->
+                  <!-- Date Inputs & Filter Submit -->
+                  <div class="filter-inputs">
+                    <div class="input-group">
+                      <label for="startDate">Start Date</label>
+                      <input type="date" id="startDate" name="startDate" value="{{startDate}}" />
+                    </div>
+                    <div class="input-group">
+                      <label for="endDate">End Date</label>
+                      <input type="date" id="endDate" name="endDate" value="{{endDate}}" />
+                    </div>
+                    <button type="submit" class="btn-filter">Filter</button>
+                    <a href="/admin/salesReport" class="btn-reset-filter">Reset</a>
+                  </div>
 
+                </div>
+
+                <!-- Export Action Buttons -->
+                <div class="action-buttons">
+                  <button type="button" class="btn-csv" onclick="downloadFile('csv')">
+                    <span class="btn-icon">📄</span> Download CSV
+                  </button>
+                  <button type="button" class="btn-pdf" onclick="downloadFile('pdf')">
+                    <span class="btn-icon">📥</span> Download PDF
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Orders Table Section -->
+            <div class="table-card">
+              <div class="table-header-row">
+                <h3>Order Details</h3>
+              </div>
+              <div class="table-responsive">
+                <table class="orders-table">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Date</th>
+                      <th>Discount</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each orders}}
+                    <tr>
+                      <td><strong class="order-id">{{orderId}}</strong></td>
+                      <td>{{customerName}}</td>
+                      <td>{{formattedDate createdAt}}</td>
+                      <td>₹{{discount}}</td>
+                      <td><strong class="final-amount">₹{{finalAmount}}</strong></td>
+                      <td>
+                         <span class="status-badge-order {{this.status}}">{{this.status}}</span>
+                      </td>
+                    </tr>
+                    {{/each}}
+                    {{#unless orders}}
+                    <tr>
+                      <td colspan="6" class="no-orders-row">
+                        <div class="empty-state">
+                          <p>No delivered orders found for this period.</p>
+                        </div>
+                      </td>
+                    </tr>
+                    {{/unless}}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+        </main>
     </div>
-  </form>
 </div>
-
-  <!-- Orders Table Section -->
-  <div class="table-card">
-    <table class="orders-table">
-      <thead>
-        <tr>
-          <th>ORDER ID</th>
-          <th>CUSTOMER</th>
-          <th>DATE</th>
-          <th>DISCOUNT</th>
-          <th>TOTAL</th>
-          <th>STATUS</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each orders}}
-        <tr>
-          <td><strong>{{orderId}}</strong></td>
-          <td>{{customerName}}</td>
-          <td>{{formattedDate createdAt}}</td>
-          <td>₹{{discount}}</td>
-          <td><strong>₹{{total}}</strong></td>
-         <td>
-    <!-- Use lowercase safe guard or direct helper call -->
-    <span class="badge {{statusClass this.status}}">{{this.status}}</span>
-</td>
-        </tr>
-        {{/each}}
-      </tbody>
-      <tfoot>
-        <tr class="table-footer">
-          <td colspan="2">totalOrders: <strong>{{summary.totalOrders}}</strong></td>
-          <td colspan="2">totalDiscount: <strong>{{summary.totalDiscount}}</strong></td>
-          <td colspan="2">Total Sales: <strong>₹{{summary.totalRevenue}}</strong></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-</div>
-
 
 <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentFilter = urlParams.get('filter') || 'daily';
+    
+    document.querySelectorAll('.btn-preset').forEach(button => {
+      if (button.value === currentFilter) {
+        button.classList.add('active');
+      }
+    });
+  });
+
   function downloadFile(type) {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;

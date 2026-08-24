@@ -1,139 +1,150 @@
-<div class="customers-page">
-    <div class="table-card">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Products</h2>
-            
-            <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 600px; justify-content: flex-end;">
-                
-                <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
-                    <form action="/admin/products" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
-                        <i class="fas fa-search"></i>
-                        <input type="text" name="search" placeholder="Search Products" value="{{searchQuery}}">
-                        {{#if searchQuery}}
-                            <a href="/admin/products" class="search-clear-btn">
-                                <i class="fas fa-times-circle"></i>
-                            </a>
-                        {{/if}}
-                    </form>
-                </div>
+<div class="admin-dashboard-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-              <a href="/admin/products/add" class="btn-cat">Add Product</a>
-            </div>
-        </div>
+    <div class="dashboard-container">
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
 
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>Price</th> 
-                    <th>Quantity</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each products}} 
-                <tr>
-                    <td>{{add @root.startIndex @index 1}}</td>
+        <main class="prod-main-content">
+            <div class="prod-table-card">
+                <div class="prod-card-header">
+                    <h2>Products</h2>
                     
-                   <td>
-    <div style="display: flex; align-items: center; gap: 10px;">
-        {{#if this.variants.[0].images.[0]}}
-            <img src="{{this.variants.[0].images.[0]}}" 
-                 alt="{{this.productName}}" 
-                 style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">
-        {{else}}
-            <div style="width: 40px; height: 40px; border-radius: 5px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #a0aec0;">
-                <i class="fas fa-image"></i>
-            </div>
-        {{/if}}
-        <strong>{{this.productName}}</strong>
-    </div>
-</td>
-                    <td>
-                        <div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start;">
-                            {{#if this.Category}}
-                                {{#if this.Category.parentCategory}}
-                                    <span style="color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        {{this.Category.parentCategory.name}}
-                                    </span>
-                                    <strong style="color: #334155; font-size: 12px;">{{this.Category.name}}</strong>
-                                {{else}}
-                                    <strong style="color: #334155; font-size: 12px;">{{this.Category.name}}</strong>
-                                {{/if}}
-                            {{else if this.category}}
-                                {{#if this.category.parentCategory}}
-                                    <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                                        {{this.category.parentCategory.name}}
-                                    </span>
-                                    <strong style="color: #334155; font-size: 0.9rem;">{{this.category.name}}</strong>
-                                {{else}}
-                                    <strong style="color: #334155; font-size: 0.9rem;">{{this.category.name}}</strong>
-                                {{/if}}
-                            {{else}}
-                                <span style="color: #cbd5e1; font-style: italic; font-size: 0.9rem;">Uncategorized</span>
-                            {{/if}}
-                        </div>
-                    </td>
-                    
-                    <td>₹{{this.regularPrice}}</td>
-                    <td>{{this.displayStock}}</td>
-
-                    <td>
-           
-                             {{#if this.isListed}}
-                                    <span class="status-badge status-listed">Listed</span>
-                                {{else}}
-                                    <span class="status-badge status-unlisted">Unlisted</span>
-                                {{/if}}
-                    </td>
-                    <td>
-                        <div style="display: flex; gap: 8px;">
-                        <a href="/admin/products/edit/{{this._id}}" class="btn-edit-small">
-                                  Edit
-                         </a>
-
-                             <form action="/admin/products/toggle-status/{{this._id}}" method="POST" style="margin: 0;">
-                                <button 
-                                    type="button"
-                                    class="btn-unlist-small {{#if this.isListed}}active{{else}}inactive{{/if}}"
-                                    data-listed="{{this.isListed}}"
-                                    data-name="{{this.productName}}"
-                                    onclick="confirmProductToggle(this)">
-                                    {{#if this.isListed}}Unlist{{else}}List{{/if}}
-                                </button>
+                    <div class="prod-header-actions">
+                        <div class="prod-search-wrapper">
+                            <form action="/admin/products" method="GET" class="prod-search-form">
+                                <div class="prod-search-inner-wrapper">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" name="search" placeholder="Search Products" value="{{searchQuery}}" class="prod-search-input" oninput="autoSearch(this)">
+                                    {{#if searchQuery}}
+                                        <a href="/admin/products" class="prod-search-clear-btn" title="Clear Search">
+                                            <i class="fas fa-times-circle"></i>
+                                        </a>
+                                    {{/if}}
+                                </div>
                             </form>
                         </div>
-                    </td>
-                </tr>
-                {{else}}
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px; color: #cbd5e1;">No products found in the database.</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
 
-        {{#if products.length}}
-        <div class="pagination">
-            {{#if pagination.hasPrevPage}}
-                <a href="/admin/products?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{searchQuery}}" class="page-link">« Prev</a>
-            {{/if}}
-            
-            <span class="page-info">Page {{pagination.page}} of {{pagination.totalPages}}</span>
-            
-            {{#if pagination.hasNextPage}}
-                <a href="/admin/products?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">Next »</a>
-            {{/if}}
-        </div>
-        {{/if}}
+                        <a href="/admin/products/add" class="prod-btn-add">Add Product</a>
+                    </div>
+                </div>
+
+                <div class="prod-table-responsive">
+                    <table class="prod-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th> 
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each products}} 
+                            <tr>
+                                <td>{{add @root.startIndex @index 1}}</td>
+                                <td>
+                                    <div class="prod-info-cell">
+                                        {{#if this.variants.[0].images.[0]}}
+                                            <img src="{{this.variants.[0].images.[0]}}" alt="{{this.productName}}" class="prod-thumb">
+                                        {{else}}
+                                            <div class="prod-thumb-placeholder">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        {{/if}}
+                                        <strong>{{this.productName}}</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="prod-category-cell">
+                                        {{#if this.Category}}
+                                            {{#if this.Category.parentCategory}}
+                                                <span class="prod-parent-cat">{{this.Category.parentCategory.name}}</span>
+                                                <strong class="prod-sub-cat">{{this.Category.name}}</strong>
+                                            {{else}}
+                                                <strong class="prod-sub-cat">{{this.Category.name}}</strong>
+                                            {{/if}}
+                                        {{else if this.category}}
+                                            {{#if this.category.parentCategory}}
+                                                <span class="prod-parent-cat">{{this.category.parentCategory.name}}</span>
+                                                <strong class="prod-sub-cat">{{this.category.name}}</strong>
+                                            {{else}}
+                                                <strong class="prod-sub-cat">{{this.category.name}}</strong>
+                                            {{/if}}
+                                        {{else}}
+                                            <span class="prod-uncategorized">Uncategorized</span>
+                                        {{/if}}
+                                    </div>
+                                </td>
+                                <td>₹{{this.regularPrice}}</td>
+                                <td>{{this.displayStock}}</td>
+                                <td>
+                                    {{#if this.isListed}}
+                                        <span class="prod-status-badge prod-status-listed">Listed</span>
+                                    {{else}}
+                                        <span class="prod-status-badge prod-status-unlisted">Unlisted</span>
+                                    {{/if}}
+                                </td>
+                                <td class="text-center">
+                                    <div class="prod-action-buttons">
+                                        <a href="/admin/products/edit/{{this._id}}" class="prod-btn-edit">Edit</a>
+                                        <form action="/admin/products/toggle-status/{{this._id}}" method="POST" class="prod-action-form">
+                                            <button 
+                                                type="button"
+                                                class="prod-btn-toggle {{#if this.isListed}}active{{else}}inactive{{/if}}"
+                                                data-listed="{{this.isListed}}"
+                                                data-name="{{this.productName}}"
+                                                onclick="confirmProductToggle(this)">
+                                                {{#if this.isListed}}Unlist{{else}}List{{/if}}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td colspan="7" class="prod-no-data-cell">No products found in the database.</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+
+                {{#if products.length}}
+                <div class="pagination">
+                    {{#if pagination.hasPrevPage}}
+                        <a href="/admin/products?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{@root.searchQuery}}" class="page-link">&laquo; Prev</a>
+                    {{/if}}
+                    
+                    <span class="page-info">Page {{pagination.page}} of {{pagination.totalPages}}</span>
+                    
+                    {{#if pagination.hasNextPage}}
+                        <a href="/admin/products?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{@root.searchQuery}}" class="page-link">Next &raquo;</a>
+                    {{else}}
+                        <span class="page-link disabled">Next &raquo;</span>
+                    {{/if}}
+                </div>
+                {{/if}}
+            </div>
+        </main>
     </div>
 </div>
 
-
 <script>
+let searchTimeout = null;
+
+function autoSearch(input) {
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        input.form.submit();
+    }, 500);
+}
+
 function confirmProductToggle(button) {
     const isListed = button.getAttribute('data-listed') === 'true';
     const itemName = button.getAttribute('data-name');
@@ -144,11 +155,11 @@ function confirmProductToggle(button) {
         text: `Do you really want to ${actionText.toLowerCase()} ${itemName}?`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: isListed ? '#d33' : '#28a745', 
-        cancelButtonColor: '#6c757d',
+        confirmButtonColor: isListed ? '#dc2626' : '#16a34a', 
+        cancelButtonColor: '#6b7280',
         confirmButtonText: `Yes, ${actionText} it!`,
         width: '320px',             
-        padding: '1rem',
+        padding: '12px',
         customClass: {
             popup: 'small-swal-popup',
             title: 'small-swal-title',
@@ -177,7 +188,7 @@ function addColorVariantBlock() {
         <div class="variant-card-header">
             <div class="color-input-wrapper">
                 <input type="color" name="variants[${variantId}][colorHex]" value="#1a202c" class="color-picker-circle" oninput="this.style.backgroundColor = this.value">
-                <input type="text" name="variants[${variantId}][colorName]" placeholder="Color Name" value="Black" class="color-name-input" >
+                <input type="text" name="variants[${variantId}][colorName]" placeholder="Color Name" value="Black" class="color-name-input">
             </div>
             <button type="button" class="btn-remove-card" onclick="removeColorBlock(${variantId})">Remove</button>
         </div>
@@ -205,9 +216,9 @@ function addSizeRow(variantId) {
     
     row.innerHTML = `
         <span>Size</span>
-        <input type="number" name="variants[${variantId}][sizes][${rowCount}][size]" class="size-input-small"  placeholder="8" min="1">
+        <input type="number" name="variants[${variantId}][sizes][${rowCount}][size]" class="size-input-small" placeholder="8" min="1">
         <span>Stock</span>
-        <input type="number" name="variants[${variantId}][sizes][${rowCount}][stock]" class="stock-input-small"  placeholder="10" min="0">
+        <input type="number" name="variants[${variantId}][sizes][${rowCount}][stock]" class="stock-input-small" placeholder="10" min="0">
         <button type="button" class="btn-remove-size-row" onclick="this.parentElement.remove()">&times;</button>
     `;
     

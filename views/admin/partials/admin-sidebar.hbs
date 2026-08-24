@@ -1,45 +1,125 @@
-<aside class="sidebar-admin">
-    
-    
-    <nav class="sidebar-links">
-        <a href="/admin/dashboard" class="nav-link {{#if (eq activePage 'dashboard')}}active{{/if}}">
-            <i class="fas fa-home"></i> <span>Dashboard</span>
-        </a>
-        <a href="/admin/products" class="nav-link {{#if (eq activePage 'products')}}active{{/if}}">
-            <i class="fas fa-box"></i> <span>Product List</span>
-        </a>
-        <a href="/admin/orders" class="nav-link  {{#if (eq activePage 'orders')}}active{{/if}}">
-            <i class="fas fa-shopping-cart"></i> <span>Order Management</span>
-        </a>
-        <a href="/admin/customers" class="nav-link {{#if (eq activePage 'customers')}}active{{/if}}">
-            <i class="fas fa-users"></i> <span>Users</span>
-        </a>
-        <a href="/admin/categories" class="nav-link  {{#if (eq activePage 'categories')}}active{{/if}}">
-            <i class="fas fa-layer-group"></i> <span>Categories</span>
-        </a>
-        <a href="/admin/coupons" class="nav-link {{#if (eq activePage 'coupons')}}active{{/if}}">
-            <i class="fas fa-ticket-alt"></i> <span>Coupon</span>
-        </a>
+<!-- Mobile Admin Sidebar Modal (Offcanvas Drawer) -->
+<div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="mobileAdminSidebarModal" aria-labelledby="mobileAdminSidebarModalLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileAdminSidebarModalLabel">Admin Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+        <aside class="admin-sidebar-unique border-0 w-100">
+            <div class="admin-sidebar-user-header">
+                <div class="admin-avatar-circle-small">
+                    <i class="fas fa-user-shield admin-user-icon admin-sidebar-avatar"></i>
+                </div>
+                <div class="admin-user-meta">
+                    <h4>Administrator</h4>
+                    <span class="admin-premium-tag">SYSTEM ADMIN</span>
+                </div>
+            </div>
 
-         <a href="/admin/offer" class="nav-link {{#if (eq activePage 'offer')}}active{{/if}}">
-              <i class="fas fa-percent"></i> <span>Offer</span>
-        </a>
+            <nav class="admin-sidebar-links">
+                <a href="/admin/dashboard" class="admin-nav-link {{#if (eq activePage 'dashboard')}}active{{/if}}">
+                    <i class="fas fa-home admin-sidebar-icon"></i> <span>Dashboard</span>
+                </a>
+                <a href="/admin/products" class="admin-nav-link {{#if (eq activePage 'products')}}active{{/if}}">
+                    <i class="fas fa-box admin-sidebar-icon"></i> <span>Product List</span>
+                </a>
+                <a href="/admin/orders" class="admin-nav-link {{#if (eq activePage 'orders')}}active{{/if}}">
+                    <i class="fas fa-shopping-cart admin-sidebar-icon"></i> <span>Order Management</span>
+                </a>
+                <a href="/admin/customers" class="admin-nav-link {{#if (eq activePage 'customers')}}active{{/if}}">
+                    <i class="fas fa-users admin-sidebar-icon"></i> <span>Users</span>
+                </a>
+                <a href="/admin/categories" class="admin-nav-link {{#if (eq activePage 'categories')}}active{{/if}}">
+                    <i class="fas fa-layer-group admin-sidebar-icon"></i> <span>Categories</span>
+                </a>
+                <a href="/admin/coupons" class="admin-nav-link {{#if (eq activePage 'coupons')}}active{{/if}}">
+                    <i class="fas fa-ticket-alt admin-sidebar-icon"></i> <span>Coupon</span>
+                </a>
+                <a href="/admin/offer" class="admin-nav-link {{#if (eq activePage 'offer')}}active{{/if}}">
+                    <i class="fas fa-percent admin-sidebar-icon"></i> <span>Offer</span>
+                </a>
+                <a href="/admin/salesReport" class="admin-nav-link {{#if (eq activePage 'sales')}}active{{/if}}">
+                    <i class="fas fa-chart-line admin-sidebar-icon"></i> <span>Sales</span>
+                </a>
+                <a href="/admin/brands" class="admin-nav-link {{#if (eq activePage 'brands')}}active{{/if}}">
+                    <i class="fas fa-tags admin-sidebar-icon"></i> <span>Brand</span>
+                </a>
+                <a href="/admin/returns" class="admin-nav-link {{#if (eq activePage 'return')}}active{{/if}}">
+                    <i class="fas fa-undo admin-sidebar-icon"></i> <span>Return</span>
+                </a>
+                <a href="/admin/logout" class="admin-nav-link logout-link">
+                    <i class="fas fa-sign-out-alt admin-sidebar-icon"></i> <span class="logout">Logout</span>
+                </a>
+            </nav>
+        </aside>
+    </div>
+</div>
 
-        <a href="/admin/salesReport" class="nav-link {{#if (eq activePage 'sales')}}active{{/if}}">
-            <i class="fas fa-chart-line"></i> <span>Sales</span>
-        </a>
+<!-- Permanent Sidebar for Large Screens -->
+<div class="d-none d-lg-block">
+    <aside class="admin-sidebar-unique">
+        <div class="admin-sidebar-user-header">
+            <div class="admin-avatar-circle-small">
+                <i class="fas fa-user-shield admin-user-icon admin-sidebar-avatar"></i>
+            </div>
+            <div class="admin-user-meta">
+                <h4>Administrator</h4>
+                <span class="admin-premium-tag">SYSTEM ADMIN</span>
+            </div>
+        </div>
 
-        <a href="/admin/brands" class="nav-link {{#if (eq activePage 'brands')}}active{{/if}}">
-            <i class="fas fa-tags"></i> <span>Brand</span>
-        </a>
-        <a href="/admin/returns" class="nav-link {{#if (eq activePage 'return')}}active{{/if}}">
-            <i class="fas fa-undo"></i> <span>Return</span>
-        </a>
-      
-     
-<a href="/admin/logout" class="nav-link logout-link {{#if (eq activePage 'logout')}}active{{/if}}">
-    <i class="fas fa-sign-out-alt" style="color: rgb(255, 81, 81);"></i> <span style="color: rgb(255, 81, 81);">Logout</span>
-</a>
-    </nav>
-</aside> 
+        <nav class="admin-sidebar-links">
+            <a href="/admin/dashboard" class="admin-nav-link {{#if (eq activePage 'dashboard')}}active{{/if}}">
+                <i class="fas fa-home admin-sidebar-icon"></i> <span>Dashboard</span>
+            </a>
+            <a href="/admin/products" class="admin-nav-link {{#if (eq activePage 'products')}}active{{/if}}">
+                <i class="fas fa-box admin-sidebar-icon"></i> <span>Product List</span>
+            </a>
+            <a href="/admin/orders" class="admin-nav-link {{#if (eq activePage 'orders')}}active{{/if}}">
+                <i class="fas fa-shopping-cart admin-sidebar-icon"></i> <span>Order Management</span>
+            </a>
+            <a href="/admin/customers" class="admin-nav-link {{#if (eq activePage 'customers')}}active{{/if}}">
+                <i class="fas fa-users admin-sidebar-icon"></i> <span>Users</span>
+            </a>
+            <a href="/admin/categories" class="admin-nav-link {{#if (eq activePage 'categories')}}active{{/if}}">
+                <i class="fas fa-layer-group admin-sidebar-icon"></i> <span>Categories</span>
+            </a>
+            <a href="/admin/coupons" class="admin-nav-link {{#if (eq activePage 'coupons')}}active{{/if}}">
+                <i class="fas fa-ticket-alt admin-sidebar-icon"></i> <span>Coupon</span>
+            </a>
+            <a href="/admin/offer" class="admin-nav-link {{#if (eq activePage 'offer')}}active{{/if}}">
+                <i class="fas fa-percent admin-sidebar-icon"></i> <span>Offer</span>
+            </a>
+            <a href="/admin/salesReport" class="admin-nav-link {{#if (eq activePage 'sales')}}active{{/if}}">
+                <i class="fas fa-chart-line admin-sidebar-icon"></i> <span>Sales</span>
+            </a>
+            <a href="/admin/brands" class="admin-nav-link {{#if (eq activePage 'brands')}}active{{/if}}">
+                <i class="fas fa-tags admin-sidebar-icon"></i> <span>Brand</span>
+            </a>
+            <a href="/admin/returns" class="admin-nav-link {{#if (eq activePage 'return')}}active{{/if}}">
+                <i class="fas fa-undo admin-sidebar-icon"></i> <span>Return</span>
+            </a>
+            <a href="/admin/logout" class="admin-nav-link logout-link">
+                <i class="fas fa-sign-out-alt admin-sidebar-icon"></i> <span class="logout">Logout</span>
+            </a>
+        </nav>
+    </aside>
+</div>
 
+<!-- Auto-close offcanvas script on mobile navigation click -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const offcanvasElement = document.getElementById('mobileAdminSidebarModal');
+        if (offcanvasElement && typeof bootstrap !== 'undefined') {
+            const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement) || new bootstrap.Offcanvas(offcanvasElement);
+            const navLinks = offcanvasElement.querySelectorAll('.admin-nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth < 992) {
+                        bsOffcanvas.hide();
+                    }
+                });
+            });
+        }
+    });
+</script>
