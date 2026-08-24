@@ -1,6 +1,8 @@
 import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 import * as productService from '../services/productService.js';
 import * as wishlistService from "../services/wishlistService.js";
+import { attachOfferPricing } from '../services/productService.js';
+
 
 /* ---------------- SHOP ---------------- */
 
@@ -41,32 +43,18 @@ export const getShop = async (req, res) => {
             }
         }
 
-        const attachOfferPricing = (product) => {
-            let discount = 0;
-            
-            if (product.offer && product.offer.isActive) {
-                discount = product.offer.discountValue;
-            } 
-            else if (product.Category && product.Category.offer && product.Category.offer.isActive) {
-                discount = product.Category.offer.discountValue;
-            }
+        const productsWithWishlist = activeProducts.map(product => ({
+            ...product,
+            isWishlisted: wishlistedProductIds.has(product._id.toString())
+        }));
 
-            const hasOffer = discount > 0;
-            const salePrice = hasOffer 
-                ? Math.round(product.regularPrice * (1 - discount / 100)) 
-                : product.regularPrice;
-
+        const latestSellersWithWishlist = await Promise.all(latestSellersRaw.map(async (product) => {
+            const enriched = await attachOfferPricing(product);
             return {
-                ...product,
-                isWishlisted: wishlistedProductIds.has(product._id.toString()),
-                hasOffer,
-                salePrice,
-                regularPrice: product.regularPrice
+                ...enriched,
+                isWishlisted: wishlistedProductIds.has(product._id.toString())
             };
-        };
-
-        const productsWithWishlist = activeProducts.map(attachOfferPricing);
-        const latestSellersWithWishlist = latestSellersRaw.map(attachOfferPricing);
+        }));
 
         const subcategoriesOnly = shopData.categories.filter(cat => cat.parentCategory !== null);
 
@@ -131,7 +119,6 @@ export const getProductId = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Product Details routing error:", error);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
 };
@@ -143,7 +130,6 @@ export const getAddProduct = async (req, res) => {
       const data = await productService.getAddProductPage();
       res.render('admin/add-product', data);
    } catch (error) {
-      console.error(error);
       return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(`Add Product Page Error: ${error.message}`);
    }
 };
@@ -157,9 +143,7 @@ export const getEditProduct = async (req, res) => {
          ...data,
          activePage: 'products'
       });
-
    } catch (error) {
-      console.error(error);
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
    }
 };
@@ -189,8 +173,7 @@ export const postAddProduct = async (req, res) => {
       });
 
    } catch (error) {
-      console.error("ADD PRODUCT VALIDATION ERROR:", error.message);
-      
+    console.log("Add product Error:",error);
       req.flash('error', error.message || 'Failed to save product');
       
       req.session.save(() => {
@@ -200,49 +183,101 @@ export const postAddProduct = async (req, res) => {
 };
 
 export const postEditProduct = async (req, res) => {
-   try {
-      const structuredFiles = {};
-      if (Array.isArray(req.files)) {
-          req.files.forEach(file => {
-              if (!structuredFiles[file.fieldname]) {
-                  structuredFiles[file.fieldname] = [];
-              }
-              structuredFiles[file.fieldname].push(file);
-          });
-      }
+    try {
+        const structuredFiles = {};
+        if (Array.isArray(req.files)) {
+            req.files.forEach(file => {
+                if (!structuredFiles[file.fieldname]) {
+                    structuredFiles[file.fieldname] = [];
+                }
+                structuredFiles[file.fieldname].push(file);
+            });
+        }
 
-      await productService.updateProduct(
-         req.params.id,
-         req.body,
-         structuredFiles
-      );
+        await productService.updateProduct(
+            req.params.id,
+            req.body,
+            structuredFiles
+        );
 
-      req.flash("success", "Product updated successfully");
-      
-      req.session.save(() => {
-          return res.redirect('/admin/products');
-      });
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            req.flash("success", "Product updated successfully");
+            return res.json({ success: true, redirectUrl: '/admin/products' });
+        }
 
-   } catch (error) {
-      console.error("EDIT PRODUCT VALIDATION ERROR:", error.message);
-      
-      req.flash("error", error.message || "Something went wrong");
-      
-      req.session.save(() => {
-          return res.redirect(`/admin/products/edit/${req.params.id}`);
-      });
-   }
+        req.flash("success", "Product updated successfully");
+        return req.session.save(() => {
+            return res.redirect('/admin/products');
+        });
+
+    } catch (error) { 
+        if (error.fieldErrors) {
+            if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['sec-fetch-mode'] === 'cors') {
+                return res.status(400).json({
+                    success: false,
+                    errors: error.fieldErrors
+                });
+            }
+
+            const editPageData = await productService.getEditProductPage(req.params.id);
+
+            const reconstructedVariants = editPageData.product.variants.map((dbVariant, i) => {
+                const inputSizes = req.body[`sizes_${i}`] || req.body[`sizes_${i}[]`];
+                const inputStocks = req.body[`stocks_${i}`] || req.body[`stocks_${i}[]`];
+                
+                let sizes = dbVariant.sizes;
+                if (inputSizes) {
+                    const sizesArr = Array.isArray(inputSizes) ? inputSizes : [inputSizes];
+                    const stocksArr = Array.isArray(inputStocks) ? inputStocks : [inputStocks];
+                    sizes = sizesArr.map((sz, idx) => ({
+                        size: Number(sz),
+                        stock: Number(stocksArr[idx]) || 0
+                    })).filter(s => s.size > 0);
+                }
+
+                return {
+                    ...dbVariant,
+                    colorName: req.body.colorNames?.[i] || dbVariant.colorName,
+                    colorHex: req.body.colorHex?.[i] || dbVariant.colorHex,
+                    sizes: sizes.length > 0 ? sizes : dbVariant.sizes
+                };
+            });
+
+            return res.render('admin/edit-product', {
+                isAdmin: true,
+                activePage: 'products',
+                product: { 
+                    ...editPageData.product, 
+                    ...req.body, 
+                    _id: req.params.id,
+                    variants: reconstructedVariants
+                }, 
+                parentCategories: editPageData.parentCategories,
+                subcategories: editPageData.subcategories,
+                brands: editPageData.brands,
+                selectedParentId: req.body.parentCategory || editPageData.selectedParentId,
+                fieldErrors: error.fieldErrors
+            });
+        }
+
+        if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['sec-fetch-mode'] === 'cors') {
+            return res.status(500).json({ success: false, message: error.message || "Something went wrong" });
+        }
+
+        req.flash("error", error.message || "Something went wrong");
+        return req.session.save(() => {
+            return res.redirect(`/admin/products/edit/${req.params.id}`);
+        });
+    }
 };
 
 
 export const getProducts = async (req, res) => {
    try {
-
-      const data = await productService.getProductsPage(req.query);
+       const data = await productService.getProductsPage(req.query);
       
-      res.render('admin/product', data);
+       res.render('admin/product', data);
    } catch (error) {
-      console.error(error);
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
    }
 };
