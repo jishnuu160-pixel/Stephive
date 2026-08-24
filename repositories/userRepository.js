@@ -62,10 +62,8 @@ export const addAddress = async (userId, addressData) => {
             { new: true }
         ).lean();
 
-        console.log("Repo: Update result:", result ? "SUCCESS" : "FAILED (User not found)");
         return result;
     } catch (error) {
-        console.error("Repo: DB Error:", error.message);
         throw error;
     }
 };
@@ -106,7 +104,6 @@ export const updateUserInfo = async (userId, updateData) => {
         );
         return updatedUser;
     } catch (error) {
-        console.error("Repository Error (updateUserInfo):", error.message);
         throw new Error("Failed to update user in database");
     }
 };
@@ -151,7 +148,6 @@ export const getAddressById = async (userId, addressId) => {
         
         return user.addresses.find(addr => addr._id.toString() === addressId.toString());
     } catch (error) {
-        console.error("Repo Error (getAddressById):", error.message);
         throw error;
     }
 };
@@ -182,7 +178,6 @@ export const removeAddressFromDb = async (userId, addressId) => {
 
         return updatedUser;
     } catch (error) {
-        console.error("Repo Error (removeAddressFromDb):", error);
         throw error;
     }
 };

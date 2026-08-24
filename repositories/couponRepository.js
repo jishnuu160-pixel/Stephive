@@ -72,11 +72,9 @@ export const decrementUseCount = async (couponId) => {
 
         if (!result) {
             throw new Error("Coupon has no remaining uses.");
-        }
-        
+        } 
         return result;
     } catch (error) {
-        console.error("Error decrementing use_count:", error);
         throw error;
     }
 };

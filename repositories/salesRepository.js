@@ -4,9 +4,7 @@ import User from '../models/userModel.js';
 export const getOrdersByDate = async (startDate, endDate) => {
     return await Order.find({
         createdAt: { $gte: startDate, $lte: endDate },
-        status: { 
-            $nin: ['Cancelled', 'cancelled', 'Returned', 'returned'] 
-        }
+        status: 'delivered'
     })
    .populate('user_id', 'fullName')
     .sort({ createdAt: -1 });
@@ -15,7 +13,7 @@ export const getOrdersByDate = async (startDate, endDate) => {
 export const getSalesChartDataFromDB = async (startDate, groupFormat, endDate = null) => {
     const matchQuery = {
         createdAt: { $gte: startDate },
-        status: { $nin: [ 'cancelled', 'returned'] }
+        status: 'delivered'
     };
 
     if (endDate) {

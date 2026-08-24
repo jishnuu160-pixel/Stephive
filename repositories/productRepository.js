@@ -1,6 +1,7 @@
 import Product from '../models/productModel.js';
 import Order from '../models/orderModel.js';
 import Category from '../models/categoryModel.js';
+import { isOfferActiveByDate } from '../utils/dateHelper.js';
 import mongoose from 'mongoose';
 
 export const countProducts = async (searchFilter) => {
@@ -60,14 +61,19 @@ export const findProducts = async (filter, sort, skip, limit) => {
 };
 
 export const updateProduct = async (productId, updateData) => {
-      return await Product.findByIdAndUpdate(
-         productId,
-         { $set: updateData },
-         { 
-             returnDocument: 'after',
-             runValidators: true     
-         }
-      );
+    const updatedProduct = await Product.findByIdAndUpdate(
+        productId,
+        { $set: updateData },
+        { 
+            returnDocument: 'after',
+            runValidators: true    
+        }
+    );
+
+    if (!updatedProduct) {
+        throw new Error("Product update failed: Product not found in database.");
+    }
+    return updatedProduct;
 };
 
 export const saveProduct = async (product) => {
@@ -84,7 +90,6 @@ export const findFilteredProducts = async (filterObject) => {
             .populate('Category')
             .lean();
     } catch (error) {
-        console.error("Repository error while fetching products:", error);
         throw error;
     }
 };
@@ -99,40 +104,30 @@ export const findDuplicateProduct = async (productName, categoryId) => {
 };
 
 export const getProductWithPagination=async (searchFilter,sort,skip,limit)=>{
-      return await Product.findOne(searchFilter)
+      return await Product.find(searchFilter)
          .sort(sort)
          .skip(skip)
          .limit(limit)
          .lean()
 };
 
-export const decreaseStock = async (productId, variantId, size, quantity) => {
+export const decreaseStock = async (productId, variantId, size, quantity, session = null) => {
+    const numericQuantity = Number(quantity);
+    const numericSize = Number(size);
+
     return await Product.updateOne(
-        { 
-            _id: new mongoose.Types.ObjectId(productId),
-            "variants": {
-                $elemMatch: {
-                    "_id": new mongoose.Types.ObjectId(variantId),
-                    "sizes": {
-                        $elemMatch: {
-                            "size": Number(size),
-                            "stock": { $gte: quantity } 
-                        }
-                    }
-                }
-            }
-        },
-        { 
-            $inc: { "variants.$[v].sizes.$[s].stock": -quantity } 
-        },
+        { _id: new mongoose.Types.ObjectId(productId) },
+        { $inc: { "variants.$[v].sizes.$[s].stock": -numericQuantity } },
         { 
             arrayFilters: [
                 { "v._id": new mongoose.Types.ObjectId(variantId) },
-                { "s.size": Number(size) }
-            ] 
+                { "s.size": numericSize, "s.stock": { $gte: numericQuantity } }
+            ],
+            session
         }
     );
 };
+
 
 export const increaseStock = async (productId, variantId, size, quantity, session = null) => {
     return await Product.updateOne(
@@ -142,13 +137,13 @@ export const increaseStock = async (productId, variantId, size, quantity, sessio
             "variants.sizes.size": Number(size)
         },
         { 
-            $inc: { "variants.$[v].sizes.$[s].stock": quantity } 
+            $inc: { "variants.$[v].sizes.$[s].stock": Number(quantity) } 
         },
         { 
             arrayFilters: [
                 { "v._id": new mongoose.Types.ObjectId(variantId) },
                 { "s.size": Number(size) }
-            ],
+            ], 
             session 
         }
     );
@@ -175,13 +170,16 @@ export const getHighestCategoryDiscountForIds = async (categoryIds) => {
         const isOfferActive = cat.offer && cat.offer.isActive === true;
         
         if (isOfferActive) {
-            const catVal = Number(cat.offer.discountValue) || 0;
-            if (catVal > highestCatDiscount) {
-                highestCatDiscount = catVal;
+            const isValidByDate = isOfferActiveByDate(cat.offer.startDate, cat.offer.expiryDate);
+            
+            if (isValidByDate) {
+                const catVal = Number(cat.offer.discountValue) || 0;
+                if (catVal > highestCatDiscount) {
+                    highestCatDiscount = catVal;
+                }
             }
         }
     });
-
     return highestCatDiscount;
 };
 
@@ -190,7 +188,7 @@ export const findTopProducts = async () => {
     return await Order.aggregate([
         { 
             $match: { 
-                status: { $nin: ['cancelled','returned', 'delivered'] } 
+                status: { $nin: ['cancelled', 'returned'] } 
             } 
         },
         { $unwind: '$items' },
@@ -222,10 +220,8 @@ export const findTopProducts = async () => {
                 variants: { $first: '$productInfo.variants' }
             } 
         },
-        
         { $sort: { totalQuantity: -1 } },
         { $limit: 10 },
-        
         {
             $project: {
                 _id: 1,
@@ -264,7 +260,7 @@ export const getBestSellers = async () => {
             } 
         },
         { $sort: { totalQuantity: -1 } },
-        { $limit: 10 },
+        { $limit: 8 },
         {
             $lookup: {
                 from: 'products',

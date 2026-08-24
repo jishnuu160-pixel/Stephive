@@ -1,7 +1,9 @@
-import Order from '../models/OrderModel.js';
+import Order from '../models/orderModel.js';
 import Cart from '../models/cartModel.js';
 import User from '../models/userModel.js';
+import * as ProductRepo from './productRepository.js';
 import mongoose from 'mongoose';
+
 
 export const findByUserId = async (userId) => {
     try {
@@ -51,8 +53,14 @@ export const findOrderById = async (orderId, options = {}) => {
 
 
 export const updateOrder = async (orderId, updateData, options = {}) => {
-    return await Order.findByIdAndUpdate(
-        orderId, 
+    const filter = { _id: orderId };
+    
+    if (updateData.status && updateData.status.toLowerCase() === 'cancelled') {
+        filter.status = { $ne: 'cancelled' }; 
+    }
+
+    return await Order.findOneAndUpdate(
+        filter, 
         updateData, 
         { returnDocument: 'after', ...options }
     );
@@ -78,7 +86,6 @@ export const findUserOrderById = async (orderId, userId) => {
         .lean();
 
     } catch (error) {
-        console.error("DEBUG: Repo Error:", error);
         throw new Error('Error retrieving order details from database');
     }
 };
@@ -140,11 +147,70 @@ export const cancelledOrder=async()=>{
 };
 
 export const updateStatus = async (orderId, newStatus) => {
-    return await Order.findByIdAndUpdate(
-        orderId, 
-        { status: newStatus }, 
-        { new: true } 
-    ).lean();
+    const order = await Order.findById(orderId);
+    if (!order) return null;
+
+    order.status = newStatus;
+
+    if (newStatus.trim().toLowerCase() === 'cancelled') {
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const itemStat = (item.status || '').toLowerCase();
+                if (itemStat !== 'returned' && itemStat !== 'refunded') {
+                    item.status = 'Cancelled';
+                }
+            });
+        }
+    } else {
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const itemStat = (item.status || '').toLowerCase();
+                if (itemStat !== 'cancelled' && itemStat !== 'returned' && itemStat !== 'refunded') {
+                    item.status = newStatus;
+                }
+            });
+        }
+    }
+
+    const updatedOrder = await order.save();
+    return updatedOrder.toObject ? updatedOrder.toObject() : updatedOrder;
+};
+
+
+export const updatePaymentStatus = async (orderId, paymentId, status) => {
+    const order = await Order.findById(orderId);
+    if (!order) return null;
+
+    const previousStatus = (order.status || '').toLowerCase();
+    const newStatus = status.toLowerCase();
+
+    if (previousStatus === 'failed' && newStatus === 'placed') {
+        if (order.items && order.items.length > 0) {
+            for (const item of order.items) {
+                await ProductRepo.decreaseStock(
+                    item.productId, 
+                    item.variantId, 
+                    item.size, 
+                    item.quantity
+                );
+            }
+        }
+    }
+
+    order.status = status; 
+    order.paymentId = paymentId;
+
+    if (order.items && order.items.length > 0) {
+        order.items.forEach(item => {
+            const itemStat = (item.status || '').toLowerCase();
+            if (itemStat === 'failed' || itemStat === 'pending') {
+                item.status = status; 
+            }
+        });
+    }
+
+    const updatedOrder = await order.save();
+    return updatedOrder.toObject ? updatedOrder.toObject() : updatedOrder;
 };
 
 
@@ -156,7 +222,7 @@ export const aggregateTotalSales = async () => {
     const result = await Order.aggregate([
         {
             $match: {
-                status: { $nin: ['Cancelled', 'cancelled', 'Returned', 'returned'] }
+                status:  'delivered'
             }
         },
         {
@@ -171,4 +237,42 @@ export const aggregateTotalSales = async () => {
 
 export const findByCustomOrderId = async (orderId, options = {}) => {
     return await Order.findOne({ orderId: orderId }, null, options).lean();
+};
+
+export const findOrderByRazorpayId = async (razorpayOrderId) => {
+    try {
+        return await Order.findOne({ razorpayOrderId: razorpayOrderId });
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+
+
+export const markOrderAsFailed = async (orderId) => {
+    const order = await Order.findById(orderId);
+    if (!order || order.status.toLowerCase() === 'failed') return null;
+
+    for (const item of order.items) {
+        await ProductRepo.increaseStock(
+            item.productId, 
+            item.variantId, 
+            item.size, 
+            item.quantity
+        );
+    }
+
+    order.status = 'failed';
+
+    if (order.items && order.items.length > 0) {
+        order.items.forEach(item => {
+            const itemStat = (item.status || '').toLowerCase();
+            if (itemStat !== 'cancelled' && itemStat !== 'returned' && itemStat !== 'refunded') {
+                item.status = 'failed';
+            }
+        });
+    }
+
+    const updatedOrder = await order.save();
+    return updatedOrder.toObject ? updatedOrder.toObject() : updatedOrder;
 };

@@ -33,7 +33,8 @@ export const updateWallet = async (userId, amount, type, description, orderId = 
 
 export const findAndUpdateWalletBalance = async (userId, amount, orderId) => {
     const objectId = new mongoose.Types.ObjectId(userId);
-
+    
+    const desc = orderId ? `Order Payment for #${orderId}` : `Order Payment`;
     const wallet = await Wallet.findOneAndUpdate(
         { 
             user_id: objectId, 
@@ -46,7 +47,7 @@ export const findAndUpdateWalletBalance = async (userId, amount, orderId) => {
                     orderId: orderId, 
                     amount: amount, 
                     type: 'debit', 
-                    description: 'Order Payment', 
+                    description: desc, 
                     date: new Date() 
                 } 
             }

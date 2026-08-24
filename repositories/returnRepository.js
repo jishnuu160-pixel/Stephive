@@ -5,8 +5,12 @@ export const saveReturn = async (returnData) => {
     return await new Return(returnData).save();
 };
 
-export const findByOrderId = async (orderId) => {
-    return await Return.findOne({ orderId: orderId });
+export const findByOrderId = async (orderId, itemId) => {
+    const query = { orderId };
+    if (itemId) {
+        query.itemId = itemId;
+    }
+    return await Return.findOne(query);
 };
 
 export const getOrderById = async (orderId) => {
@@ -48,4 +52,30 @@ export const updateOrderStatusInDb = async (orderId, status) => {
         { status: status }, 
         { new: true }
     );
+};
+
+export const updateSpecificOrderItemStatus = async (orderIdentifier, itemId, productId, status) => {
+    const isItemIdMongoId = itemId && typeof itemId === 'string' && itemId.length === 24;
+    const isProductIdMongoId = productId && typeof productId === 'string' && productId.length === 24;
+    const orderIsMongoId = orderIdentifier && typeof orderIdentifier === 'string' && orderIdentifier.length === 24;
+
+    return await Order.findOneAndUpdate(
+        {
+            $or: [
+                { orderId: orderIdentifier },
+                { _id: orderIsMongoId ? orderIdentifier : null }
+            ],
+            "items._id": isItemIdMongoId ? itemId : null
+        },
+        { 
+            $set: { "items.$.status": status } 
+        },
+        { new: true }
+    );
+};
+
+
+
+export const findAllReturnsForOrder = async (orderId) => {
+    return await Return.find({ orderId: orderId });
 };

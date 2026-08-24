@@ -53,7 +53,6 @@ export const findCategoryByNameAndParent = async (name, parentCategory, excludeI
    if (excludeId) {
       query._id = { $ne: excludeId };
    }
-
    return await Category.findOne(query);
 };
 
@@ -61,15 +60,9 @@ export const findCategoryByNameAndParent = async (name, parentCategory, excludeI
 
 export const createCategory= async(categoryData)=>{
    try {
-
       const result = await Category.create(categoryData);
-
       return result;
-
    } catch (err) {
-      console.log("❌ MONGODB CREATE ERROR:", err.message);
-      console.log(err); 
-
       throw err;
    }
 };
