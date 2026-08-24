@@ -1,123 +1,135 @@
-<div class="customers-page">
-    <div class="table-card">
+<div class="admin-dashboard-wrapper">
+    <!-- Dark Backdrop Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-            <h2>Add Product</h2>
-            <a href="/admin/products" class="btn-modal-cancel">✕</a>
-        </div>
+    <aside class="sidebar-wrapper" id="sidebarWrapper">
+        {{> admin-sidebar}}
+    </aside>
 
-        <form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="modal-form-body">
+    <div class="products-page">
+        <div class="prod-table-card">
 
-            <div class="form-row split-row4">
-                <div class="form-group">
-                    <label>Shoe Name</label>
-                    <input type="text" name="productName" placeholder="Curv Shoe" >
-                    <small class="field-error"></small>
-                </div>
-
-               <div class="form-row split-row4">
-                <div class="form-group">
-                 <label>Brand</label>
-                  <select name="brand" class="form-control">
-                   <option value="" disabled selected>Select Brand</option>
-                   {{#each brands}}
-                  <option value="{{this}}">{{this}}</option>
-                   {{/each}}
-                   </select>
-                   <small class="field-error"></small>
-               </div>
-               </div>
-
-                <div class="form-group">
-                    <label>Base Price</label>
-                    <input type="number" name="regularPrice" placeholder="5999">
-                    <small class="field-error"></small>
-                </div>
+            <div class="card-header">
+                <h2>Add Product</h2>
+                <a href="/admin/products" class="btn-cross-cancel">✕</a>
             </div>
 
-            <div class="form-group">
-                <label>Description</label>
-                <input type="text" name="description" placeholder="Comfortable everyday sneaker">
-                <small class="field-error"></small>
-            </div>
+            <form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="modal-form-body">
 
-            <div class="form-row split-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="form-group">
-                    <label>Parent Category (e.g. Men, Women)</label>
-                   <select id="parentCategorySelect" name="parentCategory">
-                     <option value="">Select Parent Category</option>
-                       {{#each parentCategories}}
-                     <option value="{{this._id}}">
-                        {{this.name}}
-                     </option>
-                        {{/each}}
-                   </select>
-                   <small class="field-error"></small>
+                <div class="form-row split-row4">
+                    <div class="form-group">
+                        <label>Shoe Name</label>
+                        <input type="text" name="productName" placeholder="Curv Shoe">
+                        <small class="field-error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <select name="brand" class="form-control">
+                            <option value="" disabled selected>Select Brand</option>
+                            {{#each brands}}
+                            <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>
+                        <small class="field-error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Base Price</label>
+                        <input type="number" name="regularPrice" placeholder="5999">
+                        <small class="field-error"></small>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Category Name (Subcategory)</label>
-                    <select id="subcategorySelect" name="category">
-                     <option value="">Select Subcategory</option>
-                    </select>
-                    <small class="field-error"></small>
-                </div>
-            </div>
-
-            <div class="variants-section">
-                <label class="section-main-label">Variants</label>
-
-                <div id="variantsContainer" class="variants-grid-wrapper"></div>
-
-                <button type="button" class="btn-add-variant-group" onclick="addColorVariantBlock()">
-                    + Add another color variant
-                </button>
-            </div>
-
-            <div class="form-row split-row4">
-                <div class="form-group">
-                    <label>Material</label>
-                    <input type="text" name="material" placeholder="Leather">
+                    <label>Description</label>
+                    <input type="text" name="description" placeholder="Comfortable everyday sneaker">
                     <small class="field-error"></small>
                 </div>
 
-                <div class="form-group">
-                    <label>Closure Type</label>
-                    <input type="text" name="closureType" placeholder="Lace up">
-                    <small class="field-error"></small>
+                <div class="form-row split-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Parent Category (e.g. Men, Women)</label>
+                        <select id="parentCategorySelect" name="parentCategory">
+                            <option value="">Select Parent Category</option>
+                            {{#each parentCategories}}
+                            <option value="{{this._id}}">
+                                {{this.name}}
+                            </option>
+                            {{/each}}
+                        </select>
+                        <small class="field-error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category Name (Subcategory)</label>
+                        <select id="subcategorySelect" name="category">
+                            <option value="">Select Subcategory</option>
+                        </select>
+                        <small class="field-error"></small>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Sole Type</label>
-                    <input type="text" name="soleType" placeholder="Rubber">
-                    <small class="field-error"></small>
-                </div>
-                
-                <div class="form-group">
-                    <label>Weight</label>
-                    <input type="text" name="weight" placeholder="300g">
-                    <small class="field-error"></small>
-                </div>
-            </div>
+               <div class="variants-section">
+    <label class="section-main-label">Variants</label>
 
-            <div class="form-row split-row4">
-                <div class="form-group">
-                    <label>Country of Origin</label>
-                    <input type="text" name="countryOfOrigin" placeholder="India">
-                    <small class="field-error"></small>
-                </div>
-            </div>
+    <div id="variantsContainer" class="variants-grid-wrapper"></div>
 
-            <div class="modal-action-footer">
-                <a href="/admin/products" class="btn-modal-cancel">Cancel</a>
-                <button type="submit" class="btn-modal-save">Save</button>
-            </div>
-
-        </form>
-
-    </div>
+    <button
+        type="button"
+        class="btn-add-variant-group"
+        onclick="addColorVariantBlock()"
+    >
+        + Add another color variant
+    </button>
 </div>
 
+
+
+                <div class="form-row split-row4">
+                    <div class="form-group">
+                        <label>Material</label>
+                        <input type="text" name="material" placeholder="Leather">
+                        <small class="field-error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Closure Type</label>
+                        <input type="text" name="closureType" placeholder="Lace up">
+                        <small class="field-error"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sole Type</label>
+                        <input type="text" name="soleType" placeholder="Rubber">
+                        <small class="field-error"></small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Weight</label>
+                        <input type="text" name="weight" placeholder="300g">
+                        <small class="field-error"></small>
+                    </div>
+                </div>
+
+                <div class="form-row split-row4">
+                    <div class="form-group">
+                        <label>Country of Origin</label>
+                        <input type="text" name="countryOfOrigin" placeholder="India">
+                        <small class="field-error"></small>
+                    </div>
+                </div>
+
+                <div class="modal-action-footer">
+                    <a href="/admin/products" class="btn-cross-cancel">Cancel</a>
+                    <button type="submit" class="btn-modal-save">Save</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
 
 <div id="variantTemplate" style="display:none;">
     <div class="variant-card" data-variant-index="0">
@@ -125,7 +137,9 @@
         
         <div class="form-group">
             <label>Color Name</label>
-            <input type="text" name="colorNames[]" placeholder="Color Name">
+        
+    <input type="text" name="colorNames[]" class="form-control" placeholder="Color Name">
+<small class="field-error"></small>
 
             <div class="color-picker" style="margin-top: 10px;">
                 <input type="color" name="colorHex[]">
@@ -148,8 +162,8 @@
     </div>
 
     <button type="button" class="remove-size">X</button>
-</div>
-            <button type="button" class="add-size" style="margin-top: 5px;">+ Add size</button>
+    </div>
+            <button type="button" class="add-size">+ Add size</button>
         </div>
 
         <div class="form-group variant-images-section" style="margin-top: 20px;">
@@ -182,7 +196,6 @@
     </div>
 </div>
 
-
 <div id="cropperModal" class="cropper-modal-container" style="display: none;">
     <div class="cropper-wrapper">
         <h3>Crop Variant Image</h3>
@@ -195,7 +208,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
 let variantCounter = 0;
@@ -230,16 +242,25 @@ function addColorVariantBlock() {
     const currentIndex = variantCounter;
     clone.setAttribute("data-variant-index", currentIndex);
     variantFilesMap[currentIndex] = [];
-    
-    clone.querySelector('input[name="sizes_0[]"]').setAttribute("name", `sizes_${currentIndex}[]`);
-    clone.querySelector('input[name="stocks_0[]"]').setAttribute("name", `stocks_${currentIndex}[]`);
+
+    clone.querySelectorAll('input[name="sizes_0[]"]').forEach(input => {
+        input.setAttribute("name", `sizes_${currentIndex}[]`);
+    });
+    clone.querySelectorAll('input[name="stocks_0[]"]').forEach(input => {
+        input.setAttribute("name", `stocks_${currentIndex}[]`);
+    });
     
     const fileInput = clone.querySelector('.variant-image-input');
-    fileInput.setAttribute("name", `variantImages_${currentIndex}`);
-    fileInput.setAttribute("data-index", currentIndex);
+    if (fileInput) {
+        fileInput.setAttribute("name", `variantImages_${currentIndex}`);
+        fileInput.setAttribute("data-index", currentIndex);
+    }
 
-    clone.querySelector('.cropped-files-container').id = `croppedFilesContainer_${currentIndex}`;
-    clone.querySelector('.images-preview-gallery-variant').id = `thumbnailsContainer_${currentIndex}`;
+    const croppedContainer = clone.querySelector('.cropped-files-container');
+    if (croppedContainer) croppedContainer.id = `croppedFilesContainer_${currentIndex}`;
+
+    const thumbContainer = clone.querySelector('.images-preview-gallery-variant');
+    if (thumbContainer) thumbContainer.id = `thumbnailsContainer_${currentIndex}`;
 
     document.getElementById("variantsContainer").appendChild(clone);
     
@@ -523,110 +544,225 @@ btnCancelCrop.addEventListener('click', () => {
 });
 
 document.querySelector('.modal-form-body').addEventListener('submit', function (e) {
-   e.preventDefault();
+    e.preventDefault();
 
-   const productName = document.querySelector('[name="productName"]').value.trim();
-   const brand = document.querySelector('[name="brand"]').value.trim();
-   const description = document.querySelector('[name="description"]').value.trim();
-   const parentCategory = document.querySelector('[name="parentCategory"]').value;
-   const category = document.querySelector('[name="category"]').value;
-   const price = document.querySelector('[name="regularPrice"]').value;
+    const productName = document.querySelector('[name="productName"]').value.trim();
+    const brand = document.querySelector('[name="brand"]').value.trim();
+    const description = document.querySelector('[name="description"]').value.trim();
+    const parentCategory = document.querySelector('[name="parentCategory"]').value;
+    const category = document.querySelector('[name="category"]').value;
+    const price = document.querySelector('[name="regularPrice"]').value;
 
-   let hasError = false;
+    let hasError = false;
 
-const productNameInput = document.querySelector('[name="productName"]');
-const brandInput = document.querySelector('[name="brand"]');
-const descriptionInput = document.querySelector('[name="description"]');
-const parentCategoryInput = document.querySelector('[name="parentCategory"]');
-const categoryInput = document.querySelector('[name="category"]');
-const priceInput = document.querySelector('[name="regularPrice"]');
-const materialInput = document.querySelector('[name="material"]');
-const closureTypeInput = document.querySelector('[name="closureType"]');
-const soleTypeInput = document.querySelector('[name="soleType"]');
-const weightInput = document.querySelector('[name="weight"]');
-const countryInput = document.querySelector('[name="countryOfOrigin"]');
+    const productNameInput = document.querySelector('[name="productName"]');
+    const brandInput = document.querySelector('[name="brand"]');
+    const descriptionInput = document.querySelector('[name="description"]');
+    const parentCategoryInput = document.querySelector('[name="parentCategory"]');
+    const categoryInput = document.querySelector('[name="category"]');
+    const priceInput = document.querySelector('[name="regularPrice"]');
+    const materialInput = document.querySelector('[name="material"]');
+    const closureTypeInput = document.querySelector('[name="closureType"]');
+    const soleTypeInput = document.querySelector('[name="soleType"]');
+    const weightInput = document.querySelector('[name="weight"]');
+    const countryInput = document.querySelector('[name="countryOfOrigin"]');
 
-if (!productName) {
-    showFieldError(productNameInput, "Product name is required");
-    hasError = true;
-} else {
-    clearFieldError(productNameInput);
+    if (!productName) {
+        showFieldError(productNameInput, "Product name is required");
+        hasError = true;
+    } else {
+        clearFieldError(productNameInput);
+    }
+
+    if (!brand) {
+        showFieldError(brandInput, "Brand is required");
+        hasError = true;
+    } else {
+        clearFieldError(brandInput);
+    }
+
+    if (!description) {
+        showFieldError(descriptionInput, "Description is required");
+        hasError = true;
+    } else {
+        clearFieldError(descriptionInput);
+    }
+
+    if (!parentCategory) {
+        showFieldError(parentCategoryInput, "Please select parent category");
+        hasError = true;
+    } else {
+        clearFieldError(parentCategoryInput);
+    }
+
+    if (!category) {
+        showFieldError(categoryInput, "Please select subcategory");
+        hasError = true;
+    } else {
+        clearFieldError(categoryInput);
+    }
+
+    if (!price || Number(price) <= 500) {
+        showFieldError(priceInput, "Price should be at least 500");
+        hasError = true;
+    } else {
+        clearFieldError(priceInput);
+    }
+
+    if (!materialInput.value.trim()) {
+        showFieldError(materialInput, "Material is required");
+        hasError = true;
+    } else {
+        clearFieldError(materialInput);
+    }
+
+    if (!closureTypeInput.value.trim()) {
+        showFieldError(closureTypeInput, "Closure type is required");
+        hasError = true;
+    } else {
+        clearFieldError(closureTypeInput);
+    }
+
+    if (!soleTypeInput.value.trim()) {
+        showFieldError(soleTypeInput, "Sole type is required");
+        hasError = true;
+    } else {
+        clearFieldError(soleTypeInput);
+    }
+
+    if (!weightInput.value.trim()) {
+        showFieldError(weightInput, "Weight is required");
+        hasError = true;
+    } else {
+        clearFieldError(weightInput);
+    }
+
+    if (!countryInput.value.trim()) {
+        showFieldError(countryInput, "Country of origin is required");
+        hasError = true;
+    } else {
+        clearFieldError(countryInput);
+    }
+
+    if (hasError) return;
+
+let validationPassed = true;
+let globalColorNames = new Set();
+let globalColorHexes = new Set();
+
+const totalCards = document.querySelectorAll(
+    "#variantsContainer .variant-card"
+);
+
+for (let card of totalCards) {
+    const colorNameInput = card.querySelector(
+        'input[name="colorNames[]"]'
+    );
+
+    if (colorNameInput) {
+
+        const colorName = colorNameInput.value.trim().toLowerCase();
+
+        if (colorName === "") {
+
+            showFieldError(
+                colorNameInput,
+                "Color name is required"
+            );
+
+            validationPassed = false;
+
+        } else if (globalColorNames.has(colorName)) {
+
+            showFieldError(
+                colorNameInput,
+                "Duplicate color name found"
+            );
+
+            validationPassed = false;
+
+        } else {
+
+            globalColorNames.add(colorName);
+
+            clearFieldError(colorNameInput);
+        }
+    }
+
+
+   const sizeInputs = card.querySelectorAll(
+    'input[name^="sizes_"]'
+    );
+
+   const sizesInThisVariant = new Set();
+
+   sizeInputs.forEach(input => {
+
+    const sizeValue = input.value.trim();
+
+    if (sizeValue === "") {
+        showFieldError(
+            input,
+            "Size is required"
+        );
+        validationPassed = false;
+        return;
+    }
+
+    if (sizesInThisVariant.has(sizeValue)) {
+        showFieldError(
+            input,
+            "Duplicate size found"
+        );
+        validationPassed = false;
+    } else {
+
+        sizesInThisVariant.add(sizeValue);
+        clearFieldError(input);
+    }
+    });
+
+    const stockInputs = card.querySelectorAll(
+        'input[name^="stocks_"]'
+    );
+
+    stockInputs.forEach(input => {
+        if (input.value.trim() === "") {
+            showFieldError(
+                input,
+                "Stock is required"
+            );
+            validationPassed = false;
+        } else {
+            clearFieldError(input);
+        }
+    });
+
+    const variantIndex =
+        card.getAttribute("data-variant-index");
+
+    const imageError =
+        card.querySelector(".image-error");
+
+    const uploadedImages =
+        variantFilesMap[variantIndex] || [];
+
+    if (uploadedImages.length < 3) {
+
+        if (imageError) {
+            imageError.textContent =
+                "At least 3 images are required";
+        }
+
+        validationPassed = false;
+
+    } else {
+
+        if (imageError) {
+            imageError.textContent = "";
+        }
+    }
 }
-
-if (!brand) {
-    showFieldError(brandInput, "Brand is required");
-    hasError = true;
-} else {
-    clearFieldError(brandInput);
-}
-
-if (!description) {
-    showFieldError(descriptionInput, "Description is required");
-    hasError = true;
-} else {
-    clearFieldError(descriptionInput);
-}
-
-if (!parentCategory) {
-    showFieldError(parentCategoryInput, "Please select parent category");
-    hasError = true;
-} else {
-    clearFieldError(parentCategoryInput);
-}
-
-if (!category) {
-    showFieldError(categoryInput, "Please select subcategory");
-    hasError = true;
-} else {
-    clearFieldError(categoryInput);
-}
-
-if (!price || Number(price) <= 500) {
-    showFieldError(priceInput, "Price should be at least 500");
-    hasError = true;
-} else {
-    clearFieldError(priceInput);
-}
-
-
-if (!materialInput.value.trim()) {
-    showFieldError(materialInput, "Material is required");
-    hasError = true;
-} else {
-    clearFieldError(materialInput);
-}
-
-if (!closureTypeInput.value.trim()) {
-    showFieldError(closureTypeInput, "Closure type is required");
-    hasError = true;
-} else {
-    clearFieldError(closureTypeInput);
-}
-
-if (!soleTypeInput.value.trim()) {
-    showFieldError(soleTypeInput, "Sole type is required");
-    hasError = true;
-} else {
-    clearFieldError(soleTypeInput);
-}
-
-if (!weightInput.value.trim()) {
-    showFieldError(weightInput, "Weight is required");
-    hasError = true;
-} else {
-    clearFieldError(weightInput);
-}
-
-if (!countryInput.value.trim()) {
-    showFieldError(countryInput, "Country of origin is required");
-    hasError = true;
-} else {
-    clearFieldError(countryInput);
-}
-
-if (hasError) return;
-   
-  const totalCards = document.querySelectorAll('#variantsContainer .variant-card');
     
     if (totalCards.length === 0) {
         if (typeof Toastify === "function") {
@@ -643,93 +779,16 @@ if (hasError) return;
         return; 
     }
 
-   let validationPassed = true;
-   let errorMessage = "";
-
-   for (let card of totalCards) {
-       const variantIdx = card.getAttribute('data-variant-index');
-       const colorNameInput = card.querySelector('input[name="colorNames[]"]');
-       const colorTitle = colorNameInput && colorNameInput.value.trim() ? colorNameInput.value.trim() : `Variant #${parseInt(variantIdx) + 1}`;
-
-       const imagesUploaded = variantFilesMap[variantIdx] ? variantFilesMap[variantIdx].length : 0;
-       const imageSection = card.querySelector('.variant-images-section');
-      const imageError = card.querySelector('.image-error');
-
-if (imageError) {
-    imageError.textContent = '';
-
-    if (imagesUploaded < 3) {
-        console.log("IMAGE ERROR TRIGGERED");
-        imageError.textContent = 'Minimum 3 images are required';
-        validationPassed = false;
+ 
+    if (!validationPassed) {
+        return;
     }
-}
-
-
-       const sizeRows = card.querySelectorAll('.sizes-container .size-row');
-       if (sizeRows.length === 0) {
-           validationPassed = false;
-           errorMessage = `Please add at least one Size & Stock option line for "${colorTitle}".`;
-           break;
-       }
-
-       for (let row of sizeRows) {
-   
-const sizeInput = row.querySelector(`input[name^="sizes_"]`);
-const stockInput = row.querySelector(`input[name^="stocks_"]`);
-
-
-const sizeError =
-    sizeInput.parentElement.querySelector(".field-error");
-
-const stockError =
-    stockInput.parentElement.querySelector(".field-error");
-
-
-           const sizeVal = sizeInput ? sizeInput.value.trim() : "";
-           const stockVal = stockInput ? stockInput.value.trim() : "";
-
-
-if (sizeError) sizeError.textContent = "";
-if (stockError) stockError.textContent = "";
-
-sizeInput.classList.remove("input-error");
-stockInput.classList.remove("input-error");
-
-if (sizeVal === "") {
-    showFieldError(sizeInput, "Size is required");
-    validationPassed = false;
-}
-
-if (stockVal === "") {
-    showFieldError(stockInput, "Stock is required");
-    validationPassed = false;
-}
-
-
-
-           if (Number(sizeVal) < 0 || Number(stockVal) < 0) {
-               validationPassed = false;
-               errorMessage = `Size and Stock amounts cannot register as negative inside "${colorTitle}".`;
-               break;
-           }
-           
-           if (sizeInput) sizeInput.style.borderColor = "";
-           if (stockInput) stockInput.style.borderColor = "";
-       }
-
-       if (!validationPassed) break;
-   }
-
-   if (!validationPassed) {
-    return;
-}
 
    Object.keys(variantFilesMap).forEach(variantIdx => {
-       finalizeVariantFilesInput(variantIdx);
-   });
+    finalizeVariantFilesInput(variantIdx);
+});
 
-   this.submit();
+e.target.submit();
 });
 
 bindColorPickers();

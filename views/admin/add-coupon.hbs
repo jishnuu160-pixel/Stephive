@@ -1,3 +1,10 @@
+<div class="admin-dashboard-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="dashboard-container">
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
 <div class="coupon-container">
     <div class="coupon-header">
         <h2>add Coupon</h2>
@@ -63,6 +70,8 @@
         </div>
     </form>
 </div>
+</div>
+</div>
 
 <script>
 const percentage = document.querySelector('input[value="percentage"]');
@@ -81,4 +90,13 @@ percentage.addEventListener("change", toggleMaxDiscount);
 fixed.addEventListener("change", toggleMaxDiscount);
 
 toggleMaxDiscount();
+
+const expiryDateInput = document.querySelector('input[name="expiryDate"]');
+
+const today = new Date();
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+const minDate = tomorrow.toISOString().split('T')[0];
+
+expiryDateInput.setAttribute('min', minDate);
 </script>
