@@ -1,7 +1,5 @@
 import Admin from '../models/adminModel.js';
-import Category from '../models/categoryModel.js';
 import User from '../models/userModel.js';
-import Product from '../models/productModel.js';
 
 class AdminRepository {
 
