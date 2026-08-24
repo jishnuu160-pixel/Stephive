@@ -118,7 +118,7 @@ export const getCustomers = async (req, res) => {
    try {
       const data =  await adminService.getCustomersPage(req.query);
 
-      res.render('admin/customers', data);
+      res.render('admin/customers', {...data});
    } catch (error) {
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
    }
@@ -126,18 +126,18 @@ export const getCustomers = async (req, res) => {
 
 export const toggleUserStatus = async (req, res) => {
    try {
-      const result =
+       const result =
          await adminService.toggleUserStatus(
             req.params.id
          );
-      req.flash('success', result.message);
-      req.session.save(() => {
-         res.redirect('/admin/customers');
+        req.flash('success', result.message);
+        req.session.save(() => {
+        res.redirect('/admin/customers');
       });
    } catch (error) {
-      req.flash('error', error.message);
-      req.session.save(() => {
-         res.redirect('/admin/customers');
+        req.flash('error', error.message);
+        req.session.save(() => {
+        res.redirect('/admin/customers');
       });
    }
 };
@@ -166,7 +166,8 @@ export const getOrders = async (req, res) => {
             activePage: 'orders',
             ...ordersData,
             orders: ordersData.orders,
-            pagination: ordersData.pagination 
+            startIndex: ordersData.startIndex,
+            pagination: ordersData.pagination, 
         });
     } catch (error) {
         console.error("Error fetching orders:", error);
@@ -183,7 +184,7 @@ export const getOrderDetails = async (req, res) => {
         
         if (!order) return res.status(HTTP_STATUS.NOT_FOUND).send("Order not found");
 
-       res.render('admin/orders-details', { order: order ,
+        res.render('admin/orders-details', { order: order ,
             ...order, 
             isAdmin: true,
            activePage: 'orders'
@@ -219,12 +220,10 @@ export const updateReturnStatus = async (req, res) => {
         
         await adminService.changeReturnStatus(id, status);
         
-        req.flash("success", "Status updated successfully");
-        res.redirect('/admin/returns'); 
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: "Status updated successfully" });
     } catch (error) {
         console.error("Update Controller Error:", error);
-        req.flash("error", "Failed to update status");
-        res.redirect('/admin/returns'); 
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: error.message || "Failed to update status" });
     }
 };
 
