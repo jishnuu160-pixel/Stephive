@@ -30,7 +30,6 @@
       <div class="order-id-badge">
         ORDER ID: <span class="order-id-text">#{{order.orderId}}</span>
       </div>
-      <p class="email-notice">A confirmation email has been sent to <span class="email-highlight">{{order.email}}</span></p>
     </div>
 
     <div class="main-layout">
@@ -56,7 +55,8 @@
               <div class="item-qty-price">
                  <span class="item-qty">Size: <strong>{{this.size}}</strong></span>
                 <span class="item-qty">Qty: <strong>{{this.quantity}}</strong></span>
-                <span class="item-price">₹{{this.price}}</span>
+                <span class="item-qty">Color:<strong>{{this.color}}</strong></span>
+                <span class="item-price">Price: ₹{{this.price}}</span>
               </div>
             </div>
             {{#unless @last}}<hr class="item-divider">{{/unless}}
@@ -111,7 +111,7 @@
             </div>
             <div class="price-row">
               <span>Shipping</span>
-              <span class="free-text">{{order.shipping}}</span>
+              <span class="free-text">Free</span>
             </div>
             <div class="price-row">
               <span>Tax (10%)</span>

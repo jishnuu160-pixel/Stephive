@@ -120,35 +120,35 @@
               </div>
               <div class="item-info">
                 <h4 class="item-name">{{this.productId.productName}}</h4>
-                <p class="item-qty">Qty: {{this.quantity}}</p>
+                <p class="item-qty">Qty: {{this.quantity}} | size: {{this.size}} | color: {{this.color}}</p>
               </div>
               <div class="item-price">₹{{this.itemSubtotal}}</div>
             </div>
             {{/each}}
           </div>
 
-<div class="coupon-section">
-    {{#if appliedCoupon}}
+     <div class="coupon-section">
+      {{#if appliedCoupon}}
         <div class="applied-coupon-badge">
             <span>Applied Coupon: <strong>{{appliedCoupon}}</strong></span>
             <button type="button" class="btn-remove-coupon" onclick="removeCoupon()">Remove</button>
         </div>
-    {{else}}
+      {{else}}
         <div class="coupon-input-group">
             <input type="text" id="couponCodeInput" placeholder="Enter coupon code" class="coupon-input" value="{{appliedCoupon}}">
             <button type="button" class="btn-apply" onclick="applyCoupon()">APPLY</button>
         </div>
         <a href="javascript:void(0)" class="view-coupons-link" onclick="openCouponModal()">VIEW AVAILABLE COUPONS</a>
-    {{/if}}
-</div>
+      {{/if}}
+     </div>
 
-<div id="couponModal" class="modal" style="display:none;">
-    <div class="modal-content-coupon">
+    <div id="couponModal" class="modal" style="display:none;">
+     <div class="modal-content-coupon">
         <h3>Available Coupons</h3>
         <div id="couponList"></div>
         <button onclick="closeCouponModal()">Close</button>
+      </div>
     </div>
-</div>
 
           <div class="price-breakdown">
             <div class="price-row">
@@ -198,7 +198,7 @@
                 <svg class="payment-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4v-6z"/></svg>
                 <div class="payment-text">
                   <span class="method-title">Wallet</span>
-                  <p class="method-desc">Pay securely using your wallet balance (Balance: Rs. 0.00)</p>
+                  <p class="method-desc">Pay securely using your wallet balance (Balance: Rs. {{walletBalance}})</p>
                 </div>
               </div>
             </label>
@@ -283,45 +283,62 @@
                 }
             } 
             else if (paymentMethod === 'razorpay') {
-                const response = await fetch('/place-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ addressId: selectedAddress, paymentMethod: 'razorpay' })
-                });
-                const data = await response.json();
+    const response = await fetch('/place-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addressId: selectedAddress, paymentMethod: 'razorpay' })
+    });
+    const data = await response.json();
 
-                const options = {
-                    key: data.key,
-                    amount: data.amount, 
-                    order_id: data.razorpayOrderId,
-                    handler: async function (response) {
-                        const verifyRes = await fetch('/payment/verify-payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_signature: response.razorpay_signature
-                            })
-                        });
-            
-                        const verifyData = await verifyRes.json();
-                        if (verifyData.success) {
-                            localStorage.removeItem('appliedCouponCode'); 
-                            window.location.href = `/order-confirmation/${verifyData.orderId}`;
-                             showToast("Order placed successfully!", "success");
-                        } else {
-                            showToast(verifyData.message || "Payment verification failed", "error");
-                        }
-                    },
-                    modal: {
-                        ondismiss: function () {
-                            window.location.href = "payment/payment-failed";
-                        }
-                    }
-                };
-                new Razorpay(options).open();
+    if (!data.success) {
+        return showToast(data.message || "Failed to initialize order", "error");
+    }
+
+    const options = {
+        key: data.key,
+        amount: data.amount, 
+        order_id: data.razorpayOrderId,
+        handler: async function (response) {
+            const verifyRes = await fetch('/payment/verify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature,
+                    dbOrderId: data.dbOrderId 
+                })
+            });
+    
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+                localStorage.removeItem('appliedCouponCode'); 
+                showToast("Order placed successfully!", "success");
+                setTimeout(() => {
+                    window.location.href = `/order-confirmation/${verifyData.orderId}`;
+                }, 1000);
+            } else {
+                showToast(verifyData.message || "Payment verification failed", "error");
             }
+        },
+        modal: {
+            ondismiss: async function () {
+                try {
+                    await fetch('/payment/payment-exit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ dbOrderId: data.dbOrderId })
+                    });
+                } catch (err) {
+                    console.error("Error updating exit status:", err);
+                } finally {
+                    window.location.href = "/history"; 
+                }
+            }
+        }
+    };
+    new Razorpay(options).open();
+}
         } catch (err) {
             console.error("Order placing error:", err);
             showToast("Server error, please try again", "error");

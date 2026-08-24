@@ -1,30 +1,26 @@
-
 <div class="edit-profile-container">
     <div class="edit-card">
         <h3>Personal Information</h3>
         <form action="/user/update-profile" method="POST">
             <div class="form-group">
-    <label>FULL NAME</label>
-   <input type="text" name="fullName" value="{{user.fullName}}">
-{{#if errors.fullName}}
-    <span class="field-error">{{errors.fullName}}</span>
-{{/if}}
-</div>
+             <label>FULL NAME</label>
+             <input type="text" name="fullName" value="{{user.fullName}}">
+              {{#if errors.fullName}}
+                <span class="field-error">{{errors.fullName}}</span>
+              {{/if}}
+             </div>
 
-<div class="form-group">
-    <label>PHONE NUMBER</label>
-    <input type="text" name="phoneNumber" value="{{user.phoneNumber}}">
-{{#if errors.phone}}
-    <span class="field-error">{{errors.phone}}</span>
-{{/if}}
-</div>
+            <div class="form-group">
+             <label>PHONE NUMBER</label>
+              <input type="text" name="phoneNumber" value="{{user.phoneNumber}}">
+              {{#if errors.phone}}
+                <span class="field-error">{{errors.phone}}</span>
+              {{/if}}
+            </div>
 
             <div class="modal-actions">
                 <button type="submit" class="btn-save">Save Changes</button>
                 <a href="/user/profile" class="btn-cancel">Cancel</a>
-                 <a href="/user/update-password-init" class="btn-profile-action">
-                    <img src="/icons/lock.png" class="btn-icon"> Update Password
-                </a>
             </div>
         </form>
     </div>

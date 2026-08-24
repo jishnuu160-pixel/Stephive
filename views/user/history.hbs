@@ -1,15 +1,21 @@
 <div class="order-history-page">
     <div class="profile-wrapper">
         <nav class="breadcrumb-container">
-            <p class="breadcrumb">My Account <span >/</span> <strong>My Orders</strong></p>
+            <p class="breadcrumb">My Account <span>/</span> <strong>My Orders</strong></p>
         </nav>
 
+        <!-- Mobile Menu Toggle Button: Triggers the Offcanvas Sidebar Modal on small screens -->
+              <button class="btn btn-outline-dark d-lg-none mb-3 w-30 d-flex align-items-center justify-content-start gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebarModal" aria-controls="mobileSidebarModal">
+                <i class="fa-solid fa-bars"></i> Menu
+              </button>
+
         <div class="profile-layout">
-                {{> userSide user=user}}
+            <!-- This partial handles both the mobile offcanvas drawer and the desktop sidebar -->
+            {{> userSide user=user}}
            
             <main class="main-content">
                 <header class="content-header">
-                    <h2>Order History</h2>
+                    <h1>Order History</h1>
                     <div class="search-wrapper">
                      <form action="/history" method="GET">
                         <i class="fas fa-search"></i>
@@ -38,51 +44,48 @@
                    <div class="order-info">
                     <div class="order-header-line">
                      <small class="order-id">ORDER #{{this.orderId}}</small>
-                    <span class="status-pill {{hyphenate this.status}}">{{this.status}}</span>
                    </div>
+                   
                   <h3 class="product-title">{{this.items.[0].productName}}</h3>
-                 <p class="purchase-date">Purchased on {{this.formattedDate}}</p>
+                  <p class="purchase-date">Purchased on {{this.formattedDate}}</p>
                </div>
-             <div class="price-display">₹{{this.finalAmount}}</div>
+                   <span class="status-pill {{hyphenate this.status}}">{{this.status}}</span>
+              <div class="price-display">₹{{this.finalAmount}}</div>
           </div>
      <hr class="separator">
        <div class="meta-bottom">
         <a href="/orders/{{this._id}}" class="action-link">View Details →</a>
          </div>
-           </div>
-              </div>
+            </div>
+             </div>
               {{else}}
 
-<div class="no-orders">
-    <h3>No Orders Yet</h3>
-    <p>You haven't placed any orders yet.</p>
-    <a href="/shop" class="shop-btn">Start Shopping</a>
-</div>
-                {{/each}}
+        <div class="no-orders">
+        <h3>No Orders Yet</h3>
+         <p>You haven't placed any orders yet.</p>
+        <a href="/shop" class="shop-btn">Start Shopping</a>
+        </div>
+            {{/each}}
             </main>
         </div>
-{{#if hasOrders}}
-<nav class="pagination-container" aria-label="Order history navigation">
-
+        
+    {{#if hasOrders}}
+     <nav class="pagination-container" aria-label="Order history navigation">
     {{#if hasPrevPage}}
         <a href="/history?page={{prevPage}}&sort={{currentSort}}&search={{searchQuery}}" class="page-btn">
             « Previous
         </a>
     {{/if}}
-
     <span class="current-page">
         Page {{currentPage}} of {{totalPages}}
     </span>
-
     {{#if hasNextPage}}
         <a href="/history?page={{nextPage}}&sort={{currentSort}}&search={{searchQuery}}" class="page-btn">
             Next »
         </a>
     {{/if}}
-
 </nav>
 {{/if}}
-    </div> 
-    </div>
+</div> 
 </div>
-
+</div>

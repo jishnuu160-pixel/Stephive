@@ -1,7 +1,8 @@
 <section class="order-details-page">
-    <div class="breadcrumb">
-        <a href="/">My Account</a> <span>/</span> <a href="/orders">Orders</a> <span>/</span> <span>Order Details</span>
+    <div class="breadcrumb-orders">
+        <a href="/">My Account</a> <span>/</span> <a href="/history">Orders</a> <span>/</span> <span>Order Details</span>
     </div>
+    
     <div class="order-header">
         <div class="left">
             <h1>Order #{{order.orderId}} 
@@ -15,187 +16,263 @@
     <div class="order-layout">
         <div class="left-column">
 
-<div class="card tracking-card">
-    <h3>
-        <i class="fa-solid {{#if order.returnRequest}}fa-rotate-left{{else}}fa-truck-fast{{/if}}"></i>
-        {{#if order.returnRequest}}Track Your Return{{else}}Track Your Delivery{{/if}}
-    </h3>
-
-    {{#if order.returnRequest}}
-        <div class="timeline">
-    <div class="timeline-item completed">
-        <span class="dot"></span>
-        <div class="content"><h4>Return Requested</h4></div>
-    </div>
-
-    {{#if (eq order.returnRequest.status 'CancelledByAdmin')}}
-        <div class="timeline-item active cancelled-status">
-            <span class="dot" style="background-color: #dc2626;"></span>
-            <div class="content">
-                <h4 style="color: #dc2626;">Return Cancelled</h4>
-                <p>The return request was cancelled by the administrator.</p>
-            </div>
-        </div>
-    {{else if (eq order.returnRequest.status 'Rejected')}}
-        <div class="timeline-item active rejected-status">
-            <span class="dot" style="background-color: #991b1b;"></span>
-            <div class="content">
-                <h4 style="color: #991b1b;">Return Rejected</h4>
-                <p>Your return request was not approved.</p>
-            </div>
-        </div>
-    {{else}}
-        <div class="timeline-item {{#if (or (eq order.returnRequest.status 'Picked Up') (eq order.returnRequest.status 'Refunded'))}}completed{{/if}}">
-            <span class="dot"></span>
-            <div class="content"><h4>Picked Up</h4></div>
-        </div>
-        <div class="timeline-item {{#if (eq order.returnRequest.status 'Refunded')}}completed{{/if}}">
-            <span class="dot"></span>
-            <div class="content"><h4>Refunded</h4></div>
-        </div>
-    {{/if}}
-</div>
-    {{else}}
-         <div class="timeline">
-            <div class="timeline-item {{#if (isStepCompleted 0 currentStep)}}completed{{/if}}">
-                <span class="dot"></span>
-                <div class="content">
-                    <h4>Order Placed</h4>
-                    <p>Order confirmed and being verified.</p>
-                    <small>{{ order.createdAt }}</small>
-                </div>
-            </div>
-            
-            <div class="timeline-item {{#if (isStepCompleted 1 currentStep)}}completed{{/if}}">
-                <span class="dot"></span>
-                <div class="content">
-                    <h4>Processing at Atelier</h4>
-                    <p>Quality check and luxury packaging in progress.</p>
-                </div>
-            </div>
-
-            {{#unless (eq order.status 'cancelled')}}
-                <div class="timeline-item {{#if (isStepCompleted 2 currentStep)}}completed{{/if}}">
-                    <span class="dot"></span>
-                    <div class="content">
-                        <h4>Shipped</h4>
-                        <p>Waiting to be picked up by courier.</p>
+            <!-- Tracking Card -->
+            <div class="card tracking-card">
+                <h3>
+                    <i class="fa-solid fa-truck-fast"></i> Track Your Delivery
+                </h3>
+                <div class="timeline">
+                    <div class="timeline-item {{#if (isStepCompleted 0 currentStep)}}completed{{/if}}">
+                        <span class="dot"></span>
+                        <div class="content">
+                            <h4>Order Placed</h4>
+                            <p>Order confirmed and being verified.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="timeline-item {{#if (isStepCompleted 3 currentStep)}}completed{{/if}}">
-                    <span class="dot"></span>
-                    <div class="content">
-                        <h4>Out of delivery</h4>
-                        <p>Order is out of delivery</p>
-                        <small>{{ order.createdAt }}</small>
+                    
+                    <div class="timeline-item {{#if (isStepCompleted 1 currentStep)}}completed{{/if}}">
+                        <span class="dot"></span>
+                        <div class="content">
+                            <h4>Processing at Atelier</h4>
+                            <p>Quality check and luxury packaging in progress.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="timeline-item {{#if (isStepCompleted 4 currentStep)}}completed{{/if}}">
-                    <span class="dot"></span>
-                    <div class="content"><h4>Delivered</h4></div>
-                </div>
-            {{/unless}}
 
-            {{#if (eq order.status 'cancelled')}}
-                <div class="timeline-item active cancelled-status">
-                    <span class="dot" style="background-color: #dc2626;"></span>
-                    <div class="content">
-                        <h4 style="color: #dc2626;">Order Cancelled</h4>
-                        <p>This order was cancelled after <strong>{{order.previousStatus}}</strong>.</p>
-                    </div>
-                </div>
-            {{/if}}
-        </div>
-    {{/if}}
-</div>
+                    {{#unless (eq order.status 'cancelled')}}
+                        <div class="timeline-item {{#if (isStepCompleted 2 currentStep)}}completed{{/if}}">
+                            <span class="dot"></span>
+                            <div class="content">
+                                <h4>Shipped</h4>
+                                <p>Waiting to be picked up by courier.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item {{#if (isStepCompleted 3 currentStep)}}completed{{/if}}">
+                            <span class="dot"></span>
+                            <div class="content">
+                                <h4>Out for Delivery</h4>
+                                <p>Order is out for delivery</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item {{#if (isStepCompleted 4 currentStep)}}completed{{/if}}">
+                            <span class="dot"></span>
+                            <div class="content">
+                                <h4>Delivered</h4>
+                                <p>Package has been safely delivered.</p>
+                            </div>
+                        </div>
+                    {{/unless}}
 
-
-<div class="card order-items-card">
-    <h3><i class="fa-solid fa-bag-shopping"></i> Order Items</h3>
-    {{#each order.items}}
-    <div class="order-item">
-         <div class="product-visual">
-          <img src="{{this.productImage}}" alt="{{this.productName}}">
-         </div>
-        <div class="details">
-            <h4>{{this.productName}}</h4>
-            <p class="description">Size: {{this.size}}</p>
-            <div class="labels">
-                <span class="qty">Quantity: {{this.quantity}}</span>
-                
-                <span class="processing {{#if (eq this.status 'cancelled')}}cancelled{{else if this.status}}{{toLowerCase this.status}}{{else}}{{toLowerCase ../order.status}}{{/if}}">
-                    {{#if (eq this.status 'cancelled')}}
-                        Cancelled
-                    {{else if this.status}}
-                        {{this.status}}
-                    {{else}}
-                        {{../order.status}}
+                    {{#if (eq order.status 'cancelled')}}
+                        <div class="timeline-item active cancelled-status">
+                            <span class="dot" style="background-color: #dc2626;"></span>
+                            <div class="content">
+                                <h4 style="color: #dc2626;">Order Cancelled</h4>
+                                <p>This order was cancelled after <strong>{{order.previousStatus}}</strong>.</p>
+                            </div>
+                        </div>
                     {{/if}}
-                </span>
-            </div> 
-            
-            {{#if (eq this.status 'cancelled')}}
-                <p class="cancelled-label" style="color: #dc2626; font-size: 13px; font-weight: 500;">Item Cancelled</p>
-            {{else}}
-                {{#if (or (eq ../order.status 'placed') (eq ../order.status 'processing'))}}
-                    <p class="cancel-item" onclick="confirmCancelItem('{{../order._id}}', '{{this._id}}')" style="cursor: pointer; color: #dc2626;">
-                        cancel item 🗙
-                    </p>
-                {{/if}}
-            {{/if}}
+                </div>
+            </div>
+
+            <!-- Order Items Card -->
+            <div class="card order-items-card">
+                <h3><i class="fa-solid fa-bag-shopping"></i> Order Items</h3>
+                {{#each order.items}}
+                <div class="order-item-container">
+                    <div class="order-item">
+                        <div class="product-visual">
+                            <img src="{{this.productImage}}" alt="{{this.productName}}">
+                        </div>
+                        <div class="details">
+                            <h4>{{this.productName}}</h4>
+                            <p class="description">Size: {{this.size}} | Color: {{this.color}}</p>
+                            <div class="labels">
+                                <span class="qty">Qty: {{this.quantity}}</span>
+                                
+                                <span class="processing 
+                                    {{#if this.itemReturnStatus}}
+                                        {{toLowerCase this.itemReturnStatus}}
+                                    {{else if (eq (toLowerCase this.status) 'cancelled')}}
+                                        cancelled
+                                    {{else if (eq (toLowerCase ../order.status) 'cancelled')}}
+                                        cancelled
+                                    {{else if (or (not this.status) (eq (toLowerCase this.status) 'placed'))}}
+                                        {{toLowerCase ../order.status}}
+                                    {{else}}
+                                        {{toLowerCase this.status}}
+                                    {{/if}}">
+                                    
+                                    {{#if this.itemReturnStatus}}
+                                        {{this.itemReturnStatus}}
+                                    {{else if (eq (toLowerCase this.status) 'cancelled')}}
+                                        Cancelled
+                                    {{else if (eq (toLowerCase ../order.status) 'cancelled')}}
+                                        Cancelled
+                                    {{else if (or (not this.status) (eq (toLowerCase this.status) 'placed'))}}
+                                        {{../order.status}}
+                                    {{else}}
+                                        {{this.status}}
+                                    {{/if}}
+                                </span>
+                            </div> 
+                            
+                            {{#if (eq this.status 'cancelled')}}
+                                <p class="cancelled-label" style="color: #dc2626; font-size: 12px; font-weight: 500;">Item Cancelled</p>
+                            {{else}}
+                                {{#if (or (eq ../order.status 'placed') (eq ../order.status 'processing'))}}
+                                    <button type="button" class="cancel-item" onclick="confirmCancelItem('{{../order._id}}', '{{this._id}}')">
+                                        Cancel Item ✕
+                                    </button>
+                                {{/if}}
+                            {{/if}}
+
+                            {{#if (eq (toLowerCase ../order.status) 'delivered')}}
+                                {{#unless (eq (toLowerCase this.status) 'cancelled')}}
+                                    {{#unless (eq (toLowerCase ../order.status) 'cancelled')}}
+                                        {{#unless this.isReturned}}
+                                            {{#unless (eq (toLowerCase this.status) 'returned')}}
+                                                {{#unless (eq (toLowerCase this.status) 'refunded')}}
+                                                    {{#unless (eq (toLowerCase this.status) 'return requested')}}
+                                                        <a href="/orders/return/{{../order._id}}" class="return-item-link">
+                                                            <i class="fa-solid fa-rotate-left"></i> Return This Item
+                                                        </a>
+                                                    {{/unless}}
+                                                {{/unless}}
+                                            {{/unless}}
+                                        {{/unless}}
+                                    {{/unless}}
+                                {{/unless}}
+                            {{/if}}
+                        </div>
+                        
+                        <div class="item-price">
+                            <strong>₹{{this.priceWithTax}}</strong> 
+                            {{#if this.itemDiscount}}
+                                <span style="text-decoration: line-through; color: var(--text-muted); font-size: 12px;">
+                                    ₹{{this.itemSubtotal}}
+                                </span>
+                            {{/if}}
+                            <small class="text-muted">(Incl. 10% Tax & Discount)</small>
+                        </div>
+                    </div>
+
+                    <!-- ITEM-SPECIFIC RETURN TIMELINE -->
+                    {{#if this.itemReturnRequest}}
+                    <div class="item-return-timeline" style="margin-top: 16px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <p style="font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-rotate-left"></i> Track Your Return
+                        </p>
+
+                        <div class="horizontal-tracker" style="display: flex; justify-content: space-between; align-items: center; position: relative; padding: 0 15px;">
+                            <div style="position: absolute; top: 6px; left: 25px; right: 25px; height: 2px; background: var(--border-color); z-index: 1;"></div>
+
+                            <div style="display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; text-align: center; flex: 1;">
+                                <div style="width: 14px; height: 14px; background: var(--primary); border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--primary); margin-bottom: 6px;"></div>
+                                <span style="font-size: 11px; font-weight: 500; color: var(--text-main); white-space: nowrap;">Requested</span>
+                            </div>
+
+                            {{#if (eq this.itemReturnRequest.status 'CancelledByAdmin')}}
+                                <div style="display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; text-align: center; flex: 1;">
+                                    <div style="width: 14px; height: 14px; background: var(--danger); border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--danger); margin-bottom: 6px;"></div>
+                                    <span style="font-size: 11px; font-weight: 500; color: var(--danger); white-space: nowrap;">Cancelled</span>
+                                </div>
+                            {{else if (eq this.itemReturnRequest.status 'Rejected')}}
+                                <div style="display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; text-align: center; flex: 1;">
+                                    <div style="width: 14px; height: 14px; background: #991b1b; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #991b1b; margin-bottom: 6px;"></div>
+                                    <span style="font-size: 11px; font-weight: 500; color: #991b1b; white-space: nowrap;">Rejected</span>
+                                </div>
+                            {{else}}
+                                <div style="display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; text-align: center; flex: 1;">
+                                    <div style="width: 14px; height: 14px; background: {{#if (or (eq this.itemReturnRequest.status 'Picked Up') (eq this.itemReturnRequest.status 'Refunded'))}}var(--primary){{else}}var(--border-color){{/if}}; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px {{#if (or (eq this.itemReturnRequest.status 'Picked Up') (eq this.itemReturnRequest.status 'Refunded'))}}var(--primary){{else}}#cbd5e1{{/if}}; margin-bottom: 6px;"></div>
+                                    <span style="font-size: 11px; font-weight: 500; color: {{#if (or (eq this.itemReturnRequest.status 'Picked Up') (eq this.itemReturnRequest.status 'Refunded'))}}var(--text-main){{else}}var(--text-muted){{/if}}; white-space: nowrap;">Picked Up</span>
+                                </div>
+
+                                <div style="display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; text-align: center; flex: 1;">
+                                    <div style="width: 14px; height: 14px; background: {{#if (eq this.itemReturnRequest.status 'Refunded')}}var(--primary){{else}}var(--border-color){{/if}}; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px {{#if (eq this.itemReturnRequest.status 'Refunded')}}var(--primary){{else}}#cbd5e1{{/if}}; margin-bottom: 6px;"></div>
+                                    <span style="font-size: 11px; font-weight: 500; color: {{#if (eq this.itemReturnRequest.status 'Refunded')}}var(--text-main){{else}}var(--text-muted){{/if}}; white-space: nowrap;">Refunded</span>
+                                </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </div>
         </div>
-        <div class="price">
-            Price: ₹{{this.price}}
-        </div>
-    </div>
-    {{/each}}
-</div>
-</div>
 
         <div class="right-column">
-            <div class="card summary-card">
-                <h3>ORDER SUMMARY</h3>
-                <div class="row"><span>Subtotal</span><span>₹{{order.subtotal}}</span></div>
-                <div class="row"><span> Discount</span><span class="green">-₹{{order.discount}}</span></div>
-                <div class="row"><span>TAX (Included)</span><span>₹{{order.tax}}</span></div>
-                <div class="row total"><span>Total</span><span><strong>₹{{order.finalAmount}}</strong></span></div>
-            </div>
 
+<div class="card summary-card">
+<aside class="order-summary">
+      <h2>ORDER SUMMARY</h2>
+      <div class="summary-grid">
+        <span>Subtotal</span> <span>₹ {{order.subtotal}}</span>
+        <span>Discount</span> <span>-₹ {{order.discount}}</span>
+        <span>Tax</span> <span>₹ {{order.tax}}</span>
+        <span>Shipping</span> <span>Free</span>
+        <strong>Total</strong>  <span>₹{{order.total}}</span>
+      </div>
+    </aside>
+</div>
+
+
+
+            <!-- Delivery Information Card -->
             <div class="card">
                 <h3>DELIVERY INFORMATION</h3>
                 <div class="info">
-                    <p><strong>Recipient</strong><p class="delivery-font">{{order.deliveryAddress.fullName}}<br>{{order.deliveryAddress.addressLine1}}, {{order.deliveryAddress.city}}<br>{{order.deliveryAddress.pincode}}</p>
-                    <p><strong>Contact</strong><br> <p class="delivery-font">{{order.deliveryAddress.mobileNumber}}</p>
-                    <p><strong>Estimated Date</strong><br> <p class="delivery-font">{{formattedDate order.expectedDeliveryDate}}</p>
+                    <div>
+                        <p><strong>Recipient</strong></p>
+                        <p class="delivery-font">{{order.deliveryAddress.fullName}}<br>{{order.deliveryAddress.addressLine1}}, {{order.deliveryAddress.city}}<br>{{order.deliveryAddress.pincode}}</p>
+                    </div>
+                    <div>
+                        <p><strong>Contact</strong></p>
+                        <p class="delivery-font">{{order.deliveryAddress.mobileNumber}}</p>
+                    </div>
+                    <div>
+                        <p><strong>Estimated Date</strong></p>
+                        <p class="delivery-font">{{formattedDate order.expectedDeliveryDate}}</p>
+                    </div>
                 </div>
             </div>
 
+            <!-- Payment Method Card -->
             <div class="card">
                 <h3>PAYMENT METHOD</h3>
                 <div class="payment-info">
                     <p><i class="fa-solid fa-credit-card"></i> {{order.paymentMethod}}</p>
                     <span class="paid-badge">{{order.paymentStatus}}</span>
+                    {{#if (eq (toLowerCase order.status) 'failed')}}
+                        <button type="button" class="btn-retry-payment" onclick="retryPayment('{{order._id}}')" id="retryBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="retry-icon">
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.73-5.19"/>
+                            </svg>
+                            <span class="btn-text">Retry Payment</span>
+                        </button>
+                    {{/if}}
                 </div>
             </div>
-  <div class="card">
-    {{#unless (eq order.status 'cancelled')}}
-        <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
-            <i class="fa-solid fa-download"></i> Download Invoice
-        </a>
-    {{/unless}}
 
-    {{#if isReturnable}}
-        <a href="/orders/return/{{order._id}}" class="return-order-btn">
-            <i class="fa-solid fa-rotate-left"></i> Return Order
-        </a>
-    {{else if showCancelButton}}
-        <button type="button" class="cancel-order-btn" onclick="confirmCancel('{{order._id}}')">
-            <i class="fa-solid fa-circle-xmark"></i> Cancel Order
-        </button>
-    {{/if}}
-</div>
-</div> 
+            <!-- Actions Card -->
+            <div class="card">
+                {{#unless (eq order.status 'cancelled')}}
+                    <a href="/orders/invoice/{{order._id}}" class="invoice-btn">
+                        <i class="fa-solid fa-download"></i> Download Invoice
+                    </a>
+                {{/unless}}
+
+                {{#if showCancelButton}}
+                    <button type="button" class="cancel-order-btn" onclick="confirmCancel('{{order._id}}')">
+                        <i class="fa-solid fa-circle-xmark"></i> Cancel Order
+                    </button>
+                {{/if}}
+            </div>
+        </div>
+    </div>
 </section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -242,7 +319,12 @@ async function confirmCancel(orderId) {
             });
 
             if (response.ok) {
-                Swal.fire('Cancelled!', 'Your order has been cancelled.', 'success')
+                Swal.fire({
+                    title: 'Cancelled!', 
+                    text: 'Your order has been cancelled.', 
+                    icon: 'success',
+                    customClass: { popup: 'small-swal-popup', title: 'small-swal-title', htmlContainer: 'small-swal-text' }
+                })
                     .then(() => window.location.reload());
             } else {
                 throw new Error('Failed to cancel');
@@ -279,7 +361,12 @@ async function confirmCancelItem(orderId, itemId) {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                Swal.fire('Cancelled!', data.message || 'Item has been cancelled.', 'success')
+                Swal.fire({
+                    title: 'Cancelled!', 
+                    text: data.message || 'Item cancelled.', 
+                    icon: 'success',
+                    customClass: { popup: 'small-swal-popup', title: 'small-swal-title', htmlContainer: 'small-swal-text' }
+                })
                     .then(() => window.location.reload());
             } else {
                 throw new Error(data.message || 'Failed to cancel item');
@@ -287,6 +374,62 @@ async function confirmCancelItem(orderId, itemId) {
         } catch (error) {
             Swal.fire('Error!', error.message || 'Something went wrong.', 'error');
         }
+    }
+}
+
+
+async function retryPayment(dbOrderId) {
+    try {
+        const response = await fetch('/payment/retry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: dbOrderId })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return Swal.fire('Error!', data.message || "Failed to initialize payment retry", "error");
+        }
+
+        const options = {
+            key: data.key,
+            amount: data.amount,
+            currency: data.currency,
+            order_id: data.razorpayOrderId,
+            handler: async function (response) {
+                const verifyRes = await fetch('/payment/verify-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        dbOrderId: dbOrderId
+                    })
+                });
+
+                const verifyData = await verifyRes.json();
+                if (verifyData.success) {
+                    Swal.fire('Success!', 'Payment successful! Updating order...', 'success')
+                        .then(() => window.location.reload());
+                } else {
+                    Swal.fire('Verification Failed', verifyData.message || "Payment verification failed", "error");
+                }
+            },
+            modal: {
+                ondismiss: function () {
+                    console.log("Payment retry modal closed by user.");
+                }
+            }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+
+    } catch (error) {
+        console.error("Retry Payment Error:", error);
+        Swal.fire('Error!', 'Server error during payment retry', 'error');
     }
 }
 </script>

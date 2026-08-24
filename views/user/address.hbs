@@ -1,8 +1,12 @@
-<div class="order-history-page">
+<div class="address-page">
     <div class="profile-wrapper">
         <nav class="breadcrumb-container">
             <p class="breadcrumb">My Account <span >/</span> <strong>My Addresses</strong></p>
         </nav>
+
+        <button class="btn btn-outline-dark d-lg-none mb-3 w-30 d-flex align-items-center justify-content-start gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebarModal" aria-controls="mobileSidebarModal">
+            <i class="fa-solid fa-bars"></i> Menu
+        </button>
 
         <div class="profile-layout">
             
@@ -83,7 +87,12 @@ document.querySelectorAll('.delete-address').forEach(link => {
             showCancelButton: true,
             confirmButtonText: 'Yes, Delete',
             cancelButtonText: 'Cancel',
-            confirmButtonColor: '#dc2626'
+            confirmButtonColor: '#dc2626',
+            customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
+        }
         }).then((result) => {
 
             if (result.isConfirmed) {

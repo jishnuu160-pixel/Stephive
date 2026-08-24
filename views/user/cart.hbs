@@ -3,14 +3,16 @@
     <div class="cart-container">
         <header class="cart-header">
             <div class="header-left">
-                <nav class="breadcrumbs">
-                    <a class="cart-link" href="/">HOME</a> / 
-                    <a class="cart-link" href="/shop">SHOP</a> / 
-                    <span style="font-weight: 600; color: black;">CART</span>
-                </nav>
+                <div class="breadcrumb">
+                    <a href="/">Home</a>
+                        <span>/</span>
+                       <a href="/shop">Shop</a>
+                         <span>/</span>
+                    <span class="wishlist">My Cart</span>
+               </div>
                 <h1>Your Cart <span class="item-count" id="cart-item-count">({{totalUnitsCount}} Items)</span></h1>
             </div>
-            <a class="continue-shopping-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
+            <a class="continue-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
         </header>
 
 <div class="cart-content">

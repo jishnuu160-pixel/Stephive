@@ -21,12 +21,13 @@
         </p>
 
         <table>
-            <tr><th>Product</th><th>Size</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+            <tr><th>Product</th><th>Size</th><th>Qty</th><th>Color</th><th>Price</th><th>Total</th></tr>
             {{#each order.items}}
             <tr>
                 <td>{{this.productName}}</td>
                 <td>{{this.size}}</td>
                 <td>{{this.quantity}}</td>
+                <td>{{this.color}}</td>
                 <td>₹{{this.price}}</td>
                 <td>₹{{multiply this.price this.quantity}}</td>
             </tr>
