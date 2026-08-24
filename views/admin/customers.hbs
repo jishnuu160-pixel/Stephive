@@ -1,90 +1,124 @@
-<div class="customers-page">
-    <div class="table-card">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Users</h2>
-            
-            <div class="header-actions" style="display: flex; align-items: center; gap: 15px; width: 100%; max-width: 600px; justify-content: flex-end;">
+<div class="admin-dashboard-wrapper">
+    <!-- Dark Backdrop Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="dashboard-container">
+        
+        <!-- Sidebar Partial Wrapped inside an aside tag -->
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="cust-main-content">
+            <div class="cust-table-card">
                 
-                <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
-                    <form action="/admin/customers" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
-                        <i class="fas fa-search"></i>
-                        <input type="text" name="search" placeholder="Search Users" value="{{searchQuery}}">
-                        {{#if searchQuery}}
-                            <a href="/admin/customers" class="search-clear-btn">
-                                <i class="fas fa-times-circle"></i>
-                            </a>
-                        {{/if}}
-                    </form>
+                <!-- Page Header with Search Container -->
+                <div class="cust-header">
+                    <h2>Users</h2>
+                    <div class="cust-controls">
+                        <div class="cust-search-wrapper">
+                            <form action="/admin/customers" method="GET" class="cust-search-form">
+                                <div class="cust-search-inner-wrapper">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" name="search" placeholder="Search Users" value="{{searchQuery}}" class="cust-search-input" oninput="autoSearch(this)">
+                                    {{#if searchQuery}}
+                                        <a href="/admin/customers" class="cust-search-clear-btn" title="Clear Search">
+                                            <i class="fas fa-times-circle"></i>
+                                        </a>
+                                    {{/if}}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
-            </div>
-        </div>
+                <!-- Table Container -->
+                <div class="cust-table-responsive">
+                    <table class="cust-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Full Name</th>
+                                <th>Email Address</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#if users.length}}
+                                {{#each users}}
+                                <tr>
+                                    <td>{{add ../startIndex @index 1}}</td>
+                                    <td><strong>{{this.fullName}}</strong></td>
+                                    <td>{{this.email}}</td>
+                                    <td>
+                                        <span class="cust-status-pill {{#if this.isBlocked}}status-blocked{{else}}status-active{{/if}}">
+                                            {{#if this.isBlocked}}Blocked{{else}}Active{{/if}}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <form action="/admin/customers/toggle-status/{{this._id}}" method="POST" class="cust-action-form">
+                                            <button type="button" 
+                                                class="cust-btn-action {{#if this.isBlocked}}btn-unblock{{else}}btn-block{{/if}}" 
+                                                onclick="confirmToggle(this, '{{this.fullName}}', {{this.isBlocked}})">
+                                                {{#if this.isBlocked}}Unblock{{else}}Block{{/if}}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            {{else}}
+                                <tr>
+                                    <td colspan="5" class="cust-no-data-cell">
+                                        No users found in database.
+                                    </td>
+                                </tr>
+                            {{/if}}
+                        </tbody>
+                    </table>
+                </div>
 
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>Full Name</th>
-                    <th>Email Address</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
+                <!-- Pagination Container -->
                 {{#if users.length}}
-                    {{#each users}}
-                    <tr>
-                        <td>{{add ../startIndex @index 1}}</td>
-                        <td><strong>{{this.fullName}}</strong></td>
-                        <td>{{this.email}}</td>
-                        <td>
-                            <span class="status-pill {{#if this.isBlocked}}status-blocked{{else}}status-active{{/if}}">
-                                {{#if this.isBlocked}}Blocked{{else}}Active{{/if}}
-                            </span>
-                        </td>
-                        <td>
-                      <form action="/admin/customers/toggle-status/{{this._id}}" method="POST" style="display:inline;">
-       <button type="button" 
-        class="btn-action-customer {{#if this.isBlocked}}btn-unblock{{else}}btn-block{{/if}}" 
-        onclick="confirmToggle(this, '{{this.fullName}}', {{this.isBlocked}})">
-    {{#if this.isBlocked}}Unblock{{else}}Block{{/if}}
-</button>
-    </form>
-</td>
-                    </tr>
-                    {{/each}}
-                {{else}}
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px; color: #94a3b8;">
-                            No users found in database.
-                        </td>
-                    </tr>
+                <div class="pagination">
+                    {{#if hasPrevPage}}
+                        <a href="/admin/customers?page={{prevPage}}&search={{searchQuery}}" class="page-link">&laquo; Prev</a>
+                    {{/if}}
+
+                    <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
+
+                    {{#if hasNextPage}}
+                        <a href="/admin/customers?page={{nextPage}}&search={{searchQuery}}" class="page-link">Next &raquo;</a>
+                    {{else}}
+                        <span class="page-link disabled">Next &raquo;</span>
+                    {{/if}}
+                </div>
                 {{/if}}
-            </tbody>
-        </table>
 
-        {{#if users.length}}
-        <div class="pagination">
-            {{#if hasPrevPage}}
-                <a href="/admin/customers?page={{prevPage}}&search={{searchQuery}}" class="page-link">« Prev</a>
-            {{/if}}
-
-            <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
-
-            {{#if hasNextPage}}
-                <a href="/admin/customers?page={{nextPage}}&search={{searchQuery}}" class="page-link">Next »</a>
-            {{/if}}
-        </div>
-        {{/if}}
+            </div>
+        </main>
     </div>
 </div>
 
-<div  class="admin-toast-container"></div>
+<div class="admin-toast-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-   function confirmToggle(button, name, isBlocked) {
+let searchTimeout = null;
+
+function autoSearch(input) {
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        input.form.submit();
+    }, 500);
+}
+
+function confirmToggle(button, name, isBlocked) {
     const action = isBlocked ? 'unblock' : 'block';
+    const alertWidth = window.innerWidth <= 480 ? '280px' : '320px';
     
     Swal.fire({
         title: 'Are you sure?',
@@ -94,9 +128,8 @@
         confirmButtonColor: isBlocked ? '#28a745' : '#d33',
         cancelButtonColor: '#6c757d',
         confirmButtonText: `Yes, ${action}!`,
- 
-        width: '320px',             
-        padding: '1rem',           
+        width: alertWidth,             
+        padding: '1rem',          
         customClass: {
             popup: 'small-swal-popup',
             title: 'small-swal-title',
@@ -109,4 +142,3 @@
     });
 }
 </script>
-

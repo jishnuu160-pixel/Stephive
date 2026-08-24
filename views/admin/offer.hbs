@@ -1,206 +1,298 @@
-<div class="stephive-offers-scope">
-    <div class="offers-page-layout">
+<div class="admin-dashboard-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="dashboard-container">
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
         
-        <main class="offers-main-content">
-            <h1 class="offers-main-title">Set Promotions & Offers</h1>
-
-            <div class="offers-dual-grid">
+        <div class="stephive-offers-scope">
+            <div class="offers-page-layout">
                 
-                <div class="setup-panel-card">
-                    <div class="panel-header header-amber">
-                        <div class="panel-icon bg-amber text-amber"><i class="fa-solid fa-tags"></i></div>
-                        <div class="panel-header-text">
-                            <h2>Product Offer Setup</h2>
-                            <p>Target a specific individual inventory item</p>
-                        </div>
-                    </div>
-                    
-                  {{#if productError}}
-                 <div class="alert alert-danger" style="display: block !important; background-color: #fee2e2; color: #991b1b; padding: 10px 15px; margin: 15px; border-radius: 6px; font-size: 0.875rem;">
-                  <i class="fa-solid fa-circle-exclamation"></i> {{productError}}
-                 </div>
-                  {{/if}}
-                    
-                    <form action="/admin/offers/apply-product" method="POST" class="panel-form">
-                        <div class="panel-form-group">
-                            <label>Select Target Product</label>
-                            <select name="targetProduct">
-                                <option value="" disabled selected>Choose a product...</option>
-                                {{#each allProducts}}
-                                    <option value="{{this._id}}">{{this.productName}} (ID: {{this.productId}}) - (₹{{this.regularPrice}})</option>
-                                {{/each}}
-                            </select>
-                        </div>
+                <main class="offers-main-content">
+                    <h1 class="offers-main-title">Set Promotions & Offers</h1>
 
-                        <div class="panel-form-group">
-                            <label>Discount Value (%)</label>
-                            <input type="number" name="discountValue" min="1" max="99">
-                        </div>
-
-                        <div class="panel-form-group">
-                            <label>Start Date</label>
-                            <input type="date" name="startDate">
-                        </div>
-
-                        <div class="panel-form-group">
-                            <label>Expiry Date</label>
-                            <input type="date" name="expiryDate">
-                        </div>
-
-                        <button type="submit" class="panel-btn btn-apply">Apply Offer</button>
-                    </form>
-
-                    <div class="active-tracker-section">
-                        <h3>Active Product Discounts</h3>
-                        <div class="panel-scroll-box">
-                            {{#if productOffers.length}}
-                                {{#each productOffers}}
-                                <div class="tracker-item">
-                                    <div class="tracker-info">
-                                        <span class="tracker-name">{{this.productName}}</span>
-                                        <span class="tracker-meta text-muted" style="font-size: 10px; display: block;">
-                                            Expires: {{formattedDate this.offer.expiryDate}}
-                                        </span>
-                                        <span class="tracker-badge color-amber">{{this.offer.discountValue}}% OFF</span>
-                                    </div>
-                                    <form action="/admin/offers/remove-product/{{this._id}}" method="POST">
-                                        <button type="submit" class="panel-btn btn-delete">Remove</button>
-                                    </form>
+                    <div class="offers-dual-grid">
+                        
+                        <!-- Product Offer Setup Card -->
+                        <div class="setup-panel-card">
+                            <div class="panel-header header-amber">
+                                <div class="panel-icon bg-amber text-amber"><i class="fa-solid fa-tags"></i></div>
+                                <div class="panel-header-text">
+                                    <h2>Product Offer Setup</h2>
+                                    <p>Target a specific individual inventory item</p>
                                 </div>
-                                {{/each}}
-                            {{else}}
-                                <p class="tracker-empty">No current active product offers</p>
-                            {{/if}}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="setup-panel-card">
-                    <div class="panel-header header-emerald">
-                        <div class="panel-icon bg-emerald text-emerald"><i class="fa-solid fa-folder-open"></i></div>
-                        <div class="panel-header-text">
-                            <h2>Category Offer Setup</h2>
-                            <p>Apply store-wide promotional rates</p>
-                        </div>
-                    </div>
-                    
-                    {{#if categoryError}}
-                        <div class="alert alert-danger" style="background-color: #fee2e2; color: #991b1b; padding: 10px 15px; margin: 15px; border-radius: 6px; font-size: 0.875rem;">
-                            <i class="fa-solid fa-circle-exclamation"></i> {{categoryError}}
-                        </div>
-                    {{/if}}
-
-                    <form action="/admin/offers/apply-category" method="POST" class="panel-form" id="categoryOfferForm">
-                        <div class="panel-form-group">
-                            <label>Select Target Subcategory</label>
-                            <select name="subCategoryName" id="targetSubCategory" >
-                                <option value="" disabled selected>Choose a subcategory...</option>
-                                {{#each subCategories}}
-                                    <option value="{{this.name}}" data-parent-name="{{this.parentCategory.name}}">{{this.name}}</option>
-                                {{/each}}
-                            </select>
-                        </div>
-
-                        <div class="panel-form-group dynamic-hidden" id="parentCategoryWrapper">
-                            <label>Affected Parent Departments</label>
-                            <div id="parentCategoryDisplayTags" class="checkbox-pill-group"></div>
-                        </div>
-
-                        <div class="panel-form-group">
-                            <label>Discount Rate (%)</label>
-                            <input type="number" name="discountValue" min="1" max="99" >
-                        </div>
-
-                        <div class="panel-form-group">
-                            <label>Start Date</label>
-                            <input type="date" name="startDate" >
-                        </div>
-
-                        <div class="panel-form-group">
-                            <label>Expiry Date</label>
-                            <input type="date" name="expiryDate" >
-                        </div>
-
-                        <button type="submit" class="panel-btn btn-apply">Apply Category Offer</button>
-                    </form>
-
-                    <div class="active-tracker-section">
-                        <h3>Active Category Discounts</h3>
-                        <div class="panel-scroll-box">
-                            {{#if categoryOffers.length}}
-                                {{#each categoryOffers}}
-                                <div class="tracker-item">
-                                    <div class="tracker-info">
-                                        <span class="tracker-name">
-                                            {{this.name}}
-                                            {{#if this.parentCategory.name}}
-                                                <small class="tracker-parent-tag">({{this.parentCategory.name}})</small>
-                                            {{/if}}
-                                            <small class="tracker-level-tag">(Subcategory Group)</small>
-                                        </span>
-                                 {{#if this.offer.expiryDate}}
-    <span class="tracker-meta text-muted" style="font-size: 10px; display: block;">
-        Expires: {{formattedDate this.offer.expiryDate}}
-    </span>
-{{/if}}
-                                        <span class="tracker-badge color-emerald">{{this.offer.discountValue}}% OFF</span>
-                                    </div>
-                                    <form action="/admin/offers/remove-category/{{this._id}}" method="POST">
-                                        <button type="submit" class="panel-btn btn-delete">Remove</button>
-                                    </form>
+                            </div>
+                            
+                            <!-- Added id="productOfferForm" here -->
+                            <form action="/admin/offers/apply-product" method="POST" class="panel-form" id="productOfferForm">
+                                <div class="panel-form-group">
+                                    <label>Select Target Product</label>
+                                    <select name="targetProduct">
+                                        <option value="" disabled selected>Choose a product...</option>
+                                        {{#each allProducts}}
+                                            <option value="{{this._id}}">{{this.productName}} (ID: {{this.productId}}) - (₹{{this.regularPrice}})</option>
+                                        {{/each}}
+                                    </select>
                                 </div>
-                                {{/each}}
-                            {{else}}
-                                <p class="tracker-empty">No current active category offers</p>
-                            {{/if}}
-                        </div>
-                    </div>
-                </div>
 
+                                <div class="panel-form-group">
+                                    <label>Discount Value (%)</label>
+                                    <input type="number" name="discountValue" min="1" max="99">
+                                </div>
+
+                                <div class="panel-form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" name="startDate">
+                                </div>
+
+                                <div class="panel-form-group">
+                                    <label>Expiry Date</label>
+                                    <input type="date" name="expiryDate">
+                                </div>
+
+                                <button type="submit" class="panel-btn btn-apply">Apply Offer</button>
+                            </form>
+
+                            <div class="active-tracker-section">
+                                <h3>Active Product Discounts</h3>
+                                <div class="panel-scroll-box">
+                                    {{#if productOffers.length}}
+                                        {{#each productOffers}}
+                                        <div class="tracker-item">
+                                            <div class="tracker-info">
+                                                <span class="tracker-name">{{this.productName}}</span>
+                                                <span class="tracker-meta text-muted" style="font-size: 10px; display: block;">
+                                                    Expires: {{formattedDate this.offer.expiryDate}}
+                                                </span>
+                                                <span class="tracker-badge color-amber">{{this.offer.discountValue}}% OFF</span>
+                                            </div>
+                                            <form action="/admin/offers/remove-product/{{this._id}}" method="POST">
+                                                <button type="submit" class="panel-btn btn-delete">Remove</button>
+                                            </form>
+                                        </div>
+                                        {{/each}}
+                                    {{else}}
+                                        <p class="tracker-empty">No current active product offers</p>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Offer Setup Card -->
+                        <div class="setup-panel-card">
+                            <div class="panel-header header-emerald">
+                                <div class="panel-icon bg-emerald text-emerald"><i class="fa-solid fa-folder-open"></i></div>
+                                <div class="panel-header-text">
+                                    <h2>Category Offer Setup</h2>
+                                    <p>Apply store-wide promotional rates</p>
+                                </div>
+                            </div>
+
+                            <form action="/admin/offers/apply-category" method="POST" class="panel-form" id="categoryOfferForm">
+                                <div class="panel-form-group">
+                                    <label>Select Target Subcategory</label>
+                                    <select name="subCategoryName" id="targetSubCategory">
+                                        <option value="" disabled selected>Choose a subcategory...</option>
+                                        {{#each subCategories}}
+                                            <option value="{{this.name}}" data-parent-name="{{this.parentCategory.name}}">{{this.name}}</option>
+                                        {{/each}}
+                                    </select>
+                                </div>
+
+                                <div class="panel-form-group dynamic-hidden" id="parentCategoryWrapper">
+                                    <label>Affected Parent Departments</label>
+                                    <div id="parentCategoryDisplayTags" class="checkbox-pill-group"></div>
+                                </div>
+
+                                <div class="panel-form-group">
+                                    <label>Discount Rate (%)</label>
+                                    <input type="number" name="discountValue" min="1" max="99">
+                                </div>
+
+                                <div class="panel-form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" name="startDate">
+                                </div>
+
+                                <div class="panel-form-group">
+                                    <label>Expiry Date</label>
+                                    <input type="date" name="expiryDate">
+                                </div>
+
+                                <button type="submit" class="panel-btn btn-apply">Apply Category Offer</button>
+                            </form>
+
+                            <div class="active-tracker-section">
+                                <h3>Active Category Discounts</h3>
+                                <div class="panel-scroll-box">
+                                    {{#if categoryOffers.length}}
+                                        {{#each categoryOffers}}
+                                        <div class="tracker-item">
+                                            <div class="tracker-info">
+                                                <span class="tracker-name">
+                                                    {{this.name}}
+                                                    {{#if this.parentCategory.name}}
+                                                        <small class="tracker-parent-tag">({{this.parentCategory.name}})</small>
+                                                    {{/if}}
+                                                    <small class="tracker-level-tag">(Subcategory Group)</small>
+                                                </span>
+                                                {{#if this.offer.expiryDate}}
+                                                <span class="tracker-meta text-muted" style="font-size: 10px; display: block;">
+                                                    Expires: {{formattedDate this.offer.expiryDate}}
+                                                </span>
+                                                {{/if}}
+                                                <span class="tracker-badge color-emerald">{{this.offer.discountValue}}% OFF</span>
+                                            </div>
+                                            <form action="/admin/offers/remove-category/{{this._id}}" method="POST">
+                                                <button type="submit" class="panel-btn btn-delete">Remove</button>
+                                            </form>
+                                        </div>
+                                        {{/each}}
+                                    {{else}}
+                                        <p class="tracker-empty">No current active category offers</p>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </main>
             </div>
-        </main>
+        </div>
     </div>
 </div>
 
-
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        function showInlineError(cardIndex, message) {
-            const cards = document.querySelectorAll('.setup-panel-card');
-            if (!cards[cardIndex]) return;
-            
-            const targetHeader = cards[cardIndex].querySelector('.panel-header');
-            const alertId = cardIndex === 0 ? 'clientProductAlert' : 'clientCategoryAlert';
-            
-            const existingAlert = document.getElementById(alertId);
-            if (existingAlert) existingAlert.remove();
+    function showFieldError(formElement, inputName, message) {
+        if (!formElement) return;
+        const inputField = formElement.querySelector(`[name="${inputName}"]`);
+        if (!inputField) return;
 
-            const alertDiv = document.createElement('div');
-            alertDiv.id = alertId;
-            alertDiv.className = 'alert alert-danger';
-            alertDiv.style.cssText = 'display: block !important; background-color: #fee2e2; color: #991b1b; padding: 10px 15px; margin: 15px; border-radius: 6px; font-size: 0.875rem;';
-            alertDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${message}`;
-            targetHeader.insertAdjacentElement('afterend', alertDiv);
+        const formGroup = inputField.closest('.panel-form-group');
+        if (!formGroup) return;
+
+        const existingAlert = formGroup.querySelector('.inline-field-error');
+        if (existingAlert) existingAlert.remove();
+
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger inline-field-error';
+        alertDiv.style.cssText = 'display: block !important; background-color: #fee2e2; color: #991b1b; padding: 6px 10px; margin-top: 6px; border-radius: 4px; font-size: 0.75rem;';
+        alertDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${message}`;
+        
+        formGroup.appendChild(alertDiv);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.panel-form input, .panel-form select').forEach(element => {
+            const clearError = function() {
+                const formGroup = this.closest('.panel-form-group');
+                if (formGroup) {
+                    const existingAlert = formGroup.querySelector('.inline-field-error');
+                    if (existingAlert) existingAlert.remove();
+                }
+            };
+            element.addEventListener('input', clearError);
+            element.addEventListener('change', clearError);
+        });
+
+        const getLocalDateString = (dateObj) => {
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        function validateDates(startDateStr, expiryDateStr) {
+            const [startYear, startMonth, startDay] = startDateStr.split('-').map(Number);
+            const [expiryYear, expiryMonth, expiryDay] = expiryDateStr.split('-').map(Number);
+            
+            const start = new Date(startYear, startMonth - 1, startDay);
+            const expiry = new Date(expiryYear, expiryMonth - 1, expiryDay);
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (start < today) {
+                return "Start date cannot be in the past.";
+            }
+
+            const minExpiryDate = new Date(start);
+            minExpiryDate.setDate(minExpiryDate.getDate() + 2);
+
+            if (expiry < minExpiryDate) {
+                return "Expiry date must be at least 2 days after the start date.";
+            }
+            
+            return null;
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const productError = urlParams.get('productError');
-        if (productError) showInlineError(0, decodeURIComponent(productError));
+        const todayStr = getLocalDateString(new Date());
 
-        const categoryError = urlParams.get('categoryError');
-        if (categoryError) showInlineError(1, decodeURIComponent(categoryError));
+        const forms = [
+            { form: document.getElementById('productOfferForm') },
+            { form: document.getElementById('categoryOfferForm') }
+        ];
 
-        const productForm = document.querySelector('form[action*="apply-product"]');
+        forms.forEach(({ form }) => {
+            if (!form) return;
+            const startInput = form.querySelector('[name="startDate"]');
+            const expiryInput = form.querySelector('[name="expiryDate"]');
+
+            if (startInput) {
+                startInput.min = todayStr;
+                startInput.addEventListener('change', function () {
+                    if (this.value) {
+                        const [year, month, day] = this.value.split('-').map(Number);
+                        const startDateObj = new Date(year, month - 1, day);
+                        
+                        startDateObj.setDate(startDateObj.getDate() + 2);
+                        const minExpiryStr = getLocalDateString(startDateObj);
+                        
+                        if (expiryInput) {
+                            expiryInput.min = minExpiryStr;
+                            if (expiryInput.value && expiryInput.value < minExpiryStr) {
+                                expiryInput.value = "";
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        const productForm = document.getElementById('productOfferForm');
         if (productForm) {
             productForm.addEventListener("submit", function (e) {
                 const targetProduct = productForm.querySelector('[name="targetProduct"]').value;
-                const discountValue = productForm.querySelector('[name="discountValue"]').value;
+                const discountValue = parseFloat(productForm.querySelector('[name="discountValue"]').value);
                 const startDate = productForm.querySelector('[name="startDate"]').value;
                 const expiryDate = productForm.querySelector('[name="expiryDate"]').value;
 
-                if (!targetProduct || !discountValue || !startDate || !expiryDate) {
+                if (!targetProduct) {
                     e.preventDefault();
-                    showInlineError(0, "Please fill in all required fields for the product offer.");
+                    showFieldError(productForm, 'targetProduct', 'Please select a product.');
+                    return;
+                }
+                if (isNaN(discountValue) || discountValue <= 0) {
+                    e.preventDefault();
+                    showFieldError(productForm, 'discountValue', 'Discount value must be greater than 0%.');
+                    return;
+                }
+                if (!startDate) {
+                    e.preventDefault();
+                    showFieldError(productForm, 'startDate', 'Start date is required.');
+                    return;
+                }
+                if (!expiryDate) {
+                    e.preventDefault();
+                    showFieldError(productForm, 'expiryDate', 'Expiry date is required.');
+                    return;
+                }
+
+                const dateError = validateDates(startDate, expiryDate);
+                if (dateError) {
+                    e.preventDefault();
+                    showFieldError(productForm, 'expiryDate', dateError);
                 }
             });
         }
@@ -279,13 +371,35 @@
         if (offerForm) {
             offerForm.addEventListener("submit", function (e) {
                 const subCategoryName = offerForm.querySelector('[name="subCategoryName"]').value;
-                const discountValue = offerForm.querySelector('[name="discountValue"]').value;
+                const discountValue = parseFloat(offerForm.querySelector('[name="discountValue"]').value);
                 const startDate = offerForm.querySelector('[name="startDate"]').value;
                 const expiryDate = offerForm.querySelector('[name="expiryDate"]').value;
 
-                if (!subCategoryName || !discountValue || !startDate || !expiryDate) {
+                if (!subCategoryName) {
                     e.preventDefault();
-                    showInlineError(1, "Please fill in all required fields for the category offer.");
+                    showFieldError(offerForm, 'subCategoryName', 'Please choose a subcategory.');
+                    return;
+                }
+                if (isNaN(discountValue) || discountValue <= 0) {
+                    e.preventDefault();
+                    showFieldError(offerForm, 'discountValue', 'Discount value must be greater than 0%.');
+                    return;
+                }
+                if (!startDate) {
+                    e.preventDefault();
+                    showFieldError(offerForm, 'startDate', 'Start date is required.');
+                    return;
+                }
+                if (!expiryDate) {
+                    e.preventDefault();
+                    showFieldError(offerForm, 'expiryDate', 'Expiry date is required.');
+                    return;
+                }
+
+                const dateError = validateDates(startDate, expiryDate);
+                if (dateError) {
+                    e.preventDefault();
+                    showFieldError(offerForm, 'expiryDate', dateError);
                     return;
                 }
 
@@ -293,7 +407,7 @@
                     const checkedBoxes = tagsContainer.querySelectorAll('input[type="checkbox"]:checked');
                     if (checkedBoxes.length === 0) {
                         e.preventDefault();
-                        showInlineError(1, "Please check at least one parent category department to apply this offer.");
+                        showFieldError(offerForm, 'subCategoryName', 'Please check at least one parent category department.');
                     }
                 }
             });

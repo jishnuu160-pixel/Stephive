@@ -1,70 +1,96 @@
-<div class="orders-page">
-    <div class="table-card-order">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>Orders</h2>
-            
-            <div class="header-actions">
-                <div class="search-wrapper" style="flex-grow: 1; margin: 0;">
-                    <form action="/admin/orders" method="GET" style="display: flex; align-items: center; width: 100%; margin: 0;">
-                        <i class="fas fa-search"></i>
-                        <input type="text" name="search" placeholder="Search by Order ID or Customer..." value="{{searchQuery}}">
-                        {{#if searchQuery}}
-                            <a href="/admin/orders" class="search-clear-btn">
-                                <i class="fas fa-times-circle"></i>
-                            </a>
-                        {{/if}}
-                    </form>
+<div class="admin-dashboard-wrapper">
+    <!-- Dark Backdrop Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="dashboard-container">
+        
+        <!-- Sidebar Partial Wrapped inside an aside tag -->
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
+        <main class="ord-main-content">
+            <div class="ord-table-card">
+                <div class="ord-card-header">
+                    <h2>Orders</h2>
+                    
+                    <div class="ord-header-actions">
+                        <div class="ord-search-wrapper">
+                            <form action="/admin/orders" method="GET">
+                                <i class="fas fa-search"></i>
+                                <input type="text" name="search" placeholder="Search by Order ID or Customer..." value="{{searchQuery}}" oninput="autoSearch(this)">
+                                {{#if searchQuery}}
+                                    <a href="/admin/orders" class="ord-search-clear-btn" title="Clear Search">
+                                        <i class="fas fa-times-circle"></i>
+                                    </a>
+                                {{/if}}
+                            </form>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="ord-table-responsive">
+                    <table class="ord-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>ORDER ID</th>
+                                <th>CUSTOMER</th>
+                                <th>DATE</th>
+                                <th>TOTAL</th>
+                                <th>STATUS</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each orders}}
+                            <tr>
+                                <td>{{add @root.startIndex @index 1}}</td>
+                                <td><strong>#{{this.orderId}}</strong></td>
+                                <td>{{this.user_id.fullName}}</td>
+                                <td>{{formattedDate this.createdAt}}</td>
+                                <td>₹{{this.total}}</td>
+                                <td>
+                                    <span class="ord-status-badge {{this.status}}">{{this.status}}</span>
+                                </td>
+                                <td>
+                                    <a href="/admin/orders/{{this._id}}" class="ord-btn-view">View</a>
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td colspan="7" class="ord-no-data-cell">No orders found in the database.</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+
+{{#if orders.length}}
+<div class="pagination">
+    {{#if pagination.hasPrevPage}}
+        <a href="/admin/orders?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">&laquo; Prev</a>
+    {{/if}}
+
+    <span class="page-info">Page {{pagination.currentPage}} of {{pagination.totalPages}}</span>
+
+    {{#if pagination.hasNextPage}}
+        <a href="/admin/orders?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">Next &raquo;</a>
+    {{/if}}
+</div>
+{{/if}}
             </div>
-        </div>
-
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>ORDER ID</th>
-                    <th>CUSTOMER</th>
-                    <th>DATE</th>
-                    <th>TOTAL</th>
-                    <th>STATUS</th>
-                    <th>ACTION</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each orders}}
-                <tr>
-                     <td>{{add @root.startIndex @index 1}}</td>
-                    <td><strong>#{{this.orderId}}</strong></td>
-                    <td>{{this.user_id.fullName}}</td>
-                    <td>{{formattedDate this.createdAt}}</td>
-                    <td>₹{{this.total}}</td>
-                    <td>
-                        <span class="status-badge-order {{this.status}}">{{this.status}}</span>
-                    </td>
-                    <td>
-                        <a href="/admin/orders/{{this._id}}" class="btn-edit-small">View</a>
-                    </td>
-                </tr>
-                {{else}}
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 20px; color: #cbd5e1;">No orders found in the database.</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-        {{#if orders.length}}
-        <div class="pagination">
-            {{#if pagination.hasPrevPage}}
-                <a href="/admin/orders?page={{pagination.prevPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">« Prev</a>
-            {{/if}}
-
-            <span class="page-link active">{{pagination.currentPage}}</span>
-
-            {{#if pagination.hasNextPage}}
-                <a href="/admin/orders?page={{pagination.nextPage}}&limit={{pagination.limit}}&search={{pagination.searchQuery}}" class="page-link">Next »</a>
-            {{/if}}
-        </div>
-        {{/if}}
+        </main>
     </div>
 </div>
-    
+
+<script>
+    let searchTimeout = null;
+
+function autoSearch(input) {
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(() => {
+        input.form.submit();
+    }, 500);
+}
+</script>

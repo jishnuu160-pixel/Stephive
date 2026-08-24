@@ -1,141 +1,150 @@
-<div class="dashboard-container">
-    <main class="main-content">
+<div class="admin-dashboard-wrapper">
+    <!-- Dark Backdrop Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-icon sales">
-                    <i class="fas fa-chart-line"></i>
+    <div class="dashboard-container">
+        
+        <!-- Sidebar Partial Wrapped inside an aside tag -->
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
+
+        <main class="main-content">
+
+
+            <!-- Top Statistics Cards Grid -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon sales">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-details">
+                        <p>Total Sales</p>
+                        <h3>₹{{totalSales}}</h3>
+                    </div>
                 </div>
-                <div class="stat-details">
-                    <p>Total Sales</p>
-                    <h3>₹{{totalSales}}</h3>
+
+                <div class="stat-card">
+                    <div class="stat-icon orders">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-details">
+                        <p>Active Orders</p>
+                        <h3>{{totalOrders}}</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-details">
+                        <p>Total Customers</p>
+                        <h3>{{userCount}}</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon cancelled">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="stat-details">
+                        <p>Cancelled Orders</p>
+                        <h3>{{cancelledOrder}}</h3>
+                    </div>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon orders">
-                    <i class="fas fa-shopping-cart"></i>
+            <!-- Sales Trend Chart Card -->
+            <div class="dashboard-card">
+                <div class="dashboard-header">
+                    <h2 id="report-title">Report for this week</h2>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="week">This week</button>
+                        <button class="filter-btn" data-filter="month">This Month</button>
+                        <button class="filter-btn" data-filter="year">This Year</button>
+                    </div>
                 </div>
-                <div class="stat-details">
-                    <p>Active Orders</p>
-                    <h3>{{totalOrders}}</h3>
+                <div class="chart-container" style="position: relative; height:350px;">
+                    <canvas id="salesTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top 10 Products Table -->
+            <div class="dashboard-card">
+                <div class="dashboard-header">
+                    <h2>Top 10 Best-Selling Products</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table-products">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Product</th>
+                                <th>Units Sold</th>
+                                <th>Revenue</th>
+                                <th>Stock Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topProductsTableBody">
+                            <tr>
+                                <td colspan="5" class="loading-state">Loading top products...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+
+            <!-- Top 10 Categories Table -->
+            <div class="dashboard-card categories-card">
+                <div class="dashboard-header">
+                    <h2>Top 10 Best-Selling Categories</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table-category">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Category Name</th>
+                                <th>Units Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topCategoriesTableBody">
+                            <tr>
+                                <td colspan="4" class="loading-state">Loading categories...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon users">
-                    <i class="fas fa-users"></i>
+            <!-- Top 10 Brands Table -->
+            <div class="dashboard-card brands-card">
+                <div class="dashboard-header">
+                    <h2>Top 10 Best-Selling Brands</h2>
                 </div>
-                <div class="stat-details">
-                    <p>Total Customers</p>
-                    <h3>{{userCount}}</h3>
+                <div class="table-responsive">
+                    <table class="admin-table-brand">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Brand Name</th>
+                                <th>Units Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topBrandsTableBody">
+                            <tr>
+                                <td colspan="4" class="loading-state">Loading brands...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-                 <div class="stat-card">
-               <div class="stat-icon cancelled">
-                 <i class="fas fa-shopping-bag"></i>
-               </div>
-                <div class="stat-details">
-                    <p>Cancelled Orders</p>
-                    <h3>{{cancelledOrder}}</h3>
-
-                </div>
-            </div>
-        </div>
-    </main>
-</div>
-
-
-
-
-<div class="dashboard-card">
-  <div class="dashboard-header">
-    <h2 id="report-title">Report for this week</h2>
-    
-    <div class="filter-buttons">
-      <button class="filter-btn active" data-filter="week">This week</button>
-      <button class="filter-btn" data-filter="month">This Month</button>
-      <button class="filter-btn" data-filter="year">This Year</button>
+        </main>
     </div>
-  </div>
-
-  <div class="chart-container" style="position: relative; height:350px;">
-    <canvas id="salesTrendChart"></canvas>
-  </div>
-</div>
-
-<div class="dashboard-card">
-  <div class="dashboard-header">
-    <h2>Top 10 Best-Selling Products</h2>
-  </div>
-
-  <div class="table-responsive">
-    <table class="admin-table">
-      <thead>
-        <tr class="product-table">
-          <th>Rank</th>
-          <th>Product</th>
-          <th>Units Sold</th>
-          <th>Revenue</th>
-          <th>Stock Status</th>
-        </tr>
-      </thead>
-      <tbody id="topProductsTableBody">
-        <tr>
-          <td colspan="5" class="loading-state">Loading top products...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
-<div class="dashboard-card categories-card">
-  <div class="dashboard-header">
-    <h2>Top 10 Best-Selling Categories</h2>
-  </div>
-
-  <div class="table-responsive">
-    <table class="admin-table">
-      <thead>
-        <tr class="category-table">
-          <th>Rank</th>
-          <th>Category Name</th>
-          <th>Units Sold</th>
-          <th>Revenue</th>
-        </tr>
-      </thead>
-      <tbody id="topCategoriesTableBody">
-        <tr>
-          <td colspan="4" class="loading-state">Loading categories...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="dashboard-card brands-card">
-  <div class="dashboard-header">
-    <h2>Top 10 Best-Selling Brands</h2>
-  </div>
-
-  <div class="table-responsive">
-    <table class="admin-table">
-      <thead>
-        <tr class="brand-table">
-          <th>Rank</th>
-          <th>Brand Name</th>
-          <th>Units Sold</th>
-          <th>Revenue</th>
-        </tr>
-      </thead>
-      <tbody id="topBrandsTableBody">
-        <tr>
-          <td colspan="4" class="loading-state">Loading brands...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -288,8 +297,7 @@
     }
   }
 
-
-async function loadTopCategories() {
+  async function loadTopCategories() {
     try {
         const response = await fetch('/admin/top-categories');
         const result = await response.json();
@@ -298,7 +306,7 @@ async function loadTopCategories() {
         tbody.innerHTML = ''; 
 
         if (!result.success || !result.data || result.data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: #6b7280;">No category sales data found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: left; padding: 15px; color: #6b7280;">No category sales data found.</td></tr>`;
             return;
         }
 
@@ -306,12 +314,12 @@ async function loadTopCategories() {
             const row = document.createElement('tr');
             row.style.cssText = "border-bottom: 1px solid #f3f4f6; font-size: 14px;";
             row.innerHTML = `
-                <td style="padding: 12px; text-align:center; font-weight: bold; color: #374151;" class="rank-pill">#${index + 1}</td>
-                <td style="padding: 12px;text-align:center; font-weight: 500; color: #111827;">
+                <td style="padding: 12px; text-align:left; font-weight: bold; color: #374151;" class="rank-pill">#${index + 1}</td>
+                <td style="padding: 12px; text-align:left; font-weight: 500; color: #111827;">
                     <span class="product-name">${category.categoryName}</span>
                 </td>
-                <td style="padding: 12px; color: #4b5563; text-align: center; font-weight: 500;">${category.totalQuantity}</td>
-                <td style="padding: 12px; font-weight: 600; color: #059669; text-align: center;">₹${category.totalRevenue.toLocaleString()}</td>
+                <td style="padding: 12px; color: #4b5563; text-align: left; font-weight: 500;">${category.totalQuantity}</td>
+                <td style="padding: 12px; font-weight: 600; color: #059669; text-align: left;">₹${category.totalRevenue.toLocaleString()}</td>
             `;
             tbody.appendChild(row);
         });
@@ -319,14 +327,7 @@ async function loadTopCategories() {
         console.error('Failed to load top categories:', error);
         document.getElementById('topCategoriesTableBody').innerHTML = `<tr><td colspan="4" style="text-align: center; color: #ef4444; padding: 15px;">Failed to load data</td></tr>`;
     }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof loadTopProducts === 'function') {
-        loadTopProducts();
-    }
-    loadTopCategories();
-});
+  }
 
   async function loadTopBrands() {
     try {
@@ -347,10 +348,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = document.createElement('tr');
         row.style.cssText = "border-bottom: 1px solid #f3f4f6; font-size: 14px;";
         row.innerHTML = `
-          <td style="padding: 12px;text-align: center; font-weight: bold; color: #374151;">#${index + 1}</td>
-          <td style="padding: 12px; text-align: center;font-weight: 500; color: #111827;">${brand.brandName}</td>
-          <td style="padding: 12px; color: #4b5563; text-align: center; font-weight: 500;">${brand.unitsSold || brand.totalQuantity}</td>
-          <td style="padding: 12px; font-weight: 600; color: #059669; text-align: center;">₹${(brand.revenue || brand.totalRevenue).toLocaleString()}</td>
+          <td style="padding: 12px; text-align: left; font-weight: bold; color: #374151;">#${index + 1}</td>
+          <td style="padding: 12px; text-align: left; font-weight: 500; color: #111827;">${brand.brandName}</td>
+          <td style="padding: 12px; color: #4b5563; text-align: left; font-weight: 500;">${brand.unitsSold || brand.totalQuantity}</td>
+          <td style="padding: 12px; font-weight: 600; color: #059669; text-align: left;">₹${(brand.revenue || brand.totalRevenue).toLocaleString()}</td>
         `;
         tbody.appendChild(row);
       });
@@ -362,14 +363,78 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }
   }
+function applyResponsiveTableStyles() {
+    const styleId = 'dynamic-responsive-tables';
+    if (document.getElementById(styleId)) return;
 
-  document.addEventListener('DOMContentLoaded', () => {
-      if (typeof loadTopProducts === 'function') {
-          loadTopProducts();
-      }
-      if (typeof loadTopCategories === 'function') {
-          loadTopCategories();
-      }
-      loadTopBrands();
-  });
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.innerHTML = `
+        @media screen and (max-width: 768px) {
+            .admin-dashboard-wrapper .admin-table-products tr,
+            .admin-dashboard-wrapper .admin-table-category tr,
+            .admin-dashboard-wrapper .admin-table-brand tr {
+                font-size: 9px !important;
+            }
+            .admin-dashboard-wrapper .admin-table-products td,
+            .admin-dashboard-wrapper .admin-table-category td,
+            .admin-dashboard-wrapper .admin-table-brand td {
+                padding: 6px 4px !important;
+                font-size: 9px !important;
+            }
+            .admin-dashboard-wrapper .admin-table-products img {
+                width: 24px !important;
+                height: 24px !important;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .admin-dashboard-wrapper .admin-table-products tr,
+            .admin-dashboard-wrapper .admin-table-category tr,
+            .admin-dashboard-wrapper .admin-table-brand tr {
+                font-size: 8px !important;
+            }
+            .admin-dashboard-wrapper .admin-table-products td,
+            .admin-dashboard-wrapper .admin-table-category td,
+            .admin-dashboard-wrapper .admin-table-brand td {
+                padding: 5px 3px !important;
+                font-size: 8px !important;
+            }
+            .admin-dashboard-wrapper .admin-table-products th,
+            .admin-dashboard-wrapper .admin-table-category th,
+            .admin-dashboard-wrapper .admin-table-brand th {
+                padding: 5px 3px !important;
+                font-size: 5px !important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    applyResponsiveTableStyles();
+
+    if (typeof loadTopProducts === 'function') {
+        loadTopProducts();
+    }
+    if (typeof loadTopCategories === 'function') {
+        loadTopCategories();
+    }
+    if (typeof loadTopBrands === 'function') {
+        loadTopBrands();
+    }
+
+    const toggleBtn = document.getElementById("sidebarToggleBtn");
+    const sidebar = document.getElementById("sidebarWrapper");
+    const overlay = document.getElementById("sidebarOverlay");
+
+    function toggleSidebar() {
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+    }
+
+    if (toggleBtn && sidebar && overlay) {
+        toggleBtn.addEventListener("click", toggleSidebar);
+        overlay.addEventListener("click", toggleSidebar);
+    }
+});
 </script>

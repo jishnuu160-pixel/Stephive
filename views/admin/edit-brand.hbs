@@ -1,5 +1,14 @@
 
-<div class="customers-page">
+<div class="admin-dashboard-wrapper">
+    <!-- Dark Backdrop Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Dashboard Flex Container -->
+    <div class="dashboard-container">
+        <aside class="sidebar-wrapper" id="sidebarWrapper">
+            {{> admin-sidebar}}
+        </aside>
+<div class="brands-page">
     <div class="table-card">
         <header class="card-header">
             <h1 class="page-title">Edit Brand</h1>
@@ -35,14 +44,16 @@
                 </div>
 
                 <div class="form-actions" style="margin-top: 20px;">
-                    <button type="submit" class="btn btn-primary" style="background: #0f172a; color: white; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer;">
+                    <button type="submit" class="btn btn-primary" >
                         Update Brand
                     </button>
-                    <a href="/admin/brands" class="btn btn-secondary" style="margin-left: 10px; color: #64748b; text-decoration: none;">Cancel</a>
+                    <a href="/admin/brands" class="btn btn-secondary" >Cancel</a>
                 </div>
             </form>
         </main>
     </div>
+</div>
+</div>
 </div>
 
 <div id="cropperModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; overflow-y:auto;">
