@@ -55,7 +55,6 @@ export const getHome = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Home page error:", error);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).render('error', { 
             message: "We encountered an issue loading the home page. Please try again later." 
         });

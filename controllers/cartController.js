@@ -11,7 +11,6 @@ export const loadCart = async (req, res) => {
         res.render('user/cart', {...cartData});  
 
     } catch (error) {
-        console.error("Error Load Cart:",error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(error.message);
     }
 };

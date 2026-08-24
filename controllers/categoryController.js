@@ -3,17 +3,11 @@ import * as categoryService from '../services/categoryService.js';
 
 export const getCategories = async (req, res) => {
    try {
+       const data = await categoryService.getCategoriesPage(req.query);
 
-      const data =
-         await categoryService.getCategoriesPage(req.query);
-
-      res.render('admin/categories', data);
-
+       res.render('admin/categories', data);
    } catch (error) {
-
-      console.error(error);
       res.redirect('/admin/dashboard');
-
    }
 };
 
@@ -26,7 +20,6 @@ export const toggleListing = async (req, res) => {
           success: true, 
           message: result.message || 'Status updated successfully!' 
       });
-
    } catch (error) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ 
           success: false, 
@@ -56,7 +49,6 @@ export const postAddCategory = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error adding category:", error.message);
         return res.status(HTTP_STATUS.BAD_REQUEST).json({ 
             success: false, 
             message: error.message 
@@ -83,10 +75,7 @@ export const updateCategory = async (req, res) => {
           success: true, 
           message: 'Category updated successfully!' 
       });
-
-   } catch (error) {
-      console.error(`Error updating category ${req.params.id}:`, error.message);
-      
+   } catch (error) {      
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ 
           success: false, 
           message: error.message || 'An unexpected error occurred.' 

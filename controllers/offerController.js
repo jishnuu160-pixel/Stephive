@@ -11,7 +11,6 @@ export const loadOffersPage = async (req, res) => {
             activePage: 'offer'
          });
     } catch (error) {
-        console.error("Failed to load offers panel:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).render("admin/error", { message: "Internal Server Error" });
     }
 };
@@ -25,8 +24,11 @@ export const processProductOffer = async (req, res) => {
         req.flash('success', "Product offer added successfully");
         res.redirect("/admin/offer");
     } catch (error) {
-        console.error("Failed to apply product offer:", error);
-        res.redirect(`/admin/offer?productError=${encodeURIComponent(error.message)}`);
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ 
+            success: false, 
+            field: 'targetProduct', 
+            error: error.message 
+        });
     }
 };
 
@@ -38,12 +40,13 @@ export const processCategoryOffer = async (req, res) => {
         req.flash('success', "Category offer added successfully");
         res.redirect("/admin/offer");
     } catch (error) {
-        console.error("Failed to apply category offer:", error);
-        res.redirect(`/admin/offer?categoryError=${encodeURIComponent(error.message)}`);
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ 
+            success: false, 
+            field: 'subCategoryName', 
+            error: error.message 
+        });
     }
 };
-
-
 
 
 export const deleteProductOffer = async (req, res) => {
@@ -53,7 +56,6 @@ export const deleteProductOffer = async (req, res) => {
         req.flash("success", "Product offer deleted successfully.");
         res.redirect("/admin/offer");
     } catch (error) {
-        console.error("Failed to remove product offer:", error);
         res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: error.message });
     }
 };
@@ -66,7 +68,6 @@ export const deleteCategoryOffer = async (req, res) => {
         req.flash("success", "Category offer deleted successfully.");
         res.redirect("/admin/offer");
     } catch (error) {
-        console.error("Failed to remove category offer:", error);
         res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: error.message });
     }
 };
