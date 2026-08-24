@@ -10,7 +10,8 @@ export const uploadToCloudinary = (fileBuffer) => {
         const uploadStream = cloudinary.uploader.upload_stream(
             { 
                 folder: 'stephive_assets', 
-                allowed_formats: ['jpg', 'png', 'jpeg', 'webp'] 
+                allowed_formats: ['jpg', 'png', 'jpeg', 'webp'] ,
+                timeout: 60000
             },
             (error, result) => {
                 if (error) {
