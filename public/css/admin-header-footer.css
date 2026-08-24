@@ -1,0 +1,125 @@
+/* ===========================
+   Global Layout & Full-Width Fixes
+   =========================== */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===========================
+   Header Styles & Responsiveness
+   =========================== */
+.admin-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 15px 30px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    width: 100%;
+    min-height: 70px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.admin-top-bar .header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-top-bar .brand-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+.mobile-menu-toggle {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: #0f172a;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+.mobile-menu-toggle:focus {
+    box-shadow: none;
+}
+
+/* ===========================
+   Footer Styles & Responsiveness
+   =========================== */
+.admin-footer-black {
+    background: #0f172a;
+    padding: 20px 30px;
+    border-top: 1px solid #1e293b;
+    color: #94a3b8;
+    font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+.admin-footer-black .footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    gap: 15px;
+    box-sizing: border-box;
+}
+
+.admin-footer-black .footer-left p {
+    margin: 0;
+}
+
+.admin-footer-black .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.admin-footer-black .version-tag {
+    background: #1e293b;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #38bdf8;
+    font-family: monospace;
+}
+
+.admin-footer-black .footer-link {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.admin-footer-black .footer-link:hover {
+    color: #ffffff;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .admin-top-bar {
+        padding: 12px 15px;
+    }
+
+    .admin-footer-black {
+        padding: 15px 20px;
+    }
+
+    .admin-footer-black .footer-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+}

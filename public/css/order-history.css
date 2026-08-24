@@ -3,6 +3,17 @@
    ========================================================================== */
 
 /* --- Page Layout --- */
+.order-history-page {
+  background-color: #f4f7f8;
+  min-height: 100vh;
+  padding: 40px 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 .profile-page-container {
     background-color: #f8f8f8;
     padding: 20px 40px;
@@ -31,6 +42,11 @@
     align-items: center;
     margin-bottom: 10px;
 }
+
+.content-header h1{
+    font-size: 24px;
+}
+
 
 .sort-select {
     padding: 8px 16px;
@@ -101,7 +117,8 @@
 .status-pill.shipped { background-color: #e0f2fe; color: #0369a1; }
 .status-pill.out-of-delivery { background-color: #fef9c3; color: #854d0e; }
 .status-pill.delivered { background-color: #dcfce7; color: #166534; }
-.status-pill.cancelled { background-color: #fee2e2; color: #991b1b; }
+.status-pill.cancelled { background-color: #edb9b9; color: #ff0101; }
+.status-pill.failed { background-color: #e78585; color: #ff1010; }
 
 .product-title {
     margin: 5px 0;
@@ -170,7 +187,7 @@
 
     .profile-main {
         flex: 1 !important;
-        max-width: calc(100% - 122px) !important;
+        max-width:100% !important;
         min-width: 0 !important;
     }
 
@@ -198,7 +215,7 @@
     }
 
     .form-footer .btn-outline {
-        width: 100%;
+        width: 50%;
         text-align: center;
         justify-content: center;
     }
@@ -209,70 +226,86 @@
    ========================================== */
 
 @media screen and (max-width: 768px) {
-    /* 1. Details Card & Form Spacing */
-    .profile-card.profile-details {
-        padding: 15px !important;
-    }
-
-    .card-header h3 {
-        font-size: 14px !important;
-        margin-bottom: 12px !important;
-    }
-
-    .form-grid {
-        gap: 12px !important;
-        margin-top: 10px !important;
-    }
-
-    .input-group label {
-        font-size: 10px !important;
-        letter-spacing: 0.03em !important;
-        margin-bottom: 2px !important;
-    }
-
-    .input-group input, 
-    .input-group select {
-        padding: 9px 12px !important;
-        font-size: 13px !important;
-        border-radius: 8px !important;
-    }
-
-    .form-footer {
+    /* 1. Order Item Card Layout (Compact with Smaller Image) */
+    .order-item-card {
+        display: flex !important;
+        flex-direction: row !important; /* Keeps image and info side-by-side, or change to column if preferred */
+        align-items: center !important;
+        padding: 10px !important;
         gap: 10px !important;
-        margin-top: 5px !important;
+        border-radius: 6px !important;
     }
 
-    .form-footer .btn-outline {
-        padding: 10px 16px !important;
-        font-size: 13px !important;
-        border-radius: 8px !important;
-    }
-
-    /* 2. Profile Summary Card Scaling */
-    .profile-card.profile-info-summary {
-        padding: 15px !important;
-        gap: 12px !important;
-    }
-
-    .avatar-border {
-        width: 60px !important;
-        height: 60px !important;
+    .product-visual {
         flex-shrink: 0 !important;
     }
 
-    .camera-btn {
-        width: 22px !important;
-        height: 22px !important;
-        font-size: 10px !important;
+    .product-visual img {
+        width: 70px !important;  /* Make the image smaller width */
+        height: 70px !important; /* Make the image smaller height (square thumbnail) */
+        object-fit: cover !important;
+        border-radius: 6px !important;
     }
 
-    .summary-text h2 {
-        font-size: 16px !important;
-        margin: 0 0 3px 0 !important;
+    .product-meta {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 4px !important;
     }
 
-    .user-email-label {
+    .meta-top {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        justify-content: space-between !important;
+        gap: 4px !important;
+        width: 100% !important;
+    }
+
+    .product-title {
         font-size: 12px !important;
+        line-height: 1.2 !important;
+        margin: 2px 0 !important;
+    }
+
+    .status-pill {
+        padding: 2px 8px !important;
+        border-radius: 12px !important;
+        font-size: 9px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        margin-left: auto !important; /* Locked to the far right */
+    }
+
+    .price-display {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        margin-top: 2px !important;
+    }
+
+    .order-id, 
+    .purchase-date {
+        font-size: 9px !important;
+    }
+
+    .action-link {
+        font-size: 6px !important;
+    }
+
+    .content-header h1{
+        font-size: 10px;
+    }
+
+    .form-footer {
+        grid-column: span 1;
+        flex-direction: column;
+    }
+
+    .form-footer .btn-outline {
+        width: 50%;
+        text-align: center;
+        justify-content: center;
     }
 }
 
@@ -292,8 +325,12 @@
         font-size: 12px !important;
     }
 
+    .content-header h2{
+        font-size: 10px;
+    }
+
     .summary-text h2 {
-        font-size: 14px !important;
+        font-size: 12px !important;
     }
 
     .user-email-label {

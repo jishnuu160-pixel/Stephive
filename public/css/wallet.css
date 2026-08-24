@@ -1,13 +1,33 @@
 /* General Page Layout */
+
+.wallet-page {
+  background-color: #f4f7f8;
+  min-height: 100vh;
+  padding: 40px 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+
 .wallet-main-content {
     background-color: #f8faf9;
     padding: 2rem;
     max-width: 1000px;
 }
 
+.wallet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
 .wallet-header h2 {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size:25px;
+    font-weight: 500;
     margin-bottom: 0.5rem;
 }
 
@@ -28,9 +48,14 @@
     margin-bottom: 2.5rem;
 }
 
+.wallet-balance-card h2{
+    font-size: 22px;
+    font-weight: 600;
+}
+
 .balance-info small {
     color: #888;
-    font-size: 0.75rem;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
 }
@@ -76,6 +101,11 @@
     margin-bottom: 1.5rem;
 }
 
+.transactions-header h3{
+    font-size: 20px;
+    font-weight: 700;
+}
+
 .download-link {
     font-size: 0.85rem;
     color: #495057;
@@ -119,6 +149,7 @@
 }
 
 .title {
+    font-size: 13px;
     font-weight: 600;
     margin: 0;
 }
@@ -126,6 +157,10 @@
 .subtitle {
     color: #999;
     font-size: 0.85rem;
+}
+
+.date{
+    font-size: 10px;
 }
 
 .date-text { margin: 0; }
@@ -204,4 +239,51 @@
 .modal-content button[onclick*="none"] {
     background: #f8f9fa;
     color: #666;
+}
+
+@media (max-width: 767px) {
+    .transactions-table, 
+    .transactions-table tbody, 
+    .transactions-table tr, 
+    .transactions-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .transactions-table thead { display: none; }
+
+    .transactions-table tr {
+        background: #fff;
+        border: 1px solid #eef0ef;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        padding: 10px 12px;
+    }
+
+    .transactions-table td {
+        border: none;
+        padding: 6px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        font-size: 10px;
+    }
+
+    .transactions-table td::before {
+        font-weight: 600;
+        color: #999;
+        font-size: 10px;
+        text-transform: uppercase;
+    }
+
+    .transactions-table td:nth-child(1)::before { content: "Description"; }
+    .transactions-table td:nth-child(2)::before { content: "Date"; }
+    .transactions-table td:nth-child(3)::before { content: "Amount"; }
+
+    .desc-cell, .amount { justify-content: flex-end; text-align: right; }
+
+    .add-money-btn {font-size: 10px;}
+    .wallet-header h2 {font-size: 16px;}
+
 }

@@ -3,7 +3,7 @@
    ========================================================================== */
 .cart-page-scope {
     width: 100%;
-    padding: 20px;
+    padding: 30px;
 }
 
 .cart-page-scope .cart-header {
@@ -391,7 +391,6 @@
 .small-swal-popup .swal2-actions {
     margin-top: 10px !important;
 }
-
 /* ==========================================================================
    📱 RESPONSIVE MEDIA QUERIES FOR CART PAGE
    ========================================================================== */
@@ -405,6 +404,11 @@
 
     .cart-page-scope .cart-content {
         padding: 15px;
+    }
+
+     .cart-page-scope .summary-card {
+        padding: 14px;
+        width: 60%;
     }
 }
 
@@ -426,42 +430,50 @@
         font-size: 11px;
     }
 
-    .cart-page-scope .continue-shopping-btn {
+    .cart-page-scope .continue-btn {
         padding: 6px 12px;
         font-size: 11px;
     }
 
+    /* Reset card to block layout so elements stack naturally without grid bugs */
     .cart-page-scope .cart-card {
         padding: 16px;
         border-radius: 12px;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 12px;
+        display: block;
+        position: relative;
     }
 
-    .cart-page-scope .item-image-wrapper {
-        width: 70px;
-        height: 70px;
-        border-radius: 10px;
+    /* Top row inside card: Image and Details side-by-side */
+    .cart-page-scope .cart-card > .item-image-wrapper {
+        float: left;
+        width: 75px;
+        height: 75px;
+        margin-right: 12px;
+        margin-bottom: 10px;
     }
 
-    .cart-page-scope .item-details {
-        padding-left: 10px;
-        flex: 1;
-        min-width: 140px;
+    .cart-page-scope .cart-card > .item-details {
+        padding-left: 0;
+        width: auto;
+        overflow: hidden;
     }
 
     .cart-page-scope .item-title {
         font-size: 13px;
+        margin-bottom: 2px;
     }
 
     .cart-page-scope .item-specs {
-        margin-bottom: 10px;
+        font-size: 0.6rem;
+        margin-bottom: 8px;
     }
 
+    /* Pricing and Quantity layout */
     .cart-page-scope .item-pricing-row {
-        gap: 12px;
-        flex-wrap: wrap;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        clear: none;
     }
 
     .cart-page-scope .item-price {
@@ -474,31 +486,43 @@
         border-radius: 16px;
     }
 
+    /* Clear fix and bottom row for Subtotal and Delete button */
     .cart-page-scope .item-actions-subtotal {
-        height: auto;
-        width: 100%;
+        clear: both;
+        display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        margin-top: 10px;
-        padding-top: 10px;
+        height: auto;
+        width: 100%;
+        margin-top: 15px;
+        padding-top: 12px;
         border-top: 1px solid #f1f5f9;
     }
 
+    .cart-page-scope .delete-btn {
+        font-size: 15px;
+        padding: 0;
+    }
+
     .cart-page-scope .subtotal-box {
-        text-align: left;
+        text-align: right;
+    }
+
+    .cart-page-scope .subtotal-label {
+        font-size: 10px;
     }
 
     .cart-page-scope .subtotal-price {
         font-size: 13px;
     }
 
+    /* Summary Card & Checkout Button Fixes */
     .cart-page-scope .summary-card {
         padding: 20px;
         border-radius: 12px;
     }
 
-    /* Fix checkout button alignment and width layout issue inside card summary */
     .cart-page-scope .checkout-btn {
         width: 100% !important;
         margin-left: 0 !important;
@@ -524,32 +548,55 @@
         font-size: 15px;
     }
 
-    .cart-page-scope .empty-cart-state {
-        padding: 40px 0;
+    .summary-row span{
+        font-size: 10px;
     }
 }
 
-/* Extra Small Mobile Devices (Max Width: 480px) */
+/* Very Small Mobile Devices (Max Width: 480px) */
 @media screen and (max-width: 480px) {
+    .cart-page-scope {
+        padding: 6px;
+    }
+
     .cart-page-scope .cart-card {
         padding: 12px;
     }
 
-    .cart-page-scope .item-image-wrapper {
-        width: 60px;
-        height: 60px;
+    .cart-page-scope .cart-card > .item-image-wrapper {
+        width: 65px;
+        height: 65px;
+        margin-right: 10px;
     }
 
     .cart-page-scope .item-title {
         font-size: 12px;
     }
 
+    .cart-page-scope .item-specs {
+        font-size: 0.55rem;
+    }
+
     .cart-page-scope .summary-card {
-        padding: 15px;
+        padding: 14px;
+        width: 90%;
     }
 
     .cart-page-scope .checkout-btn {
-        padding: 10px 14px;
-        font-size: 11px;
+        font-size: 8px;
+        width: 50%;
+        padding: 5px 10px;
+    }
+
+    .cart-page-scope .total-title {
+    font-size: 10px;
+    }
+
+    .cart-page-scope .total-subtitle {
+    font-size: 10px;
+    }
+
+    .total-price {
+        font-size: 10px;
     }
 }

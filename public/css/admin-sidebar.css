@@ -1,0 +1,154 @@
+/* ==========================================================================
+   ADMIN SIDEBAR STYLES (Always Column layout)
+   ========================================================================== */
+
+/* Sidebar Container */
+.admin-sidebar-unique {
+    width: 260px;
+    background: white;
+    border-radius: 15px;
+    padding: 15px 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+    flex-shrink: 0;
+    border-right: none !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* User header */
+.admin-sidebar-user-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 0 5px 12px 5px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.admin-avatar-circle-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f1f3f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.admin-sidebar-avatar {
+    font-size: 12px;
+    color: #495057;
+}
+
+.admin-user-meta h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #212529;
+    margin: 0 0 2px 0;
+    white-space: nowrap;
+}
+
+.admin-premium-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6c757d;
+    letter-spacing: 0.05em;
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Navigation Links List - Column Layout */
+.admin-sidebar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+    width: 100%;
+}
+
+/* Base Link Styling */
+.admin-sidebar-links .admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #718096;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    width: 100%;
+    font-weight: 500;
+    font-size: 11px;
+    justify-content: flex-start;
+}
+
+/* Icon Elements */
+.admin-sidebar-icon {
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* Hover State */
+.admin-sidebar-links .admin-nav-link:hover {
+    background: #f7fafc;
+    color: #2d3748;
+}
+
+/* Active Page State */
+.admin-sidebar-links .admin-nav-link.active {
+    background: #000000;
+    color: #ffffff !important;
+    font-weight: 600;
+    width: 100%;
+}
+
+/* Logout Customization */
+.admin-sidebar-links .admin-nav-link.logout-link {
+    margin-top: 6px;
+}
+
+.admin-sidebar-links .admin-nav-link.logout-link:hover {
+    background-color: #fff5f5;
+    color: #dc3545;
+}
+
+.admin-sidebar-links .admin-nav-link.logout-link.active {
+    background-color: #dc3545;
+    color: #ffffff !important;
+}
+
+.admin-sidebar-links .admin-nav-link span.logout {
+    color: inherit;
+}
+
+/* Responsive adjustments for mobile viewports while keeping buttons in a column stack */
+@media screen and (max-width: 480px) {
+    .admin-sidebar-unique {
+        width: 100%;
+        max-width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .admin-sidebar-links {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .admin-sidebar-links .admin-nav-link {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 13px;
+        gap: 8px;
+    }
+}

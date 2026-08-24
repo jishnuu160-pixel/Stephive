@@ -1,0 +1,388 @@
+/* ==========================================
+   Order Details Page - Highly Responsive Styles
+   ========================================== */
+
+.order-details-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: inherit;
+    color: #333;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.order-details-container *, 
+.order-details-container *::before, 
+.order-details-container *::after {
+    box-sizing: border-box;
+}
+
+/* Header */
+.order-details-container .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.order-details-container .header-left {
+    flex: 1;
+    min-width: 200px;
+}
+
+.order-details-container .order-header h1 {
+    font-size: 22px;
+    margin: 0 0 5px 0;
+    word-break: break-word;
+}
+
+.order-details-container .order-header p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.order-details-container .status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #e5e7eb;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Main Grid Layout */
+.order-details-container .order-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.order-details-container section, 
+.order-details-container aside,
+.order-details-container .customer-info, 
+.order-details-container .status-update {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    min-width: 0; /* Prevents flex/grid blowouts */
+}
+
+.order-details-container h2 {
+    font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 8px;
+}
+
+/* Item Cards */
+.order-details-container .item-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.order-details-container .item-card:last-child {
+    border-bottom: none;
+}
+
+.order-details-container .item-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.order-details-container .item-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.order-details-container .item-details h3 {
+    font-size: 14px;
+    margin: 0 0 4px 0;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.order-details-container .item-details p {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0 0 4px 0;
+    word-break: break-word;
+}
+
+.order-details-container .item-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Summary Grid */
+.order-details-container .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px 15px;
+    font-size: 14px;
+    align-items: center;
+}
+
+.order-details-container .summary-grid span {
+    color: #4b5563;
+    word-break: break-word;
+}
+
+.order-details-container .summary-grid span:nth-child(even),
+.order-details-container .summary-grid strong + span {
+    text-align: right;
+    font-weight: 600;
+    color: #111827;
+}
+
+.order-details-container .summary-grid strong {
+    font-size: 15px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+    grid-column: 1;
+}
+
+.order-details-container .summary-grid strong + span {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+}
+
+/* Footer Grid */
+.order-details-container .order-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.order-details-container .customer-info p {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #4b5563;
+    margin: 0 0 10px 0;
+    word-break: break-word;
+}
+
+.order-details-container .customer-info h3 {
+    font-size: 13px;
+    margin: 15px 0 5px 0;
+    color: #374151;
+}
+
+/* Status Update Form */
+.order-details-container .status-update form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.order-details-container .status-update label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.order-details-container .status-update select {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+.order-details-container .save-btn {
+    background-color: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 12px;
+    margin-top: 5px;
+    width: 80%;
+}
+
+.order-details-container .save-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.order-back-link{
+    font-size: 15px;
+    text-decoration: none;
+    color: #888a8f;
+}
+
+/* ==========================================
+   Responsive Breakpoints for Small Screens
+   ========================================== */
+
+@media screen and (max-width: 1024px) {
+    .order-details-container .order-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .order-details-container {
+        padding: 12px;
+    }
+
+    .order-details-container .order-footer {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .order-details-container section, 
+    .order-details-container aside,
+    .order-details-container .customer-info, 
+    .order-details-container .status-update {
+        padding: 15px;
+    }
+
+    .order-details-container .order-header h1 {
+        font-size: 19px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .order-details-container {
+        padding: 8px;
+    }
+
+    .order-details-container section, 
+    .order-details-container aside,
+    .order-details-container .customer-info, 
+    .order-details-container .status-update {
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    .order-details-container .order-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding-bottom: 12px;
+        margin-bottom: 15px;
+    }
+
+    .order-details-container .status-badge {
+        align-self: flex-start;
+        font-size: 8px;
+    }
+
+    .order-details-container .order-header h1 {
+        font-size: 13px;
+    }
+
+    .order-details-container .order-header p {
+        font-size: 10px;
+    }
+
+    /* Stack items vertically on very small screens for neat alignment */
+    .order-details-container .item-card {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .order-details-container .item-card img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .ordered-items h2{
+        font-size: 12px;
+    }
+    
+    .order-summary h2{
+        font-size: 12px;
+    }
+
+    .customer-info h2{
+        font-size: 12px;
+    }
+
+    .status-update h2{
+        font-size: 12px;
+    }
+
+    .status-update label{
+        font-size: 11px;
+    }
+
+    .order-details-container .item-details h3 {
+        font-size: 13px;
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .order-details-container .item-details p {
+        font-size: 11px;
+    }
+
+    .order-details-container .item-price {
+        font-size: 13px;
+    }
+
+    .order-details-container .summary-grid {
+        font-size: 12px;
+        gap: 8px 10px;
+    }
+
+    .status option{
+        font-size: 8px;
+    }
+
+    .order-details-container .summary-grid strong {
+        font-size: 12px;
+    }
+
+    .order-details-container .customer-info p,
+    .order-details-container .customer-info h3 {
+        font-size: 10px;
+    }
+
+    .order-details-container .status-update select {
+        width: 30%;
+        font-size: 10px;
+        padding: 8px;
+    }
+
+    .order-details-container .save-btn {
+        width: 40%;
+        padding: 8px;
+        font-size: 8px;
+    }
+
+    .order-back-link{
+    font-size: 10px;
+    text-decoration: none;
+    color: #888a8f;
+}
+}

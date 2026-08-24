@@ -1,4 +1,14 @@
 /* Container & Background */
+.address-page {
+  background-color: #f4f7f8;
+  min-height: 100vh;
+  padding: 40px 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
 
 .profile-layout {
     display: flex;
@@ -43,9 +53,10 @@
 .btn-add-address {
     background-color: #4ade80; /* The bright green */
     text-decoration: none;
+    font-size: 12px;
     color: #064e3b;
     border: none;
-    padding: 12px 28px;
+    padding: 12px 24px;
     border-radius: 40px;
     font-weight: 700;
     cursor: pointer;
@@ -127,6 +138,11 @@
 .breadcrumb a:hover {
     color: #000;
     text-decoration: underline;
+}
+
+.page-header h1{
+    font-size: 21px;
+    font-weight: 600;
 }
 
 .form-error{
@@ -222,7 +238,7 @@
     border-top: 1px solid #f1f5f9;
 }
 
-.btn-save {
+.btn-address-save {
     background-color: #ecba06 !important;
     color: white;
     padding: 6px 10px; /* Smaller button height */
@@ -444,10 +460,10 @@
 
 .type-chip span{
     display: inline-block;
-    padding: 10px 16px;
+    padding: 4px 12px;
     border: 1px solid #d1d5db;
     border-radius: 30px;
-    font-size: 13px;
+    font-size: 8px;
     cursor: pointer;
     transition: .2s;
 }
@@ -483,17 +499,6 @@
     font-weight: 500;
 }
 
-.btn-save{
-    padding: 12px 24px;
-    background: #111827;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
 .btn-save:hover{
     opacity: .9;
 }
@@ -517,51 +522,84 @@
   }
 
   .address-form-wrapper {
-    padding: 25px;
+    padding: 15px;
   }
 }
+
 
 /* ==========================================
    2. Mobile & Portrait Tablets (Max Width: 768px)
    ========================================== */
 @media screen and (max-width: 768px) {
-  /* Stack the layout vertically on smaller screens */
-  .profile-layout {
+
+    .profile-layout {
     flex-direction: column;
     gap: 15px;
     margin-top: 10px;
   }
 
   /* Sidebar takes full width and transforms into a horizontal or block menu */
-  .profile-sidebar {
-    width: 100%;
-    max-width: 100%;
-    padding: 15px;
-  }
+   .btn-add-address{
+    font-size: 10px;
+    padding: 5px 5px;
+   }
 
+   .header-titles h1{
+    font-size: 12px;
+   }
+
+   .header-titles p{
+    font-size: 10px;
+   }
+
+   .breadcrumb a{
+    font-size: 8px;
+   }
+
+   .page-header h1{
+    font-size: 12px;
+   }
   /* Main content / form wrapper takes full width */
   .address-form-wrapper {
     width: 100%;
-    padding: 20px 15px;
+    padding: 14px 12px;
   }
+
+  .type-chip span{
+    font-size: 8px;
+    padding: 4px 10px;
+  }
+
+  .default-check{
+    font-size: 10px;
+  }
+
 }
 
-/* ==========================================
-   3. Small Mobile Phones (Max Width: 480px)
-   ========================================== */
-@media screen and (max-width: 480px) {
-  .profile-layout {
-    gap: 10px;
-    margin-top: 5px;
+@media screen and (max-width: 390px) {
+
+    .profile-layout {
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
   }
 
-  .profile-sidebar {
-    padding: 12px 10px;
-    border-radius: 8px;
-  }
+  /* Sidebar takes full width and transforms into a horizontal or block menu */
+   .btn-add-address{
+    font-size: 8px;
+    padding: 5px;
+   }
 
+   .header-titles h1{
+    font-size: 16px;
+   }
+
+   .header-titles p{
+    font-size: 13px;
+   }
   .address-form-wrapper {
-    padding: 15px 10px;
-    border-radius: 8px;
+    width: 100%;
+    padding: 10px 15px;
   }
 }
+

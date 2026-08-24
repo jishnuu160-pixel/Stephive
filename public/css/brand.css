@@ -2,20 +2,19 @@
    Brands Page - Admin Dashboard Styles
    ================================================================= */
 
-.customers-page {
+.brands-page {
+    flex-grow: 1;
     padding: 24px;
-    background-color: #f8fafc;
-    min-height: 100vh;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color: #0f172a;
+    box-sizing: border-box;
 }
 
-.table-card {
+.brand-table-card {
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
     border: 1px solid #e2e8f0;
-    overflow: hidden;
+    overflow: visible;
+    width: 100%;
 }
 
 /* --- Card Header & Search Layout --- */
@@ -203,7 +202,7 @@
 }
 
 .brand-names {
-    padding-left:10px;
+    padding-left: 10px;
     font-weight: 600;
     font-size: 14px;
     color: #0f172a;
@@ -232,33 +231,64 @@
     color: #991b1b;
 }
 
-/* --- Table Action Buttons & Forms --- */
-.action-cell {
+/* --- Table Action Buttons & Wrappers --- */
+.brand-actions-wrapper {
     display: flex;
-    align-items: center;
-    justify-content: center;
     gap: 8px;
+    align-items: center;
 }
 
-.inline-form {
-    display: inline-block;
+.status-toggle-form {
     margin: 0;
 }
 
-
-
-.btn-status-unlist:hover {
-    background: #fecaca;
+/* Base style for small action buttons */
+.btn-edit-small,
+.btn-unlist-small {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.btn-status-list {
-    background: #ccfbf1;
+/* Edit Button Style */
+.btn-edit-small {
+    background-color: #f1f5f9;
+    color: #334155;
+    border-color: #cbd5e1;
+}
+
+.btn-edit-small:hover {
+    background-color: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Unlist / List Toggle Button States */
+.btn-unlist-small.active {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+.btn-unlist-small.active:hover {
+    background-color: #fecaca;
+}
+
+.btn-unlist-small.inactive {
+    background-color: #ccfbf1;
     color: #0f766e;
     border-color: #99f6e4;
 }
 
-.btn-status-list:hover {
-    background: #99f6e4;
+.btn-unlist-small.inactive:hover {
+    background-color: #99f6e4;
 }
 
 /* --- Empty State --- */
@@ -324,22 +354,169 @@
     color: #475569 !important;
 }
 
-/* --- Responsive Adjustments --- */
-@media (max-width: 768px) {
-    .card-header {
-        flex-direction: column;
-        align-items: stretch;
+.btn  {
+    background-color: #f1f5f9;
+    color: #475569;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+} 
+
+/* ==========================================================================
+   📱 RESPONSIVE MEDIA QUERIES (TABLETS & MOBILITY FIXES)
+   ========================================================================== */
+
+@media screen and (max-width: 1024px) {
+    .brands-page {
+        padding: 16px;
     }
-    
-    .header-actions {
-        max-width: 100%;
+    .card-header {
+        padding: 16px;
+        gap: 12px;
+    }
+}
+
+/* ==========================================================
+   Mobile Responsive View (< 768px): Card-based Layout
+   ========================================================== */
+@media (max-width: 767px) {
+    .brands-page {
+        padding: 12px;
+    }
+
+    .card-header {
+        display: flex;
         flex-direction: column;
         align-items: stretch;
+        padding: 16px;
+        gap: 10px;
+    }
+
+    .page-title {
+        font-size: 1.1rem;
+        margin: 0;
+        white-space: normal;
+    }
+
+    .header-actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
         margin-left: 0;
+        gap: 8px;
+        justify-content: space-between;
+    }
+
+    .search-container {
+        flex-grow: 1;
+        max-width: none;
+        margin: 0;
+    }
+
+    .search-form,
+    .search-wrapper,
+    .search-input {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .search-input {
+        padding: 7px 30px 7px 28px;
+        font-size: 0.75rem;
     }
 
     .btn-cat {
-        width: 100%;
+        width: auto !important;
+        padding: 7px 12px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        flex-shrink: 0;
         justify-content: center;
+        text-align: center;
+    }
+
+    /* Transform Table into Mobile Card Rows */
+    .brand-table, 
+    .brand-table tbody, 
+    .brand-table tr, 
+    .brand-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .brand-table thead {
+        display: none;
+    }
+
+    .brand-table tr {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        padding: 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .brand-table tr:hover {
+        background-color: #ffffff;
+    }
+
+    .brand-table td {
+        border: none;
+        padding: 8px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+    }
+
+    .brand-table td::before {
+        font-weight: 700;
+        color: #64748b;
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        text-align: left;
+        margin-right: 12px;
+    }
+
+    .brand-table td:nth-child(1)::before { content: "Brand"; }
+    .brand-table td:nth-child(2)::before { content: "Name"; }
+    .brand-table td:nth-child(3)::before { content: "Description"; }
+    .brand-table td:nth-child(4)::before { content: "Status"; }
+    .brand-table td:nth-child(5)::before { content: "Action"; }
+
+    .brand-cell {
+        justify-content: flex-end;
+    }
+
+    .brand-names {
+        padding-left: 0;
+    }
+
+    .brand-desc {
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    .brand-actions-wrapper {
+        justify-content: flex-end;
+        width: 100%;
+    }
+
+    .table-empty-state {
+        display: block !important;
+        text-align: center;
     }
 }

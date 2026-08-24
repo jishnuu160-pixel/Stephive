@@ -1133,164 +1133,98 @@
     to { transform: translateY(0); opacity: 1; }
 }
 
+/* ==========================================
+   Responsive Breakpoints & Adjustments
+   ========================================== */
 
-/* ==========================================================================
-   📱 COMPACT & FULLY RESPONSIVE MEDIA QUERIES FOR CHECKOUT & COUPON MODAL
-   ========================================================================== */
+/* --- Medium Screens / Tablets (Max 850px) --- */
+@media (max-width: 850px) {
+  #checkout-view-scoped {
+    padding: 20px 12px;
 
-/* Tablet & Smaller Laptops (Max Width: 968px) */
-@media screen and (max-width: 968px) {
-    #checkout-view-scoped {
-        padding: 16px 10px;
+    /* Switch the 2-column checkout grid to a single column */
+    .main-layout {
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
-    #checkout-view-scoped .main-layout {
-        grid-template-columns: 1fr;
-        gap: 16px;
+
+    /* Adjust card padding for smaller screens */
+    .card {
+      padding: 20px;
     }
-    #checkout-view-scoped .card {
-        padding: 16px;
-        border-radius: 14px;
+
+    /* Allow the add address button to take up more space if needed */
+    .btn-add-address-checkout {
+      width: 50%;
     }
+  }
 }
 
-/* Mobile Devices (Max Width: 768px) */
-@media screen and (max-width: 768px) {
-    #checkout-view-scoped {
-        padding: 10px 6px;
-    }
-    #checkout-view-scoped .stepper {
-        margin-bottom: 16px;
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding-bottom: 4px;
-    }
-    #checkout-view-scoped .step-line {
-        width: 20px;
-        margin: 0 4px;
-    }
-    #checkout-view-scoped .card {
-        padding: 14px;
-        border-radius: 12px;
-        margin-bottom: 14px;
-    }
-    #checkout-view-scoped .card-title {
-        font-size: 14px;
-        margin-bottom: 10px;
-    }
-    #checkout-view-scoped .address-box {
-        padding: 10px;
-        margin-bottom: 12px;
-        border-radius: 8px;
-    }
-    #checkout-view-scoped .btn-add-address-checkout {
-        width: 100%;
-        padding: 6px;
-        font-size: 11px;
-        justify-content: center;
-        margin-top: 12px;
-        border-radius: 8px;
-    }
-    #checkout-view-scoped .coupon-input-group {
-        flex-direction: column;
-        gap: 6px;
-    }
-    #checkout-view-scoped .coupon-input {
-        padding: 8px 10px;
-        font-size: 12px;
-    }
-    #checkout-view-scoped .btn-apply {
-        width: 100%;
-        padding: 8px;
-        font-size: 11px;
-    }
-    #checkout-view-scoped .total-price {
-        font-size: 16px;
-    }
-    #checkout-view-scoped .btn-place-order {
-        padding: 12px;
-        font-size: 13px;
-        border-radius: 20px;
+/* --- Small Screens / Mobile Phones (Max 480px) --- */
+@media (max-width: 480px) {
+  #checkout-view-scoped {
+    padding: 10px 8px;
+
+    /* Compress stepper labels or stack them if space is tight */
+    .stepper {
+      margin-bottom: 24px;
+      overflow-x: auto;
+      justify-content: flex-start;
+      padding-bottom: 8px;
     }
 
-    /* Modal Compact Adjustments */
-    .modal {
-        padding: 10px;
+    .step-line {
+      width: 30px;
+      margin: 0 6px;
     }
-    .modal-content-coupon {
-        width: 95%;
-        max-width: 340px;
-        padding: 14px;
-        gap: 10px;
-        border-radius: 10px;
-    }
-    .modal-content-coupon h3 {
-        font-size: 13px;
-        margin: 4px;
-        padding-bottom: 4px;
-    }
-    #couponList {
-        padding: 4px;
-        max-height: 160px;
-        gap: 8px;
-    }
-    .coupon-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 6px;
-        padding: 8px 10px;
-        border-radius: 6px;
-    }
-    .coupon-item button {
-        width: 100%;
-        padding: 6px;
-        font-size: 11px;
-    }
-    .modal-content-coupon > button {
-        padding: 8px;
-        font-size: 12px;
-        border-radius: 6px;
-    }
-}
 
-/* Extra Small Mobile Devices (Max Width: 480px) */
-@media screen and (max-width: 480px) {
-    #checkout-view-scoped {
-        padding: 6px 4px;
+    /* Make buttons full width on mobile */
+    .btn-add-address-checkout {
+      width: 40%;
     }
-    #checkout-view-scoped .card {
-        padding: 10px;
-        border-radius: 10px;
+
+    .coupon-input-group {
+      flex-direction: column;
     }
-    #checkout-view-scoped .step-label {
-        font-size: 9px;
+
+    .btn-apply {
+        width: 20%;
+        padding: 5px;
+        font-size: 10px;
     }
-    #checkout-view-scoped .step-num {
-        width: 18px;
-        height: 18px;
-        font-size: 9px;
-    }
-    #checkout-view-scoped .item-img-wrapper {
-        width: 36px;
-        height: 36px;
-        border-radius: 6px;
-    }
-    #checkout-view-scoped .item-name {
-        font-size: 11px;
-    }
-    #checkout-view-scoped .item-price {
-        font-size: 11px;
-    }
-    .modal-content-coupon {
-        max-width: 300px;
-        padding: 12px;
-    }
-    .coupon-code {
-        font-size: 13px;
-    }
-    .coupon-discount {
-        font-size: 12px;
-    }
-    .coupon-text {
-        font-size: 11px;
-    }
+  }
+
+  /* Adjust Modal padding on mobile */
+  .modal, 
+  #editCategoryModal.modal-overlay {
+    padding: 15px;
+  }
+
+  .modal-content-coupon {
+    width: 95%;
+    padding: 20px 16px;
+  }
+
+  #couponList {
+    padding: 10px;
+  }
+
+  /* Failure Card responsiveness */
+  .failure-card {
+    padding: 24px 16px;
+  }
+
+  .card-title{
+    font-size: 10px;
+  }
+
+   .action-group .btn-place-order {
+    width: 50%;
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  .step-label{
+    font-size: 10px;
+  }
 }

@@ -9,7 +9,7 @@
 body {
     background-color: #f8fafb;
     color: #1a202c;
-    overflow-x: hidden; /* Prevents side-scrolling if things break */
+  /* Prevents side-scrolling if things break */
 }
 
 /* ===== NAVBAR ===== */

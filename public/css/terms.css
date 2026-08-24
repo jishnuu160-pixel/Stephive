@@ -43,77 +43,13 @@
     line-height: 1.6;
 }
 
-/* Responsive adjustments */
+
+/* ===== RESPONSIVE MEDIA QUERIES ===== */
+
+/* Tablets and Medium Screens */
 @media (max-width: 768px) {
-    .terms-page {
-        padding: 20px 10px;
-    }
-
     .terms-page .terms-content {
-        padding: 20px;
-    }
-
-    .terms-page h1 {
-        font-size: 2rem;
-    }
-}
-
-/* ==========================================
-   RESPONSIVE MEDIA QUERIES FOR TERMS PAGE
-   ========================================== */
-
-/* Tablets and small laptops (1024px and down) */
-@media screen and (max-width: 1024px) {
-    .terms-page .terms-content {
-        max-width: 100%;
         padding: 30px 20px;
-    }
-}
-
-/* Mobile phones and tablets in portrait (768px and down) */
-@media screen and (max-width: 768px) {
-    .terms-page {
-        padding: 15px 8px;
-    }
-
-    .terms-page .terms-content {
-        padding: 16px;
-        border-radius: 8px;
-    }
-
-    .terms-page h1 {
-        font-size: 1.75rem;
-        margin-bottom: 8px;
-    }
-
-    .terms-page .terms-subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 20px;
-    }
-
-    .terms-page .term-section {
-        margin-bottom: 18px;
-    }
-
-    .terms-page .term-section h2 {
-        font-size: 1.1rem;
-        margin-bottom: 6px;
-    }
-
-    .terms-page .term-section p {
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-}
-
-/* Very small mobile devices (480px and down) */
-@media screen and (max-width: 480px) {
-    .terms-page {
-        padding: 10px 5px;
-    }
-
-    .terms-page .terms-content {
-        padding: 12px;
     }
 
     .terms-page h1 {
@@ -122,14 +58,42 @@
 
     .terms-page .terms-subtitle {
         font-size: 10px;
-        margin-bottom: 15px;
+        margin-bottom: 24px;
     }
 
     .terms-page .term-section h2 {
         font-size: 10px;
     }
 
+    .term-section li{
+        font-size: 10px;
+    }
+}
+
+/* Small Mobile Devices */
+@media (max-width: 480px) {
+    .terms-page .terms-content {
+        padding: 20px 16px;
+    }
+
+    .terms-page h1 {
+        font-size: 10px;
+    }
+
+    .terms-page .terms-subtitle {
+        font-size: 10px;
+        margin-bottom: 20px;
+    }
+
+    .terms-page .term-section {
+        margin-bottom: 20px;
+    }
+
+    .terms-page .term-section h2 {
+        font-size: 11px;
+    }
+
     .terms-page .term-section p {
-        font-size: 8px;
+        font-size: 10px;
     }
 }

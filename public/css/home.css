@@ -35,7 +35,7 @@
   font-style: italic;
 }
 
-.hero-text span {
+.hero-text .hero-animated-title {
   color: #e2a11e;
 }
 
@@ -315,10 +315,11 @@
 }
 
 .search-input.visible {
-    width: 150px; 
+    font-size: 12px;
+    width: 130px; 
     opacity: 1;
     padding: 10px 32px 10px 10px; /* Right padding leaves space so text doesn't hide under the × button */
-    border: 1px solid black;
+    border: 1px solid rgb(228, 224, 224);
     border-radius: 12px;
 }
 
@@ -446,6 +447,44 @@
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animated-title {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animated-title span {
+  display: inline-block;
+  animation: fadeInUp 0.8s ease-out 0.2s forwards;
+  opacity: 0; /* Prevents flash before animation starts */
+}
+
+@keyframes fadeSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px); /* Starts 30px to the left */
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0); /* Slides to its original position */
+  }
+}
+
+.fade-slide-text {
+  display: inline-block;
+  opacity: 0; /* Hidden initially */
+  animation: fadeSlideRight 1s ease-out 0.4s forwards; /* 1s duration, starts after a 0.4s delay */
+}
+
 /* Smooth zoom entry animation when items append */
 @keyframes popIn {
     0% { transform: scale(0); opacity: 0; }
@@ -468,6 +507,7 @@
 
     .hero {
         padding-left: 50px;
+        height: 60vh;
     }
 
     .hero-text h1 {
@@ -485,6 +525,13 @@
     .category-grid {
         grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
     }
+
+        .auth-card {
+     font-size: 8px;
+     right: -12px; 
+     top: -10px;
+}
+
 }
 
 /* Mobile Phones and Small Screens (768px and below) */
@@ -527,16 +574,6 @@
         font-size: 34px;
     }
 
-    /* Reposition auth-card and floating shoe for mobile viewports */
-    .auth-card {
-        position: relative;
-        right: auto;
-        top: auto;
-        margin-top: 20px;
-        width: 100%;
-        max-width: 230px;
-    }
-
     .floating-shoe {
         position: relative;
         right: auto;
@@ -548,28 +585,14 @@
         width: 220px;
     }
 
-    .category-grid {
-        grid-template-columns: 1fr; /* 1 column on mobile */
-    }
-
     .auth-card {
-        position: relative;
-        right: auto;
-        top: auto;
-        margin-top: 20px;
-        width: 170px;
-        height: auto;
-        padding: 15px 10px;
-        border-radius: 25px;
-        background: rgba(10, 10, 10, 0.85);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        z-index: 100;
+     font-size: 8px;
+     right: -8px; 
+     top: -10px;
+}
+    .btn{
+        font-size: 8px;
+        padding: 8px;
     }
 }
 
@@ -592,7 +615,7 @@
     }
     
     .home-page .hero {
-        height: 40vh;
+        height: 45vh;
         min-height: unset;
         padding: 40px 15px;
     }
@@ -604,5 +627,13 @@
     .hero-text p {
         font-size: 14px;
     }
+
+    .search-input.visible {
+    width: 90px;
+    opacity: 1;
+    padding: 4px 6px 5px 5px;
+    border: 1px solid black;
+    border-radius: 12px;
+}
 }
 

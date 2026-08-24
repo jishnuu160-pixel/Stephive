@@ -64,7 +64,7 @@
 
 .glass-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 2fr));
     gap: 20px;
     max-width: 1000px;
     margin: 30px auto;
@@ -81,6 +81,14 @@
     text-align: center;
     transition: transform 0.3s ease, background 0.3s ease, border 0.3s ease;
     cursor: pointer;
+}
+
+.glass-card h3{
+    font-size: 20px;
+}
+
+.glass-card p{
+    font-size: 14px;
 }
 
 .glass-card:hover {
@@ -118,21 +126,34 @@
    ========================================== */
 
 /* Tablets and Below (Max 768px) */
+/* ===== RESPONSIVE MEDIA QUERIES ===== */
+
+/* Tablets and Medium Screens */
 @media (max-width: 768px) {
     .features h2 {
-        margin-left: 0;
         text-align: center;
-        padding: 0 20px;
+        margin-left: 0;
+    }
+    
+   .glass-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+    .glass-card h3{
+        font-size: 12px;
     }
 
-    .story {
-        margin: 30px auto;
+    .glass-card p{
+        font-size: 10px;
     }
 
-    .cta {
-        padding: 50px 20px;
+    .cta .btn-shop{
+        padding: 8px;
+        font-size: 10px;
     }
 }
+
+
 
 /* Standard Mobile Phones (Max 480px) */
 @media (max-width: 480px) {
@@ -144,26 +165,26 @@
         padding: 50px 15px 20px 15px;
     }
 
-    .glass-grid {
-        grid-template-columns: 1fr; /* Forces 1 clean card per row */
-        gap: 15px;
-        padding: 0 15px;
-    }
+  
 
     .glass-card {
-        padding: 22px 15px; 
+        padding: 20px 10px; 
     }
 
     .cta {
         padding: 40px 15px;
     }
 
+    .cta h2{
+        font-size: 12px;
+    }
+
     .btn-shop {
         display: block;
-        width: 100%;
-        max-width: 280px; /* Keeps button from stretching too wide on wide phones */
-        margin: 15px auto 0 auto;
-        padding: 13px 20px;
+        width: 50%;
+        max-width: 180px; /* Keeps button from stretching too wide on wide phones */
+        margin: 10px auto 0 auto;
+        padding: 10px 15px;
         box-sizing: border-box;
     }
 }
@@ -177,6 +198,14 @@
     .story {
         padding: 0 10px;
         margin: 20px auto;
+    }
+
+    .story h2,p{
+        font-size: 10px;
+    }
+
+    .hero-content p{
+        font-size: 12px;
     }
 
     .glass-grid {

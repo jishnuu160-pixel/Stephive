@@ -6,7 +6,7 @@
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #1f2937;
     background-color: #f8fafc;
-    padding: 1.25rem 1rem; /* Reduced outer scope padding */
+    padding: 1.25rem 1rem;
     min-height: 100vh;
     box-sizing: border-box;
     width: 100%;
@@ -20,18 +20,18 @@
 
 /* --- Layout Structure --- */
 .stephive-offers-scope .offers-page-layout {
-    max-width: 1200px; /* Snugger page bounds */
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .stephive-offers-scope .offers-main-content {
     display: flex;
     flex-direction: column;
-    gap: 1rem; /* Tighter gap */
+    gap: 1rem;
 }
 
 .stephive-offers-scope .offers-main-title {
-    font-size: 1.5rem; /* Slightly smaller header */
+    font-size: 1.5rem;
     font-weight: 700;
     color: #111827;
     margin: 0 0 0.25rem 0;
@@ -41,21 +41,15 @@
 /* --- Dual Grid Container --- */
 .stephive-offers-scope .offers-dual-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* Adjusted minimum width lower */
-    gap: 1.25rem; /* Reduced grid distance */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
     align-items: start;
-}
-
-@media (max-width: 768px) {
-    .stephive-offers-scope .offers-dual-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* --- Setup Panel Card --- */
 .stephive-offers-scope .setup-panel-card {
     background: #ffffff;
-    border-radius: 8px; /* Slightly crisper corners */
+    border-radius: 8px;
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
     border: 1px solid #e5e7eb;
     overflow: hidden;
@@ -70,7 +64,7 @@
 
 /* --- Panel Header Styles --- */
 .stephive-offers-scope .panel-header {
-    padding: 0.75rem 1rem; /* Tighter padding */
+    padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -86,8 +80,8 @@
 }
 
 .stephive-offers-scope .panel-icon {
-    width: 32px; /* Scaled down from 42px */
-    height: 32px; /* Scaled down from 42px */
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -102,7 +96,7 @@
 .stephive-offers-scope .text-emerald { color: #059669; }
 
 .stephive-offers-scope .panel-header-text h2 {
-    font-size: 0.95rem; /* Scaled down text density */
+    font-size: 0.95rem;
     font-weight: 600;
     color: #111827;
     margin: 0 0 0.05rem 0;
@@ -116,10 +110,10 @@
 
 /* --- Panel Form Controls --- */
 .stephive-offers-scope .panel-form {
-    padding: 1rem; /* Reduced form block spacing */
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem; /* Less vertical space between elements */
+    gap: 0.85rem;
 }
 
 .stephive-offers-scope .panel-form-group {
@@ -129,15 +123,16 @@
 }
 
 .stephive-offers-scope .panel-form-group label {
-    font-size: 0.8rem; /* Cleaner, smaller labeling */
+    font-size: 0.8rem;
     font-weight: 500;
     color: #374151;
 }
 
 .stephive-offers-scope .panel-form-group select,
-.stephive-offers-scope .panel-form-group input[type="number"] {
+.stephive-offers-scope .panel-form-group input[type="number"],
+.stephive-offers-scope .panel-form-group input[type="date"] {
     width: 100%;
-    padding: 0.45rem 0.65rem; /* Significantly shorter click target vertical sizing */
+    padding: 0.45rem 0.65rem;
     font-size: 0.85rem;
     border: 1px solid #d1d5db;
     border-radius: 6px;
@@ -147,7 +142,8 @@
 }
 
 .stephive-offers-scope .panel-form-group select:focus,
-.stephive-offers-scope .panel-form-group input[type="number"]:focus {
+.stephive-offers-scope .panel-form-group input[type="number"]:focus,
+.stephive-offers-scope .panel-form-group input[type="date"]:focus {
     outline: none;
     border-color: #f59e0b;
     box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
@@ -171,7 +167,7 @@
     gap: 0.25rem;
     background-color: #f9fafb;
     border: 1px solid #e5e7eb;
-    padding: 0.25rem 0.55rem; /* Denser selection pills */
+    padding: 0.25rem 0.55rem;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 500;
@@ -198,7 +194,7 @@
     color: #ffffff;
     font-weight: 600;
     font-size: 0.85rem;
-    padding: 0.5rem 1rem; /* Tighter button boundaries */
+    padding: 0.5rem 1rem;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -227,7 +223,7 @@
     color: #991b1b;
     font-size: 0.7rem;
     font-weight: 600;
-    padding: 0.25rem 0.5rem; /* Smaller track item buttons */
+    padding: 0.25rem 0.5rem;
     border: 1px solid #fecaca;
     border-radius: 4px;
     cursor: pointer;
@@ -241,7 +237,7 @@
 
 /* --- Active Tracker Sections --- */
 .stephive-offers-scope .active-tracker-section {
-    padding: 0 1rem 1rem 1rem; /* Scaled down container bounds */
+    padding: 0 1rem 1rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -251,14 +247,14 @@
 }
 
 .stephive-offers-scope .active-tracker-section h3 {
-    font-size: 0.85rem; /* Shrunk subsection headers */
+    font-size: 0.85rem;
     font-weight: 600;
     color: #374151;
     margin: 0.75rem 0 0 0;
 }
 
 .stephive-offers-scope .panel-scroll-box {
-    max-height: 140px; /* Reduced vertical footprint from 220px to save structural height */
+    max-height: 140px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -275,7 +271,7 @@
     background-color: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
-    padding: 0.45rem 0.65rem; /* Made inner listing nodes distinctly thinner */
+    padding: 0.45rem 0.65rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -316,10 +312,149 @@
 .stephive-offers-scope .tracker-badge.color-emerald { background-color: #d1fae5; color: #047857; }
 
 .stephive-offers-scope .tracker-empty {
-    font-size: 0.8  rem;
+    font-size: 0.8rem;
     color: #9ca3af;
     text-align: center;
     padding: 0.75rem 0;
     margin: 0;
     font-style: italic;
+}
+
+/* ==========================================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================================== */
+
+/* ==========================================================
+   RESPONSIVE MEDIA QUERIES (ULTRA-COMPACT MOBILE STYLING)
+   ========================================================== */
+
+@media screen and (max-width: 768px) {
+    .stephive-offers-scope {
+        padding: 0.5rem 0.35rem;
+    }
+
+    .stephive-offers-scope .offers-dual-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .stephive-offers-scope .offers-main-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stephive-offers-scope .setup-panel-card {
+        border-radius: 6px;
+    }
+
+    .stephive-offers-scope .panel-header {
+        padding: 0.5rem 0.65rem;
+        gap: 0.5rem;
+    }
+
+    .stephive-offers-scope .panel-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+    }
+
+    .stephive-offers-scope .panel-header-text h2 {
+        font-size: 0.85rem;
+    }
+
+    .stephive-offers-scope .panel-header-text p {
+        font-size: 0.65rem;
+    }
+
+    .stephive-offers-scope .panel-form {
+        padding: 0.65rem;
+        gap: 0.5rem;
+    }
+
+    .stephive-offers-scope .panel-form-group {
+        gap: 0.15rem;
+    }
+
+    .stephive-offers-scope .panel-form-group label {
+        font-size: 0.7rem;
+    }
+
+    .stephive-offers-scope .panel-form-group select,
+    .stephive-offers-scope .panel-form-group input[type="number"],
+    .stephive-offers-scope .panel-form-group input[type="date"] {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 4px;
+    }
+
+    .stephive-offers-scope .panel-btn.btn-apply {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        margin-top: 0.15rem;
+    }
+
+    .stephive-offers-scope .active-tracker-section {
+        padding: 0 0.65rem 0.65rem 0.65rem;
+        gap: 0.35rem;
+    }
+
+    .stephive-offers-scope .active-tracker-section h3 {
+        font-size: 0.75rem;
+        margin: 0.5rem 0 0 0;
+    }
+
+    .stephive-offers-scope .panel-scroll-box {
+        max-height: 110px;
+        gap: 0.25rem;
+    }
+
+    .stephive-offers-scope .tracker-item {
+        padding: 0.35rem 0.5rem;
+        border-radius: 4px;
+        gap: 0.35rem;
+    }
+
+    .stephive-offers-scope .tracker-name {
+        font-size: 0.7rem;
+    }
+
+    .stephive-offers-scope .tracker-level-tag {
+        font-size: 0.55rem;
+    }
+
+    .stephive-offers-scope .tracker-badge {
+        font-size: 0.55rem;
+        padding: 0.02rem 0.2rem;
+    }
+
+    .stephive-offers-scope .panel-btn.btn-delete {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.35rem;
+    }
+
+    .stephive-offers-scope .tracker-empty {
+        font-size: 0.7rem;
+        padding: 0.4rem 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .stephive-offers-scope {
+        padding: 0.25rem 0.15rem;
+    }
+
+    .stephive-offers-scope .panel-form {
+        padding: 0.5rem;
+        gap: 0.4rem;
+    }
+
+    .stephive-offers-scope .panel-header {
+        padding: 0.45rem 0.5rem;
+    }
+
+    .stephive-offers-scope .active-tracker-section {
+        padding: 0 0.5rem 0.5rem 0.5rem;
+    }
 }

@@ -87,3 +87,39 @@
 .back-link:hover {
     color: white;
 }
+
+
+/* ===== RESPONSIVE STYLES ===== */
+
+/* For Tablets and smaller devices (max-width: 768px) */
+@media (max-width: 768px) {
+    .otp-hero {
+        height: 100vh; /* Adjusts hero height to fit mobile viewports better */
+        padding: 10px;
+    }
+
+    .otp-box {
+        width: 90%;
+        max-width: 300px; /* Prevents it from stretching too wide */
+        height: auto; /* Allows the box to grow naturally based on content */
+        padding: 20px;
+    }
+
+    .otp-inputs input {
+        width: 35px;
+        height: 35px;
+        font-size: 12px;
+    }
+}
+
+/* For Small Mobile Devices (max-width: 400px) */
+@media (max-width: 400px) {
+    .otp-box {
+        padding: 15px;
+    }
+
+    .otp-inputs input {
+        width: 32px;
+        height: 38px;
+    }
+}

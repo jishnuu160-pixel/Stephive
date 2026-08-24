@@ -2,7 +2,7 @@
    📱 FULLY RESPONSIVE REFER & EARN PAGE & SIDEBAR STYLES (ALL DEVICES)
    ========================================================================== */
 
-.order-history-page {
+.refer-page {
   background-color: #f8f9fa;
   min-height: 100vh;
   padding: 40px 20px;
@@ -13,9 +13,9 @@
   overflow-x: hidden;
 }
 
-.order-history-page *, 
-.order-history-page *::before, 
-.order-history-page *::after {
+.refer-page *, 
+.refer-page *::before, 
+.refer-page *::after {
   box-sizing: inherit;
 }
 
@@ -101,14 +101,14 @@
 }
 
 .referral-hero h2 {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 700;
   margin: 0 0 12px 0;
   line-height: 1.2;
 }
 
 .referral-hero p {
-  font-size: 15px;
+  font-size: 12px;
   color: #d1d5db;
   margin: 0;
   line-height: 1.5;
@@ -131,7 +131,7 @@
 }
 
 .referral-code-section h3 {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   margin: 0 0 12px 0;
 }
@@ -149,7 +149,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 12px 16px;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 600;
   color: #374151;
   letter-spacing: 1px;
@@ -167,8 +167,8 @@
   color: #ffffff;
   border: none;
   border-radius: 8px;
-  padding: 0 24px;
-  font-size: 14px;
+  padding: 0 14px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
@@ -195,7 +195,7 @@
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -400,7 +400,7 @@
 
 /* Tablets, Smaller Laptops & Mobile (Max Width: 1024px) */
 @media screen and (max-width: 1024px) {
-  .order-history-page {
+  .refer-page {
     padding: 24px 15px;
   }
 
@@ -483,7 +483,7 @@
 
 /* Mobile Devices (Max Width: 768px) */
 @media screen and (max-width: 768px) {
-  .order-history-page {
+  .refer-page {
     padding: 16px 10px;
   }
 
@@ -511,18 +511,28 @@
   }
 
   .btn-copy {
-    width: 100%;
-    padding: 12px;
+    width: 50%;
+    padding: 10px 3px;
+    font-size: 10px;
   }
+  
 
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:1, 1fr;
     gap: 12px;
   }
 
   .stat-card {
-    padding: 18px 20px;
+    padding: 14px 20px;
     border-radius: 12px;
+  }
+
+  .stat-card small{
+      font-size: 10px;
+  }
+
+  .stat-card h3{
+      font-size: 12px;
   }
 
   .history-section {
@@ -588,7 +598,7 @@
 
 /* Tiny Devices / Foldables (Max Width: 360px) */
 @media screen and (max-width: 360px) {
-  .order-history-page {
+  .refer-page {
     padding: 12px 6px;
   }
 

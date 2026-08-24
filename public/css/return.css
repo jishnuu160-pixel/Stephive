@@ -1,78 +1,539 @@
-/* Container and Table Layout */
-.rm-container { font-family: sans-serif; padding: 20px; color: #333; }
+/* ==========================================================================
+   ADMIN RETURN REQUESTS PAGE STYLES
+   ========================================================================== */
 
-.rm-table { width: 100%; border-collapse: separate; border-spacing: 0 15px; }
-
-.rm-table th { text-align: left; color: #666; font-size: 0.85rem; padding: 10px; }
-
-.rm-table td { background: #fff; padding: 20px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
-
-/* Product Details */
-.rm-product-name { font-weight: 600; }
-
-/* Status and Type Badges */
-.rm-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-.rm-Return { background: #f3e5f5; color: #7b1fa2; }
-.rm-Exchange { background: #e8f5e9; color: #2e7d32; }
-
-.rm-status { font-size: 0.8rem; font-weight: 500; }
-.rm-status-Requested { color: #0288d1; }
-.rm-status-PickedUp { color: #f57c00; }
-.rm-status-Refunded { color: #00796b; }
-.rm-status-Rejected { color: #d32f2f; }
-
-/* Buttons */
-.rm-btn-view { 
-  background-color: #6200ea; color: white; border: none; 
-  padding: 8px 20px; border-radius: 20px; cursor: pointer; 
+/* Main Layout Wrapper */
+.admin-dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    position: relative;
+    overflow-x: hidden;
 }
 
-/* Pagination */
-.rm-pagination button { border: none; padding: 5px 12px; margin: 0 5px; cursor: pointer; }
-.rm-page-active { background: #333; color: white; border-radius: 4px; }
-/* Search Form Styling */
-.return-mgmt-app .rm-search-form {
+/* Dashboard Container holding Sidebar and Main Content */
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* Sidebar Wrapper */
+.sidebar-wrapper {
+    flex-shrink: 0;
+}
+
+/* Dark Backdrop Overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+}
+
+/* Main Content Area */
+.ret-main-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Table Card Layout */
+.ret-table-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Card Header & Search Controls */
+.ret-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.ret-card-header h4 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0;
+}
+
+.ret-header-actions {
     display: flex;
     align-items: center;
-    background: white;
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    width: 300px;
+    gap: 12px;
 }
 
-.return-mgmt-app .rm-search-form input {
-    border: none;
+.ret-search-wrapper form {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ret-search-wrapper i.fa-search {
+    position: absolute;
+    left: 14px;
+    color: #a0aec0;
+    font-size: 0.9rem;
+}
+
+.ret-search-wrapper input[type="text"] {
+    width: 280px;
+    height: 40px;
+    padding: 0 36px 0 38px;
+    font-size: 0.9rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background-color: #f8fafc;
+    color: #2d3748;
+    transition: all 0.2s ease;
+}
+
+.ret-search-wrapper input[type="text"]:focus {
     outline: none;
-    padding: 5px 10px;
-    width: 100%;
+    border-color: #cbd5e1;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
 }
 
-.return-mgmt-app .rm-search-clear {
-    color: #999;
+.ret-search-clear-btn {
+    position: absolute;
+    right: 12px;
+    color: #a0aec0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
     text-decoration: none;
-    font-size: 1.2rem;
-    margin-left: 10px;
+    transition: color 0.2s;
 }
 
-.return-mgmt-app .rm-search-form i {
-    color: #888;
+.ret-search-clear-btn:hover {
+    color: #4a5568;
 }
 
-.badgeBold{
-    font-weight: 600;
+/* Responsive Table Wrapper */
+.ret-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Base styles for all badges */
-.badge {
-    display: inline-block;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    line-height: 1;
-    text-align: center;
+/* Table Styles */
+.ret-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
     white-space: nowrap;
-    border-radius: 0.375rem;
-    color: #151414;
-    transition: background-color 0.2s ease-in-out;
+}
+
+.ret-table th {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #718096;
+    background-color: #f8fafc;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.ret-table td {
+    padding: 14px 16px;
+    font-size: 12px;
+    color: #2d3748;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.ret-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.ret-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Table Content Specific Highlights */
+.ret-badge-bold {
+    font-weight: 600;
+    color: #1a202c;
+}
+
+.ret-badge-type {
+    font-size: 12px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+/* No Data Row */
+.ret-no-data-cell {
+    text-align: center;
+    padding: 30px !important;
+    color: #a0aec0;
+    font-style: italic;
+}
+
+/* Status Badges */
+.ret-status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    text-transform: capitalize;
+}
+
+.ret-status-badge.ret-requested {
+    background-color: #fffbeb;
+    color: #d97706;
+}
+
+.ret-status-badge.ret-pickedup {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.ret-status-badge.ret-refunded {
+    background-color: #f0fdf4;
+    color: #16a34a;
+}
+
+.ret-status-badge.ret-rejected {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+/* Action Button */
+.ret-btn-view {
+    display: inline-block;
+    padding: 6px 14px;
+    font-size: 10px;
+    font-weight: 500;
+    color: #4a5568;
+    background-color: #f1f5f9;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.ret-btn-view:hover {
+    background-color: #e2e8f0;
+    color: #1a202c;
+}
+
+/* Pagination Section */
+
+/* ==========================================================================
+   ADMIN RETURN REQUESTS PAGE STYLES (MULTI-BREAKPOINT CARD LAYOUT WITH VISIBLE HEADINGS)
+   ========================================================================== */
+
+/* Default Desktop/Wide Screen Table Styles (> 768px) */
+.ret-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.ret-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.ret-table th {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #718096;
+    background-color: #f8fafc;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.ret-table td {
+    padding: 14px 16px;
+    font-size: 12px;
+    color: #2d3748;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.ret-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.ret-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.ret-badge-bold {
+    font-weight: 600;
+    color: #1a202c;
+}
+
+.ret-badge-type {
+    font-size: 12px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.ret-no-data-cell {
+    text-align: center;
+    padding: 30px !important;
+    color: #a0aec0;
+    font-style: italic;
+}
+
+.ret-status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    text-transform: capitalize;
+}
+
+.ret-status-badge.ret-requested {
+    background-color: #fffbeb;
+    color: #d97706;
+}
+
+.ret-status-badge.ret-pickedup {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.ret-status-badge.ret-refunded {
+    background-color: #f0fdf4;
+    color: #16a34a;
+}
+
+.ret-status-badge.ret-rejected {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+
+.ret-btn-view:hover {
+    background-color: #e2e8f0;
+    color: #1a202c;
+}
+
+
+/* Tablet Screen View (768px and below) - Keeping Headings Visible as Cards */
+@media screen and (max-width: 768px) {
+    .ret-table-responsive {
+        overflow-x: visible;
+    }
+
+    /* Ensure table headers are displayed as card title blocks */
+    .ret-table thead {
+        display: block;
+    }
+
+    .ret-table thead tr {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .ret-table th {
+        display: none; /* Hide standard column th text headers since individual card blocks have labels */
+    }
+
+    .ret-table,
+    .ret-table tbody,
+    .ret-table tr,
+    .ret-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .ret-table tbody tr {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        padding: 16px 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        transition: all 0.2s ease;
+    }
+
+    .ret-table tbody tr:hover {
+        background-color: #ffffff;
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+   
+    .ret-table td {
+        border: none;
+        padding: 8px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+    }
+
+    .ret-table td::before {
+        font-weight: 700;
+        color: #64748b;
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        text-align: left;
+        margin-right: 12px;
+    }
+
+    .ret-table td:nth-child(1)::before { content: "No."; }
+    .ret-table td:nth-child(2)::before { content: "ReturnID"; }
+    .ret-table td:nth-child(3)::before { content: "OrderID"; }
+    .ret-table td:nth-child(4)::before { content: "Request  type"; }
+    .ret-table td:nth-child(5)::before { content: "Status"; }
+    .ret-table td:nth-child(6)::before { content: "Action"; }
+
+    .ret-badge-type {
+        font-size: 0.9rem;
+    }
+
+    .ret-no-data-cell {
+        text-align: center;
+        padding: 30px !important;
+        justify-content: center !important;
+    }
+
+    .ret-no-data-cell::before {
+        content: none !important;
+    }
+
+    .ret-status-badge {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+        border-radius: 20px;
+    }
+
+  
+
+    .ret-btn-view {
+        width: 50%;
+        padding: 4px 5px;
+        font-size: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        align-items: flex-end;
+    }
+}
+
+
+/* Large Mobile Screen View (480px and below) */
+@media screen and (max-width: 480px) {
+    .ret-table-card {
+        padding: 16px;
+        gap: 15px;
+    }
+
+    .ret-card-header h4 {
+        font-size: 1.2rem;
+    }
+
+    .ret-search-wrapper input[type="text"] {
+        width: 100%;
+    }
+
+    .ret-card-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ret-header-actions,
+    .ret-search-wrapper,
+    .ret-search-wrapper form {
+        width: 100%;
+    }
+
+    .ret-table tbody tr {
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+
+    .ret-table td {
+        padding: 8px 0;
+        font-size: 0.85rem;
+    }
+
+    .ret-table td::before {
+        font-size: 0.85rem;
+        margin-right: 10px;
+    }
+
+    .ret-status-badge {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+    }
+
+    .ret-btn-view {
+        width: 40%;
+        text-align: center;
+        padding: 5px 10px;
+        align-items: flex-end;
+    }
+
+}
+
+
+/* Compact/Small Mobile Screen View (360px and below) */
+@media screen and (max-width: 360px) {
+    .dashboard-container {
+        padding: 10px;
+    }
+
+    .ret-table-card {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .ret-card-header h4 {
+        font-size: 1.1rem;
+    }
+
+    .ret-table tbody tr {
+        padding: 12px 14px;
+        margin-bottom: 10px;
+    }
+
+    .ret-table td {
+        font-size: 0.8rem;
+        padding: 7px 0;
+    }
+
+    .ret-table td::before {
+        font-size: 0.8rem;
+        margin-right: 8px;
+    }
+
+    .ret-status-badge {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+    }
+
+    .page-link {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+
+    .page-info {
+        font-size: 0.75rem;
+    }
 }

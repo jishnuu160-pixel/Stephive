@@ -2,7 +2,12 @@
 .edit-profile-container {
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-height: 100vh;
     padding: 40px 20px;
+    background: #eeeded;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 /* The Card styling */
@@ -13,11 +18,20 @@
     padding: 30px;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    box-sizing: border-box;
 }
 
 .edit-card .btn-save{
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
     background-color: #e3b80b;
     color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .edit-card .btn-profile-action{
@@ -47,15 +61,18 @@
 }
 
 .form-group input[type="text"] {
+    width: 100%;
     padding: 12px 16px;
     border: 1.5px solid #e2e8f0;
     border-radius: 10px;
     font-size: 14px;
+    box-sizing: border-box;
 }
 
 /* Gender Selection Styling */
 .gender-selection {
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     margin-top: 5px;
 }
@@ -75,26 +92,37 @@
     accent-color: #000000; /* Makes the radio dot black */
 }
 
-/* Action Buttons */
+/* Action Buttons (Default: Desktop/Large Screens) */
 .modal-actions {
     display: flex;
-    flex-direction: rpw;
+    flex-direction: row;
     gap: 10px;
     margin-top: 25px;
+    width: 100%;
 }
 
-
+.modal-actions > * {
+    flex: 1;
+}
 
 .btn-save:hover {
     opacity: 0.8;
 }
 
 .btn-cancel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     text-decoration: none;
     color: #718096;
     font-size: 14px;
     font-weight: 500;
+    padding: 12px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-sizing: border-box;
 }
 
 .btn-profile-action {
@@ -109,32 +137,40 @@
     border-radius: 10px;
     font-size: 13px;
     border: 1px solid #e2e8f0;
+    box-sizing: border-box;
 }
 
 .btn-icon {
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
 }
 
-/* ==========================================================================
-   📱 RESPONSIVE MEDIA QUERIES FOR EDIT PROFILE PAGE
-   ========================================================================== */
 
-/* Tablet & Smaller Laptops (Max Width: 968px) */
-@media screen and (max-width: 968px) {
+/* ==========================================
+   RESPONSIVE MEDIA QUERIES FOR ALL SCREENS
+   ========================================== */
+
+/* 1. Tablets (Screen widths between 481px and 768px) */
+@media screen and (max-width: 768px) {
     .edit-profile-container {
-        padding: 30px 15px;
+        padding: 20px 15px;
+    }
+    
+    .edit-card {
+        padding: 25px 20px;
     }
 }
 
-/* Mobile Devices (Max Width: 768px) */
-@media screen and (max-width: 768px) {
+/* 2. Small Screen Phones (Screen widths 480px and below) */
+@media screen and (max-width: 480px) {
     .edit-profile-container {
-        padding: 20px 10px;
+        padding: 10px;
+        align-items: flex-start; /* Prevents card from clipping if content is long */
     }
 
     .edit-card {
-        padding: 20px;
+        padding: 20px 15px;
         border-radius: 12px;
     }
 
@@ -143,53 +179,21 @@
         margin-bottom: 20px;
     }
 
-    .form-group {
-        margin-bottom: 16px;
+    /* Stacks buttons vertically and makes them smaller/compact on mobile */
+    .modal-actions {
+        flex-direction: row;
+        gap: 8px;
     }
 
-    .form-group input[type="text"] {
-        padding: 10px 14px;
-        font-size: 13px;
+     .btn-save .btn-cancel{
+        width: 20%;
+        height: 10%;
+        flex: none;
+        padding: 4px; /* Reduced padding for smaller height */
+        border-radius: 8px;
     }
 
     .gender-selection {
         gap: 15px;
-    }
-
-    .modal-actions {
-        flex-direction: column;
-        gap: 12px;
-        margin-top: 20px;
-    }
-
-    .modal-actions button,
-    .modal-actions a,
-    .btn-save,
-    .btn-profile-action {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-        padding: 12px;
-    }
-}
-
-/* Extra Small Mobile Devices (Max Width: 480px) */
-@media screen and (max-width: 480px) {
-    .edit-profile-container {
-        padding: 15px 6px;
-    }
-
-    .edit-card {
-        padding: 16px;
-        border-radius: 10px;
-    }
-
-    .edit-card h3 {
-        font-size: 16px;
-    }
-
-    .gender-selection {
-        flex-direction: column;
-        gap: 10px;
     }
 }

@@ -1,0 +1,462 @@
+/* ===========================
+   Main Products Page Container
+   =========================== */
+.admin-dashboard-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    box-sizing: border-box;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.admin-dashboard-wrapper .prod-main-content {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+}
+
+/* ===========================
+   Table Card Component
+   =========================== */
+.prod-table-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 26px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* ===========================
+   Card Header & Actions Layout
+   =========================== */
+.prod-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.prod-card-header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.prod-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ===========================
+   Search Wrapper & Form Styling
+   =========================== */
+.prod-search-wrapper {
+    min-width: 220px;
+    box-sizing: border-box;
+}
+
+.prod-search-form {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+}
+
+.prod-search-inner-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.prod-search-input {
+    width: 100%;
+    padding: 8px 32px 8px 32px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    box-sizing: border-box;
+    background-color: #fdfdfd;
+}
+
+.prod-search-input:focus {
+    border-color: #2563eb;
+    background-color: #ffffff;
+}
+
+.prod-search-wrapper i.fa-search {
+    position: absolute;
+    left: 10px;
+    color: #9ca3af;
+    font-size: 0.8rem;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.prod-search-clear-btn {
+    position: absolute;
+    right: 10px;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+}
+
+.prod-search-clear-btn:hover {
+    color: #374151;
+}
+
+/* ===========================
+   Add Product Button
+   =========================== */
+.prod-btn-add {
+    background-color: #151515;
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.prod-btn-add:hover {
+    background-color: #333436;
+}
+
+/* ===========================
+   Table Responsive Layout
+   =========================== */
+.prod-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.prod-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.prod-table th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    background-color: #f9fafb;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.prod-table td {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+    color: #1f2937;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.prod-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* ===========================
+   Shared Elements Styling
+   =========================== */
+.prod-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.prod-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.prod-thumb-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: #9ca3af;
+}
+
+.prod-category-cell {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.prod-parent-cat {
+    font-size: 0.7rem;
+    color: #6b7280;
+}
+
+.prod-sub-cat {
+    font-size: 0.85rem;
+    color: #111827;
+}
+
+.prod-status-badge {
+    display: inline-block;
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.prod-status-listed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.prod-status-unlisted {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.prod-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.prod-btn-edit {
+    background-color: #f3f4f6;
+    color: #374151;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-decoration: none;
+    border: 1px solid #d1d5db;
+    font-weight: 500;
+}
+
+.prod-btn-edit:hover {
+    background-color: #e5e7eb;
+}
+
+.prod-btn-toggle {
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.prod-btn-toggle.active {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.prod-btn-toggle.inactive {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.prod-no-data-cell {
+    text-align: center;
+    color: #6b7280;
+    padding: 30px;
+}
+
+/* ===========================
+   SweetAlert2 Custom Styling
+   =========================== */
+.small-swal-popup {
+    font-size: 10px !important;
+    border-radius: 12px !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    box-sizing: border-box;
+}
+
+.small-swal-title {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    margin-bottom: 4px !important;
+}
+
+.small-swal-text {
+    font-size: 10px !important;
+    color: #4b5563 !important;
+    line-height: 1.4 !important;
+}
+
+/* Optional buttons tuning to match your dashboard UI */
+.swal2-styled.swal2-confirm,
+.swal2-styled.swal2-cancel {
+    font-size: 10px !important;
+    padding: 6px 14px !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+}
+
+.swal2-styled.swal2-confirm:focus,
+.swal2-styled.swal2-cancel:focus {
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ==========================================================
+   MOBILE RESPONSIVE VIEW (< 768px): Compact Card Layout
+   ========================================================== */
+
+@media (max-width: 767px) {
+    /* 1. Reduce main content padding to make the card wider */
+    .admin-dashboard-wrapper .prod-main-content {
+        padding: 12px !important;
+    }
+
+    /* 2. Make the table card stretch to full width */
+    .prod-table-card {
+        padding: 14px !important;
+        width: 100% !important;
+    }
+
+    /* Stack card title on top, and controls on the next line */
+    .prod-card-header {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .prod-card-header h2 {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    /* Make search bar and add product button sit side-by-side on the next line */
+    .prod-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .prod-search-wrapper {
+        flex-grow: 1;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .prod-search-input {
+        width: 100% !important;
+        padding: 7px 30px 7px 28px;
+        font-size: 0.75rem;
+        box-sizing: border-box;
+    }
+
+    .prod-btn-add {
+        padding: 7px 12px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .prod-table, 
+    .prod-table tbody, 
+    .prod-table tr, 
+    .prod-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .prod-table thead {
+        display: none;
+    }
+
+    .prod-table tr {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        padding: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .prod-table td {
+        border: none;
+        padding: 6px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        font-size: 0.8rem;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .prod-table td::before {
+        font-weight: 600;
+        color: #64748b;
+        font-size: 0.8rem;
+        text-align: left;
+    }
+
+    .prod-table td:nth-child(1)::before { content: "No."; }
+    .prod-table td:nth-child(2)::before { content: "Product"; }
+    .prod-table td:nth-child(3)::before { content: "Category"; }
+    .prod-table td:nth-child(4)::before { content: "Price"; }
+    .prod-table td:nth-child(5)::before { content: "Quantity"; }
+    .prod-table td:nth-child(6)::before { content: "Status"; }
+    .prod-table td:nth-child(7)::before { content: "Actions"; }
+
+
+    /* 4. Ensure action buttons container is properly laid out */
+    .prod-action-buttons {
+        display: flex !important;
+        gap: 6px;
+        justify-content: flex-end;
+    }
+
+    .prod-btn-edit,
+    .prod-btn-toggle {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+}

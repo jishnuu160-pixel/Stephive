@@ -18,20 +18,19 @@ body {
 /* Breadcrumb */
 .breadcrumb {
     display: flex;
-    gap: 10px;
     font-size: 14px;
     color: #888;
     margin-bottom: 20px;
 }
 
 .breadcrumb a {
-    color: #6c83a5;
+    color: #252627;
     text-decoration: none;
 }
 
-.wishlist {
+.wishlist { 
     font-weight: 600;
-    color: #000;
+    color: #000000;
 }
 
 /* Header */
@@ -237,80 +236,42 @@ body {
 }
 
 /* Mobile Devices (Max Width: 768px) */
-@media screen and (max-width: 768px) {
-    .wishlist-page {
-        width: 95%;
-        margin: 15px auto;
-    }
-
-    .breadcrumb {
-        font-size: 9px;
-        margin-bottom: 8px;
-        gap: 2px;
-        white-space: nowrap;
-        overflow-x: auto;
-        padding-bottom: 2px;
-        scrollbar-width: none;
-    }
-
-    .breadcrumb::-webkit-scrollbar {
-        display: none;
-    }
-
-    .wishlist-header {
-        flex-direction: row; 
-        justify-content: space-between; 
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-
-    .continue-btn {
-        width: auto; 
-        text-align: center;
-        padding: 8px 14px;
-        font-size: 10px;
-        margin-left: auto; 
-    }
-
-    /* Convert standard HTML table layout into a card-stack layout or clean horizontal scroll on mobile */
-    .wishlist-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-        border-radius: 10px;
-    }
-
-    .wishlist-table th,
+@media (max-width: 768px) {
+    /* Reduce padding across all cells */
     .wishlist-table td {
-        padding: 10px 12px;
-        font-size: 11px;
+        padding: 8px 10px;
     }
 
-    .product-col {
-        gap: 12px;
+    /* Target Product Column (1st child) to shrink image and text */
+    .wishlist-table td:nth-child(1) .product-col img {
+        width: 55px;
+        height: 55px;
     }
 
-    .product-col img {
-        width: 60px;
-        height: 60px;
-        border-radius: 8px;
-    }
-
-    .action-col {
-        gap: 10px;
-    }
-
-    .action-col a,
-    .action-col button {
-        width: 34px;
-        height: 34px;
+    .wishlist-table td:nth-child(1) h5 {
         font-size: 13px;
     }
 
-    .empty-wishlist {
-        height: 45vh;
-        margin-bottom: 40px;
+    .wishlist-table td:nth-child(1) .product-meta {
+        font-size: 11px !important;
+    }
+
+    /* Target Price Column (2nd child) */
+    .wishlist-table td:nth-child(2) {
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    /* Target Action Column (3rd child) to make buttons smaller */
+    .wishlist-table td:nth-child(3) a,
+    .wishlist-table td:nth-child(3) button {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+    
+    .action-col {
+        gap: 8px; /* Reduce gap between action buttons on mobile */
     }
 }
 
