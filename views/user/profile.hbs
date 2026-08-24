@@ -1,32 +1,31 @@
-<div class="order-history-page">
-    <div class="profile-wrapper">
-        <nav class="breadcrumb-container">
-            <p class="breadcrumb">My Account <span >/</span> <strong>Profile</strong></p>
-        </nav>
+<div class="profile-page">
+     <div class="profile-wrapper">
+          <nav class="breadcrumb-container">
+            <p class="breadcrumb">My Account <span>/</span> <strong>Profile</strong></p>
+          </nav>
         
+        <!-- Mobile Menu Toggle Button -->
+          <button class="btn btn-outline-dark d-lg-none mb-3 w-30 d-flex align-items-center justify-content-start gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebarModal" aria-controls="mobileSidebarModal">
+           <i class="fa-solid fa-bars"></i> Menu
+          </button>
+
         <div class="profile-layout">
-            
-            {{> userSide}} 
+            {{> userSide user=user}}
 
             <main class="profile-main">
-                
                 <section class="profile-card profile-info-summary">
                     <div class="avatar-edit-container">
                         <form action="/user/update-avatar" method="POST" enctype="multipart/form-data" id="avatarForm">
-
-
-                       <div class="avatar-border">
-                         <img class="profile-avatar"src="{{user.profileImage}}?t={{timestamp}}"
- id="profile-preview" class="user-icon sidebar-avatar">
-                                 
+                           <div class="avatar-border">
+                            <img class="profile-avatar" src="{{#if user.profileImage}}{{user.profileImage}}?t={{timestamp}}{{else}}/images/default-pic.jpg{{/if}}" id="profile-preview"/>                                 
                             <label for="avatar-upload" class="camera-btn">
                                 <i class="fa-solid fa-camera"></i>
                                 <input type="file" id="avatar-upload" name="profileImage" hidden accept="image/*">
                             </label>
-                        </div>
+                           </div>
                         </form>
                     </div>
-                    <div class="summary-text">
+                    <div class="profile-text">
                         <h2>{{user.fullName}}</h2>
                         <p class="user-email-label">{{user.email}}</p>
                     </div>
@@ -37,7 +36,7 @@
                         <h3><img src="/icons/information-icon.png" class="section-icon"> Personal Information</h3>
                     </div>
                     
-                    <form id="profile-form" action="/user/update-profile" method="POST" class="form-grid">
+                    <form id="profile-form" action="/user/update-profile" method="POST" class="profile-form-grid">
                         <div class="input-group">
                             <label>FULL NAME</label>
                             <input type="text" name="fullName" value="{{user.fullName}}" disabled>
@@ -60,17 +59,17 @@
                             </div>
                         </div>
                     
-                        <div class="form-footer">
+                        <div class="profile-form-footer">
                             <a href="/user/edit-profile" class="btn-outline"><img src="/icons/edit-profile.png" class="edit-profile">Edit Profile</a>
                             <a href="/user/send-email-change-otp" class="btn-outline"><img src="/icons/email.png" class="edit-profile"> Change Email</a>
+                            <a href="/user/update-password-init" class="btn-outline"><img src="/icons/lock.png" class="edit-profile"> Update Password</a>
+                        </div>
                         </div>
                     </form>
                 </section>
-
             </main> 
         </div>
     </div>
-</div>
 
 <div id="cropperModal" class="crop-modal-overlay" style="display: none;">
     <div class="crop-modal-content">
@@ -84,10 +83,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-

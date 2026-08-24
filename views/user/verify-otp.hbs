@@ -6,7 +6,6 @@
         {{/if}}
 
         <div id="js-error-message" style="color: #ff4d4d; text-align: center; margin-bottom: 5px; display: none; font-size: 10px;"></div>
-
             <div class="lock-icon">🔒</div>
 
             <p class="otp-text">
@@ -34,13 +33,12 @@
                 <span id="timer-container">Resend in <b id="timer">01:00</b></span>
                 
                <a href="/user/resend-otp?email={{email}}&target={{target}}&isPasswordUpdate={{#if isPasswordUpdate}}true{{else}}false{{/if}}" 
-   id="resend-link" 
-   style="display: none; color: #ffffff; font-weight: bold; text-decoration: none;">
-    Resend OTP
-</a>
+                id="resend-link" style="display: none; color: #ffffff; font-weight: bold; text-decoration: none;">
+                Resend OTP
+               </a>
             </p>
 
-<a href="{{#if (eq target 'signup')}}/user/signup{{else if (eq target 'email')}}/user/profile{{else if (eq target 'updatepassword')}}/user/profile{{else}}/user/forgot-password{{/if}}" class="back-link">
+            <a href="{{#if (eq target 'signup')}}/user/signup{{else if (eq target 'email')}}/user/profile{{else if (eq target 'updatepassword')}}/user/profile{{else}}/user/forgot-password{{/if}}" class="back-link">
     {{#if (eq target 'email')}}
         ← BACK TO PROFILE
     {{else if (eq target 'updatepassword')}}
@@ -50,7 +48,7 @@
     {{else}}
         ← BACK TO FORGOT PASSWORD
     {{/if}}
-</a>
+            </a>
         </form>
     </div>
 </section>

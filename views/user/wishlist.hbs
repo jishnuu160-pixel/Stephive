@@ -13,7 +13,6 @@
            {{else}}
               0
            {{/if}} items saved</p>
-
         <a href="/shop" class="continue-btn">
             ← Continue Shopping
         </a>
@@ -29,19 +28,13 @@
                 <th>ACTION</th>
             </tr>
         </thead>
-
         <tbody>
-
             {{#each wishlist.items}}
-
-            <tr>
-                 
-<td class="product-col">
-    <img src="{{this.productId.variants.[0].images.[0]}}" alt="{{this.productId.productName}}">
-
-    <div class="product-info">
+            <tr>            
+        <td class="product-col">
+        <img src="{{this.productId.variants.[0].images.[0]}}" alt="{{this.productId.productName}}">
+        <div class="product-info">
         <h5>{{this.productId.productName}}</h5>
-        
         <div class="product-meta" style="font-size: 13px; color: #64748b; display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
             {{#if this.productId.material}}
                 <span>Material: <strong>{{this.productId.material}}</strong></span>
@@ -57,24 +50,21 @@
             {{#if this.size}}
                 <span>Size: <strong>{{this.size}}</strong></span>
             {{/if}}
-        </div>
-    </div>
-</td>
-
-                <td class="price-col">
-
-                    {{#if this.productId.salePrice}}
-                        ₹{{this.productId.salePrice}}
-                    {{else}}
-                        ₹{{this.productId.regularPrice}}
-                    {{/if}}
-
+           </div>
+          </div>
+         </td>
+           <td class="price-col">
+                {{#if this.productId.salePrice}}
+                    ₹{{this.productId.salePrice}}
+                {{else}}
+                    ₹{{this.productId.regularPrice}}
+                {{/if}}
                 </td>
 
-<td class="action-col">
-<a href="/details/{{this.productId._id}}?variant={{this.variantId}}&size={{this.size}}" class="view-btn">
-    <i class="fa-solid fa-eye"></i>
-</a>
+        <td class="action-col">
+      <a href="/details/{{this.productId._id}}?variant={{this.variantId}}&size={{this.size}}" class="view-btn">
+       <i class="fa-solid fa-eye"></i>
+     </a>
 
 <button type="button" class="btn-secondary-cart" 
     data-product="{{json this.productId}}" 
@@ -92,21 +82,13 @@
 </button>
 </td>
 
-            </tr>
-
-            {{/each}}
-
-        </tbody>
-
-    </table>
-
+</tr>
+{{/each}}
+</tbody>
+  </table>
     {{else}}
-
     <div class="empty-wishlist">
-
-
-        <h3>Your Wishlist is Empty</h3>
-
+     <h3>Your Wishlist is Empty</h3>
     </div>
     {{/if}}
 </section>

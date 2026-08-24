@@ -6,39 +6,61 @@
             <p>Order #{{order.orderId}}</p>
         </header>
 
-        <form action="/orders/return/{{order._id}}" method="POST" class="return-form-grid">
+        <form action="/orders/return/{{order._id}}" method="POST" class="return-form-grid" id="returnForm" novalidate>
             <input type="hidden" name="orderId" value="{{order.orderId}}">
+            
             <div class="form-section">
                 <h3>Select Item to Return</h3>
                 {{#each order.items}}
-                <div class="item-card">
-                    <input type="radio" name="productId" value="{{this.productId._id}}" required>
-                    <img src="{{this.productImage}}" alt="{{this.productName}}">
-                    <div class="item-info">
-                        <h4>{{this.productName}}</h4>
-                        <p>Size: {{this.size}} | Qty: {{this.quantity}} | Price: ₹{{this.total}}</p>
+                    {{#unless (or this.isReturned (eq (toLowerCase this.status) 'cancelled') this.itemReturnStatus)}}
+                    <div class="item-card" style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px; border: 1px solid #eee; padding: 10px; border-radius: 6px;">
+                        <input type="radio" name="itemId" value="{{this._id}}" required 
+                               onchange="
+                                   document.getElementById('selectedProductId').value='{{this.productId._id}}'; 
+                                   document.getElementById('selectedPrice').value='{{this.price}}';
+                                   document.getElementById('selectedVariantId').value='{{this.variantId}}';
+                                   document.getElementById('selectedSize').value='{{this.size}}';
+                                   document.getElementById('selectedQuantity').value='{{this.quantity}}';
+                                   document.getElementById('error-itemId').style.display = 'none';
+                               ">
+                        
+                        <img src="{{this.productImage}}" alt="{{this.productName}}" width="60" style="border-radius: 4px;">
+                        <div class="item-info">
+                            <h4 style="margin: 0 0 4px 0;">{{this.productName}}</h4>
+                            <p style="margin: 0; color: #666; font-size: 13px;">Size: {{this.size}} | Qty: {{this.quantity}} | Price: ₹{{this.price}} | Color: {{this.color}}</p>
+                        </div>
                     </div>
-                </div>
+                    {{/unless}}
                 {{/each}}
+                <small id="error-itemId" style="color: red; font-size: 12px; display: none; margin-top: 5px;">Please select an item to return.</small>
+
+                <!-- Hidden inputs to catch dynamic item values -->
+                <input type="hidden" id="selectedProductId" name="productId">
+                <input type="hidden" id="selectedPrice" name="price">
+                <input type="hidden" id="selectedVariantId" name="variantId">
+                <input type="hidden" id="selectedSize" name="size">
+                <input type="hidden" id="selectedQuantity" name="quantity">
             </div>
 
             <div class="form-section">
                 <h3>Return Details</h3>
                 <div class="form-group">
-                 <label>Request Type</label>
-                     <select name="returnType" required>
-                         <option value="Return">Return (Refund)</option>
-                         <option value="Exchange">Exchange (Replace)</option>
-                     </select>
+                    <label>Request Type</label>
+                    <select name="returnType" required>
+                        <option value="Return">Return (Refund)</option>
+                        <option value="Exchange">Exchange (Replace)</option>
+                    </select>
                 </div>
+                
                 <div class="field">
                     <label>Return Reason</label>
-                    <select name="reason" required>
+                    <select name="reason" id="returnReason" required onchange="document.getElementById('error-reason').style.display = 'none';">
                         <option value="">Select a reason...</option>
                         <option value="size">Size issue</option>
                         <option value="defective">Item defective</option>
                         <option value="not-as-described">Not as described</option>
                     </select>
+                    <small id="error-reason" style="color: red; font-size: 12px; display: none; margin-top: 5px;">Please select a return reason.</small>
                 </div>
 
                 <div class="field">
@@ -54,25 +76,102 @@
                     </select>
                 </div>
 
+                <!-- Single Pickup Address Section -->
                 <div class="field">
                     <label>Pickup Address</label>
-                    <div class="address-box">
-                        <p>{{order.deliveryAddress.fullName}},<br>{{order.deliveryAddress.addressLine1}}, {{order.deliveryAddress.city}}, {{order.deliveryAddress.pincode}}<br>{{order.deliveryAddress.mobileNumber}}</p>
-                        <a href="/user/add-address" class="add-address">
-                      + Add Address
-                       </a>
-                       <a href="/user/edit-address/{{order.deliveryAddress._id}}" class="edit-address">Edit</a>
-                    </div>
+                    
+                    <!-- Hidden input submits the original delivery address ID automatically -->
                     <input type="hidden" name="pickupAddress" value="{{order.deliveryAddress._id}}">
+
+                    <!-- Static card showing the order's delivery address -->
+                    <div class="address-box" style="margin-bottom: 10px; border: 1px solid #ddd; padding: 12px; border-radius: 6px; background-color: #f9f9f9;">
+                        <div class="address-details">
+                            <p style="margin: 2px 0;"><strong>{{order.deliveryAddress.fullName}}</strong> <span style="font-size: 12px; color: #28a745; float: right;"><i class="fa-solid fa-check-circle"></i> Original Delivery Address</span></p>
+                            <p style="margin: 2px 0;">{{order.deliveryAddress.addressLine1}}, {{order.deliveryAddress.city}}, {{order.deliveryAddress.state}} - {{order.deliveryAddress.pincode}}</p>
+                            <p style="margin: 2px 0; color: #666;">Phone: {{order.deliveryAddress.mobileNumber}}</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="field">
-                    <label>Pickup Date</label>
-                    <input type="date" name="pickupDate" required>
+                <div class="field" style="margin-top: 15px;">
+                    <label>Pickup Date (Tomorrow onwards)</label>
+                    <input type="date" id="pickupDate" name="pickupDate" required style="width: 100%; padding: 8px;" onchange="document.getElementById('error-pickupDate').style.display = 'none';">
+                    <small id="error-pickupDate" style="color: red; font-size: 12px; display: none; margin-top: 5px;"></small>
                 </div>
 
-                <button type="submit" class="submit-full-btn">Submit Formal Request</button>
+                <button type="submit" class="submit-full-btn" style="margin-top: 20px;">Submit Formal Request</button>
             </div>
         </form>
     </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const pickupDateInput = document.getElementById("pickupDate");
+    
+    if (pickupDateInput) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDateStr = tomorrow.toISOString().split("T")[0];
+        
+        pickupDateInput.setAttribute("min", minDateStr);
+
+        const maxDate = new Date(tomorrow);
+        maxDate.setDate(maxDate.getDate() + 14);
+        pickupDateInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
+    }
+
+    const returnForm = document.getElementById("returnForm");
+    if (returnForm) {
+        returnForm.addEventListener("submit", function (e) {
+            let isValid = true;
+
+            const selectedItem = document.querySelector('input[name="itemId"]:checked');
+            const itemError = document.getElementById("error-itemId");
+            if (!selectedItem) {
+                isValid = false;
+                if (itemError) itemError.style.display = "block";
+            } else {
+                if (itemError) itemError.style.display = "none";
+            }
+
+            const reasonSelect = document.getElementById("returnReason");
+            const reasonError = document.getElementById("error-reason");
+            if (!reasonSelect.value) {
+                isValid = false;
+                if (reasonError) reasonError.style.display = "block";
+            } else {
+                if (reasonError) reasonError.style.display = "none";
+            }
+
+            const dateVal = pickupDateInput ? pickupDateInput.value : '';
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            
+            const selectedDate = new Date(dateVal);
+            selectedDate.setHours(0, 0, 0, 0);
+            
+            const dateError = document.getElementById("error-pickupDate");
+
+            if (!dateVal || isNaN(selectedDate.getTime()) || selectedDate < tomorrow) {
+                isValid = false;
+                if (dateError) {
+                    dateError.textContent = "Pickup must be scheduled for tomorrow or a later date.";
+                    dateError.style.display = "block";
+                }
+            } else {
+                if (dateError) dateError.style.display = "none";
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                const firstError = returnForm.querySelector('small[style*="display: block"]');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    }
+});
+</script>

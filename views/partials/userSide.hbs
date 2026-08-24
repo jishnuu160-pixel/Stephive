@@ -1,37 +1,95 @@
-<aside class="profile-sidebar">
-    <div class="sidebar-user-header">
-       <div class="avatar-circle-small">
-          <img src="{{user.profileImage}}?v={{timestamp}}" id="profile-preview"class="user-icon sidebar-avatar">
-        </div>
-        <div class="user-meta">
-            <h4>{{user.fullName}}</h4>
-            <span class="premium-tag">ACTIVE MEMBER</span>
-        </div>
+<!-- Mobile Sidebar Modal (Offcanvas Drawer) -->
+<div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="mobileSidebarModal" aria-labelledby="mobileSidebarModalLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileSidebarModalLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
+    <div class="offcanvas-body p-0">
+        <aside class="profile-sidebar border-0 w-100">
+            <div class="sidebar-user-header">
+                <div class="avatar-circle-small">
+                    <img src="{{user.profileImage}}?v={{timestamp}}" id="profile-preview" class="user-icon sidebar-avatar">
+                </div>
+                <div class="profile-text">
+                    <h2>{{user.fullName}}</h2>
+                    <span class="premium-tag">ACTIVE MEMBER</span>
+                </div>
+            </div>
 
-    <nav class="sidebar-nav">
-        <a href="/user/profile" class="nav-item {{#if (eq activePage 'profile')}}active{{/if}}">
-            <img src="/icons/profile.png" class="sidebar-icon"> <span>Profile</span>
-        </a>
+            <nav class="sidebar-nav">
+                <a href="/user/profile" class="nav-item {{#if (eq activePage 'profile')}}active{{/if}}">
+                    <img src="/icons/profile.png" class="sidebar-icon"> <span>Profile</span>
+                </a>
+                <a href="/history" class="nav-item {{#if (eq activePage 'orders')}}active{{/if}}">
+                    <img src="/icons/orders.png" class="sidebar-icon"> <span>My orders</span>
+                </a>
+                <a href="/wallet" class="nav-item {{#if (eq activePage 'wallet')}}active{{/if}}">
+                    <img src="/icons/wallet.png" class="sidebar-icon"> <span>Wallet</span>
+                </a>
+                <a href="/user/address" class="nav-item {{#if (eq activePage 'address')}}active{{/if}}">
+                    <img src="/icons/address.png" class="sidebar-icon"> <span>Address</span>
+                </a>
+                <a href="/referral" class="nav-item {{#if (eq activePage 'referral')}}active{{/if}}">
+                    <img src="/icons/refer.png" class="sidebar-icon"> <span>Refer & Earn</span>
+                </a>
+                <a href="/user/logout" class="nav-item logout-link">
+                    <img src="/icons/logout.png" class="sidebar-icon"> <span class="logout">Logout</span>
+                </a>
+            </nav>
+        </aside>
+    </div>
+</div>
 
-        <a href="/history" class="nav-item {{#if (eq activePage 'orders')}}active{{/if}}">
-            <img src="/icons/orders.png" class="sidebar-icon"> <span>My orders</span>
-        </a>
+<!-- Permanent Sidebar for Large Screens -->
 
-        <a href="/wallet" class="nav-item {{#if (eq activePage 'wallet')}}active{{/if}}">
-            <img src="/icons/wallet.png" class="sidebar-icon"> <span>Wallet</span>
-        </a>
+    <aside class="profile-sidebar">
+        <div class="sidebar-user-header">
+            <div class="avatar-circle-small">
+                <img src="{{#if user.profileImage}}{{user.profileImage}}?v={{timestamp}}{{else}}/images/default-pic.jpg{{/if}}" id="profile-preview" class="user-icon sidebar-avatar">
+            </div>
+            <div class="profile-text">
+                <h2>{{user.fullName}}</h2>
+                <span class="premium-tag">ACTIVE MEMBER</span>
+            </div>
+        </div>
 
-        <a href="/user/address" class="nav-item {{#if (eq activePage 'address')}}active{{/if}}">
-            <img src="/icons/address.png" class="sidebar-icon"> <span>Address</span>
-        </a>
+        <nav class="sidebar-nav">
+            <a href="/user/profile" class="nav-item {{#if (eq activePage 'profile')}}active{{/if}}">
+                <img src="/icons/profile.png" class="sidebar-icon"> <span>Profile</span>
+            </a>
+            <a href="/history" class="nav-item {{#if (eq activePage 'orders')}}active{{/if}}">
+                <img src="/icons/orders.png" class="sidebar-icon"> <span>My orders</span>
+            </a>
+            <a href="/wallet" class="nav-item {{#if (eq activePage 'wallet')}}active{{/if}}">
+                <img src="/icons/wallet.png" class="sidebar-icon"> <span>Wallet</span>
+            </a>
+            <a href="/user/address" class="nav-item {{#if (eq activePage 'address')}}active{{/if}}">
+                <img src="/icons/address.png" class="sidebar-icon"> <span>Address</span>
+            </a>
+            <a href="/referral" class="nav-item {{#if (eq activePage 'referral')}}active{{/if}}">
+                <img src="/icons/refer.png" class="sidebar-icon"> <span>Refer & Earn</span>
+            </a>
+            <a href="/user/logout" class="nav-item logout-link">
+                <img src="/icons/logout.png" class="sidebar-icon"> <span class="logout">Logout</span>
+            </a>
+        </nav>
+    </aside>
 
-        <a href="/referral" class="nav-item {{#if (eq activePage 'referral')}}active{{/if}}">
-            <img src="/icons/refer.png" class="sidebar-icon"> <span>Refer & Earn</span>
-        </a>
 
-        <a href="/user/logout" class="nav-item logout-link">
-            <img src="/icons/logout.png" class="sidebar-icon"> <span class="logout">Logout</span>
-        </a>
-    </nav>
-</aside>
+<!-- Auto-close offcanvas script on mobile navigation click -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const offcanvasElement = document.getElementById('mobileSidebarModal');
+        if (offcanvasElement) {
+            const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement) || new bootstrap.Offcanvas(offcanvasElement);
+            const navLinks = offcanvasElement.querySelectorAll('.nav-item');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth < 992) {
+                        bsOffcanvas.hide();
+                    }
+                });
+            });
+        }
+    });
+</script>

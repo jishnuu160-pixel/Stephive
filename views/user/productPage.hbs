@@ -486,6 +486,7 @@ async function buyNow(productId) {
             productId, 
             variantId: activeVariantId, 
             size: chosenSize, 
+            color: chosenColor,
             quantity: document.getElementById("purchaseQty").value 
         })
     });
@@ -502,6 +503,4 @@ async function buyNow(productId) {
         }
     }
 }
-
-
 </script>

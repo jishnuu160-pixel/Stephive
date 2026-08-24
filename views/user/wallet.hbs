@@ -1,14 +1,17 @@
-<div class="order-history-page">
+<div class="wallet-page">
     <div class="profile-wrapper">
         <nav class="breadcrumb-container">
             <p class="breadcrumb">My Account <span>/</span> <strong>Wallet</strong></p>
         </nav>
 
+        <button class="btn btn-outline-dark d-lg-none mb-3 w-30 d-flex align-items-center justify-content-start gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebarModal" aria-controls="mobileSidebarModal">
+            <i class="fa-solid fa-bars"></i> Menu
+        </button>
+
         <div class="profile-layout">
             {{> userSide}}
-
             <main class="main-content">
-                <header class="content-header">
+                <header class="wallet-header">
                     <h2>My Wallet</h2>
                     <button class="add-money-btn">+ Add Money</button>
                 </header>
@@ -18,21 +21,16 @@
                     <h2>₹{{wallet.balance}} <span class="currency">IND</span></h2>
                 </div>
 
-               <div class="transactions-container">
-    <div class="transactions-header">
-        <h3>Transactions</h3>
-        <a href="#" class="download-link">↓ Download Statement</a>
-    </div>
-
-    <table class="transactions-table">
-        <thead>
-            <tr>
+            <div class="transactions-container">
+             <table class="transactions-table">
+              <thead>
+                <tr>
                 <th>DESCRIPTION</th>
                 <th>DATE</th>
                 <th>AMOUNT</th>
-            </tr>
-        </thead>
-        <tbody>
+                </tr>
+              </thead>
+             <tbody>
             {{#each wallet.transactions}}
             <tr>
                 <td>
@@ -47,8 +45,8 @@
                     </div>
                 </td>
                 <td>
-                    <p>{{formattedDate this.date}}</p>
-                    <small>{{formattedTime this.date}}</small>
+                    <p class="date">{{formattedDate this.date}}</p>
+                    <small class="date">{{formattedTime this.date}}</small>
                 </td>
                 <td class="amount {{this.type}}">
                     {{#if (eq this.type 'credit')}}+{{else}}-{{/if}} ₹{{this.amount}}
@@ -72,6 +70,7 @@
     </div>
 </div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
     const addMoneyBtn = document.querySelector('.add-money-btn');
@@ -115,14 +114,14 @@
         const data = await res.json();
         
         if (data.success) {
-            alert("Money added successfully!");
+            showToast("Money added successfully","success");
             setTimeout(() => { location.reload(); }, 500); 
         } else {
             alert("Verification failed: " + (data.message || "Unknown error"));
         }
     } catch (err) {
         console.error("Verification fetch error:", err);
-        alert("An error occurred during verification.");
+        showToast("An error occurred during verification.","error");
     }
 }
         };
