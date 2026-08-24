@@ -1,8 +1,4 @@
 import * as userService from '../services/userServices.js';
-import { error, profile } from 'console';
-import { title } from 'process';
-import { generateOTP } from '../utils/otpUtils.js';
-import { sendOtpEmail } from '../utils/sendOtpEmail.js';
 import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 
 export const updateAvatar = async (req, res) => {
@@ -42,41 +38,40 @@ export const getSignup = (req, res) => {
     });
 };
 
-export const postSignup = async (req, res, next) => {
+export const postSignup = async (req, res) => {
     try {
-        const { email, phoneNumber } = req.body;
+        await userService.validateSignupInitial(req.body);
+
+        const { email } = req.body;
+
+        const otp = await userService.sendSignupOTP(email.trim());
 
         req.session.signupData = req.body;
-
-        const otp = await userService.sendSignupOTP(email);
-
         req.session.otp = otp;
         req.session.otpExpiryTime = Date.now() + 60 * 1000; 
 
         req.session.save((err) => {
-        if (err) {
-        console.error("Session Save Error:", err);
-        return res.redirect(
-            '/user/signup?error=' +
-            encodeURIComponent("Session error, please try again.")
-        );
-    }
-    res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup`);
-});
-} catch (err) {
-        console.error("Signup Error:", err.message);
-        res.redirect('/user/signup?error=' + encodeURIComponent(err.message));
+            if (err) {
+                console.error("Session Save Error:", err);
+                return res.render('user/signup', {
+                    error: 'Session error, please try again.',
+                    formData: req.body
+                });
+            }
+
+            return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup`);
+        });
+
+    } catch (err) {        
+        return res.render('user/signup', {
+            error: err.message, 
+            validationErrors: err.validationErrors || {},
+            formData: req.body 
+        });
     }
 };
 
-
 export const postVerifyOTP = async (req, res, next) => {
-    console.log("\n========== OTP VERIFICATION DEBUG START ==========");
-    console.log("1. req.body received:", req.body);
-    console.log("2. Session signupData exists?", !!req.session.signupData);
-    console.log("3. Session OTP stored:", req.session.otp);
-    console.log("==================================================\n");
-
     try {
         const email = req.query.email || req.body.email;
         const target = req.query.target || req.body.target || (req.session.signupData ? 'signup' : '');
@@ -120,7 +115,8 @@ export const postVerifyOTP = async (req, res, next) => {
             delete req.session.otpExpiryTime;
             delete req.session.signupData;
 
-            return res.redirect('/shop?success=' + encodeURIComponent("Account created successfully!"));
+            req.flash('success', 'Account created successfully');
+            return res.redirect('/shop');
         } 
         
         else {
@@ -136,7 +132,6 @@ export const postVerifyOTP = async (req, res, next) => {
         }
 
     } catch (err) {
-        console.error("Verification Error:", err.message);
         const email = req.query.email || req.body.email;
         const target = req.query.target || req.body.target || (req.session.signupData ? 'signup' : '');
         return res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${encodeURIComponent(email || '')}&target=${encodeURIComponent(target)}`);
@@ -181,9 +176,8 @@ export const postForgot = async (req, res) => {
   
         req.session.otpExpiryTime=Date.now() + 60000;
 
-       res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=forgot`);
+        res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=forgot`);
     } catch (err) {
-        console.log("ERROR:", err.message);
         res.redirect('/user/forgot-password?error=' + encodeURIComponent(err.message));
     }
 };
@@ -203,7 +197,6 @@ export const postResetPassword = async (req, res) => {
 
         res.redirect('/user/login?success=Password updated successfully');   
     } catch (err) {
-        console.error("Forgot Password Reset Error:", err.message);
         res.render('user/reset-password', { 
             error: "Reset failed: " + err.message, 
             email 
@@ -257,7 +250,6 @@ export const getResendOTP = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Resend Error:", err);
         const target = req.query.target || (req.session.signupData ? 'signup' : '');
         const email = req.query.email || req.session.signupData?.email || '';
         
@@ -311,7 +303,6 @@ export const getProfile = async (req, res) => {
         const user = await userService.getUserById(userId);
 
         if (!user) {
-            console.log("User not found in database");
             return res.redirect('/user/login');
         }
 
@@ -321,8 +312,6 @@ export const getProfile = async (req, res) => {
     activePage:'profile'
 });
     } catch (error) {
-       
-        console.error("Profile Error:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(error.message);
     }
 };
@@ -368,15 +357,11 @@ export const postAddAddress = async (req, res) => {
             ...req.body,
             isDefault: req.body.isDefault === 'on'
         });
-        req.flash('success', 'Address added successfully');
-        
+        req.flash('success', 'Address added successfully');   
         res.redirect('/user/address');
 
     } catch (error) {
-
-        const user = await userService.getUserById(
-            req.session.user.id
-        );
+        const user = await userService.getUserById(req.session.user.id);
 
         if (error.validationErrors) {
 
@@ -399,8 +384,6 @@ export const postAddAddress = async (req, res) => {
                     : null
             });
         }
-
-        console.error(error);
 
         res.render('user/add-address', {
             user,
@@ -455,8 +438,6 @@ export const postEditAddress = async (req, res) => {
                 activePage: 'address'
             });
         }
-
-        console.error("Edit Error:", error);
         res.render('user/edit-address', {
             user,
             address: mergedAddress,
@@ -488,7 +469,6 @@ export const getEditAddress = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
         res.redirect('/user/address');
     }
 };
@@ -526,7 +506,6 @@ export const getEditProfile = async (req, res) => {
             se: 'profile' 
         });
     } catch (error) {
-        console.error("GET Edit Profile Error:", error);
         res.redirect('/user/profile');
     }
 };
@@ -574,7 +553,6 @@ export const postVerifyPasswordOTP = async (req, res) => {
         res.redirect(`/user/changepass?email=${encodeURIComponent(email)}&verified=true&target=${encodeURIComponent(target)}`);
 
     } catch (err) {
-        console.error("Verification Error:", err.message);
         
         const email = req.query.email || req.body.email || '';
         const target = req.query.target || req.body.target || 'updatepassword';
@@ -607,8 +585,6 @@ export const postChangeEmail = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Change Email Error:", error);
-
         if (error.isValidation) {
             return res.render('user/change-email', { 
                 error: error.message, 
@@ -720,7 +696,6 @@ export const getAbout = async (req, res) => {
             user: req.session.user
         });
     } catch (error) {
-        console.error("About Error:", error);
         res.redirect('/');
     }
 };
@@ -762,19 +737,14 @@ export const removeCoupon = async (req, res) => {
             return res.status(HTTP_STATUS.OK).json({ success: true, message: "Coupon removed successfully" });
         });
     } catch (error) {
-        console.error("Remove Coupon Error:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to remove coupon" });
     }
 };
 
 export const postCheckoutAddAddress = async (req, res) => {
-    console.log("=== DEBUG ADD ADDRESS ===");
-    console.log("Session User:", req.session.user);
-    console.log("Request Body:", req.body);
     
     try {
         const userId = req.session.user?.id || req.session.user?._id;
-        console.log("Resolved User ID:", userId);
 
         await userService.addAddress(userId, {
             ...req.body,
@@ -806,7 +776,6 @@ export const getAddressForEdit = async (req, res) => {
 
         res.status(HTTP_STATUS.OK).json({ success: true, address });
     } catch (err) {
-        console.error("getAddressForEdit error:", err);
         res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: err.message || "Could not retrieve address" });
     }
 };
@@ -860,8 +829,8 @@ export const resendSignupOTP = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Resend Signup OTP Error:", err.message);
         const email = req.session.signupData?.email || '';
         return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("Failed to resend OTP. Please try again."));
     }
 };
+

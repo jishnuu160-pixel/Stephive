@@ -18,7 +18,6 @@ export const getWallet = async (req, res) => {
             RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID
         });
     } catch (error) {
-        console.error("Error loading wallet:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
 };

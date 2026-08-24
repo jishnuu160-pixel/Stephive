@@ -6,7 +6,6 @@ export const getReferralPage = async (req, res) => {
         const userId = req.user.id; 
         const data = await referralService.getReferralDashboardData(userId);
         
-        console.log("Referal data:",data);
         res.render('user/refer-earn', { 
             user: data.user, 
             layout: 'main', 
@@ -18,7 +17,6 @@ export const getReferralPage = async (req, res) => {
             referralCode: data.referralCode
         });
     } catch (error) {
-        console.error(error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading referral page");
     }
 };
@@ -35,7 +33,6 @@ export const getAllReferralHistory = async (req, res) => {
             activePage: 'referral'
         });
     } catch (error) {
-        console.error(error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading referral history");
     }
 };

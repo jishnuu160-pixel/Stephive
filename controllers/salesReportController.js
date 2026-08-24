@@ -8,6 +8,10 @@ const getDateRangeFromQuery = (query) => {
     let start, end;
     const now = new Date(); 
 
+    if (!filter && (!startDate || !endDate)) {
+        filter = 'daily';
+    }
+
     if (filter === 'daily') {
         start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
@@ -29,7 +33,6 @@ const getDateRangeFromQuery = (query) => {
         end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
     }
-
     return { start, end };
 };
 
@@ -48,10 +51,10 @@ export const viewSalesReport = async (req, res) => {
             summary: report.summary,
             activePage: 'sales',
             startDate: formattedStartDate,
-            endDate: formattedEndDate
+            endDate: formattedEndDate,
+            filter: req.query.filter || 'daily'
         });
     } catch (error) {
-        console.error("Error in viewSalesReport:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send('Server Error');
     }
 };
@@ -79,7 +82,6 @@ export const downloadCSV = async (req, res) => {
         res.setHeader('Content-Disposition', 'attachment; filename=sales-report.csv');
         res.status(HTTP_STATUS.OK).end(csv);
     } catch (error) {
-        console.error("Error generating CSV:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error generating CSV file");
     }
 };
@@ -160,7 +162,6 @@ export const downloadPDF = async (req, res) => {
 
         doc.end();
     } catch (error) {
-        console.error("Error generating PDF:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error generating PDF file");
     }
 };
