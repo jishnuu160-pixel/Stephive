@@ -213,7 +213,7 @@ export const postEditProduct = async (req, res) => {
     } catch (error) { 
         if (error.fieldErrors) {
             if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['sec-fetch-mode'] === 'cors') {
-                return res.status(400).json({
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({
                     success: false,
                     errors: error.fieldErrors
                 });
@@ -261,7 +261,7 @@ export const postEditProduct = async (req, res) => {
         }
 
         if (req.xhr || req.headers.accept?.includes('application/json') || req.headers['sec-fetch-mode'] === 'cors') {
-            return res.status(500).json({ success: false, message: error.message || "Something went wrong" });
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message || "Something went wrong" });
         }
 
         req.flash("error", error.message || "Something went wrong");
