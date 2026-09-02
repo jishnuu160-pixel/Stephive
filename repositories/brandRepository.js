@@ -23,11 +23,13 @@ export const findBrandById = async (id) => {
     return await Brand.findById(id); 
 };
 
-
-export const findUniqueProductBrands = async () => {
-    return await Product.distinct('brand');
+export const ensureBrandExists = async (brandName) => {
+    const normalized = brandName.trim();
+    const existing = await Brand.findOne({ name: { $regex: `^${normalized}$`, $options: 'i' } });
+    if (!existing) {
+        await Brand.create({ name: normalized, isListed: true });
+    }
 };
-
 
 export const countProductsForBrand = async (brandName) => {
     return await Product.countDocuments({
@@ -42,20 +44,6 @@ export const countListedProductsForBrand = async (brandName) => {
         isListed: true 
     });
 };
-
-export const ensureBrandExists = async (brandName) => {
-    const existing = await Brand.findOne({ name: { $regex: `^${brandName}$`, $options: 'i' } });
-    
-    if (!existing) {
-        await Brand.create({
-            name: brandName,
-            description: `Auto-detected from existing product listings.`,
-            logo: "default-logo.png", 
-            isListed: true
-        });
-    }
-};
-
 
 export const updateProductsStatusByBrand = async (brandName, isListedStatus) => {
     return await Product.updateMany(

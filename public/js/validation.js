@@ -5,8 +5,13 @@ const jsErrorBox = document.getElementById("js-error-message");
 if (loginForm) {
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
+    const serverErrorBox = document.querySelector(".server-error"); 
 
     const showError = (message) => {
+        if (serverErrorBox) {
+            serverErrorBox.style.display = "none";
+        }
+
         if (jsErrorBox) {
             jsErrorBox.innerText = message;
             jsErrorBox.style.display = "block";
@@ -14,6 +19,9 @@ if (loginForm) {
     };
 
     const hideError = () => {
+        if (serverErrorBox) {
+            serverErrorBox.style.display = "none";
+        }
         if (jsErrorBox) {
             jsErrorBox.style.display = "none";
             jsErrorBox.innerText = "";
@@ -39,11 +47,19 @@ if (loginForm) {
             showError("Please enter a valid email address!");
             return;
         }
+        
+       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-        if (password.length < 6) {
-            e.preventDefault();
-            showError("Password must be at least 6 characters long!");
-            return;
+       if (!password) {
+         e.preventDefault();
+         showError("Password is required!");
+         return;
+       }
+
+       if (!passwordRegex.test(password)) {
+         e.preventDefault();
+         showError("Must be 8+ chars with uppercase, lowercase, number, and symbol.");
+         return;
         }
     });
 }
@@ -107,7 +123,7 @@ if (signupForm) {
             return;
         }
 
-        const fullNameRegex = /^[A-Za-z ]{3,50}$/;
+        const fullNameRegex = /^[A-Za-z ]{3,10}$/;
         if (!fullNameValue) {
             showFieldError("fullNameError", "Full Name is required.");
             isFormValid = false;
@@ -128,22 +144,24 @@ if (signupForm) {
             isFormValid = false;
         }
 
+        const phoneValue = phoneNumberValue ? phoneNumberValue.toString().replace(/[\s-]/g, '') : ""; 
         const phoneRegex = /^\d{10}$/;
-        if (!phoneNumberValue) {
+        if (!phoneValue) {
             showFieldError("phoneError", "Phone number is required.");
             isFormValid = false;
-        } else if (!phoneRegex.test(phoneNumberValue)) {
+        } else if (!phoneRegex.test(phoneValue)) {
             showFieldError("phoneError", "Phone number must be exactly 10 digits.");
             isFormValid = false;
         }
 
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordValue) {
             showFieldError("passwordError", "Password is required.");
             isFormValid = false;
-        } else if (passwordValue.length < 6) {
-            showFieldError("passwordError", "Password must be at least 6 characters long.");
+        } else if (!passwordRegex.test(passwordValue)) {
+            showFieldError("passwordError", "Must be 8+ chars with uppercase, lowercase, number, and symbol.");
             isFormValid = false;
-        }
+        } 
 
         if (!confirmPasswordValue) {
             showFieldError("confirmPasswordError", "Please confirm your password.");
@@ -156,7 +174,7 @@ if (signupForm) {
         if (referralCodeValue) {
             const referralCodeRegex = /^STEPHYVE-[A-Za-z0-9]{4}$/;
             if (!referralCodeRegex.test(referralCodeValue)) {
-                showFieldError("referralError", "Invalid referral code format. (e.g., STEPHYVE-1234)");
+                showFieldError("referralError", "Invalid referral code format. (e.g., STEPHYVE-ALEG)");
                 isFormValid = false; 
             }
         }
@@ -238,12 +256,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   
-    if (resetForm) {
+if (resetForm) {
     resetForm.addEventListener("submit", (e) => {
      
+        const otp = document.getElementById("otp").value.trim();
         const password = document.getElementById("password").value.trim();
         const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
+        if (!otp) {
+            e.preventDefault();
+            showError("Please enter the OTP code!");
+            return;
+        }
         
         if (!password || !confirmPassword) {
             e.preventDefault(); 
@@ -251,15 +275,17 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        if (password !== confirmPassword) {
-            e.preventDefault(); 
-            showError("Passwords do not match!");
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        if (!passwordRegex.test(password)) {
+            e.preventDefault();
+            showError("Must be 8+ chars with uppercase, lowercase, number, and symbol.");
             return;
         }
 
-        if (password.length < 6) {
-            e.preventDefault();
-            showError("Password must be at least 6 characters.");
+        if (password !== confirmPassword) {
+            e.preventDefault(); 
+            showError("Passwords do not match!");
             return;
         }
     });

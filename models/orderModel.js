@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
     color: String,
     status: { 
       type: String, 
-      enum: ['failed','placed', 'processing', 'shipped', 'out of delivery', 'delivered', 'cancelled', 'Returned'],
+      enum: ['failed','placed','pending' ,'processing', 'shipped', 'out of delivery', 'delivered', 'cancelled', 'returned', 'refunded'],
       default: 'placed',
       lowercase: true,
     }
@@ -42,7 +42,7 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['razorpay', 'cod', 'wallet'] },
   status: { 
     type: String, 
-    enum: ['failed','placed','pending', 'processing', 'shipped', 'out of delivery', 'delivered', 'cancelled', 'Returned'],
+    enum: ['failed','placed','pending', 'processing', 'shipped', 'out of delivery', 'delivered', 'cancelled', 'returned','refunded'],
     default: 'placed',
     lowercase: true,
   },
