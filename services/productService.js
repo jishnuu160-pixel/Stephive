@@ -198,28 +198,40 @@ export const attachOfferPricing = async (productDoc) => {
     }
 
 
-    // ---------------- FINAL OFFER ----------------
+// ---------------- FINAL OFFER ----------------
 
-    const maxDiscountAmount = Math.max(productDiscountAmt,categoryDiscountAmt);
+let effectiveDiscount = 0;
+let maxDiscountAmount = 0;
 
-    let effectiveDiscount = 0;
+if (productDiscountAmt > categoryDiscountAmt) {
+    maxDiscountAmount = productDiscountAmt;
+    effectiveDiscount = productDiscountPct;
+}
 
-    if (productDiscountAmt > categoryDiscountAmt) {
-        effectiveDiscount = productDiscountPct;
-    } else if (categoryDiscountAmt > productDiscountAmt) {
-        effectiveDiscount = categoryDiscountPct;
-    }
+else if (categoryDiscountAmt > productDiscountAmt) {
+    maxDiscountAmount = categoryDiscountAmt;
+    effectiveDiscount = categoryDiscountPct;
+}
 
-    const salePrice = Math.max(0, regularPrice - maxDiscountAmount);
+else if (productDiscountAmt === categoryDiscountAmt && productDiscountAmt > 0) {
+    maxDiscountAmount = productDiscountAmt;
 
-    return {
-        ...product,
-        regularPrice,
-        salePrice: Math.round(salePrice),
-        discountAmount: Math.round(maxDiscountAmount),
-        effectiveDiscount: Math.round(effectiveDiscount),
-        hasOffer: maxDiscountAmount > 0
-    };
+    effectiveDiscount = Math.max(
+        productDiscountPct,
+        categoryDiscountPct
+    );
+}
+
+const salePrice = Math.max(0, regularPrice - maxDiscountAmount);
+
+return {
+    ...product,
+    regularPrice,
+    salePrice: Math.round(salePrice),
+    discountAmount: Math.round(maxDiscountAmount),
+    effectiveDiscount: Math.round(effectiveDiscount),
+    hasOffer: maxDiscountAmount > 0
+};
 };
 
 
