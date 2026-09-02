@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import mongoose from 'mongoose';
 
 import * as OrderService from '../services/orderService.js';
 import * as WalletService from '../services/walletService.js'; 
@@ -53,6 +52,7 @@ export const createOrder = async (req, res) => {
     }
 };
 
+
 export const verifyPayment = async (req, res) => {
     try {
         const { 
@@ -88,6 +88,7 @@ export const verifyPayment = async (req, res) => {
         }
 
         const targetOrderId = dbOrderId || req.session.failedPayment?.dbOrderId;
+        const appliedCouponCode = req.session.appliedCouponCode;
 
         if (!targetOrderId) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -96,7 +97,7 @@ export const verifyPayment = async (req, res) => {
             });
         }
 
-        await OrderService.updatePaymentStatus(targetOrderId, razorpay_payment_id, 'placed');
+        await OrderService.updatePaymentStatus(targetOrderId, razorpay_payment_id, 'placed', appliedCouponCode);
 
         delete req.session.pendingOrder;
         delete req.session.failedPayment;

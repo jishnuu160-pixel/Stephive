@@ -73,7 +73,7 @@ export const getChartData = async (req, res) => {
         const { filter = 'week' } = req.query;
         const chartData = await adminService.getSalesChartData(filter);
          
-        res.json(chartData); 
+        res.status(HTTP_STATUS.OK).json(chartData); 
     } catch (error) {
         console.error("Chart Data Controller Error:", error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Failed to fetch chart metrics' });

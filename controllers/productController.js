@@ -90,7 +90,7 @@ export const getProductId = async (req, res) => {
         if (!result || !result.product || result.product.isListed === false || result.product.isBlocked === true) {
             req.flash('error', 'The product you are looking for is no longer available.');
             return req.session.save(() => {
-                res.redirect('/shop');
+                res.render('user/page-not-found');
             });
         }
 

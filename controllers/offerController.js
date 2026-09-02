@@ -51,8 +51,9 @@ export const processCategoryOffer = async (req, res) => {
 
 export const deleteProductOffer = async (req, res) => {
     try {
-        const { id } = req.params;
-        await OfferService.removeProductOffer(id);
+        const { id, offerId } = req.params;
+        await OfferService.removeProductOffer(id, offerId);
+        
         req.flash("success", "Product offer deleted successfully.");
         res.redirect("/admin/offer");
     } catch (error) {
@@ -63,11 +64,15 @@ export const deleteProductOffer = async (req, res) => {
 
 export const deleteCategoryOffer = async (req, res) => {
     try {
-        const { id } = req.params;
-        await OfferService.removeCategoryOffer(id);
+        const { id, offerId } = req.params;
+        await OfferService.removeCategoryOffer(id,offerId);
+
         req.flash("success", "Category offer deleted successfully.");
         res.redirect("/admin/offer");
     } catch (error) {
-        res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: error.message });
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
+            success: false,
+            error: error.message
+        });
     }
 };

@@ -6,7 +6,6 @@ import { HTTP_STATUS } from '../constants/httpStatusCode.js';
 
 import Razorpay from 'razorpay';
 import puppeteer from 'puppeteer';
-import mongoose  from 'mongoose';
 
 
 const razorpayInstance = new Razorpay({
@@ -38,11 +37,12 @@ export const getUserOrders = async (req, res) => {
            activePage:'orders',
            searchQuery: req.query.search || '',  
            currentSort: sort       
-    });
+       });
     } catch (error) {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(`<pre>${error.stack}</pre>`); 
     }
 };
+
 
 export const getOrderById = async (req, res) => {
        try {
@@ -51,12 +51,13 @@ export const getOrderById = async (req, res) => {
              order
             );
        }catch (error) {
-        return res.status(error.message === 'Order not found' ? HTTP_STATUS.NOT_FOUND : HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ 
         success: false, 
         message: error.message 
     });
   }
 };
+
 
 export const cancelOrder = async (req, res) => {
     try {
@@ -75,6 +76,7 @@ export const cancelOrder = async (req, res) => {
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
+
 
 export const renderCheckoutPage = async (req, res) => {
     try {   
@@ -146,6 +148,7 @@ export const renderCheckoutPage = async (req, res) => {
     }
 };
 
+
 export const handleCheckoutData = (req, res) => {
     try {
         const { productId, variantId, size, quantity, color } = req.body;
@@ -165,6 +168,7 @@ export const handleCheckoutData = (req, res) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to process checkout" });
     }
 };
+
 
 export const placeOrder = async (req, res) => {
     try {
@@ -344,6 +348,7 @@ export const placeOrder = async (req, res) => {
     }
 };
 
+
 export const getOrderConfirmation = async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -357,6 +362,7 @@ export const getOrderConfirmation = async (req, res) => {
         res.status(HTTP_STATUS.NOT_FOUND).send("Order confirmation not found.");
     }
 };
+
 
 export const getOrderDetails = async (req, res) => {
     try {
@@ -386,6 +392,7 @@ export const getOrderDetails = async (req, res) => {
     }
 };
 
+
 export const cancelOrderItem = async (req, res) => {
     const { orderId, itemId } = req.params;
     
@@ -403,6 +410,7 @@ export const cancelOrderItem = async (req, res) => {
         });
     }
 };
+
 
 export const getReturnForm = async (req, res) => {
     try {
@@ -481,6 +489,7 @@ export const renderPaymentFailurePage = async (req, res) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Server Error");
     }
 };
+
 
 export const handlePaymentExit = async (req, res) => {
     try {
