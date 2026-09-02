@@ -55,7 +55,9 @@ export const createNewCoupon = async (data) => {
     if (!data.expiryDate) {
         errors.expiryDate = "Expiry date is required.";
     } else {
-        const expiry = new Date(data.expiryDate);
+            const expiry = new Date(data.expiryDate);
+             expiry.setHours(0, 0, 0, 0);
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -74,11 +76,14 @@ export const createNewCoupon = async (data) => {
         throw err;
     }
 
+    const expiryDate = new Date(data.expiryDate);
+    expiryDate.setHours(23, 59, 59, 999);
+
     const couponData = {
         name: data.name.trim(),
         code: data.couponCode.trim().toUpperCase(),
         startDate: new Date(),
-        expiryDate: new Date(data.expiryDate),
+        expiryDate: expiryDate,
         discountValue: Number(data.discountValue),
         discountType: data.discountType,
         min_orderAmount: Number(data.min_orderAmount),
@@ -118,11 +123,13 @@ export const updateCoupon = async (id, data) => {
             "Flat discount must be less than the minimum purchase amount."
         );
     }
+    const expiryDate = new Date(data.expiryDate);
+    expiryDate.setHours(23, 59, 59, 999);
 
     const updatedData = {
         name: data.name,
         code: data.couponCode.toUpperCase(),
-        expiryDate: new Date(data.expiryDate),
+        expiryDate: expiryDate,
         discountValue: Number(data.discountValue),
         discountType: data.discountType,
         use_count: data.maxUseCount,

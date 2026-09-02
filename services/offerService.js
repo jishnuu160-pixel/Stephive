@@ -1,4 +1,5 @@
 import * as OfferRepo from '../repositories/offerRepository.js';
+import { isOfferActiveByDate } from '../utils/dateHelper.js';
 
 /**
  * Compiles all data required to render the unified offer management dashboard
@@ -9,8 +10,6 @@ export const getOfferPageData = async () => {
         OfferRepo.findActiveProducts(),
         OfferRepo.findActiveCategories()
     ]);
-
-    const now = new Date();
 
     const subCategories = allCategories.filter(category =>
             category.parentCategory !== null &&
@@ -27,14 +26,14 @@ allProducts.forEach(product => {
             ? [product.offer]
             : [];
 
-    offers.forEach(offer => {
-        if (!offer || !offer.isActive) return;
-
-        productOffers.push({
-            ...product,
-            offer
-        });
-    });
+   offers.forEach(offer => { 
+    if (!offer || !isOfferActiveByDate(offer)) return; 
+ 
+    productOffers.push({ 
+        ...product, 
+        offer 
+    }); 
+});
 });
 
 const categoryOffers = [];
@@ -46,14 +45,14 @@ allCategories.forEach(category => {
             ? [category.offer]
             : [];
 
-    offers.forEach(offer => {
-        if (!offer) return;
-
-        categoryOffers.push({
-            ...category,
-            offer
-        });
-    });
+    offers.forEach(offer => { 
+    if (!offer || !isOfferActiveByDate(offer)) return; 
+ 
+    categoryOffers.push({ 
+        ...category, 
+        offer 
+    }); 
+});
 });
 
     return {allProducts,
@@ -145,12 +144,18 @@ export const applyProductOffer = async (productId,discountValue,startDate,expiry
         return !hasOverlap;
     });
 
+    const offerStartDate = new Date(startDate);
+    offerStartDate.setHours(0, 0, 0, 0);
+
+    const offerExpiryDate = new Date(expiryDate);
+    offerExpiryDate.setHours(23, 59, 59, 999);
+
     const offerData = {
         discountValue: numericDiscount,
         isActive: true,
         offerType: "Percentage",
-        startDate: new Date(startDate),
-        expiryDate: new Date(expiryDate)
+        startDate: offerStartDate,
+        expiryDate: offerExpiryDate
     };
 
     const updatedOffers = [
@@ -251,12 +256,18 @@ export const applyCategoryOffer = async (
         );
     }
 
+    const offerStartDate = new Date(startDate);
+    offerStartDate.setHours(0, 0, 0, 0);
+
+    const offerExpiryDate = new Date(expiryDate);
+     offerExpiryDate.setHours(23, 59, 59, 999);
+
     const offerData = {
         discountValue: numericDiscount,
         isActive: true,
         offerType: "Percentage",
-        startDate: new Date(startDate),
-        expiryDate: new Date(expiryDate)
+        startDate: offerStartDate,
+        expiryDate: offerExpiryDate
     };
 
     for (const category of targetSubCategories) {
