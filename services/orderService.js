@@ -3,80 +3,54 @@ import * as ProductRepo from '../repositories/productRepository.js';
 import * as ReturnRepo from '../repositories/returnRepository.js';
 import * as UserRepo from '../repositories/userRepository.js';
 import * as WalletRepo from '../repositories/walletRepository.js';
+import * as CouponRepo from '../repositories/couponRepository.js';
 import mongoose from 'mongoose';
 import { generateOrderID } from '../utils/idGenerator.js';
-import { isOfferActiveByDate } from '../utils/dateHelper.js';
+import { attachOfferPricing } from './productService.js';
 
 
 export const calculatePricing = async (items) => {
-    const itemsWithSubtotals = await Promise.all(items.map(async (item) => {
-        const product = typeof item.productId === 'object' && item.productId !== null
-            ? item.productId
-            : await ProductRepo.findProductById(item.productId);
+    const itemsWithSubtotals = await Promise.all(
+        items.map(async (item) => {
+            const product = typeof item.productId === 'object' && item.productId !== null
+                    ? item.productId
+                    : await ProductRepo.findProductById(item.productId);
 
-        const regularPrice = Number(product?.regularPrice || item.price) || 0;
-        let productDiscountAmt = 0;
-        let categoryDiscountAmt = 0;
-
-        if (product) {
-            if (isOfferActiveByDate(product.offer)) {
-                const val = parseFloat(product.offer.discountValue) || 0;
-                const offerType = String(product.offer.offerType || '').trim().toLowerCase();
-                productDiscountAmt = offerType === 'percentage' 
-                    ? regularPrice * (val / 100) 
-                    : val;
+            if (!product) {
+                return {
+                    ...item,
+                    price: 0,
+                    itemSubtotal: 0
+                };
             }
 
-            const categoryId = product.Category?._id || product.Category;
-            if (categoryId) {
-                const category = await mongoose.model('Category').findById(categoryId).populate('parentCategory');
-                
-                if (category) {
-                    if (isOfferActiveByDate(category.offer)) {
-                        const catVal = parseFloat(category.offer.discountValue) || 0;
-                        const catType = String(category.offer.offerType || '').trim().toLowerCase();
-                        const catDiscountAmt = catType === 'percentage' 
-                            ? regularPrice * (catVal / 100) 
-                            : catVal;
-                        
-                        if (catDiscountAmt > categoryDiscountAmt) {
-                            categoryDiscountAmt = catDiscountAmt;
-                        }
-                    }
+            const pricedProduct = await attachOfferPricing(product);
+            const effectivePrice = Number(pricedProduct.salePrice) || 0;
+            const qty = Number(item.quantity) || 1;
 
-                    const parentCat = category.parentCategory;
-                    if (isOfferActiveByDate(parentCat?.offer)) {
-                        const parentVal = parseFloat(parentCat.offer.discountValue) || 0;
-                        const parentType = String(parentCat.offer.offerType || '').trim().toLowerCase();
-                        const parentDiscountAmt = parentType === 'percentage' 
-                            ? regularPrice * (parentVal / 100) 
-                            : parentVal;
-                        
-                        if (parentDiscountAmt > categoryDiscountAmt) {
-                            categoryDiscountAmt = parentDiscountAmt;
-                        }
-                    }
-                }
-            }
-        }
+            return {
+                ...item,
+                regularPrice: pricedProduct.regularPrice,
+                price: effectivePrice,
+                discountAmount: pricedProduct.discountAmount,
+                effectiveDiscount: pricedProduct.effectiveDiscount,
+                hasOffer: pricedProduct.hasOffer,
+                itemSubtotal: effectivePrice * qty
+            };
+        })
+    );
 
-        const maxDiscountAmount = Math.max(productDiscountAmt, categoryDiscountAmt);
-        const effectivePrice = Math.max(0, regularPrice - maxDiscountAmount);
-        const qty = Number(item.quantity) || 1;
+    const subtotal = itemsWithSubtotals.reduce(
+        (sum, item) => sum + item.itemSubtotal,
+        0
+    );
 
-        return {
-            ...item,
-            price: Math.round(effectivePrice),
-            itemSubtotal: Math.round(effectivePrice) * qty
-        };
-    }));
-
-    const subtotal = itemsWithSubtotals.reduce((sum, item) => sum + item.itemSubtotal, 0);
     const tax = Math.floor(subtotal * 0.10);
-    
+
     return {
-        items: itemsWithSubtotals, 
-        summary: {            
+        items: itemsWithSubtotals,
+
+        summary: {
             subtotal,
             tax,
             total: subtotal + tax,
@@ -107,7 +81,7 @@ export const getCheckoutPageData = async (userId) => {
     return { cart: updatedCart, addresses: user?.addresses || [] };
 };
 
-export const processCheckout = async (userId, orderData, isDirect = false) => {
+export const processCheckout = async (userId, orderData, isDirect = false,couponCode=null) => {
     
     const sanitize = (val) => {
         const num = parseFloat(val);
@@ -144,6 +118,7 @@ export const processCheckout = async (userId, orderData, isDirect = false) => {
         subtotal, tax, discount, 
         total: calculatedTotal,
         finalAmount: calculatedTotal,
+        couponCode: couponCode,
         orderId: generateOrderID(),
         expectedDeliveryDate: edd
     };
@@ -263,67 +238,48 @@ export const cancelUserOrder = async (orderId, userId) => {
     }
 };
 
-export const getDirectProductDetails = async (productId, variantId, size, quantity, colorInput) => {
+export const getDirectProductDetails = async (
+    productId,
+    variantId,
+    size,
+    quantity,
+    colorInput
+) => {
     const objId = new mongoose.Types.ObjectId(productId);
-    
+
     const product = await ProductRepo.findProductById(objId);
-    if (!product) throw new Error(`Product not found for ID: ${productId}`);
 
-    const variant = product.variants.find(v => v._id.toString() === variantId.toString());
-    if (!variant) throw new Error("Variant not found");
-    
-    const color = colorInput || variant.colorName || variant.color || '';
-    const regularPrice = Number(product.regularPrice) || 0;
-
-    let productDiscountAmt = 0;
-    let categoryDiscountAmt = 0;
-
-    if (isOfferActiveByDate(product.offer)) {
-        const val = parseFloat(product.offer.discountValue) || 0;
-        const offerType = String(product.offer.offerType || '').trim().toLowerCase();
-        
-        productDiscountAmt = offerType === 'percentage' 
-            ? regularPrice * (val / 100) 
-            : val;
+    if (!product) {
+        throw new Error(`Product not found for ID: ${productId}`);
     }
 
-    if (product.Category) {
-        const category = await mongoose.model('Category').findById(product.Category).populate('parentCategory');
-        
-        if (category) {
-            if (isOfferActiveByDate(category.offer)) {
-                const catVal = parseFloat(category.offer.discountValue) || 0;
-                const catType = String(category.offer.offerType || '').trim().toLowerCase();
-                
-                const calculatedCatDiscount = catType === 'percentage' 
-                    ? regularPrice * (catVal / 100) 
-                    : catVal;
-                
-                if (calculatedCatDiscount > categoryDiscountAmt) {
-                    categoryDiscountAmt = calculatedCatDiscount;
-                }
-            }
+    const variant = product.variants.find(
+        v => v._id.toString() === variantId.toString()
+    );
 
-            const parentCat = category.parentCategory;
-            if (isOfferActiveByDate(parentCat?.offer)) {
-                const parentVal = parseFloat(parentCat.offer.discountValue) || 0;
-                const parentType = String(parentCat.offer.offerType || '').trim().toLowerCase();
-                
-                const calculatedParentDiscount = parentType === 'percentage' 
-                    ? regularPrice * (parentVal / 100) 
-                    : parentVal;
-                
-                if (calculatedParentDiscount > categoryDiscountAmt) {
-                    categoryDiscountAmt = calculatedParentDiscount;
-                }
-            }
-        }
+    if (!variant) {
+        throw new Error("Variant not found");
     }
 
-    const maxDiscountAmount = Math.max(productDiscountAmt, categoryDiscountAmt);
+    const sizeObj = variant.sizes.find(
+        s => Number(s.size) === Number(size)
+    );
 
-    const finalPrice = Math.max(0, regularPrice - maxDiscountAmount);
-    const qty = Number(quantity);
+    if (!sizeObj) {
+        throw new Error("Size not found");
+    }
+
+    const color =
+        colorInput ||
+        variant.colorName ||
+        variant.color ||
+        '';
+
+    const pricedProduct = await attachOfferPricing(product);
+
+    const price = Number(pricedProduct.salePrice) || 0;
+
+    const qty = Number(quantity) || 1;
 
     return {
         productId: product,
@@ -331,8 +287,18 @@ export const getDirectProductDetails = async (productId, variantId, size, quanti
         size,
         color,
         quantity: qty,
-        price: Math.round(finalPrice),
-        itemSubtotal: Math.round(finalPrice) * qty 
+
+        regularPrice: pricedProduct.regularPrice,
+
+        price,
+
+        discountAmount: pricedProduct.discountAmount,
+
+        effectiveDiscount: pricedProduct.effectiveDiscount,
+
+        hasOffer: pricedProduct.hasOffer,
+
+        itemSubtotal: price * qty
     };
 };
 
@@ -354,15 +320,11 @@ export const getUserOrderDetails = async (orderId, userId) => {
     const returnsList = await ReturnRepo.findAllReturnsForOrder(order.orderId);
     const returnRequest = returnsList.length > 0 ? returnsList[0] : null;
 
-    let displayStatus = order.status; 
-    if (returnRequest && returnRequest.status !== 'Rejected' && returnRequest.status !== 'CancelledByAdmin') {
-        displayStatus = `Return ${returnRequest.status}`;
-    } 
-
     const activeItemsForCalc = order.items.filter(i => (i.status || '').toLowerCase() !== 'cancelled');
     const calculatedOriginalSubtotal = activeItemsForCalc.reduce((sum, i) => sum + ((i.price || 0) * (Number(i.quantity) || 1)), 0);
     const orderSubtotal = calculatedOriginalSubtotal > 0 ? calculatedOriginalSubtotal : (Number(order.subtotal) || 1); 
     const orderDiscount = Number(order.discount) || 0;
+    const orderShippingCharge = Number(order.shippingCharge) || 0;
 
     const updatedItems = order.items.map(item => {
         let itemReturnStatus = (item.status && item.status.length < 24) ? item.status : (order.status || 'Placed');        
@@ -398,15 +360,14 @@ export const getUserOrderDetails = async (orderId, userId) => {
             isReturned = true;
         }
 
-        const itemSubtotal = (item.price || 0) * (Number(item.quantity) || 1);
+        const rawItemSubtotal = (item.price || 0) * (Number(item.quantity) || 1);
         
-        const itemTaxShare = itemSubtotal * 0.10;
-        
-        const priceWithTaxBeforeDiscount = itemSubtotal + itemTaxShare;
+        const itemTaxShare = rawItemSubtotal * 0.10;
+        const priceWithTaxBeforeDiscount = rawItemSubtotal + itemTaxShare;
 
         let itemDiscountShare = 0;
         if (orderSubtotal > 0 && orderDiscount > 0) {
-            const proportion = itemSubtotal / orderSubtotal;
+            const proportion = rawItemSubtotal / orderSubtotal;
             itemDiscountShare = Number((orderDiscount * proportion).toFixed(2));
         }
 
@@ -415,6 +376,7 @@ export const getUserOrderDetails = async (orderId, userId) => {
 
         return {
             ...item,
+            basePrice: Number(rawItemSubtotal.toFixed(2)),  
             itemSubtotal: Number(priceWithTaxBeforeDiscount.toFixed(2)),
             itemDiscount: itemDiscountShare, 
             itemReturnStatus,
@@ -425,9 +387,59 @@ export const getUserOrderDetails = async (orderId, userId) => {
         };
     });
 
+    const activeItems = updatedItems.filter(item => {
+        const statusLower = (item.status || '').toLowerCase();
+        return statusLower !== 'cancelled' && !item.isReturned;
+    });
+
+    const isOrderFullyInactive = activeItems.length === 0;
+
+    const finalSubtotal = isOrderFullyInactive 
+        ? Number(order.subtotal || orderSubtotal) 
+        : Number(activeItems.reduce((sum, i) => sum + ((i.price || 0) * (Number(i.quantity) || 1)), 0).toFixed(2));
+
+    const finalTax = isOrderFullyInactive 
+        ? Number(order.tax || (finalSubtotal * 0.10).toFixed(2)) 
+        : Number((finalSubtotal * 0.10).toFixed(2));
+
+    const finalDiscount = isOrderFullyInactive 
+        ? orderDiscount 
+        : Number(activeItems.reduce((sum, i) => {
+            const itemSub = (i.price || 0) * (Number(i.quantity) || 1);
+            if (orderSubtotal > 0 && orderDiscount > 0) {
+                return sum + (orderDiscount * (itemSub / orderSubtotal));
+            }
+            return sum;
+        }, 0).toFixed(2));
+
+    const finalAmount = isOrderFullyInactive 
+        ? Number(order.finalAmount || order.total || ((finalSubtotal - finalDiscount) + finalTax + orderShippingCharge).toFixed(2))
+        : Math.max(0, Number(((finalSubtotal - finalDiscount) + finalTax + orderShippingCharge).toFixed(2)));
+
+    const totalItemsCount = order.items.length;
+    const returnedCount = updatedItems.filter(i => i.isReturned || ['returned', 'refunded'].includes((i.status || '').toLowerCase())).length;
+    const cancelledCount = updatedItems.filter(i => (i.status || '').toLowerCase() === 'cancelled').length;
+
+    let displayStatus = order.status;
+    if (returnRequest && returnRequest.status !== 'Rejected' && returnRequest.status !== 'CancelledByAdmin') {
+        displayStatus = `Return ${returnRequest.status}`;
+    } else if (returnedCount === totalItemsCount && totalItemsCount > 0) {
+        displayStatus = 'Returned';
+    } else if (returnedCount > 0) {
+        displayStatus = 'Partially Returned';
+    } else if (cancelledCount === totalItemsCount && totalItemsCount > 0) {
+        displayStatus = 'Cancelled';
+    } else if (cancelledCount > 0) {
+        displayStatus = 'Partially Cancelled';
+    }
+
     return {
         ...order,
-        subtotal: orderSubtotal,
+        subtotal: finalSubtotal,
+        tax: finalTax,
+        discount: finalDiscount,
+        finalAmount: finalAmount,
+        total: finalAmount,
         items: updatedItems,
         displayStatus,
         returnRequest,
@@ -553,8 +565,23 @@ const calculateEDD = (days = 5) => {
     return date;
 };
 
-export const updatePaymentStatus = async (orderId, paymentId, status) => {
-    return await OrderRepo.updatePaymentStatus(orderId, paymentId, status);
+export const updatePaymentStatus = async (orderId, paymentId, status, sessionCouponCode = null) => {
+    const updateOrder = await OrderRepo.updatePaymentStatus(orderId, paymentId, status);
+
+    const activeCouponCode = updateOrder?.couponCode || sessionCouponCode;
+
+    console.log("DEBUG: Updated Order Object ->", updateOrder);
+    console.log("DEBUG: Coupon Code Found ->", activeCouponCode);
+
+    if (updateOrder && status.toLowerCase() === 'placed' && activeCouponCode) {
+        const coupon = await CouponRepo.findByCode(activeCouponCode);
+        console.log("DEBUG: Matched Coupon ->", coupon);
+        if (coupon) {
+            await CouponRepo.decrementUseCount(coupon._id);
+            console.log("DEBUG: Coupon count successfully decremented.");
+        }
+    }
+    return updateOrder;
 };
 
 export const getSelectedAddress = async (userId, addressId) => {

@@ -12,20 +12,8 @@ export const getBrandsPageData = async (queryParameters) => {
         filter.name = { $regex: searchQuery, $options: 'i' };
     }
 
-    let totalBrands = await brandRepo.countBrands(filter);
-    let rawBrands = await brandRepo.findBrands(filter, skip, limit);
-
-    if (totalBrands === 0 && !searchQuery) { 
-        const uniqueBrandNames = await brandRepo.findUniqueProductBrands();
-        
-        for (const brandName of uniqueBrandNames) {
-            if (!brandName) continue;
-            await brandRepo.ensureBrandExists(brandName);
-        }
-
-        totalBrands = await brandRepo.countBrands(filter);
-        rawBrands = await brandRepo.findBrands(filter, skip, limit);
-    }
+    const totalBrands = await brandRepo.countBrands(filter);
+    const rawBrands = await brandRepo.findBrands(filter, skip, limit);
 
     const brands = await Promise.all(rawBrands.map(async (brandDoc) => {
         const brand = typeof brandDoc.toObject === 'function' ? brandDoc.toObject() : brandDoc;
@@ -40,15 +28,13 @@ export const getBrandsPageData = async (queryParameters) => {
             name: brand.name,
             description: brand.description || 'No description provided.',
             logo: brand.logo || 'default-logo.png',
-    
             isListed: Boolean(brand.isListed), 
-            
             listedProductCount: listedProducts,
             unlistedProductCount: unlistedProducts
         };
     }));
 
-    const totalPages = Math.ceil(totalBrands / limit);
+    const totalPages = Math.ceil(totalBrands / limit) || 1;
 
     return {
         brands,

@@ -103,20 +103,30 @@ const transporter = nodemailer.createTransport({
 
 
 export const sendOTP = async (email) => {
-       const user = await userRepo.findByEmail(email);
-       if (!user) throw new Error("No account found with this email address.");
+    console.log("1. sendOTP service started with raw email:", email);
+    
+    const cleanEmail = email ? email.trim().toLowerCase() : '';
+    console.log("2. Normalized email for search:", cleanEmail);
+    
+    const user = await userRepo.findByEmail(cleanEmail);
+    console.log("3. Database user lookup result:", user ? "User found!" : "User NOT found!");
+
+    if (!user) {
+        throw new Error("No account found with this email address.");
+    }
 
     const otp = generateOTP();
-    await userRepo.saveOTP(email, otp); 
+    console.log("4. Generated OTP, about to save to DB:", otp);
+
+    await userRepo.saveOTP(cleanEmail, otp); 
  
     console.log(`\n=========================================`);
-    console.log(` OTP for ${email} is [ ${otp} ]`);
+    console.log(` OTP for ${cleanEmail} is [ ${otp} ]`);
     console.log(`=========================================\n`);
 
-    await sendOtpEmail(email, otp);
+    await sendOtpEmail(cleanEmail, otp);
     return otp; 
 };
-
 
 
 export const sendSignupOTP = async (email) => {
@@ -128,40 +138,56 @@ export const sendSignupOTP = async (email) => {
 };
 
 export const verifyOTP = async (email, otp) => {
-    const user = await userRepo.findByEmail(email);
+    const cleanEmail = email ? email.trim().toLowerCase() : '';
     
-    if (!user || !user.otp) {
-        throw new Error("Invalid or expired OTP.");
+    if (!cleanEmail) {
+        throw new Error("Session expired. Please request a new OTP.");
     }
 
-    if (Date.now() > user.otpExpiry) {
-        await userRepo.clearOTP(email);
+    const user = await userRepo.findByEmail(cleanEmail);
+
+    if (!user) {
+        throw new Error("User not found.");
+    }
+
+    if (user.otpExpiry && Date.now() > new Date(user.otpExpiry).getTime()) {
+        await userRepo.clearOTP(cleanEmail); 
         throw new Error("OTP has expired.");
     }
 
-    if (user.otp !== otp) {
-        throw new Error('Invalid OTP code.');
+    if (!user.otp || !user.otpExpiry) {
+        throw new Error("Please request a new one");
     }
 
-    await userRepo.clearOTP(email); 
+    if (String(user.otp).trim() !== String(otp).trim()) {
+        throw new Error("Invalid OTP code.");
+    }
+ 
     return true;
 };
 
-export const changePasswordWithOld = async (email, oldPassword, newPassword) => {
+
+export const changePasswordWithOld = async (email, newPassword) => {
+
+    const cleanEmail = email ? email.trim().toLowerCase() : '';
+    if (!cleanEmail) {
+        throw new Error("Email is required for password change.");
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!newPassword || !passwordRegex.test(newPassword)) {
+        throw new Error("Must be 8+ chars with uppercase, lowercase, number, and symbol.");
+    }
+
     const user = await userRepo.findByEmailWithPassword(email);
     if (!user) {
         throw new Error("User not found");
     }
 
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch) {
-        throw new Error("Incorrect old password");
-    }
-
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-    return await userRepo.updateUser(email, { password: hashedPassword });
+    return await userRepo.updateUser(cleanEmail, { password: hashedPassword });
 };
 
 export const verifySignupSession = (session, submittedOtp) => {
@@ -178,20 +204,38 @@ export const verifySignupSession = (session, submittedOtp) => {
 };
 
 
-export const resetPassword = async (email, newPassword) => {
+export const resetPassword = async (email, otp, newPassword) => {
+    const cleanEmail = email ? email.trim().toLowerCase() : '';
+    
+    const user = await userRepo.findByEmail(cleanEmail);
+    if (!user) {
+        throw new Error("User not found.");
+    }
+
+    if (String(user.otp).trim() !== String(otp).trim()) {
+        throw new Error("Invalid OTP code.");
+    }
+
     if (!newPassword) {
         throw new Error("Password is required for hashing");
+    }
+    
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+        throw new Error("Must be 8+ chars with uppercase, lowercase, number, and symbol.");
     }
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-    const updatedUser = await userRepo.updateUser(email, { password: hashedPassword });
+    const updatedUser = await userRepo.updateUser(cleanEmail, { password: hashedPassword });
 
     if (!updatedUser) {
         throw new Error("User not found during password reset");
     }
     
+    await userRepo.clearOTP(cleanEmail);
+
     return updatedUser;
 };
 
@@ -211,8 +255,11 @@ export const updateProfile = async (userId, data) => {
     const { fullName, phoneNumber } = data;
     const errors = {};
 
-    if (!fullName || fullName.trim() === "") {
+    const fullNameValue = /^[A-Za-z\s]+$/;
+    if (!fullName) {
         errors.fullName = "*Full Name is required";
+    }else if(!fullNameValue.test(fullName)){
+        errors.fullName = "FullName should contain only letters and space.";
     }
 
     const phoneStr = phoneNumber ? phoneNumber.toString().trim() : "";
@@ -243,18 +290,48 @@ export const addAddress = async (userId, addressData) => {
 
     const errors = {};
 
-    if (!fullName?.trim()) errors.fullName = "*Full Name is required";
-    if (!phone?.trim()) errors.phone = "*Mobile Number is required";
-    if (!street?.trim()) errors.street = "*Address Line 1 is required";
-    if (!city?.trim()) errors.city = "*City is required";
-    if (!state?.trim()) errors.state = "*State is required";
-    if (!pincode?.trim()) errors.pincode = "*Pincode is required";
-
-    if (phone?.trim() && !/^\d{10}$/.test(phone.trim())) {
-        errors.phone = "Phone number must be 10 digits";
+    const fullNameValue = /^[A-Za-z\s]+$/;
+    if (!fullName?.trim()){
+      errors.fullName = "*Full Name is required";
+    }else if(!fullNameValue.test(fullName)){
+        errors.fullName = "FullName should contain only letters and space.";
+    } 
+        
+    const streetValue = /^[A-Za-z\s]+$/;
+    if (!street?.trim()){
+        errors.street = "*Address Line 1 is required";
+    } else if(!streetValue.test(street)){
+        errors.street = "*Please Enter a valid Address.";
+    }
+ 
+    const cityValue = /^[A-Za-z\s]+$/;
+    if (!city?.trim()){
+        errors.city = "*City is required";
+    } else if (!cityValue.test(city)){
+        errors.city = "Should contain only Letters and space"
     }
 
-    if (pincode?.trim() && !/^\d{6}$/.test(pincode.trim())) {
+    const stateValue = /^[A-Za-z\s]+$/;
+    if (!state?.trim()){
+       errors.state = "*State is required";
+    } else if(!stateValue.test(state)){
+        errors.state = "Should contain only letter and space."
+    }
+   
+    const phoneValue = /^\d{10}$/;
+    const cleanPhone = phone?.toString().replace(/[\s-]/g, "") || "";
+
+    if (!cleanPhone) {
+       errors.phone = "*Phone Number is required";
+    } else if (!phoneValue.test(cleanPhone)) {
+       errors.phone = "Should contain 10 digits";
+    }
+
+    const pincodeValue = /^\d{6}$/;
+
+    if (!pincode?.toString().trim()) {
+        errors.pincode = "*Pincode is required";
+    } else if (!pincodeValue.test(pincode)) {
         errors.pincode = "Pincode must be 6 digits";
     }
 
@@ -323,33 +400,48 @@ export const editAddress = async (
 
     const errors = {};
 
-    if (!fullName?.trim()) {
-        errors.fullName = "Full Name is required";
+   const fullNameValue = /^[A-Za-z\s]+$/;
+    if (!fullName?.trim()){
+      errors.fullName = "*Full Name is required";
+    }else if(!fullNameValue.test(fullName)){
+        errors.fullName = "FullName should contain only letters and space.";
     }
 
-    const phoneStr = phone?.trim();
+    const phoneValue = /^\d{10}$/;
+    const cleanPhone = phone?.toString().replace(/[\s-]/g, "") || "";
 
-    if (!phoneStr) {
-        errors.phone = "*Mobile Number is required";
-    } else if (!/^\d{10}$/.test(phoneStr)) {
-        errors.phone = "Phone number must be exactly 10 digits and contain only numbers";
-    }  
+    if (!cleanPhone) {
+       errors.phone = "*Phone Number is required";
+    } else if (!phoneValue.test(cleanPhone)) {
+       errors.phone = "Should contain 10 digits";
+    }
+ 
 
-    if (!street?.trim()) {
-        errors.street = "Address Line 1 is required";
+    const streetValue = /^[A-Za-z\s]+$/;
+    if (!street?.trim()){
+        errors.street = "*Address Line 1 is required";
+    } else if(!streetValue.test(street)){
+        errors.street = "*Please Enter a valid Address.";
     }
 
-    if (!city?.trim()) {
-        errors.city = "City is required";
+    const cityValue = /^[A-Za-z\s]+$/;
+    if (!city?.trim()){
+        errors.city = "*City is required";
+    } else if (!cityValue.test(city)){
+        errors.city = "Should contain only Letters and space"
     }
 
-    if (!state?.trim()) {
-        errors.state = "State is required";
+    const stateValue = /^[A-Za-z\s]+$/;
+    if (!state?.trim()){
+       errors.state = "*State is required";
+    } else if(!stateValue.test(state)){
+        errors.state = "Should contain only letter and space."
     }
 
-    if (!pincode?.trim()) {
-        errors.pincode = "Pincode is required";
-    } else if (!/^\d{6}$/.test(pincode.trim())) {
+    const pincodeValue = /^\d{6}$/;
+    if (!pincode?.toString().trim()) {
+        errors.pincode = "*Pincode is required";
+    } else if (!pincodeValue.test(pincode)) {
         errors.pincode = "Pincode must be 6 digits";
     }
 
@@ -545,13 +637,22 @@ export const deleteAddressService = async (userId, addressId) => {
 
 export const changeEmailService = async (userId, currentEmail, newEmail) => {
     if (!newEmail || !newEmail.trim()) {
-        throw new Error("New email is required.");
+        const error = new Error("New email is required.");
+        error.isValidation = true;
+        throw error;
     }
 
     const sanitizedEmail = newEmail.trim().toLowerCase();
 
     if (sanitizedEmail === currentEmail.toLowerCase()) {
         const error = new Error("New email must be different from your current one.");
+        error.isValidation = true;
+        throw error;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(sanitizedEmail)) {
+        const error = new Error("Please enter a valid email address.");
         error.isValidation = true;
         throw error;
     }
@@ -563,7 +664,64 @@ export const changeEmailService = async (userId, currentEmail, newEmail) => {
         throw error;
     }
 
-    return await userRepo.updateUserInfo(userId, { email: sanitizedEmail });
+    const otp = generateOTP();
+    await userRepo.saveEmailChangeOTP(userId, sanitizedEmail, otp);
+    
+    await sendOtpEmail(sanitizedEmail, otp);
+
+    return otp;
+};
+
+export const verifyEmailChangeOTP = async (userId, submittedOtp) => {
+    const user = await userRepo.findById(userId);
+    
+    if (!user || !user.otp) {
+        const error = new Error("Session expired. Please request a new OTP.");
+        error.isValidation = true;
+        error.otpExpiryTime = user?.otpExpiry ? new Date(user.otpExpiry).getTime() : Date.now();
+        throw error;
+    }
+
+    if (user.otpExpiry && Date.now() > new Date(user.otpExpiry).getTime()) {
+        const expiryTime = new Date(user.otpExpiry).getTime();
+        await userRepo.clearEmailChangeOTP(userId); 
+        const error = new Error("OTP has expired.");
+        error.isValidation = true;
+        error.otpExpiryTime = expiryTime;
+        throw error;
+    }
+
+    if (String(user.otp).trim() !== String(submittedOtp).trim()) {
+        const error = new Error("Invalid OTP code.");
+        error.isValidation = true;
+        error.otpExpiryTime = new Date(user.otpExpiry).getTime();
+        throw error;
+    }
+
+    const newEmail = user.pendingEmail;
+
+    await userRepo.updateUserInfo(userId, { 
+        email: newEmail,
+        pendingEmail: null,
+        otp: null,
+        otpExpiry: null
+    });
+
+    return newEmail;
+};
+
+export const resendEmailChangeOTPService = async (userId, sessionPendingEmail) => {
+    const user = await userRepo.findById(userId);
+    
+    const targetEmail = user?.pendingEmail || sessionPendingEmail;
+    
+    if (!user || !targetEmail) {
+        throw new Error("No pending email change found.");
+    }
+    
+    await changeEmailService(userId, user.email, targetEmail);
+    
+    return targetEmail;
 };
 
 
@@ -578,7 +736,7 @@ export const validateSignupInitial = async (data) => {
         throw validationError;
     }
 
-    const nameRegex = /^[A-Za-z ]{3,50}$/;
+    const nameRegex = /^[A-Za-z ]{3,10}$/;
     
     if (!fullName || !fullName.trim()) {
         errors.fullName = "Full Name is required";
@@ -593,17 +751,19 @@ export const validateSignupInitial = async (data) => {
         errors.email = "Please enter a valid email address";
     }
 
-    const phoneStr = phoneNumber ? phoneNumber.toString().trim() : "";
-    if (!phoneStr) {
-        errors.phoneNumber = "Phone Number is required";
-    } else if (!/^\d{10}$/.test(phoneStr)) {
-        errors.phoneNumber = "Phone number must be exactly 10 digits";
+    const cleanPhone = phoneNumber?.toString().replace(/\D/g, "") || "";
+
+    if (!cleanPhone) {
+    errors.phoneNumber = "Phone Number is required";
+    } else if (cleanPhone.length !== 10) {
+    errors.phoneNumber = "Phone number must be exactly 10 digits";
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!password) {
         errors.password = "Password is required";
-    } else if (password.length < 6) {
-        errors.password = "Password must be at least 6 characters long";
+    } else if (!passwordRegex.test(password)) {
+        errors.password = "Must be 8+ chars with uppercase, lowercase, number, and symbol.";
     }
 
     if (password !== confirmPassword) {
@@ -621,8 +781,8 @@ export const validateSignupInitial = async (data) => {
         throw new Error('User already exists');
     }
 
-    if (phoneStr) {
-        const existingPhone = await userRepo.findByPhone(phoneStr);
+    if (cleanPhone) {
+        const existingPhone = await userRepo.findByPhone(cleanPhone);
         if (existingPhone) {
             throw new Error('Phone number already registered');
         }

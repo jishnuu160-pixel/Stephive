@@ -238,24 +238,51 @@ export const updateQuantity = async (userId, data) => {
 
 export const removeFromCart = async (userId, itemData) => {
     const cart = await cartRepo.findCartByUserId(userId);
-    if (!cart) return { totalUnitsCount: 0 };
+
+    if (!cart) {
+        return { totalUnitsCount: 0 };
+    }
+
+    const requestedProductId = itemData.productId?.toString();
+    const requestedVariantId = itemData.variantId?.toString();
+    const requestedSize = itemData.size?.toString().trim();
+    const requestedColor = itemData.color?.toString().trim().toLowerCase();
 
     cart.items = cart.items.filter(cartItem => {
-        const existingProductId = (cartItem.productId?._id ? cartItem.productId._id : cartItem.productId)?.toString();
-        const requestedProductId = itemData.productId.toString();
 
-        const existingSize = cartItem.size?.toString().trim();
-        const requestedSize = itemData.size?.toString().trim();
+        const existingProductId =
+            (cartItem.productId?._id
+                ? cartItem.productId._id
+                : cartItem.productId
+            )?.toString();
 
-        const isMatch = existingProductId === requestedProductId && existingSize === requestedSize;
-        
-        return !isMatch; 
+        const existingVariantId =
+            cartItem.variantId?.toString();
+
+        const existingSize =
+            cartItem.size?.toString().trim();
+
+        const existingColor =
+            cartItem.color?.toString().trim().toLowerCase();
+
+        const isMatch =
+            existingProductId === requestedProductId &&
+            existingVariantId === requestedVariantId &&
+            existingSize === requestedSize &&
+            existingColor === requestedColor;
+
+        return !isMatch;
     });
 
-    await cartRepo.updateCart(userId, { items: cart.items });
-    return { success: true, ...calculateCartTotals(cart.items) };
-};
+    await cartRepo.updateCart(userId, {
+        items: cart.items
+    });
 
+    return {
+        success: true,
+        ...calculateCartTotals(cart.items)
+    };
+};
 
 export const transferFromWishlist = async (userId, itemData) => {
     const product = await productRepo.findProductById(itemData.productId);

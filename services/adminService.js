@@ -1,4 +1,4 @@
-import adminRepo from '../repositories/adminRepository.js';
+import * as adminRepo from '../repositories/adminRepository.js';
 import * as OrderRepo from '../repositories/orderRepository.js';
 import * as returnRepo from '../repositories/returnRepository.js';
 import * as productRepo from "../repositories/productRepository.js";
@@ -6,14 +6,10 @@ import * as WalletRepo from "../repositories/walletRepository.js";
 import * as salesRepo from "../repositories/salesRepository.js";
 
 
-import Return from '../models/ReturnModel.js';
+import Return from '../models/returnModel.js';
 import bcrypt from 'bcrypt';
 
-export const login = async (
-   email,
-   password
-) => {
-
+export const login = async (email,password) => {
    const admin = await adminRepo.findAdminByEmail(email);
 
    if (!admin) {
@@ -25,90 +21,61 @@ export const login = async (
    if (!isMatch) {
       throw new Error("Incorrect password");
    }
-
    return admin;
 };
 
-export const getCustomers = async ( query, skip, limit) => {
 
+export const getCustomers = async ( query, skip, limit) => {
    return await adminRepo.findCustomers(
       query,
       skip,
       limit
    );
-
 };
+
 
 export const countCustomers = async (query) => {
    return await adminRepo.countCustomers(query);
 
 };
 
+
 export const cancelledOrder= async(query)=>{
     return await OrderRepo.cancelledOrder(query);
 };
 
+
 export const getCustomersPage = async (queryParams) => {
 
-   const search = queryParams.search || '';
-   const page = parseInt(queryParams.page) || 1;
-   const limit = 8;
-   const skip = (page - 1) * limit;
+    const search = queryParams.search || '';
+    const page = parseInt(queryParams.page) || 1;
+    const limit = 8;
+    const skip = (page - 1) * limit;
 
-   let query = {
-      isAdmin: { $ne: true }
-   };
+    const totalUsers = await adminRepo.countCustomers(search);
 
-   if (search) {
-      query.$and = [
-         { isAdmin: { $ne: true } },
-         {
-            $or: [
-               {
-                  fullName: {
-                     $regex: search,
-                     $options: 'i'
-                  }
-               },
-               {
-                  email: {
-                     $regex: search,
-                     $options: 'i'
-                  }
-               }
-            ]
-         }
-      ];
+    const customers = await adminRepo.findCustomers(
+        search,
+        skip,
+        limit
+    );
 
-   }
+    const totalPages = Math.max(1,Math.ceil(totalUsers / limit));
 
-   const totalUsers = await adminRepo.countCustomers(query);
-
-   const customers =await adminRepo.findCustomers(
-         query,
-         skip,
-         limit
-      );
-
-   const totalPages = Math.max(
-         1,
-         Math.ceil(totalUsers / limit)
-      );
-
-   return {
-      isAdmin: true,
-      title: 'Customer Management',
-      activePage: 'customers',
-      startIndex: skip,
-      users: customers,
-      currentPage: page,
-      totalPages,
-      hasNextPage: page < totalPages,
-      hasPrevPage: page > 1,
-      nextPage: page + 1,
-      prevPage: page - 1,
-      searchQuery: search
-   };
+    return {
+        isAdmin: true,
+        title: 'Customer Management',
+        activePage: 'customers',
+        startIndex: skip,
+        users: customers,
+        currentPage: page,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        nextPage: page + 1,
+        prevPage: page - 1,
+        searchQuery: search
+    };
 };
 
 export const toggleUserStatus = async (userId) => {
@@ -167,7 +134,7 @@ export const getOrderById = async (orderId) => {
 
 
 export const updateOrderStatus = async (orderId, newStatus) => {
-    const validStatuses = ['Processing', 'Shipped', 'Out of delivery', 'Delivered', 'Cancelled'];
+    const validStatuses = ['Pending','Placed','Processing', 'Shipped', 'Out of delivery', 'Delivered', 'Cancelled'];
     const order = await OrderRepo.findOrderById(orderId);
     
     if (!order) throw new Error("Order not found");
@@ -180,7 +147,7 @@ export const updateOrderStatus = async (orderId, newStatus) => {
     }  
 
     const currentOrderStatus = order.status ? order.status.trim().toLowerCase() : '';
-    const linearSequence = ['processing', 'shipped', 'out of delivery', 'delivered'];
+    const linearSequence = ['placed','processing', 'shipped', 'out of delivery', 'delivered'];
 
     if (currentOrderStatus === normalizedNewStatus) {
         throw new Error(`Order is already in "${newStatus}" status.`);
@@ -191,6 +158,10 @@ export const updateOrderStatus = async (orderId, newStatus) => {
     }
 
     if (normalizedNewStatus === 'cancelled') {
+        if(currentOrderStatus === 'pending'){
+            throw new Error("Cannot cancel an order while the status is pending");
+        }
+
         if (currentOrderStatus === 'delivered') {
             throw new Error("Cannot cancel an order that has already been delivered.");
         }
@@ -323,8 +294,13 @@ export const changeReturnStatus = async (returnId, newStatus) => {
             await returnRepo.updateSpecificOrderItemStatus(
                 updatedReturn.orderId, 
                 updatedReturn.itemId, 
-                'Returned'
+                'refunded'
             );
+
+            const orderDoc = await OrderRepo.findByCustomOrderId(updatedReturn.orderId);
+            if (orderDoc) {
+                await OrderRepo.updateOrderStatusBasedOnItems(orderDoc._id);
+            }
         } 
         else if (normalizedNewStatus === "Rejected") {
             await returnRepo.updateSpecificOrderItemStatus(
@@ -342,6 +318,7 @@ export const changeReturnStatus = async (returnId, newStatus) => {
         throw error;
     }
 };
+
 
 export const getDashboardMetrics = async () => {
     const totalOrders = await OrderRepo.countActiveOrders();

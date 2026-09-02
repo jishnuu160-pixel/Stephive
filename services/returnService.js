@@ -118,6 +118,7 @@ export const processReturnRequest = async (userId, orderId, body) => {
     return savedReturn;
 };
 
+
 export const getReturnDetailsById = async (returnId) => {
     const returnData = await ReturnRepo.findReturnById(returnId);
     
@@ -127,10 +128,12 @@ export const getReturnDetailsById = async (returnId) => {
     return returnData;
 };
 
+
 export const checkIfReturnExists = async (orderIdString, itemId) => {
     const existing = await ReturnRepo.findByOrderId(orderIdString, itemId);
     return !!existing;
 };
+
 
 export const getAllReturnsPaginated = async (page = 1, limit = 10, searchQuery = '') => {
     const pageNumber = parseInt(page, 10) || 1;
@@ -182,6 +185,7 @@ export const getReturnFormByIdService = async (userId, formId) => {
         throw error;
     }
 };
+
 
 export const editReturnFormCheckout = async (userId, formId, updateData) => {
     try {

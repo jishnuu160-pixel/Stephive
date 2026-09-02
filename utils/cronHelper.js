@@ -41,11 +41,14 @@ export const initOfferExpiryCron = () => {
                 },
                 { 
                     $set: { 
-                        "offer.isActive": false, 
-                        "offer.discountValue": 0,
-                        "offer.startDate": null,
-                        "offer.expiryDate": null
+                        "offer.$[elem].isActive": false, 
+                        "offer.$[elem].discountValue": 0,
+                        "offer.$[elem].startDate": null,
+                        "offer.$[elem].expiryDate": null
                     } 
+                },
+                {
+                    arrayFilters: [{ "elem.isActive": true, "elem.expiryDate": { $lt: now } }]
                 }
             );
 
@@ -60,11 +63,14 @@ export const initOfferExpiryCron = () => {
                 },
                 { 
                     $set: { 
-                        "offer.isActive": false, 
-                        "offer.discountValue": 0,
-                        "offer.startDate": null,
-                        "offer.expiryDate": null
+                        "offer.$[elem].isActive": false, 
+                        "offer.$[elem].discountValue": 0,
+                        "offer.$[elem].startDate": null,
+                        "offer.$[elem].expiryDate": null
                     } 
+                },
+                {
+                    arrayFilters: [{ "elem.isActive": true, "elem.expiryDate": { $lt: now } }]
                 }
             );
 

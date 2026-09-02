@@ -1,12 +1,7 @@
 import * as productRepo from '../repositories/productRepository.js';
 import * as brandRepo from '../repositories/brandRepository.js';
 import { isOfferActiveByDate } from '../utils/dateHelper.js';
-import {
-    findParentCategory,
-    findAllCategories,
-    findParentCategories,
-    findSubCategoriesByParent
-} from '../repositories/categoryRepository.js';
+import {findParentCategory,findAllCategories,findParentCategories,findSubCategoriesByParent} from '../repositories/categoryRepository.js';
 import mongoose from 'mongoose';
 import cloudinary from '../config/cloudinary.js'; 
 
@@ -56,60 +51,165 @@ const validateUploadedFile = (file) => {
 /* ---------------- SHOP PAGE ---------------- */
 
 export const attachOfferPricing = async (productDoc) => {
-    const product = typeof productDoc.toObject === 'function' ? productDoc.toObject() : { ...productDoc };
-    
+    const product = typeof productDoc.toObject === 'function'
+            ? productDoc.toObject()
+            : { ...productDoc };
+
     const regularPrice = Number(product.regularPrice) || 0;
+
     let productDiscountAmt = 0;
+    let productDiscountPct = 0;
+
     let categoryDiscountAmt = 0;
-    let productDiscountPct = product.discountPercentage || 0;
     let categoryDiscountPct = 0;
 
-    if (product.offer && isOfferActiveByDate(product.offer)) {
-        const val = parseFloat(product.offer.discountValue) || 0;
-        const offerType = String(product.offer.offerType || '').trim().toLowerCase();
-        
+    // ---------------- PRODUCT OFFERS ----------------
+
+    const productOffers = Array.isArray(product.offer)
+        ? product.offer
+        : product.offer
+            ? [product.offer]
+            : [];
+
+    const activeProductOffers = productOffers.filter(
+        offer => offer.isActive && isOfferActiveByDate(offer)
+    );
+
+    for (const offer of activeProductOffers) {
+        const val = parseFloat(offer.discountValue) || 0;
+        const offerType = String(offer.offerType || '')
+            .trim()
+            .toLowerCase();
+
+        let discountAmt = 0;
+        let discountPct = 0;
+
         if (offerType === 'percentage') {
-            productDiscountAmt = regularPrice * (val / 100);
-            if (val > productDiscountPct) productDiscountPct = val;
+            discountAmt = regularPrice * (val / 100);
+            discountPct = val;
         } else {
-            productDiscountAmt = val;
-            const calcPct = regularPrice > 0 ? (val / regularPrice) * 100 : 0;
-            if (calcPct > productDiscountPct) productDiscountPct = Math.round(calcPct);
+            discountAmt = val;
+            discountPct = regularPrice > 0
+                ? (val / regularPrice) * 100
+                : 0;
+        }
+
+        if (discountAmt > productDiscountAmt) {
+            productDiscountAmt = discountAmt;
+            productDiscountPct = Math.round(discountPct);
         }
     }
+
+
+    // ---------------- CATEGORY OFFERS ----------------
 
     const categoryId = product.Category?._id || product.Category;
+
     if (categoryId) {
-        const category = await mongoose.model('Category').findById(categoryId).populate('parentCategory');
-        
+        const category = await mongoose
+            .model('Category')
+            .findById(categoryId)
+            .populate('parentCategory');
+
         if (category) {
-            if (category.offer && isOfferActiveByDate(category.offer)) {
-                const catVal = parseFloat(category.offer.discountValue) || 0;
-                const catType = String(category.offer.offerType || '').trim().toLowerCase();
-                
-                const catAmt = catType === 'percentage' ? regularPrice * (catVal / 100) : catVal;
-                if (catAmt > categoryDiscountAmt) {
-                    categoryDiscountAmt = catAmt;
-                    categoryDiscountPct = catType === 'percentage' ? catVal : Math.round((catVal / regularPrice) * 100);
+
+            // -------- SUBCATEGORY OFFER --------
+
+            const categoryOffers = Array.isArray(category.offer)
+                ? category.offer
+                : category.offer
+                    ? [category.offer]
+                    : [];
+
+            const activeCategoryOffers = categoryOffers.filter(
+                offer => offer.isActive && isOfferActiveByDate(offer)
+            );
+
+            for (const offer of activeCategoryOffers) {
+
+                const val = parseFloat(offer.discountValue) || 0;
+
+                const offerType = String(offer.offerType || '')
+                    .trim()
+                    .toLowerCase();
+
+                let discountAmt = 0;
+                let discountPct = 0;
+
+                if (offerType === 'percentage') {
+                    discountAmt = regularPrice * (val / 100);
+                    discountPct = val;
+                } else {
+                    discountAmt = val;
+                    discountPct = regularPrice > 0
+                        ? (val / regularPrice) * 100
+                        : 0;
+                }
+
+                if (discountAmt > categoryDiscountAmt) {
+                    categoryDiscountAmt = discountAmt;
+                    categoryDiscountPct = Math.round(discountPct);
                 }
             }
 
+
+            // -------- PARENT CATEGORY OFFER --------
+
             const parentCat = category.parentCategory;
-            if (parentCat?.offer && isOfferActiveByDate(parentCat.offer)) {
-                const parentVal = parseFloat(parentCat.offer.discountValue) || 0;
-                const parentType = String(parentCat.offer.offerType || '').trim().toLowerCase();
-                
-                const parentAmt = parentType === 'percentage' ? regularPrice * (parentVal / 100) : parentVal;
-                if (parentAmt > categoryDiscountAmt) {
-                    categoryDiscountAmt = parentAmt;
-                    categoryDiscountPct = parentType === 'percentage' ? parentVal : Math.round((parentVal / regularPrice) * 100);
+
+            if (parentCat) {
+                const parentOffers = Array.isArray(parentCat.offer)
+                    ? parentCat.offer
+                    : parentCat.offer
+                        ? [parentCat.offer]
+                        : [];
+
+                const activeParentOffers = parentOffers.filter(
+                    offer => offer.isActive && isOfferActiveByDate(offer)
+                );
+
+                for (const offer of activeParentOffers) {
+                    const val = parseFloat(offer.discountValue) || 0;
+
+                    const offerType = String(offer.offerType || '')
+                        .trim()
+                        .toLowerCase();
+
+                    let discountAmt = 0;
+                    let discountPct = 0;
+
+                    if (offerType === 'percentage') {
+                        discountAmt = regularPrice * (val / 100);
+                        discountPct = val;
+                    } else {
+                        discountAmt = val;
+                        discountPct = regularPrice > 0
+                            ? (val / regularPrice) * 100
+                            : 0;
+                    }
+
+                    if (discountAmt > categoryDiscountAmt) {
+                        categoryDiscountAmt = discountAmt;
+                        categoryDiscountPct = Math.round(discountPct);
+                    }
                 }
             }
         }
     }
 
-    const maxDiscountAmount = Math.max(productDiscountAmt, categoryDiscountAmt);
-    const effectiveDiscount = productDiscountAmt >= categoryDiscountAmt ? productDiscountPct : categoryDiscountPct;
+
+    // ---------------- FINAL OFFER ----------------
+
+    const maxDiscountAmount = Math.max(productDiscountAmt,categoryDiscountAmt);
+
+    let effectiveDiscount = 0;
+
+    if (productDiscountAmt > categoryDiscountAmt) {
+        effectiveDiscount = productDiscountPct;
+    } else if (categoryDiscountAmt > productDiscountAmt) {
+        effectiveDiscount = categoryDiscountPct;
+    }
+
     const salePrice = Math.max(0, regularPrice - maxDiscountAmount);
 
     return {
@@ -284,118 +384,7 @@ export const getLatestSellers = async () => {
         return [];
     }
 };
-/* ---------------- GENDER COMPILATION PAGES ---------------- */
 
-const buildGenderQuery = (subIds, filters) => {
-    const authorizedObjectIds = (subIds || []).map(id => new mongoose.Types.ObjectId(id));
-
-    let query = { 
-        isListed: true,
-        Category: { $in: authorizedObjectIds } 
-    };
-
-    const { category, price, brand, material, search } = filters;
-
-    if (brand) query.brand = new RegExp(`^${brand}$`, 'i');
-    if (material) query.material = new RegExp(`^${material}$`, 'i');
-
-    if (search && search.trim() !== '') {
-        query.productName = { $regex: search.trim(), $options: 'i' };
-    }
-
-    if (category && mongoose.Types.ObjectId.isValid(category)) {
-        const selectedId = new mongoose.Types.ObjectId(category);
-        const isAuthorized = authorizedObjectIds.some(activeId => activeId.equals(selectedId));
-        
-        if (isAuthorized) {
-            query.Category = selectedId;
-        } else {
-            query.Category = null; 
-        }
-    }
-
-    if (price && price !== 'all') {
-        if (price === 'under5k') query.regularPrice = { $lt: 5000 };
-        if (price === '5k-10k') query.regularPrice = { $gte: 5000, $lte: 10000 };
-        if (price === 'above10k') query.regularPrice = { $gt: 10000 };
-    }
-
-    return query;
-};
-
-export const getGenderPage = async (gender, req) => {
-    const { category, price, sort, material, brand, page = 1, search } = req.query;
-    const limit = 6;
-
-    const oppositeGender = gender.toLowerCase() === 'men' ? 'women' : 'men';
-    const oppositeParentCategory = await findParentCategory(new RegExp(`^${oppositeGender}`, 'i'));
-
-    const allCategories = await findAllCategories();
-
-    const unlistedParentIds = allCategories
-        .filter(cat => cat.isListed === false || cat.isListed === 'false')
-        .map(cat => cat._id.toString());
-
-    const activeCategories = allCategories.filter(cat => {
-        if (cat.isListed === false || cat.isListed === 'false') return false;
-
-        if (cat.parentCategory) {
-            const parentIdStr = typeof cat.parentCategory === 'object' && cat.parentCategory._id 
-                ? cat.parentCategory._id.toString() 
-                : cat.parentCategory.toString();
-
-            if (unlistedParentIds.includes(parentIdStr)) return false;
-        }
-        return true;
-    });
-
-    let filteredSubcategories = [];
-
-    if (oppositeParentCategory) {
-        filteredSubcategories = activeCategories.filter(cat => {
-            const currentParentIdStr = cat.parentCategory && (cat.parentCategory._id || cat.parentCategory).toString();
-            const oppositeParentIdStr = oppositeParentCategory._id.toString();
-            
-            const belongsToOppositeGender = cat.parentCategory && (currentParentIdStr === oppositeParentIdStr);
-            const isRootNode = !cat.parentCategory;
-
-            return !belongsToOppositeGender && !isRootNode;
-        });
-    } else {
-        filteredSubcategories = activeCategories.filter(cat => cat.parentCategory);
-    }
-
-    const subIds = filteredSubcategories.map(c => c._id);
-
-    const productQuery = buildGenderQuery(subIds, { category, price, brand, material, search });
-    const filterQuery = buildGenderQuery(subIds, { category, price, material, search });
-
-    const sortQuery = getSort(sort);
-    const totalProducts = await productRepo.countProducts(productQuery);
-    const products = await productRepo.findProducts(productQuery, sortQuery, (page - 1) * limit, limit);
-    
-    const brands = await productRepo.distinctBrandsByQuery(filterQuery);
-    const materials = await productRepo.distinctMaterials(filterQuery);
-
-    return {
-        products,
-        subcategories: filteredSubcategories, 
-        brands,
-        materials,
-        genderTitle: gender,
-        currentPage: Number(page),
-        totalPages: Math.ceil(totalProducts / limit) || 1,
-        hasPrevPage: page > 1,
-        hasNextPage: page < Math.ceil(totalProducts / limit),
-        prevPage: Number(page) - 1,
-        nextPage: Number(page) + 1,
-        activeCategory: category || null,
-        activePrice: price || "all",
-        activeSort: sort || null,
-        activeMaterial: material || null,
-        activeBrand: brand || null
-    };
-};
 
 const getSort = (sort) => {
     if (sort === 'low-high') return { regularPrice: 1 };
@@ -479,7 +468,10 @@ pagination: {
 
 export const getAddProductPage = async () => {
     const parentCategories = await findParentCategories();
-    const brands = await productRepo.distinctBrands(); 
+    const rawBrands = await brandRepo.getAllBrands();
+    const brands = rawBrands
+        .filter(b => b.isListed !== false)
+        .map(b => b.name);
 
     return {
         isAdmin: true,
@@ -514,16 +506,36 @@ export const getEditProductPage = async (productId) => {
 
 export const createProduct = async (body, files) => {
     const {
-        productName, brand, regularPrice, salePrice, description,
+        productName, brand, regularPrice, description,
         category, parentCategory, countryOfOrigin, material, closureType, soleType, weight
     } = body;
+    const errors={};
 
-    if (!productName?.trim()) throw new Error("Product name is required");
-    if (!brand?.trim()) throw new Error("Brand is required");
-    if (!description?.trim()) throw new Error("Description is required");
-    if (!parentCategory) throw new Error("Please select a parent category");
-    if (!category) throw new Error("Please select a subcategory");
-    if (!regularPrice || Number(regularPrice) <= 0) throw new Error("Enter a valid price");
+    const productValue = /^[A-Za-z\s]+$/;
+    if (!productName?.trim()){
+       errors.productName = "Product name is required.";
+    } else if(!productValue.test(productValue)){
+       errors.productName = "Should contain only letters and space.";
+    }
+
+    if (!brand?.trim()) errors.brand =("Brand is required");
+
+    const descriptionValue = /^[A-Za-z\s]+$/;
+    if (!description?.trim()){
+      errors.description = ("Description is required");
+    } else if(!descriptionValue.test(description)){
+       errors.description = ("Should contain only letters and space."); 
+    } 
+
+    if (!parentCategory) errors.parentCategory = ("Please select a parent category");
+    if (!category) errors.Category = ("Please select a subcategory");
+
+
+   if (!regularPrice || isNaN(Number(regularPrice))) {
+    errors.Price = ("Enter a valid price");
+   } else if (Number(regularPrice) <= 500) {
+    errors.Price = ("Price must be greater than 500"); 
+   }
 
     const existingProduct = await productRepo.findDuplicateProduct(productName, category);
     if (existingProduct) {
@@ -583,13 +595,15 @@ export const createProduct = async (body, files) => {
 
     await brandRepo.ensureBrandExists(brand.trim());
 
+    const parsedRegularPrice = Number(regularPrice) || 0;
+
     const productData = {
         productName: productName.trim(),
         brand: brand.trim(),
         parentCategory: parentCategory, 
         Category: category,
-        regularPrice: Number(regularPrice) || 0,
-        salePrice: salePrice ? Number(salePrice) : null,
+        regularPrice: parsedRegularPrice, 
+        salePrice: parsedRegularPrice ,
         description: description.trim(),
         variants: finalVariantsArray,
         totalQuantity: globalTotalStockCount,
@@ -620,7 +634,13 @@ export const updateProduct = async (productId, bodyData, structuredFiles) => {
     const weight = bodyData.weight?.trim();
     const countryOfOrigin = bodyData.countryOfOrigin?.trim();
 
-    if (!productName) errors.productName = "Product name is required.";
+    const nameRegex = /^[A-Za-z\s]+$/;
+
+    if (!productName) {
+        errors.productName = "Product name is required.";
+    } else if (!nameRegex.test(productName)) {
+        errors.productName = "Product name should only contain letters and spaces.";
+    }
     if (!brand) errors.brand = "Brand selection is required.";
     if (!regularPrice || Number(regularPrice) <= 500) {
         errors.regularPrice = "Base price must be greater than 500.";

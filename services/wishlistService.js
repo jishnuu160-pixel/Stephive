@@ -1,19 +1,32 @@
 import * as wishlistRepo from "../repositories/wishlistRepository.js";
+import { attachOfferPricing } from "./productService.js";
 
 export const getWishlist = async (userId) => {
     if (!userId) {
         console.warn("⚠️ getWishlist called with undefined userId. Skipping creation.");
-        return { items: [] }; 
+        return { items: [] };
     }
 
     let wishlist = await wishlistRepo.findByUserId(userId);
-    
+
     if (!wishlist) {
         wishlist = await wishlistRepo.createWishlist(userId);
-        if (wishlist && typeof wishlist.toObject === 'function') {
-            wishlist = wishlist.toObject();
-        }
     }
+
+    if (wishlist && typeof wishlist.toObject === 'function') {
+        wishlist = wishlist.toObject();
+    }
+
+    wishlist.items = await Promise.all(
+        wishlist.items.map(async (item) => {
+            if (item.productId) {
+                item.productId = await attachOfferPricing(item.productId);
+            }
+
+            return item;
+        })
+    );
+
     return wishlist;
 };
 

@@ -21,6 +21,7 @@ export const updateAvatar = async (req, res) => {
     }
 };
 
+
 export const getLogin = (req, res) => {
     res.render('user/login', {
         layout: 'main', 
@@ -28,15 +29,18 @@ export const getLogin = (req, res) => {
     });
 };
 
+
 export const getSignup = (req, res) => {
     const formData = req.session.signupData || {};
     const error = req.query.error || null;
 
     res.render('user/signup', {
+        error: error,
         formData,
         error
     });
 };
+
 
 export const postSignup = async (req, res) => {
     try {
@@ -59,7 +63,7 @@ export const postSignup = async (req, res) => {
                 });
             }
 
-            return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup`);
+            return res.redirect(`/user/verify-otp?&target=signup`);
         });
 
     } catch (err) {        
@@ -71,9 +75,10 @@ export const postSignup = async (req, res) => {
     }
 };
 
+
 export const postVerifyOTP = async (req, res, next) => {
     try {
-        const email = req.query.email || req.body.email;
+        const email = req.query.email || req.body.email || req.session.email || (req.session.signupData ? req.session.signupData.email : '');
         const target = req.query.target || req.body.target || (req.session.signupData ? 'signup' : '');
         
         let otp = req.body.otp;
@@ -86,16 +91,20 @@ export const postVerifyOTP = async (req, res, next) => {
                 .join('');
         }
 
-        if (req.session.signupData) {
+        if (target === 'signup') {
             if (!req.session.otp) {
-                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("Session expired. Please sign up again."));
+                req.session.errorMessage = "Session expired. Please sign up again.";
+                req.session.otpTarget = "signup";
+                return res.redirect('/user/verify-otp');
             }
             if (Date.now() > req.session.otpExpiryTime) {
-                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("OTP has expired."));
+                return res.redirect(`/user/verify-otp?target=signup&error=` + encodeURIComponent("OTP has expired."));
             }
 
             if (String(req.session.otp).trim() !== String(otp).trim()) {
-                return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("Invalid OTP code."));
+                req.session.errorMessage = "Invalid OTP code.";
+                req.session.otpTarget = "signup";
+                return res.redirect('/user/verify-otp');
             }
 
             const newUser = await userService.signup(req.session.signupData);
@@ -119,24 +128,45 @@ export const postVerifyOTP = async (req, res, next) => {
             return res.redirect('/shop');
         } 
         
-        else {
-            await userService.verifyOTP(email, otp);
-
+       else {
             if (target === 'email') {
-                return res.redirect(`/user/change-email?verified=true`);
+                const userId = req.session.user.id || req.session.user._id;
+                
+                await userService.verifyEmailChangeOTP(userId, otp);
+
+                const user = await userService.getUserById(userId);
+                req.session.user.email = user.email;
+                delete req.session.otpTarget;
+
+                req.flash('success', "Email updated successfully!");
+                return req.session.save(() => {
+                    res.redirect('/user/profile');
+                });
             } else if (target === 'updatepassword') {
-                return res.redirect(`/user/changepass?email=${encodeURIComponent(email)}&verified=true`);
-            } else {
-                return res.redirect(`/user/reset-password?email=${encodeURIComponent(email)}`);
-            }
+                await userService.verifyOTP(email, otp);
+                return res.redirect(`/user/changepass?verified=true`);
+            }  else {
+        await userService.verifyOTP(email, otp);
+        
+        req.session.isOtpVerified = true;
+        req.session.resetEmail = email;
+        req.session.resetOtp = otp;
+
+        return req.session.save(() => {
+            res.redirect('/user/reset-password');
+        });
+    }
         }
 
     } catch (err) {
-        const email = req.query.email || req.body.email;
         const target = req.query.target || req.body.target || (req.session.signupData ? 'signup' : '');
-        return res.redirect(`/user/verify-otp?error=${encodeURIComponent(err.message)}&email=${encodeURIComponent(email || '')}&target=${encodeURIComponent(target)}`);
+
+        req.session.errorMessage = err.message;
+        req.session.otpTarget = target;
+        return res.redirect('/user/verify-otp');
     }
 };
+
 
 export const postLogin = async (req, res) => {
     try {
@@ -155,6 +185,7 @@ export const postLogin = async (req, res) => {
             gender: user.gender
         };
 
+        req.flash('success', 'Logged in successfully.');
         req.session.save((err) => {
             if (err) return next(err);
             res.redirect('/shop'); 
@@ -164,6 +195,7 @@ export const postLogin = async (req, res) => {
         res.redirect('/user/login');      
     }
 };
+
 
 export const postForgot = async (req, res) => {
     try {
@@ -176,7 +208,9 @@ export const postForgot = async (req, res) => {
   
         req.session.otpExpiryTime=Date.now() + 60000;
 
-        res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=forgot`);
+        req.session.otpTarget='forgot';
+        req.session.email=email;
+        res.redirect('/user/verify-otp');
     } catch (err) {
         res.redirect('/user/forgot-password?error=' + encodeURIComponent(err.message));
     }
@@ -184,56 +218,115 @@ export const postForgot = async (req, res) => {
 
 
 export const postResetPassword = async (req, res) => {
-    const { email, password, confirmPassword,target } = req.body;
+    const { email, otp, password, confirmPassword } = req.body;
 
     try {
-        if (password !== confirmPassword) {
+        if (!otp) {
             return res.render('user/reset-password', { 
-                error: "Passwords do not match", 
+                formError: "Reset failed: OTP is missing. Please request a new one.", 
                 email 
             });
         }
-        await userService.resetPassword(email, password);
 
-        res.redirect('/user/login?success=Password updated successfully');   
+        if (!password || !confirmPassword) {
+            return res.render('user/reset-password', { 
+                formError: "Please fill in all password fields.", 
+                email, 
+                otp 
+            });
+        }
+
+        if (password !== confirmPassword) {
+            return res.render('user/reset-password', { 
+                formError: "Passwords do not match.", 
+                email, 
+                otp 
+            });
+        }
+
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.render('user/reset-password', { 
+                formError: "Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.", 
+                email, 
+                otp 
+            });
+        }
+
+        await userService.resetPassword(email, otp, password);
+
+        delete req.session.isOtpVerified;
+        delete req.session.resetEmail;
+        delete req.session.resetOtp;
+
+        req.flash('success', 'Password updated successfully');
+      return req.session.save(() => {
+    res.redirect('/user/login');
+});
     } catch (err) {
         res.render('user/reset-password', { 
-            error: "Reset failed: " + err.message, 
-            email 
+            formError: "Reset failed: " + err.message, 
+            email, 
+            otp 
         });
     }
 };
 
+
 export const getVerifyOTP = (req, res) => {
+    const email = req.query.email;
+    const error = req.query.error || req.session.errorMessage;
+    const target = req.query.target || req.session.otpTarget;
+
+    delete req.session.errorMessage;
+    delete req.session.otpTarget;
+
     res.render('user/verify-otp', {
-        email: req.query.email,
-        error: req.query.error,
-        target: req.query.target,
+        email: email,
+        error: error,
+        target: target,
         isPasswordUpdate: req.query.isPasswordUpdate === 'true',
-        otpExpiryTime:req.session.otpExpiryTime
+        otpExpiryTime: req.session.otpExpiryTime
     });
 };
 
+
 export const getResendOTP = async (req, res) => {
+    const userId = req.session?.user?._id || req.session?.user?.id;
+
     try {
         const { isPasswordUpdate } = req.query;
-        const target = req.query.target || (req.session.signupData ? 'signup' : '');
-        const email = req.query.email || req.session.signupData?.email;
+        const target = req.query.target || req.session.otpTarget || (req.session.signupData ? 'signup' : '');
+        const email = req.query.email || req.session.email || req.session.signupData?.email;
 
-        if (!email && target !== 'signup') {
-            return res.redirect('/user/login?error=' + encodeURIComponent('Email missing, please try again.'));
+        if (!email && target !== 'signup' && target !== 'email-change') {
+            req.session.errorMessage = 'Email missing, please try again.';
+            return req.session.save(() => res.redirect('/user/login'));
         }
+
+        let activeEmail = email;
 
         if (target === 'signup') {
             if (!req.session.signupData || !req.session.signupData.email) {
-                return res.redirect('/user/signup?error=' + encodeURIComponent('Session expired. Please sign up again.'));
+                req.session.errorMessage = "Session expired. Please sign up again.";
+                return req.session.save(() => res.redirect('/user/signup'));
             }
-            const signupEmail = req.session.signupData.email;
-            const newOtp = await userService.sendSignupOTP(signupEmail);
+            activeEmail = req.session.signupData.email;
+            const newOtp = await userService.sendSignupOTP(activeEmail);
             req.session.otp = newOtp;
             req.session.otpExpiryTime = Date.now() + 60 * 1000;
-        } else {
-            await userService.sendOTP(email);
+        } 
+        else if (target === 'email-change') {
+            if (!userId) {
+                throw new Error("Session expired. Please log in again.");
+            }
+            activeEmail = await userService.resendEmailChangeOTPService(userId, req.session.pendingEmail);
+            req.session.email = activeEmail;
+            req.session.otpExpiryTime = Date.now() + 60000;
+        }
+        else {
+            req.session.email = activeEmail; 
+            await userService.sendOTP(activeEmail);
             req.session.otpExpiryTime = Date.now() + 60000;
         }
 
@@ -241,19 +334,25 @@ export const getResendOTP = async (req, res) => {
             ? '/user/verify-password-otp' 
             : '/user/verify-otp';
 
-        const activeEmail = target === 'signup' ? req.session.signupData.email : email;
+        req.session.otpTarget = target;
+        req.flash("success", "A new OTP code has been sent!");
+        delete req.session.errorMessage; 
 
         req.session.save((err) => {
             if (err) console.error("Session Save Error on Resend:", err);
-            
-            res.redirect(`${redirectPath}?email=${encodeURIComponent(activeEmail)}&target=${encodeURIComponent(target)}&success=` + encodeURIComponent('A new OTP code has been sent!'));
+            res.redirect(redirectPath);
         });
 
     } catch (err) {
-        const target = req.query.target || (req.session.signupData ? 'signup' : '');
-        const email = req.query.email || req.session.signupData?.email || '';
+        console.error("Resend OTP Error:", err.message);
+        const target = req.query.target || req.session.otpTarget || (req.session.signupData ? 'signup' : '');
         
-        return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=${encodeURIComponent(target)}&error=` + encodeURIComponent(err.message || 'Failed to resend OTP'));
+        req.session.otpTarget = target;
+        req.session.errorMessage = err.message || 'Failed to resend OTP';
+
+        req.session.save(() => {
+            res.redirect('/user/verify-otp');
+        });
     }
 };
 
@@ -264,18 +363,34 @@ export const getForgot = (req, res) => {
     });
 };
 
-export const getResetPassword = (req, res) => { 
-    const { email } = req.query;
 
-    if (!email) {
-        return res.redirect('/user/forgot-password?error=' + encodeURIComponent("Invalid reset link. Please try again."));
+export const getResetPassword = (req, res) => { 
+    if (!req.session.isOtpVerified) {
+        req.session.errorMessage = "Please verify your OTP first.";
+        return req.session.save(() => {
+            res.redirect('/user/verify-otp');
+        });
+    }
+
+    const email = req.query.email || req.session.resetEmail || req.session.email;
+    const otp = req.session.resetOtp; 
+
+    if (!email || !otp) {
+        req.session.errorMessage = "Invalid reset session. Please try again.";
+        return req.session.save(() => {
+            res.redirect('/user/forgot-password');
+        });
     }
 
     res.render('user/reset-password', {
         email: email,
-        error: req.query.error
+        otp: otp, 
+        error: req.query.error || req.session.errorMessage
     });
+    
+    delete req.session.errorMessage;
 };
+
 
 export const userLogout = (req, res) => {
     delete req.session.user;
@@ -299,6 +414,9 @@ export const userLogout = (req, res) => {
 
 export const getProfile = async (req, res) => {
     try {
+        const success = req.session.success;
+       delete req.session.success;
+
         const userId = req.session.user.id;
         const user = await userService.getUserById(userId);
 
@@ -307,6 +425,7 @@ export const getProfile = async (req, res) => {
         }
 
       res.render('user/profile', {
+        success,
     user,
     timestamp: Date.now(),
     activePage:'profile'
@@ -334,6 +453,7 @@ export const getAddress = async (req, res) => {
     }
 };
 
+
 export const getAddAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -348,6 +468,7 @@ export const getAddAddress = async (req, res) => {
         res.redirect('/user/address');
     }
 };
+
 
 export const postAddAddress = async (req, res) => {
     try {
@@ -395,6 +516,7 @@ export const postAddAddress = async (req, res) => {
     }
 };
 
+
 export const removeAddress = async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -408,6 +530,7 @@ export const removeAddress = async (req, res) => {
         res.redirect('/user/address');
     }
 };
+
 
 export const postEditAddress = async (req, res) => {
     try {
@@ -447,6 +570,7 @@ export const postEditAddress = async (req, res) => {
     }
 };
 
+
 export const getEditAddress = async (req, res) => {
     try {
         const user = await userService.getUserById(
@@ -473,13 +597,15 @@ export const getEditAddress = async (req, res) => {
     }
 };
 
+
 export const postUpdateProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
         await userService.updateProfile(userId, req.body);
 
         req.session.user = { ...req.session.user, ...req.body };
-        req.session.save(() => res.redirect('/user/profile?success=Updated'));
+        req.session.success = 'Profile updated successfully';
+        req.session.save(() => res.redirect('/user/profile'));
     } catch (error) {
         const user = await userService.getUserById(req.session.user.id);
         
@@ -490,6 +616,7 @@ export const postUpdateProfile = async (req, res) => {
         });
     }
 };
+
 
 export const getEditProfile = async (req, res) => {
     try {
@@ -514,20 +641,24 @@ export const getEditProfile = async (req, res) => {
 export const sendUpdatePasswordOTP = async (req, res) => {
     try {
         const email = req.session.user.email;
+        req.session.email = email;
+
         await userService.sendOTP(email);
 
         req.session.otpExpiryTime = Date.now() + 60000; 
 
-        res.redirect(`/user/verify-otp?email=${email}&target=updatepassword`);
+        res.redirect(`/user/verify-otp?target=updatepassword`);
     } catch (err) {
         res.redirect('/user/profile?error=Could not send verification code');
     }
 };
 
+
 export const getVerifyPasswordOTP = (req, res) => {
     res.render('user/verify-otp', {
         email: req.query.email,
         isPasswordUpdate: true ,
+        target: 'updatepassword',
         otpExpiryTime:req.session.otpExpiryTime
     });
 };
@@ -568,41 +699,45 @@ export const getChangeEmail = (req, res) => {
     });
 };
 
+
 export const postChangeEmail = async (req, res) => {
     try {
+        const userId = req.session?.user?._id || req.session?.user?.id;
+        const currentEmail = req.session?.user?.email;
         const { newEmail } = req.body;
-        const userId = req.session.user.id;
-        const currentEmail = req.session.user.email;
+
+        console.log("Post Change Email - Resolved User ID:", userId);
+
+        if (!userId) {
+            throw new Error("User session not found or expired. Please log in again.");
+        }
 
         await userService.changeEmailService(userId, currentEmail, newEmail);
 
-        req.session.user.email = newEmail.trim().toLowerCase();
-        req.flash('success', "Email updated successfully!");
+        req.session.pendingEmail = newEmail.trim().toLowerCase();
+        req.session.otpTarget = 'email-change'; 
 
         req.session.save((err) => {
-            if (err) return res.redirect('/user/profile?error=Session sync failed');
-            res.redirect('/user/profile');
+            if (err) console.error("Session Save Error:", err);
+            return res.redirect('/user/verify-email-change-otp');
         });
 
     } catch (error) {
-        if (error.isValidation) {
-            return res.render('user/change-email', { 
-                error: error.message, 
-                user: req.session.user,
-                title: "Change Email"
-            });
-        }
-
-        res.redirect('/user/profile?error=Something went wrong. Please try again.');
+        console.log("error:", error);
+        return res.render('user/change-email', { 
+            user: req.session.user,
+            errorMessage: error.message
+        });
     }
 };
+
 
 export const getChangePassword = (req, res) => {
     if (!req.query.verified) {
         return res.redirect('/user/profile'); 
     }
 
-    res.render('user/reset-password', {
+    res.render('user/changePass', {
         email: req.query.email,
         target: 'updatepassword',
         title: "Create New Password",
@@ -610,48 +745,43 @@ export const getChangePassword = (req, res) => {
     });
 };
 
+
 export const postChangePassword = async (req, res) => {
-    const { email, oldPassword, password, confirmPassword } = req.body;
+    const { email, password, confirmPassword } = req.body;
     
+
+    const targetEmail = email || req.session.email;
     try {
         if (password !== confirmPassword) {
-            return res.render('user/reset-password', { 
+            return res.render('user/changePass', { 
                 error: "New passwords do not match", 
                 email, 
-                oldPassword: oldPassword || '', 
                 isLoggedIn: true 
             });
-        }
+        }else if (!password?.trim() || !confirmPassword?.trim()) {
+            return res.render('user/changePass', {
+                error: "Please fill in both password fields.",
+                email: targetEmail,
+                isLoggedIn: true
+        });
+    }
 
-        await userService.changePasswordWithOld(email, oldPassword, password);
+        await userService.changePasswordWithOld(targetEmail, password);
+        delete req.session.email;
         
-        req.flash('success', 'Password updated successfully');
+        req.session.success='Password Updated Successfully';
         req.session.save(() => {
             res.redirect('/user/profile');
         });
     } catch (err) {
-        res.render('user/reset-password', { 
+        res.render('user/changePass', { 
             error: err.message, 
-            email, 
-            oldPassword: oldPassword || '', 
-            isLoggedIn: true 
+            email: targetEmail,
+            isLoggedIn: false 
         });
     }
 };
 
-
-export const sendEmailChangeOTP = async (req, res) => {
-    try {
-        const email = req.session.user.email; 
-        await userService.sendOTP(email);
-
-        req.session.otpExpiryTime = Date.now() + 60000; 
-
-        res.redirect(`/user/verify-otp?email=${email}&target=email`);
-    } catch (err) {
-        res.redirect('/user/profile?error=' + encodeURIComponent("Failed to send verification code"));
-    }
-};
 
 export const googleAuthSuccess = (req, res) => {
     const user = req.user;
@@ -709,6 +839,7 @@ export const getTerms= async(req,res)=>{
     }
 };
 
+
 export const getPrivacy= async(req,res)=>{
     try{
        res.render('user/privacy');
@@ -716,6 +847,7 @@ export const getPrivacy= async(req,res)=>{
        res.redirect('/');
     }
 };
+
 
 export const getContact= async(req,res)=>{
     try{
@@ -741,6 +873,7 @@ export const removeCoupon = async (req, res) => {
     }
 };
 
+
 export const postCheckoutAddAddress = async (req, res) => {
     
     try {
@@ -761,6 +894,7 @@ export const postCheckoutAddAddress = async (req, res) => {
     }
 };
 
+
 export const getAddressForEdit = async (req, res) => {
     try {
         let sessionUser = req.session.userId || req.session.user;
@@ -780,6 +914,7 @@ export const getAddressForEdit = async (req, res) => {
     }
 };
 
+
 export const handleEditAddress = async (req, res) => {
     try {
         let sessionUser = req.session.userId || req.session.user;
@@ -796,6 +931,7 @@ export const handleEditAddress = async (req, res) => {
     }
 };
 
+
 export const deleteCheckoutAddress = async (req, res) => {
     try {
         let sessionUser = req.session.userId || req.session.user;
@@ -809,10 +945,12 @@ export const deleteCheckoutAddress = async (req, res) => {
     }
 };
 
+
 export const resendSignupOTP = async (req, res) => {
     try {
         if (!req.session.signupData || !req.session.signupData.email) {
-            return res.redirect('/user/signup?error=' + encodeURIComponent("Session expired. Please sign up again."));
+            req.session.errorMessage = "Session expired. Please sign up again.";
+            return res.redirect('/user/signup?');
         }
 
         const email = req.session.signupData.email;
@@ -825,12 +963,63 @@ export const resendSignupOTP = async (req, res) => {
             if (err) {
                 console.error("Session Save Error on Resend:", err);
             }
-            return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&success=` + encodeURIComponent("A new OTP has been sent to your email."));
+            req.session.success='A new OTP has been sent to your email.';
+            return res.redirect('/user/verify-otp?target=signup');
         });
 
     } catch (err) {
         const email = req.session.signupData?.email || '';
-        return res.redirect(`/user/verify-otp?email=${encodeURIComponent(email)}&target=signup&error=` + encodeURIComponent("Failed to resend OTP. Please try again."));
+        return res.redirect(`/user/verify-otp?target=signup&error=` + encodeURIComponent("Failed to resend OTP. Please try again."));
     }
 };
 
+
+export const getVerifyEmailChangeOTP = (req, res) => {
+    res.render('user/verify-otp', { 
+        email: req.session.pendingEmail || 'your new email',
+        target: 'email-change',
+        otpExpiryTime: Date.now() + 60000 
+    });
+};
+
+
+export const postVerifyEmailChangeOTP = async (req, res) => {
+    try {
+        const userId = req.session?.user?._id || req.session?.user?.id;
+
+        if (!userId) {
+            throw new Error("Session expired. Please log in again.");
+        }
+
+        const otp = Array.isArray(req.body.otp) ? req.body.otp.join('') : req.body.otp;
+
+        const newEmail = await userService.verifyEmailChangeOTP(userId, otp);
+
+        req.session.user.email = newEmail;
+        delete req.session.pendingEmail;
+
+        req.session.success = "Email updated successfully";
+        return res.redirect('/user/profile');
+    } catch (error) {
+        console.error("Verification Error:", error.message);
+        
+        return res.render('user/verify-otp', { 
+            error: error.message, 
+            target: 'email-change', 
+            email: req.session.pendingEmail || 'your new email',
+            otpExpiryTime: error.otpExpiryTime || Date.now() + 60000 
+        });
+    }
+};
+
+
+export const sendEmailChangeOTP = async (req, res) => {
+    try {
+        return res.render('user/change-email', { user: req.session.user });
+    } catch (error) {
+        return res.render('profile', { 
+            user: req.session.user, 
+            errorMessage: error.message 
+        });
+    }
+};

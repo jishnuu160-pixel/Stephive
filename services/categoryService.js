@@ -42,18 +42,26 @@ export const getCategoriesPage = async (queryParams) => {
 };
 
 export const createCategory = async (body) => {
-   const { categoryName, description, parentCategory, childCategory, discountValue } = body;
+   const { categoryName, description, parentCategory, discountValue } = body;
 
+   const nameRegex=/^[A-Za-z\s]+$/;
    if(!categoryName?.trim() && !description?.trim()){
       throw new Error("Category and description is required");
+   } else if(!nameRegex.test(categoryName) && !nameRegex.test(description)){
+      throw new Error("Category and description should contain letters.");
    }
+
 
    if (!categoryName?.trim()) {
       throw new Error("Category name is required");
+   } else if(!nameRegex.test(categoryName)){
+      throw new Error("Category should contain letters.");
    }
 
    if (!description?.trim()) {
       throw new Error("Description is required");
+   }  else if(!nameRegex.test(description)){
+      throw new Error("Description should contain letters.");
    }
 
    const existingCategory = await categoryRepo.findCategoryByNameAndParent(categoryName.trim(), parentCategory || null);
@@ -84,13 +92,20 @@ export const updateCategory = async (categoryId, body) => {
       throw new Error('Category name and description fields are required.');
    }
 
+   const nameRegex=/^[A-Za-z\s]+$/;
+
     if (!categoryName?.trim()) {
       throw new Error("Category name is required");
+   } else if(!nameRegex.test(categoryName)){
+      throw new Error("Category should contain letters.");
    }
 
    if (!description?.trim()) {
       throw new Error("Description is required");
+   } else if(!nameRegex.test(description)){
+      throw new Error("Description should contain letters.");
    }
+
 
    
    const duplicate = await categoryRepo.findCategoryByNameAndParent(
