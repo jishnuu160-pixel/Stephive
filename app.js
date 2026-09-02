@@ -21,7 +21,7 @@ import referralRoutes from './routes/referralRoutes.js';
 
 import {  injectNavbarData } from'./middleware/authMiddleware.js';
 import passport from './config/passport.js';
-import { initCouponExpiryCron, initOfferExpiryCron } from './utils/cronHelper.js';
+import { initExpiryCron } from './utils/cronHelper.js';
 
 const app = express();
 
@@ -242,7 +242,6 @@ app.use('/payment', paymentRoutes);
 app.use('/', walletRoutes);
 app.use('/', referralRoutes);
 
-initCouponExpiryCron();
-initOfferExpiryCron();
+initExpiryCron();
 
 export default app;
