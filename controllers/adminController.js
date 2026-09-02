@@ -32,7 +32,7 @@ export const postAdminLogin = async (req, res) => {
             res.redirect('/admin/dashboard');
         });
     } catch (error) {
-    res.render('admin/login', {
+    return res.status(HTTP_STATUS.UNAUTHORIZED).render('admin/login', {
         title: 'Admin Login',
         layout: 'auth-layout',
         isAdmin: true,
@@ -137,7 +137,7 @@ export const toggleUserStatus = async (req, res) => {
    } catch (error) {
         req.flash('error', error.message);
         req.session.save(() => {
-        res.redirect('/admin/customers');
+        res.status(HTTP_STATUS.BAD_REQUEST).redirect('/admin/customers');
       });
    }
 };
@@ -207,7 +207,7 @@ export const updateOrderStatus = async (req, res) => {
     } catch (error) {
         console.error("Update failed:", error.message);
         req.flash("error", error.message || "Error updating order status");
-        return res.redirect(`/admin/orders/${req.params.id}`);
+        return res.status(HTTP_STATUS.BAD_REQUEST).redirect(`/admin/orders/${req.params.id}`);
     }
 };
 
