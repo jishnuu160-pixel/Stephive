@@ -1,4 +1,4 @@
-import Return from '../models/ReturnModel.js';
+import Return from '../models/returnModel.js';
 import Order from '../models/orderModel.js';
 
 export const saveReturn = async (returnData) => {
@@ -54,10 +54,9 @@ export const updateOrderStatusInDb = async (orderId, status) => {
     );
 };
 
-export const updateSpecificOrderItemStatus = async (orderIdentifier, itemId, productId, status) => {
-    const isItemIdMongoId = itemId && typeof itemId === 'string' && itemId.length === 24;
-    const isProductIdMongoId = productId && typeof productId === 'string' && productId.length === 24;
-    const orderIsMongoId = orderIdentifier && typeof orderIdentifier === 'string' && orderIdentifier.length === 24;
+export const updateSpecificOrderItemStatus = async (orderIdentifier, itemId, status) => {
+    const isItemIdMongoId = itemId && (typeof itemId === 'string' ? itemId.length === 24 : true);
+    const orderIsMongoId = orderIdentifier && (typeof orderIdentifier === 'string' ? orderIdentifier.length === 24 : true);
 
     return await Order.findOneAndUpdate(
         {
@@ -65,10 +64,10 @@ export const updateSpecificOrderItemStatus = async (orderIdentifier, itemId, pro
                 { orderId: orderIdentifier },
                 { _id: orderIsMongoId ? orderIdentifier : null }
             ],
-            "items._id": isItemIdMongoId ? itemId : null
+            "items._id": isItemIdMongoId ? itemId : itemId
         },
         { 
-            $set: { "items.$.status": status } 
+            $set: { "items.$.status": status.toLowerCase() } 
         },
         { new: true }
     );

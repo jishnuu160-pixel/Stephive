@@ -276,3 +276,23 @@ export const markOrderAsFailed = async (orderId) => {
     const updatedOrder = await order.save();
     return updatedOrder.toObject ? updatedOrder.toObject() : updatedOrder;
 };
+
+export const updateOrderStatusBasedOnItems = async (orderId) => {
+    const order = await Order.findById(orderId);
+    if (!order || !order.items || order.items.length === 0) return null;
+
+    const allItemsRefunded = order.items.every(item => {
+        const itemStatus = (item.status || '').toLowerCase();
+        const itemReturnStatus = (item.itemReturnStatus || '').toLowerCase();
+        return itemStatus === 'refunded' || itemReturnStatus === 'refunded';
+    });
+
+    if (allItemsRefunded) {
+        order.status = 'Returned';
+        const updatedOrder = await order.save();
+        return updatedOrder.toObject ? updatedOrder.toObject() : updatedOrder;
+    }
+
+    return null;
+};
+

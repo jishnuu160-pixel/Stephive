@@ -1,9 +1,26 @@
 import Wishlist from "../models/wishlistModel.js";
 
 export const findByUserId = async (userId) => {
-    return await Wishlist.findOne({ user_id: userId })
+    const wishlist = await Wishlist.findOne({ user_id: userId })
         .populate("items.productId")
         .lean();
+
+    if (!wishlist) {
+        return null;
+    }
+
+    wishlist.items = wishlist.items.map(item => {
+        const variant = item.productId?.variants?.find(
+            v => v._id.toString() === item.variantId.toString()
+        );
+
+        return {
+            ...item,
+            variant
+        };
+    });
+
+    return wishlist;
 };
 
 export const createWishlist = async (userId) => {

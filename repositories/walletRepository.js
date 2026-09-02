@@ -6,6 +6,7 @@ export const findByUserId = async (userId) => {
     return await Wallet.findOne({ user_id: userId });
 };
 
+
 export const createWallet = async (userId) => {
     return await Wallet.create({
         user_id: userId, 
@@ -13,6 +14,7 @@ export const createWallet = async (userId) => {
         transactions: []
     });
 };
+
 
 export const updateWallet = async (userId, amount, type, description, orderId = null) => {
     const update = {

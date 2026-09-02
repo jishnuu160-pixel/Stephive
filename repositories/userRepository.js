@@ -2,7 +2,10 @@ import User from '../models/userModel.js';
 import Referral from '../models/referralModel.js';
 
 export const findByEmail = async (email) => {
-    return await User.findOne({ email: email }).lean();
+    const cleanEmail = email ? email.trim().toLowerCase() : '';
+    return await User.findOne({ 
+        email: { $regex: new RegExp(`^${cleanEmail}$`, "i") } 
+    }).lean();
 };
 
 export const findByPhone = async (phoneNumber) => {
@@ -34,19 +37,26 @@ export const updateUser = async (email, data) => {
     }
 };
 
-export const saveOTP = async (email, otp) => {
+export const saveOTP = async (email, otp, expiryTime = 60000) => {
     try {
-        return await User.findOneAndUpdate(
-            { email: email },
+        const cleanEmail = email ? email.trim().toLowerCase() : '';
+        console.log("Attempting to save OTP for email:", cleanEmail);
+
+        const updatedUser = await User.findOneAndUpdate(
+            { email: { $regex: new RegExp(`^${cleanEmail}$`, "i") } },
             { 
                 $set: { 
-                    otp: otp, 
-                    otpExpiry: Date.now() + 60000 
+                    otp: String(otp), 
+                    otpExpiry: new Date(Date.now() + expiryTime) 
                 } 
             },
-            { returnDocument: 'after' } 
+            { new: true }
         );
+
+        console.log("Database update result:", updatedUser ? "Success!" : "Failed - User not found!");
+        return updatedUser;
     } catch (error) {
+        console.error("Save OTP Error:", error);
         throw new Error('Error saving OTP to database');
     }
 };
@@ -180,4 +190,31 @@ export const removeAddressFromDb = async (userId, addressId) => {
     } catch (error) {
         throw error;
     }
+};
+
+export const saveEmailChangeOTP = async (userId, newEmail, otp) => {
+    console.log("Saving to pendingEmail ->", newEmail);
+    const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        {
+            $set: {
+                pendingEmail: newEmail,
+                otp: String(otp),
+                otpExpiry: new Date(Date.now() + 60000)
+            }
+        },
+        { new: true }
+    );
+    console.log("Repository update execution result:", updatedUser ? "Success!" : "Failed!");
+    return updatedUser;
+};
+
+export const clearEmailChangeOTP = async (userId) => {
+    return await User.findByIdAndUpdate(
+        userId,
+        {
+            $unset: { pendingEmail: "", otp: "", otpExpiry: "" }
+        },
+        { new: true }
+    );
 };
