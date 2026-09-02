@@ -20,7 +20,7 @@
                     <div class="form-group">
                         <label>Shoe Name</label>
                         <input type="text" name="productName" placeholder="Curv Shoe">
-                        <small class="field-error"></small>
+                        <small class="field-error" id="error-productName"></small>
                     </div>
 
                     <div class="form-group">
@@ -546,13 +546,6 @@ btnCancelCrop.addEventListener('click', () => {
 document.querySelector('.modal-form-body').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const productName = document.querySelector('[name="productName"]').value.trim();
-    const brand = document.querySelector('[name="brand"]').value.trim();
-    const description = document.querySelector('[name="description"]').value.trim();
-    const parentCategory = document.querySelector('[name="parentCategory"]').value;
-    const category = document.querySelector('[name="category"]').value;
-    const price = document.querySelector('[name="regularPrice"]').value;
-
     let hasError = false;
 
     const productNameInput = document.querySelector('[name="productName"]');
@@ -567,8 +560,22 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
     const weightInput = document.querySelector('[name="weight"]');
     const countryInput = document.querySelector('[name="countryOfOrigin"]');
 
+    const productName = productNameInput.value.trim();
+    const brand = brandInput.value.trim();
+    const description = descriptionInput.value.trim();
+    const parentCategory = parentCategoryInput.value;
+    const category = categoryInput.value;
+    const price = priceInput.value.trim();
+
+    const nameRegex = /^[A-Za-z\s]+$/;
     if (!productName) {
         showFieldError(productNameInput, "Product name is required");
+        hasError = true;
+    } else if (productName.length < 3) {
+        showFieldError(productNameInput, "Product name must contain at least 3 characters.");
+        hasError = true;
+    } else if (!nameRegex.test(productName)) {
+        showFieldError(productNameInput, "Product name should contain only letters and space.");
         hasError = true;
     } else {
         clearFieldError(productNameInput);
@@ -581,8 +588,18 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
         clearFieldError(brandInput);
     }
 
+    const descriptionRegex = /^[A-Za-z\s]+$/;
     if (!description) {
         showFieldError(descriptionInput, "Description is required");
+        hasError = true;
+    } else if (!descriptionRegex.test(description)) {
+        showFieldError(descriptionInput, "Should contain only letters and space.");
+        hasError = true;
+    } else if (description.length < 10) {
+        showFieldError(descriptionInput, "Description must contain at least 10 characters.");
+        hasError = true;
+    }  else if (description.length > 500) {
+        showFieldError(descriptionInput, "Description cannot exceed 500 characters.");
         hasError = true;
     } else {
         clearFieldError(descriptionInput);
@@ -602,169 +619,77 @@ document.querySelector('.modal-form-body').addEventListener('submit', function (
         clearFieldError(categoryInput);
     }
 
-    if (!price || Number(price) <= 500) {
-        showFieldError(priceInput, "Price should be at least 500");
+    if (!price || isNaN(price) || Number(price) <= 500) {
+        showFieldError(priceInput, "Price should be a valid number greater than 500");
         hasError = true;
     } else {
         clearFieldError(priceInput);
     }
 
+    const materialRegex = /^[A-Za-z\s]+$/; 
     if (!materialInput.value.trim()) {
         showFieldError(materialInput, "Material is required");
+        hasError = true;
+    } else if (!materialRegex.test(materialInput.value.trim())) {
+        showFieldError(materialInput, "Should contain only letters and space.");
         hasError = true;
     } else {
         clearFieldError(materialInput);
     }
-
+ 
+    const closureRegex = /^[A-Za-z\s]+$/; 
     if (!closureTypeInput.value.trim()) {
         showFieldError(closureTypeInput, "Closure type is required");
+        hasError = true;
+    }  else if (!materialRegex.test(closureTypeInput.value.trim())) {
+        showFieldError(closureTypeInput, "Should contain only letters and space.");
         hasError = true;
     } else {
         clearFieldError(closureTypeInput);
     }
 
+    const SoleRegex = /^[A-Za-z\s]+$/; 
     if (!soleTypeInput.value.trim()) {
         showFieldError(soleTypeInput, "Sole type is required");
+        hasError = true;
+    } else if (!SoleRegex.test(soleTypeInput.value.trim())) {
+        showFieldError(soleTypeInput, "Should contain only letters and space.");
         hasError = true;
     } else {
         clearFieldError(soleTypeInput);
     }
 
+    const WeightRegex = /^[0-9]+$/;
     if (!weightInput.value.trim()) {
         showFieldError(weightInput, "Weight is required");
+        hasError = true;
+    }  else if (!WeightRegex.test(weightInput.value.trim())) {
+        showFieldError(weightInput, "Should contain only numbers");
         hasError = true;
     } else {
         clearFieldError(weightInput);
     }
 
+    const CountryRegex = /^[A-Za-z\s]+$/; 
     if (!countryInput.value.trim()) {
         showFieldError(countryInput, "Country of origin is required");
+        hasError = true;
+    } else if (!CountryRegex.test(countryInput.value.trim())) {
+        showFieldError(countryInput, "Should contain only letters and space.");
         hasError = true;
     } else {
         clearFieldError(countryInput);
     }
 
-    if (hasError) return;
+    let globalColorNames = new Set();
+    const totalCards = document.querySelectorAll("#variantsContainer .variant-card");
 
-let validationPassed = true;
-let globalColorNames = new Set();
-let globalColorHexes = new Set();
-
-const totalCards = document.querySelectorAll(
-    "#variantsContainer .variant-card"
-);
-
-for (let card of totalCards) {
-    const colorNameInput = card.querySelector(
-        'input[name="colorNames[]"]'
-    );
-
-    if (colorNameInput) {
-
-        const colorName = colorNameInput.value.trim().toLowerCase();
-
-        if (colorName === "") {
-
-            showFieldError(
-                colorNameInput,
-                "Color name is required"
-            );
-
-            validationPassed = false;
-
-        } else if (globalColorNames.has(colorName)) {
-
-            showFieldError(
-                colorNameInput,
-                "Duplicate color name found"
-            );
-
-            validationPassed = false;
-
-        } else {
-
-            globalColorNames.add(colorName);
-
-            clearFieldError(colorNameInput);
-        }
-    }
-
-
-   const sizeInputs = card.querySelectorAll(
-    'input[name^="sizes_"]'
-    );
-
-   const sizesInThisVariant = new Set();
-
-   sizeInputs.forEach(input => {
-
-    const sizeValue = input.value.trim();
-
-    if (sizeValue === "") {
-        showFieldError(
-            input,
-            "Size is required"
-        );
-        validationPassed = false;
-        return;
-    }
-
-    if (sizesInThisVariant.has(sizeValue)) {
-        showFieldError(
-            input,
-            "Duplicate size found"
-        );
-        validationPassed = false;
-    } else {
-
-        sizesInThisVariant.add(sizeValue);
-        clearFieldError(input);
-    }
-    });
-
-    const stockInputs = card.querySelectorAll(
-        'input[name^="stocks_"]'
-    );
-
-    stockInputs.forEach(input => {
-        if (input.value.trim() === "") {
-            showFieldError(
-                input,
-                "Stock is required"
-            );
-            validationPassed = false;
-        } else {
-            clearFieldError(input);
-        }
-    });
-
-    const variantIndex =
-        card.getAttribute("data-variant-index");
-
-    const imageError =
-        card.querySelector(".image-error");
-
-    const uploadedImages =
-        variantFilesMap[variantIndex] || [];
-
-    if (uploadedImages.length < 3) {
-
-        if (imageError) {
-            imageError.textContent =
-                "At least 3 images are required";
-        }
-
-        validationPassed = false;
-
-    } else {
-
-        if (imageError) {
-            imageError.textContent = "";
-        }
-    }
-}
-    
     if (totalCards.length === 0) {
+    const existingToasts = Array.from(document.querySelectorAll('.toastify')).some(
+        t => t.textContent.includes("Please add at least one color variant configuration")
+    );
+
+    if (!existingToasts) {
         if (typeof Toastify === "function") {
             Toastify({
                 text: "Please add at least one color variant configuration",
@@ -776,19 +701,80 @@ for (let card of totalCards) {
         } else {
             alert("Please add at least one color variant configuration");
         }
-        return; 
+    }
+    return;
+}
+
+    for (let card of totalCards) {
+        const colorNameInput = card.querySelector('input[name="colorNames[]"]');
+        if (colorNameInput) {
+            const colorNameRegex = /^[A-Za-z]+$/;
+            const colorName = colorNameInput.value.trim().toLowerCase();
+            if (colorName === "") {
+                showFieldError(colorNameInput, "Color name is required");
+                hasError = true;
+            } else if (!colorNameRegex.test(colorName)) {
+                showFieldError(colorNameInput, "Should contain only letters.");
+                hasError = true;
+            }  else if (globalColorNames.has(colorName)) {
+                showFieldError(colorNameInput, "Duplicate color name found");
+                hasError = true;
+            } else {
+                globalColorNames.add(colorName);
+                clearFieldError(colorNameInput);
+            }
+        }
+
+        const sizeInputs = card.querySelectorAll('input[name^="sizes_"]');
+        const sizesInThisVariant = new Set();
+        sizeInputs.forEach(input => {
+            const sizeValue = input.value.trim();
+            if (sizeValue === "" || isNaN(sizeValue) || Number(sizeValue) <= 0) {
+                showFieldError(input, "Valid size is required");
+                hasError = true;
+            } else if (sizesInThisVariant.has(sizeValue)) {
+                showFieldError(input, "Duplicate size found");
+                hasError = true;
+            } else {
+                sizesInThisVariant.add(sizeValue);
+                clearFieldError(input);
+            }
+        });
+
+        const stockInputs = card.querySelectorAll('input[name^="stocks_"]');
+        stockInputs.forEach(input => {
+            const stockValue = input.value.trim();
+            if (stockValue === "" || isNaN(stockValue) || Number(stockValue) < 0) {
+                showFieldError(input, "Valid stock quantity is required");
+                hasError = true;
+            } else {
+                clearFieldError(input);
+            }
+        });
+
+        const variantIndex = card.getAttribute("data-variant-index");
+        const imageError = card.querySelector(".image-error");
+        const uploadedImages = variantFilesMap[variantIndex] || [];
+
+        if (uploadedImages.length < 3) {
+            if (imageError) {
+                imageError.textContent = "At least 3 images are required for this variant";
+            }
+            hasError = true;
+        } else {
+            if (imageError) {
+                imageError.textContent = "";
+            }
+        }
     }
 
- 
-    if (!validationPassed) {
-        return;
-    }
+    if (hasError) return;
 
-   Object.keys(variantFilesMap).forEach(variantIdx => {
-    finalizeVariantFilesInput(variantIdx);
-});
+    Object.keys(variantFilesMap).forEach(variantIdx => {
+        finalizeVariantFilesInput(variantIdx);
+    });
 
-e.target.submit();
+    e.target.submit();
 });
 
 bindColorPickers();

@@ -53,7 +53,6 @@
 
                                 <button type="submit" class="panel-btn btn-apply">Apply Offer</button>
                             </form>
-
                             <div class="active-tracker-section">
                                 <h3>Active Product Discounts</h3>
                                 <div class="panel-scroll-box">
@@ -62,12 +61,15 @@
                                         <div class="tracker-item">
                                             <div class="tracker-info">
                                                 <span class="tracker-name">{{this.productName}}</span>
+                                                 <span class="tracker-meta text-muted" style="font-size: 10px; display: block;">
+                                                    Start: {{formattedDate this.offer.startDate}}
+                                                </span>
                                                 <span class="tracker-meta text-muted" style="font-size: 10px; display: block;">
                                                     Expires: {{formattedDate this.offer.expiryDate}}
                                                 </span>
                                                 <span class="tracker-badge color-amber">{{this.offer.discountValue}}% OFF</span>
                                             </div>
-                                            <form action="/admin/offers/remove-product/{{this._id}}" method="POST">
+                                            <form action="/admin/offers/remove-product/{{this._id}}/{{this.offer._id}}" method="POST">
                                                 <button type="submit" class="panel-btn btn-delete">Remove</button>
                                             </form>
                                         </div>
@@ -137,6 +139,11 @@
                                                     {{/if}}
                                                     <small class="tracker-level-tag">(Subcategory Group)</small>
                                                 </span>
+                                                {{#if this.offer.startDate}}
+                                                <span class="tracker-meta text-muted" style="font-size: 10px; display: block;">
+                                                    Starts: {{formattedDate this.offer.startDate}}
+                                                </span>
+                                                {{/if}}
                                                 {{#if this.offer.expiryDate}}
                                                 <span class="tracker-meta text-muted" style="font-size: 10px; display: block;">
                                                     Expires: {{formattedDate this.offer.expiryDate}}
@@ -144,7 +151,7 @@
                                                 {{/if}}
                                                 <span class="tracker-badge color-emerald">{{this.offer.discountValue}}% OFF</span>
                                             </div>
-                                            <form action="/admin/offers/remove-category/{{this._id}}" method="POST">
+                                            <form action="/admin/offers/remove-category/{{this._id}}/{{this.offer._id}}" method="POST">
                                                 <button type="submit" class="panel-btn btn-delete">Remove</button>
                                             </form>
                                         </div>

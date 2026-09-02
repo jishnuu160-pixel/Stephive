@@ -57,6 +57,7 @@
       <form action="/admin/orders/update/{{order._id}}" method="POST">
         <label>CURRENT STATUS:</label>
         <select name="status">
+        <option value="placed" {{#if (eq status "pending")}}selected{{/if}}>Pending</option>
         <option value="placed" {{#if (eq status "placed")}}selected{{/if}}>Placed</option>
         <option value="processing" {{#if (eq status "processing")}}selected{{/if}}>Processing</option>
         <option value="shipped" {{#if (eq status "shipped")}}selected{{/if}}>Shipped</option>

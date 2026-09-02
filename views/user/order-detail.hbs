@@ -410,12 +410,34 @@ async function retryPayment(dbOrderId) {
                 });
 
                 const verifyData = await verifyRes.json();
-                if (verifyData.success) {
-                    Swal.fire('Success!', 'Payment successful! Updating order...', 'success')
-                        .then(() => window.location.reload());
-                } else {
-                    Swal.fire('Verification Failed', verifyData.message || "Payment verification failed", "error");
-                }
+
+             if (verifyData.success) {
+    Swal.fire({
+        title: 'Success!',
+        text: 'Payment successful! Updating order...',
+        icon: 'success',
+        width: '350px',
+        customClass: {
+            popup: 'small-swal-popup',
+            title: 'small-swal-title',
+            htmlContainer: 'small-swal-text'
+        }
+    }).then(() => {
+        window.location.reload();
+    });
+} else {
+                Swal.fire({
+                   title: 'Verification Failed',
+                   text: verifyData.message || 'Payment verification failed',
+                   icon: 'error',
+                   width: '350px',
+                   customClass: {
+                       popup: 'small-swal-popup',
+                       title: 'small-swal-title',
+                       htmlContainer: 'small-swal-text'
+                    }
+                });
+             }
             },
             modal: {
                 ondismiss: function () {

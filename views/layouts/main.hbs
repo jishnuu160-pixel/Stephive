@@ -39,6 +39,7 @@
     <link rel="stylesheet" href="/css/refer-earn.css">
     <link rel="stylesheet" href="/css/terms.css">
     <link rel="stylesheet" href="/css/contactUs.css">
+    <link rel="stylesheet" href="/css/not-found.css">
 </head>
 
 <body class="{{#if isHome}}home-page{{/if}} {{#if isLogin}}login-page{{/if}} {{#if isSignup}}signup-page{{/if}}">
@@ -68,26 +69,35 @@
     <script src="/js/category.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const authPaths = ['/user/login', '/user/signup', '/user/forgot-password', '/user/verify-otp','/user/add-address'];
-            const isAuthPage = authPaths.some(path => window.location.pathname.includes(path));
+    document.addEventListener("DOMContentLoaded", function() {
+        const authPaths = ['/user/login', '/user/signup', '/user/forgot-password', '/user/verify-otp', '/user/add-address','/user/verify-email-change-otp','/user/changepass'];
+        const isAuthPage = authPaths.some(path => window.location.pathname.includes(path));
 
-            let successMsg = "{{{success}}}".toString().trim();
-            let errorMsg = "{{{error}}}".toString().trim();
+        let successMsg = "{{{success}}}".toString().trim();
+        let errorMsg = "{{{error}}}".toString().trim();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSuccess = urlParams.get('success');
+        if (urlSuccess && (!successMsg || successMsg === "null")) {
+            successMsg = urlSuccess;
+        }
+
+        if (successMsg && successMsg !== "null" && successMsg !== "") {
+            const isOtpMsg = successMsg.toLowerCase().includes("otp");
+            const isPasswordUpdate = successMsg.toLowerCase().includes("password") || successMsg.toLowerCase().includes("updated");
+            const isLogoutMsg = successMsg.toLowerCase().includes("logout");
             
-            if (successMsg && successMsg !== "null" && successMsg !== "") {
-                const isOtpMsg = successMsg.toLowerCase().includes("otp");
-                if (!isAuthPage || isOtpMsg) {
-                    if (typeof showToast === "function") showToast(successMsg, "success"); 
-                }
+            if (!isAuthPage || isOtpMsg || isPasswordUpdate || isLogoutMsg) {
+                if (typeof showToast === "function") showToast(successMsg, "success"); 
             }
+        }
 
-            if (errorMsg && errorMsg !== "null" && errorMsg !== "") {
-                if (!isAuthPage) {
-                    if (typeof showToast === "function") showToast(errorMsg, "error"); 
-                }
+        if (errorMsg && errorMsg !== "null" && errorMsg !== "") {
+            if (!isAuthPage) {
+                if (typeof showToast === "function") showToast(errorMsg, "error"); 
             }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>

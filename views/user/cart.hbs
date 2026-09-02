@@ -15,19 +15,20 @@
             <a class="continue-btn" href="/shop" style="text-decoration: none;">← Continue Shopping</a>
         </header>
 
-<div class="cart-content">
+        <div class="cart-content">
             <div class="cart-layout-grid">
                 
                 <section class="cart-items-list" {{#unless cart.items.length}}style="grid-column: 1 / -1; width: 100%; display: flex; justify-content: center;"{{/unless}}>
                     {{#if cart.items.length}}
                         {{#each cart.items}}
-                        <div class="cart-card 
-                            {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} 
-                            {{#if this.hasInsufficientStock}}stock-error-border{{/if}} 
-                            {{#if this.isUnlisted}}disabled-item-opacity{{/if}}" 
-                            data-product-id="{{this.productId._id}}" 
-                            data-size="{{#if this.size}}{{this.size}}{{else}}default{{/if}}" 
-                            data-color="{{#if this.color}}{{this.color}}{{else}}default{{/if}}">
+                       <div class="cart-card 
+                         {{#if this.isOutOfStock}}disabled-item-opacity{{/if}} 
+                         {{#if this.hasInsufficientStock}}stock-error-border{{/if}} 
+                         {{#if this.isUnlisted}}disabled-item-opacity{{/if}}" 
+                          data-product-id="{{this.productId._id}}" 
+                          data-variant-id="{{this.variantId}}"
+                          data-size="{{#if this.size}}{{this.size}}{{else}}default{{/if}}" 
+                          data-color="{{#if this.color}}{{this.color}}{{else}}default{{/if}}">
                             
                             <div class="item-image-wrapper">
                                 {{#if this.productId.variants.[0].images.[0]}}
@@ -283,8 +284,8 @@ if (badge && targetQuantity <= maxStock) {
 }
 
 
-
 async function removeCartRow(buttonElement) {
+
     const result = await Swal.fire({
         title: 'Remove Product?',
         text: "This item will be removed from your cart.",
@@ -293,7 +294,7 @@ async function removeCartRow(buttonElement) {
         confirmButtonText: 'Remove',
         cancelButtonText: 'Cancel',
         reverseButtons: true,
-       customClass: {
+        customClass: {
             popup: 'small-swal-popup',
             title: 'small-swal-title',
             htmlContainer: 'small-swal-text'
@@ -303,11 +304,14 @@ async function removeCartRow(buttonElement) {
     if (!result.isConfirmed) return;
 
     const card = buttonElement.closest('.cart-card');
+
     const productId = card.getAttribute('data-product-id');
+    const variantId = card.getAttribute('data-variant-id');
     const size = card.getAttribute('data-size');
     const color = card.getAttribute('data-color');
 
     try {
+
         const response = await fetch('/cart/remove', {
             method: 'DELETE',
             headers: {
@@ -315,6 +319,7 @@ async function removeCartRow(buttonElement) {
             },
             body: JSON.stringify({
                 productId,
+                variantId,
                 size,
                 color
             })
@@ -323,16 +328,25 @@ async function removeCartRow(buttonElement) {
         const data = await response.json();
 
         if (response.ok && data.success) {
+
             card.remove();
+
             showToast("Product removed from cart");
 
             setTimeout(() => {
                 window.location.reload();
             }, 800);
+
         } else {
-            showToast(data.message || "Failed to remove product", "error");
+
+            showToast(
+                data.message || "Failed to remove product",
+                "error"
+            );
         }
+
     } catch (err) {
+
         console.error(err);
         showToast("Something went wrong", "error");
     }

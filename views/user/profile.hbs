@@ -12,7 +12,7 @@
         <div class="profile-layout">
             {{> userSide user=user}}
 
-            <main class="profile-main">
+            <main class="profile-main-content">
                 <section class="profile-card profile-info-summary">
                     <div class="avatar-edit-container">
                         <form action="/user/update-avatar" method="POST" enctype="multipart/form-data" id="avatarForm">
@@ -64,7 +64,7 @@
                             <a href="/user/send-email-change-otp" class="btn-outline"><img src="/icons/email.png" class="edit-profile"> Change Email</a>
                             <a href="/user/update-password-init" class="btn-outline"><img src="/icons/lock.png" class="edit-profile"> Update Password</a>
                         </div>
-                        </div>
+                       
                     </form>
                 </section>
             </main> 

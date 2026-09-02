@@ -110,11 +110,7 @@
                                 <input type="text" name="colorNames[]" value="{{this.colorName}}" placeholder="Color Name">
                                 <small class="field-error"></small>
                                 
-                                {{!-- Dynamic lookup error for colorNames_{index} --}}
-                               <div
-    class="text-danger small mt-1"
-    id="error-colorNames_{{@index}}">
-</div>
+                               <div class="text-danger small mt-1" id="error-colorNames_{{@index}}"></div>
 
                                 <div class="color-picker">
                                     <input type="color" name="colorHex[]" value="{{this.colorHex}}">
@@ -159,11 +155,7 @@
                                 <div class="images-preview-gallery-variant" id="thumbnailsContainer_{{@index}}"></div>
 
                                 <div class="image-error text-danger small mt-1" id="error-variantImages_{{@index}}"></div>
-                                {{!-- Dynamic lookup error for variantImages_{index} --}}
-                                <div
-    class="text-danger small mt-1"
-    id="error-variantImages_{{@index}}">
-</div>
+                                <div class="text-danger small mt-1" id="error-variantImages_{{@index}}"></div>
                             </div>
 
                             <div class="sizes-container">
@@ -182,11 +174,7 @@
                                 <button type="button" class="add-size">+ Add size</button>
                                 <div class="size-error text-danger small mt-1"></div>
 
-                                {{!-- Dynamic lookup error for sizes_{index} --}}
-                                <div
-    class="text-danger small mt-1"
-    id="error-sizes_{{@index}}">
-</div>
+                                <div class="text-danger small mt-1" id="error-sizes_{{@index}}"></div>
                             </div>
 
                             <button type="button" class="remove-variant">
@@ -355,31 +343,38 @@ function validateProductForm() {
         el.textContent = '';
     });
 
-    function showError(id, message) {
-        const element = document.getElementById(id);
+function showError(id, message) {
+    let element = document.getElementById(id);
 
-        if (element) {
-            element.textContent = message;
+    if (!element) {
+        const fieldName = id.replace(/^error-/, '');
+        const inputElement = document.querySelector(`[name="${fieldName}"]`);
+        if (inputElement) {
+            element = inputElement.parentElement.querySelector('.client-error, .text-danger, .error-message');
         }
-
-        isValid = false;
     }
 
-    const productName = document
-        .querySelector('[name="productName"]')
-        ?.value.trim();
+    if (element) {
+        element.textContent = message;
+    }
+    isValid = false;
+}
+
+    const productName = document.querySelector('[name="productName"]')?.value.trim();
+
+    const nameRegex = /^[A-Za-z\s]+$/;    
 
     if (!productName) {
-        showError('error-productName', 'Shoe name is required.');
+        showError('error-productName', 'Product name is required.');
     } else if (productName.length < 3) {
         showError(
             'error-productName',
-            'Shoe name must contain at least 3 characters.'
+            'Product name must contain at least 3 characters.'
         );
-    } else if (productName.length > 100) {
+    } else if (!nameRegex.test(productName)) {
         showError(
             'error-productName',
-            'Shoe name cannot exceed 100 characters.'
+            'Product name should contain only letters and space.'
         );
     }
 
@@ -396,12 +391,12 @@ function validateProductForm() {
     if (!regularPrice) {
         showError(
             'error-regularPrice',
-            'Base price is required.'
+            'Price is required.'
         );
-    } else if (Number(regularPrice) <= 0) {
+    } else if (Number(regularPrice) <= 500) {
         showError(
             'error-regularPrice',
-            'Base price must be greater than 0.'
+            'Price must be greater than 500.'
         );
     }
 
@@ -409,12 +404,18 @@ function validateProductForm() {
         .querySelector('[name="description"]')
         ?.value.trim();
 
+    const descriptionRegex = /^[A-Za-z\s]+$/; 
     if (!description) {
         showError(
             'error-description',
             'Description is required.'
         );
-    } else if (description.length < 10) {
+    } else if (!descriptionRegex.test(description)) {
+        showError(
+            'error-description',
+            'Should contain only letters and space.'
+        );
+    }  else if (description.length < 10) {
         showError(
             'error-description',
             'Description must contain at least 10 characters.'
@@ -430,46 +431,73 @@ function validateProductForm() {
         .querySelector('[name="material"]')
         ?.value.trim();
 
+    const materialRegex = /^[A-Za-z\s]+$/; 
+
     if (!material) {
         showError(
             'error-material',
             'Material is required.'
         );
+    } else if (!materialRegex.test(material)) {
+        showError(
+            'error-material',
+            'Should contain only letters and space.'
+        );
     }
-
+    
     const closureType = document
         .querySelector('[name="closureType"]')
         ?.value.trim();
+
+    const closureRegex = /^[A-Za-z\s]+$/;
 
     if (!closureType) {
         showError(
             'error-closureType',
             'Closure type is required.'
         );
+    } else if (!closureRegex.test(closureType)){
+        showError(
+            'error-closureType',
+            'Should contain only contain letters and space.'
+        )
     }
 
     const soleType = document
         .querySelector('[name="soleType"]')
         ?.value.trim();
 
+    const soleRegex = /^[A-Za-z\s]+$/;
     if (!soleType) {
         showError(
             'error-soleType',
             'Sole type is required.'
         );
+    } else if (!soleRegex.test(soleType)){
+        showError(
+            'error-soleType',
+            'Should contain only contain letters and space.'
+        )
     }
 
     const weight = document
         .querySelector('[name="weight"]')
         ?.value.trim();
 
+    const WeightRegex = /^[0-9]+$/;
     if (!weight) {
         showError(
             'error-weight',
             'Weight is required.'
         );
+    } else if (!WeightRegex.test(weight)){
+        showError(
+            'error-weight',
+            'Should contain only numbers'
+        )
     }
 
+     const countryRegex = /^[A-Za-z\s]+$/;
     const country = document
         .querySelector('[name="countryOfOrigin"]')
         ?.value.trim();
@@ -479,7 +507,13 @@ function validateProductForm() {
             'error-countryOfOrigin',
             'Country of origin is required.'
         );
+    } else if (!countryRegex.test(country)){
+        showError(
+            'error-countryOfOrigin',
+            'Should contain only contain letters and space.'
+        )
     }
+
 
     const variantCards = document.querySelectorAll(
         '#variantsContainer .variant-card'
@@ -500,6 +534,7 @@ function validateProductForm() {
             .querySelector('[name="colorNames[]"]')
             ?.value.trim();
 
+        const colorRegex = /^[A-Za-z\s]+$/;
         if (!colorName) {
             const error = card.querySelector(
                 `#error-colorNames_${index}`
@@ -509,9 +544,18 @@ function validateProductForm() {
                 error.textContent =
                     'Color name is required.';
             }
-
             isValid = false;
-        }
+        }else if (!colorRegex.test(colorName)) {
+            const error = card.querySelector(
+                `#error-colorNames_${index}`
+            );
+
+            if (error) {
+                error.textContent =
+                    'Color name should contain only letters and space.';
+            }
+            isValid = false;
+        } 
 
         const sizeRows = card.querySelectorAll(
             '.size-row'
@@ -990,5 +1034,42 @@ function reindexVariants() {
         });
     });
 }
+
+
+document.addEventListener('input', (e) => {
+        const target = e.target;
+        
+        if (target.classList.contains('is-invalid')) {
+            target.classList.remove('is-invalid');
+        }
+
+        const fieldName = target.getAttribute('name');
+        if (fieldName) {
+            const cleanName = fieldName.replace(/\[\]$/, ''); 
+            const errorSlot = document.getElementById(`error-${cleanName}`) || 
+                              target.parentElement?.querySelector('.client-error, .text-danger, .error-message');
+            if (errorSlot) {
+                errorSlot.textContent = '';
+            }
+        }
+    });
+
+    document.addEventListener('change', (e) => {
+        const target = e.target;
+        
+        if (target.classList.contains('is-invalid')) {
+            target.classList.remove('is-invalid');
+        }
+
+        const fieldName = target.getAttribute('name');
+        if (fieldName) {
+            const cleanName = fieldName.replace(/\[\]$/, '');
+            const errorSlot = document.getElementById(`error-${cleanName}`) || 
+                              target.parentElement?.querySelector('.client-error, .text-danger, .error-message');
+            if (errorSlot) {
+                errorSlot.textContent = '';
+            }
+        }
+    });
 </script>
 

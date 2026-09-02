@@ -19,11 +19,11 @@
 
         <div class="hero-image-wrapper" style="flex: 1; position: relative;">
 
-<button class="wishlist-btn {{#if isWishlisted}}active{{/if}}" data-product-id="{{product._id}}">
-    <i class="{{#if isWishlisted}}fa-solid{{else}}fa-regular{{/if}} fa-heart"></i>
-</button>
+       <button class="wishlist-btn" data-product-id="{{product._id}}">
+        <i class="fa-regular fa-heart"></i>
+       </button>
 
-            <div class="product-card">
+    <div class="product-card">
     {{#if product.variants.[0].images.[0]}}
     <div class="zoom-container">
         <img id="mainProductImage" 
@@ -32,16 +32,15 @@
              data-zoom="{{product.variants.[0].images.[0]}}" 
              crossorigin="anonymous" 
              alt="{{product.productName}}">
-    </div>
+      </div>
     <div class="detail-zoom-pane"></div>
     {{else}}
     <div class="no-image-fallback">No Product Image Available</div>
     {{/if}}
-</div>
-
-        </div>
-
     </div>
+    </div>
+  </div>
+
 <div class="product-configurator-block">
       <h1 class="item-title">
         {{#if product.productName}}{{product.productName}}{{else}}StepHive Premium Sneaker{{/if}}
@@ -83,6 +82,7 @@
       <button 
         type="button" 
         class="size-chip {{#if (eq this.stock 0)}}out-of-stock{{/if}}" 
+        data-size="{{this.size}}"
         {{#if (eq this.stock 0)}}disabled{{/if}}
         onclick="updateSelectedSize('{{this.size}}', this)">
         {{this.size}}
@@ -205,6 +205,7 @@
     let chosenSize = null;
     let chosenColor = "{{lookup (lookup product.variants 0) 'colorName'}}";
     let activeVariantId = "{{lookup (lookup product.variants 0) '_id'}}";
+    let wishlistCheckToken = 0;
 
     const globalVariants = [
     {{#each product.variants}}
@@ -248,7 +249,171 @@
         if (element) element.classList.add('active-thumb');
     }
 
+async function updateWishlistButton() {
+    const wishlistBtn = document.querySelector(".wishlist-btn");
+
+    if (!wishlistBtn || !activeVariantId) return;
+
+    const productId = wishlistBtn.dataset.productId;
+
+    const requestToken = ++wishlistCheckToken;
+
+    const variantIdBeingChecked = activeVariantId.toString();
+    const sizeBeingChecked = chosenSize;
+
+    try {
+        if (sizeBeingChecked) {
+
+            const response = await fetch(
+                `/wishlist/check?productId=${encodeURIComponent(productId)}&variantId=${encodeURIComponent(variantIdBeingChecked)}&size=${encodeURIComponent(sizeBeingChecked)}`
+            );
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            if (requestToken !== wishlistCheckToken) return;
+
+            if (activeVariantId.toString() !== variantIdBeingChecked) return;
+
+            if (chosenSize?.toString() !== sizeBeingChecked.toString()) return;
+
+            const icon = wishlistBtn.querySelector("i");
+
+            if (data.success && data.isInWishlist) {
+
+                wishlistBtn.classList.add("active");
+
+                if (icon) {
+                    icon.classList.remove("fa-regular");
+                    icon.classList.add("fa-solid");
+                }
+            } else {
+                wishlistBtn.classList.remove("active");
+
+                if (icon) {
+                    icon.classList.remove("fa-solid");
+                    icon.classList.add("fa-regular");
+                }
+            }
+            return;
+        }
+
+
+        const currentVariant = globalVariants.find(
+            v => v._id.toString() === variantIdBeingChecked
+        );
+
+        if (!currentVariant) return;
+
+
+        let foundWishlistedSize = null;
+
+        for (const sizeObj of currentVariant.sizes) {
+
+            const response = await fetch(
+                `/wishlist/check?productId=${encodeURIComponent(productId)}&variantId=${encodeURIComponent(variantIdBeingChecked)}&size=${encodeURIComponent(sizeObj.size)}`
+            );
+
+            if (!response.ok) continue;
+
+            const data = await response.json();
+
+            if (requestToken !== wishlistCheckToken) return;
+
+            if (activeVariantId.toString() !== variantIdBeingChecked) {
+                return;
+            }
+
+            if (chosenSize !== null) {
+                return;
+            }
+
+            if (data.success && data.isInWishlist) {
+                foundWishlistedSize = sizeObj.size;
+                break;
+            }
+        }
+
+        if (requestToken !== wishlistCheckToken) return;
+
+        if (activeVariantId.toString() !== variantIdBeingChecked) return;
+
+        if (chosenSize !== null) return;
+
+
+        document.querySelectorAll(".size-chip").forEach(btn => {
+            btn.classList.remove("active-size");
+        });
+
+        const icon = wishlistBtn.querySelector("i");
+
+        if (foundWishlistedSize !== null) {
+            chosenSize = foundWishlistedSize;
+
+            const sizeButton = [...document.querySelectorAll(".size-chip")]
+                .find(btn =>
+                    btn.dataset.size?.toString() ===
+                    foundWishlistedSize.toString()
+                );
+
+            if (sizeButton) {
+                sizeButton.classList.add("active-size");
+            }
+
+            const indicator = document.getElementById("selectedSizeIndicator");
+
+            if (indicator) {
+                indicator.innerText = foundWishlistedSize;
+                indicator.style.color = "#10b981";
+            
+            }
+
+            wishlistBtn.classList.add("active");
+
+            if (icon) {
+                icon.classList.remove("fa-regular");
+                icon.classList.add("fa-solid");
+            }
+
+            const purchaseMatrix =document.getElementById("purchaseActionMatrix");
+
+            if (purchaseMatrix) {
+                purchaseMatrix.style.display = "flex";
+            }
+        } else {
+            chosenSize = null;
+
+            const indicator =
+                document.getElementById("selectedSizeIndicator");
+
+            if (indicator) {
+                indicator.innerText = "SELECT A SIZE";
+                indicator.style.color = "";
+            }
+
+            wishlistBtn.classList.remove("active");
+
+            if (icon) {
+                icon.classList.remove("fa-solid");
+                icon.classList.add("fa-regular");
+            }
+
+            const purchaseMatrix =
+                document.getElementById("purchaseActionMatrix");
+
+            if (purchaseMatrix) {
+                purchaseMatrix.style.display = "none";
+            }
+        }
+
+    } catch (err) {
+        console.error("Wishlist status error:", err);
+    }
+}
+
 function updateSelectedColor(colorName, variantId, variantIndex, buttonElement) {
+        wishlistCheckToken++;
         chosenColor = colorName;
         activeVariantId = variantId;
         chosenSize = null;
@@ -297,6 +462,7 @@ function updateSelectedColor(colorName, variantId, variantIndex, buttonElement) 
             sizeButton.type = "button";
             sizeButton.className = `size-chip ${isOutOfStock ? 'out-of-stock' : ''}`;
             sizeButton.disabled = isOutOfStock;
+            sizeButton.dataset.size = sizeObj.size;
             sizeButton.innerText = sizeObj.size;
             sizeButton.onclick = () => updateSelectedSize(sizeObj.size, sizeButton);
 
@@ -316,21 +482,35 @@ function updateSelectedColor(colorName, variantId, variantIndex, buttonElement) 
             
             sizeChipsGrid.appendChild(container);
         });
+         updateWishlistButton();
     }
        
 function updateSelectedSize(sizeValue, buttonElement) {
-        chosenSize = sizeValue;
-        const indicator = document.getElementById("selectedSizeIndicator");
+
+    wishlistCheckToken++;
+
+    chosenSize = sizeValue;
+
+    const indicator =
+        document.getElementById("selectedSizeIndicator");
+
+    if (indicator) {
         indicator.innerText = sizeValue;
-        indicator.style.color = "#10b981"; 
-        
-        document.querySelectorAll('.size-chip').forEach(el => el.classList.remove('active-size'));
-        buttonElement.classList.add('active-size');
-
-        document.getElementById("purchaseQty").value = 1;
-
-        document.getElementById("purchaseActionMatrix").style.display = "flex";
+        indicator.style.color = "#10b981";
     }
+
+    document.querySelectorAll(".size-chip")
+        .forEach(el => el.classList.remove("active-size"));
+
+    buttonElement.classList.add("active-size");
+
+    document.getElementById("purchaseQty").value = 1;
+
+    document.getElementById("purchaseActionMatrix").style.display = "flex";
+
+    updateWishlistButton();
+}
+
    function updateQty(change) {
     if (!chosenSize) {
         return showToast("Please select a size first", "error");
@@ -380,7 +560,7 @@ async function addToCart(productId, variantId, size) {
         });
 
         if (response.status === 401 || response.status === 403) {
-            window.location.href = "/user/login?error=Please login to continue";
+            window.location.href = "/user/login";
             return;
         }
 
@@ -417,7 +597,7 @@ async function addToCart(productId, variantId, size) {
         setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 2500);
     }
 
-document.querySelector(".wishlist-btn").addEventListener("click", async function(){
+    document.querySelector(".wishlist-btn").addEventListener("click", async function(){
     const btn = this;
     const isCurrentlyActive = btn.classList.contains("active");
 
@@ -438,9 +618,14 @@ document.querySelector(".wishlist-btn").addEventListener("click", async function
             })
         });
 
+        if (response.status === 401 || response.status === 403) {
+            window.location.href = "/user/login";
+            return;
+        }
+
         const data = await response.json();
 
-if (data.success) {
+       if (data.success){
             const icon = btn.querySelector("i");
 
             if (data.isWishlisted === true) {
@@ -498,9 +683,58 @@ async function buyNow(productId) {
         btn.innerText = "Buy Now";
         showToast("Please login to order", "error");
          if (response.status === 401 || response.status === 403) {
-            window.location.href = "/user/login?error=Please login to continue";
+            window.location.href = "/user/login";
             return;
         }
     }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const params = new URLSearchParams(window.location.search);
+
+    const urlVariantId = params.get("variant");
+    const urlSize = params.get("size");
+
+    if (urlVariantId) {
+        const variantIndex = globalVariants.findIndex(
+            variant => variant._id.toString() === urlVariantId.toString()
+        );
+
+        if (variantIndex !== -1) {
+
+            const variant = globalVariants[variantIndex];
+            const colorButtons = document.querySelectorAll(".swatch-circle");
+            const colorButton = colorButtons[variantIndex];
+
+            if (colorButton) {
+                updateSelectedColor(
+                    variant.colorName,
+                    variant._id,
+                    variantIndex,
+                    colorButton
+                );
+            }
+
+            if (urlSize) {
+                setTimeout(() => {
+                    const sizeButton = [...document.querySelectorAll(".size-chip")]
+                        .find(button =>
+                            button.innerText.trim() === urlSize.toString()
+                        );
+
+                    if (sizeButton && !sizeButton.disabled) {
+
+                        updateSelectedSize(
+                            urlSize,
+                            sizeButton
+                        );
+
+                    }
+
+                }, 50);
+            }
+        }
+    }
+});
 </script>

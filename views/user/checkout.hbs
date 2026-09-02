@@ -276,8 +276,11 @@
 
                 if (data.success) {
                     localStorage.removeItem('appliedCouponCode'); 
-                    window.location.href = `/order-confirmation/${data.orderId}`;
-                     showToast("Order placed successfully!", "success");
+                      showToast("Order placed successfully!", "success");
+
+                     setTimeout(() => {
+                          window.location.href = `/order-confirmation/${data.orderId}`;
+                    }, 1000);
                 } else {
                     showToast(data.message || "Wallet payment failed", "error");
                 }
