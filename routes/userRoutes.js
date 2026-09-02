@@ -19,7 +19,8 @@ import {
     getAbout, deleteCheckoutAddress,
     getPrivacy,handleEditAddress,
     getTerms,getAddressForEdit,
-    getContact,postCheckoutAddAddress
+    getContact,postCheckoutAddAddress,
+    getVerifyEmailChangeOTP,postVerifyEmailChangeOTP
 } from '../controllers/userController.js';
 import { getAvailableCouponsAjax,applyCoupon, removeCoupon} from '../controllers/couponController.js';
 import { isUserAuthenticated, isUserLoggedOut,  preventCache } from '../middleware/authMiddleware.js';
@@ -95,12 +96,7 @@ router.get('/profile', isUserAuthenticated, getProfile);
 router.get('/edit-profile', preventCache, isUserAuthenticated, getEditProfile);
 
 
-router.post(
-   '/update-profile',
-   preventCache,
-   isUserAuthenticated,
-   postUpdateProfile
-);
+router.post('/update-profile',preventCache,isUserAuthenticated,postUpdateProfile);
 
 router.get('/logout', userLogout);
 
@@ -116,6 +112,9 @@ router.get('/send-email-change-otp', isUserAuthenticated, sendEmailChangeOTP);
 
 router.get('/change-email', preventCache, isUserAuthenticated, getChangeEmail);
 router.post('/change-email', preventCache, isUserAuthenticated, postChangeEmail);
+
+router.get('/verify-email-change-otp', isUserAuthenticated, getVerifyEmailChangeOTP);
+router.post('/verify-email-change-otp', isUserAuthenticated, postVerifyEmailChangeOTP);
 
 router.get('/changepass', isUserAuthenticated, getChangePassword);
 router.post('/changepass', isUserAuthenticated, postChangePassword);

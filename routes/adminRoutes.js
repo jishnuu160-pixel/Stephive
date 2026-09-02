@@ -95,8 +95,8 @@ router.get('/categories/:id/subcategories', getSubcategoriesByParent);
 router.get('/offer',isAdminAuthenticated,loadOffersPage);
 router.post('/offers/apply-category',isAdminAuthenticated,processCategoryOffer);
 router.post('/offers/apply-product',isAdminAuthenticated,processProductOffer);
-router.post('/offers/remove-product/:id',isAdminAuthenticated,deleteProductOffer);
-router.post('/offers/remove-category/:id',isAdminAuthenticated,deleteCategoryOffer);
+router.post('/offers/remove-product/:id/:offerId',isAdminAuthenticated,deleteProductOffer);
+router.post('/offers/remove-category/:id/:offerId',isAdminAuthenticated,deleteCategoryOffer);
 
 router.get('/returns', isAdminAuthenticated, getAllReturns);
 router.get('/returns/:id', isAdminAuthenticated, getReturnDetails);
