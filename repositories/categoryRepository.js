@@ -57,7 +57,6 @@ export const findCategoryByNameAndParent = async (name, parentCategory, excludeI
 };
 
 
-
 export const createCategory= async(categoryData)=>{
    try {
       const result = await Category.create(categoryData);
@@ -78,6 +77,7 @@ export const createCategory= async(categoryData)=>{
          }
       );
  };
+
 
 export const countCategories= async(query)=>{
       return await Category.countDocuments(query);
