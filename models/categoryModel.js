@@ -17,7 +17,7 @@ const categorySchema = new mongoose.Schema({
         default: null 
     },
 
- offer: {
+    offer: [{
         discountValue: { 
             type: Number, 
             default: 0,
@@ -40,7 +40,7 @@ const categorySchema = new mongoose.Schema({
             type: Date, 
             default: null 
         }
-    },
+    }],
     isListed: {
         type: Boolean,
         default: true

@@ -33,7 +33,7 @@ const productSchema = new mongoose.Schema({
         ref: 'Category',
         required: true
     },
-    offer: {
+    offer: [ {
         discountValue: { 
             type: Number, 
             min: 0,
@@ -55,7 +55,7 @@ const productSchema = new mongoose.Schema({
             type: Date, 
             default: null 
         }
-    },
+    }] ,
     regularPrice: {
         type: Number,
         required: true

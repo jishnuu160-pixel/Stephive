@@ -36,6 +36,7 @@ const getDateRangeFromQuery = (query) => {
     return { start, end };
 };
 
+
 export const viewSalesReport = async (req, res) => {
     try {
         const { start, end } = getDateRangeFromQuery(req.query);
@@ -58,6 +59,7 @@ export const viewSalesReport = async (req, res) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send('Server Error');
     }
 };
+
 
 export const downloadCSV = async (req, res) => {
     try {
@@ -85,6 +87,7 @@ export const downloadCSV = async (req, res) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error generating CSV file");
     }
 };
+
 
 export const downloadPDF = async (req, res) => {
     try {
