@@ -1,85 +1,99 @@
+
 import cron from 'node-cron';
 import Coupon from '../models/couponModel.js';
-import Product  from '../models/productModel.js';
-import Category  from '../models/categoryModel.js'; 
+import Product from '../models/productModel.js';
+import Category from '../models/categoryModel.js';
 
-
-export const initCouponExpiryCron = () => {
+export const initExpiryCron = () => {
     cron.schedule('* * * * *', async () => {
+        console.log(`[Cron] Expiry check started: ${new Date().toISOString()}`);
+
         try {
             const now = new Date();
 
-            const result = await Coupon.updateMany(
-                { 
-                    status: 'Active', 
-                    expiryDate: { $lt: now } 
+            // Expire coupons
+            const couponResult = await Coupon.updateMany(
+                {
+                    status: 'Active',
+                    expiryDate: { $lt: now }
                 },
-                { 
-                    $set: { status: 'Inactive' } 
+                {
+                    $set: {
+                        status: 'Inactive'
+                    }
                 }
             );
 
-            if (result.modifiedCount > 0) {
-                console.log(`[Cron] Auto-expired ${result.modifiedCount} coupon(s).`);
+            if (couponResult.modifiedCount > 0) {
+                console.log(
+                    `[Cron] Auto-expired ${couponResult.modifiedCount} coupon(s).`
+                );
             }
-        } catch (error) {
-            console.error("[Cron Error] Failed to expire coupons:", error);
-        }
-    });
-};
 
-
-export const initOfferExpiryCron = () => {
-    cron.schedule('* * * * *', async () => {
-        try {
-            const now = new Date();
-
+            // Expire product offers
             const productResult = await Product.updateMany(
-                { 
-                    "offer.isActive": true, 
-                    "offer.expiryDate": { $lt: now } 
-                },
-                { 
-                    $set: { 
-                        "offer.$[elem].isActive": false, 
-                        "offer.$[elem].discountValue": 0,
-                        "offer.$[elem].startDate": null,
-                        "offer.$[elem].expiryDate": null
-                    } 
+                {
+                    'offer.isActive': true,
+                    'offer.expiryDate': { $lt: now }
                 },
                 {
-                    arrayFilters: [{ "elem.isActive": true, "elem.expiryDate": { $lt: now } }]
+                    $set: {
+                        'offer.$[elem].isActive': false,
+                        'offer.$[elem].discountValue': 0,
+                        'offer.$[elem].startDate': null,
+                        'offer.$[elem].expiryDate': null
+                    }
+                },
+                {
+                    arrayFilters: [
+                        {
+                            'elem.isActive': true,
+                            'elem.expiryDate': { $lt: now }
+                        }
+                    ]
                 }
             );
 
             if (productResult.modifiedCount > 0) {
-                console.log(`[Cron] Auto-expired product offers for ${productResult.modifiedCount} product(s).`);
+                console.log(
+                    `[Cron] Auto-expired offers for ${productResult.modifiedCount} product(s).`
+                );
             }
 
+            // Expire category offers
             const categoryResult = await Category.updateMany(
-                { 
-                    "offer.isActive": true, 
-                    "offer.expiryDate": { $lt: now } 
-                },
-                { 
-                    $set: { 
-                        "offer.$[elem].isActive": false, 
-                        "offer.$[elem].discountValue": 0,
-                        "offer.$[elem].startDate": null,
-                        "offer.$[elem].expiryDate": null
-                    } 
+                {
+                    'offer.isActive': true,
+                    'offer.expiryDate': { $lt: now }
                 },
                 {
-                    arrayFilters: [{ "elem.isActive": true, "elem.expiryDate": { $lt: now } }]
+                    $set: {
+                        'offer.$[elem].isActive': false,
+                        'offer.$[elem].discountValue': 0,
+                        'offer.$[elem].startDate': null,
+                        'offer.$[elem].expiryDate': null
+                    }
+                },
+                {
+                    arrayFilters: [
+                        {
+                            'elem.isActive': true,
+                            'elem.expiryDate': { $lt: now }
+                        }
+                    ]
                 }
             );
 
             if (categoryResult.modifiedCount > 0) {
-                console.log(`[Cron] Auto-expired category offers for ${categoryResult.modifiedCount} category(ies).`);
+                console.log(
+                    `[Cron] Auto-expired offers for ${categoryResult.modifiedCount} categor(ies).`
+                );
             }
 
         } catch (error) {
-            console.error("[Cron Error] Failed to expire offers:", error);
+            console.error('[Cron Error] Failed to expire coupons/offers:', error);
         }
     });
+
+    console.log('[Cron] Expiry cron initialized.');
 };
