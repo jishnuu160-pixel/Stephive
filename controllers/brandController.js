@@ -35,7 +35,7 @@ export const toggleBrandStatus = async (req, res) => {
         res.redirect(redirectUrl);
     } catch (error) {
         req.flash('error', "Failed to update brand status.");
-        res.redirect('/admin/brands');
+        res.status(HTTP_STATUS.BAD_REQUEST).redirect('/admin/brands');
     }
 };
 
@@ -57,6 +57,7 @@ export const getEditBrandPage = async (req, res) => {
     }
 };
 
+
 export const updateBrand = async (req, res) => {
     try {
         const { id } = req.params;
@@ -76,9 +77,10 @@ export const updateBrand = async (req, res) => {
             req.flash('error', error.message || 'Brand update failed!');
         }
 
-        res.redirect(`/admin/brands/edit/${id}`);
+        res.status(HTTP_STATUS.BAD_REQUEST).redirect(`/admin/brands/edit/${id}`);
     }
 };
+
 
 export const getAddBrandPage = async (req, res) => {
     try {
@@ -87,6 +89,7 @@ export const getAddBrandPage = async (req, res) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading add brand page.");
     }
 };
+
 
 export const postAddBrand = async (req, res) => {
     try {
@@ -100,9 +103,10 @@ export const postAddBrand = async (req, res) => {
         } else {
             req.flash('error', error.message || 'Failed to add brand.');
         }
-        res.redirect('/admin/brands/add');
+        res.status(HTTP_STATUS.BAD_REQUEST).redirect('/admin/brands/add');
     }
 };
+
 
 export const getTopSellingBrands = async (req, res) => {
     try {

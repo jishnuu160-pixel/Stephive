@@ -15,6 +15,7 @@ export const loadCart = async (req, res) => {
     }
 };
 
+
 export const addToCart = async (req, res) => {
     try {
         const userId = req.user?._id || req.session?.user?.id;
@@ -33,6 +34,7 @@ export const addToCart = async (req, res) => {
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
     }
 };
+
 
 export const updateQuantity = async (req, res) => {
     try {
@@ -58,10 +60,11 @@ export const updateQuantity = async (req, res) => {
 export const removeFromCart = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const { productId, size, color } = req.body;
+        const { productId,variantId, size, color } = req.body;
 
         const result = await cartService.removeFromCart(userId, {
             productId,
+            variantId,
             size,
             color
         });

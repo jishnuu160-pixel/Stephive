@@ -7,7 +7,7 @@ export const getCategories = async (req, res) => {
 
        res.render('admin/categories', data);
    } catch (error) {
-      res.redirect('/admin/dashboard');
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).redirect('/admin/dashboard');
    }
 };
 
@@ -82,6 +82,7 @@ export const updateCategory = async (req, res) => {
       });
    }
 };
+
 
 export const getSubcategoriesByParent = async (req, res) => {
     try {

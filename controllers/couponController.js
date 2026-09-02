@@ -28,9 +28,11 @@ export const getCouponPage = async (req, res) => {
     }
 };
 
+
 export const getAddCouponPage = (req, res) => {
     res.render('admin/add-coupon', { layout: 'admin-layout',activePage:'coupons' });
 };
+
 
 export const addCoupon = async (req, res) => {
     try {
@@ -49,6 +51,7 @@ export const addCoupon = async (req, res) => {
       });
    }
 }
+
 
 export const getEditCouponPage = async (req, res) => {
     try {
@@ -72,6 +75,7 @@ export const getEditCouponPage = async (req, res) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading edit page");
     }
 };
+
 
 export const updateCoupon = async (req, res) => {
     try {
@@ -97,6 +101,7 @@ export const toggleCouponStatus = async (req, res) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error updating coupon status");
     }
 };
+
 
 export const applyCoupon = async (req, res) => {
     try {
@@ -125,6 +130,7 @@ export const applyCoupon = async (req, res) => {
     }
 };
 
+
 export const getAvailableCoupons = async (req, res) => {
     try {
         const coupons = await couponService.getActiveCoupons();
@@ -133,6 +139,7 @@ export const getAvailableCoupons = async (req, res) => {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Error fetching coupons" });
     }
 };
+
 
 export const getAvailableCouponsAjax = async (req, res) => {
     try {

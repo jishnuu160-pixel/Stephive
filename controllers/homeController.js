@@ -46,7 +46,7 @@ export const getHome = async (req, res) => {
         const latestSellers = latestSellersRaw.map(attachOfferPricing);
         const bestSellers = bestSellersRaw.map(attachOfferPricing); 
 
-        return res.status(HTTP_STATUS.OK).render('home', {
+        return res.render('home', {
             isHome: true,
             activePage: 'home',
             user: req.session.user || null,
