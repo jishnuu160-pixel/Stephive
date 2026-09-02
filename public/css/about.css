@@ -84,11 +84,11 @@
 }
 
 .glass-card h3{
-    font-size: 20px;
+    font-size: 15px;
 }
 
 .glass-card p{
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .glass-card:hover {
@@ -101,6 +101,11 @@
 .cta { 
     text-align: center; 
     padding: 60px 20px; 
+}
+
+.cta h2{
+    font-weight: 700;
+    font-size: 20px;
 }
 
 .btn-shop {

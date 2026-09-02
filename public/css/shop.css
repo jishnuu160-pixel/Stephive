@@ -155,7 +155,7 @@
     display: flex;
     gap: 30px;
     padding: 20px;
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -166,18 +166,17 @@
 .product-card,
 .product-card-gender,
 .best-sellers .product-card {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 16px !important;
-    padding: 16px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    height: 100% !important;
-    box-sizing: border-box !important;
+    background: #ffffff ;
+    border: 1px solid #e2e8f0 ;
+    border-radius: 16px ;
+    padding: 12px ;
+    display: flex ;
+    flex-direction: column ;
+    justify-content: space-between ;
+    box-sizing: border-box ;
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .product-card:hover,
@@ -189,8 +188,8 @@
 }
 
 .product-image {
-    width: 100% !important;
-    aspect-ratio: 1 / 1 !important;
+    width: 100% ;
+    aspect-ratio: 1 / 1 ;
     background-color: #f8fafc !important;
     border-radius: 12px !important;
     display: flex !important;
@@ -722,37 +721,6 @@
 /* ==========================================================================
    📱 RESPONSIVE BREAKPOINT OVERRIDES
    ========================================================================== */
-
-@media screen and (max-width: 1024px) {
-    .shop-main-layout {
-        flex-direction: row !important;
-        gap: 16px !important;
-        padding: 10px !important;
-    }
-
-    .product-grid {
-        grid-template-columns: 160px 1fr !important;
-        gap: 12px !important;
-    }
-
-    .sidebar-wrapper {
-        flex: 0 0 160px !important;
-        width: 160px !important;
-        margin: 0 !important;
-    }
-
-    .products-wrapper-grid-shop {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-        padding: 0 !important;
-    }
-    
-    .products-wrapper-grid-search {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-        padding: 0 !important;
-    }
-}
 
 @media screen and (max-width: 968px) {
     .shop-main-layout {

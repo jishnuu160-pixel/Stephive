@@ -75,19 +75,13 @@
 
 /* Tablets & Small Laptops */
 @media screen and (max-width: 1024px) {
+.sidebar-user-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
 
-    .profile-layout > .profile-sidebar {
-        display: none !important;
-    }
-
-  .profile-sidebar::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide profile info on smaller screens */
-  .sidebar-user-header {
-    display: none;
-  }
 
   .nav-item {
     flex-shrink: 0;
@@ -98,7 +92,7 @@
   }
 
   .nav-item.active {
-    width: auto;
+    width: 100%;
     padding: 10px 14px;
   }
 
@@ -122,9 +116,29 @@
     }
 }
 
+@media screen and (max-width: 991px){
+      .profile-layout > .profile-sidebar {
+        display: none !important;
+    }
+
+    .profile-layout > .sidebar-nav {
+        display: none !important;
+    }
+}
+
 /* Mobile Devices */
 @media screen and (max-width: 768px) {
 
+
+    .profile-layout > .profile-sidebar {
+        display: none !important;
+    }
+
+    .profile-layout > .sidebar-nav {
+        display: none !important;
+    }
+
+    
   .profile-sidebar {
     padding: 10px 12px;
     border-radius: 12px;

@@ -4,7 +4,7 @@
 
 /* Sidebar Container */
 .admin-sidebar-unique {
-    width: 260px;
+    width: 240px;
     background: white;
     border-radius: 15px;
     padding: 15px 10px;
@@ -106,7 +106,7 @@
     background: #000000;
     color: #ffffff !important;
     font-weight: 600;
-    width: 100%;
+    width: 90%;
 }
 
 /* Logout Customization */

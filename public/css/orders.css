@@ -141,7 +141,7 @@
 /* Responsive Table Wrapper */
 .ord-table-responsive {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: none;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -164,8 +164,8 @@
 }
 
 .ord-table td {
-    padding: 14px 16px;
-    font-size: 12px;
+    padding: 12px 14px;
+    font-size: 10px;
     color: #2d3748;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;

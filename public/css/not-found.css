@@ -1,0 +1,62 @@
+
+
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-code {
+  font-size: 110px;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.error-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 15px 0 10px;
+  text-transform: capitalize;
+}
+
+.error-description {
+  color: #888888;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-not-found {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 30px;
+  transition: opacity 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #ffffff;
+  color: #121212;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}

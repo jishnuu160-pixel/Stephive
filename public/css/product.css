@@ -34,7 +34,7 @@
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 26px;
+    padding: 10px;
     box-sizing: border-box;
     width: 100%;
     max-width: 100%;
@@ -157,7 +157,7 @@
    =========================== */
 .prod-table-responsive {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: hidden;
 }
 
 .prod-table {
@@ -167,7 +167,7 @@
 }
 
 .prod-table th {
-    font-size: 0.75rem;
+    font-size: 10px;
     font-weight: 600;
     color: #6b7280;
     background-color: #f9fafb;
@@ -178,8 +178,8 @@
 }
 
 .prod-table td {
-    padding: 12px 14px;
-    font-size: 0.85rem;
+    padding: 10px 12px;
+    font-size: 12px;
     color: #1f2937;
     border-bottom: 1px solid #f3f4f6;
     vertical-align: middle;

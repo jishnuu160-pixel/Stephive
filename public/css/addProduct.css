@@ -535,11 +535,15 @@
    ================================          */
 @media screen and (max-width: 1024px) {
     .admin-dashboard-wrapper {
-        flex-direction: column;
+        display: flex;
     }
 
     .products-page {
         padding: 16px;
+    }
+
+    .prod-table-card{
+        width: 100%;
     }
 }
 

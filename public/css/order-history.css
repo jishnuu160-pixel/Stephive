@@ -177,12 +177,14 @@
         gap: 12px !important;
     }
 
+    
+
     .profile-sidebar {
-        flex: 0 0 110px !important;
-        width: 110px !important;
-        padding: 15px 8px !important;
-        position: sticky !important;
-        top: 10px !important;
+        flex: 0 0 110px ;
+        width: 180px !important;
+        padding: 15px 8px ;
+        position: sticky ;
+        top: 10px ;
     }
 
     .profile-main {
