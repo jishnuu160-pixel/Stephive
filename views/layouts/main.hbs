@@ -69,6 +69,11 @@
     <script src="/js/category.js"></script>
 
     <script>
+  window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (performance.navigation && performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
     document.addEventListener("DOMContentLoaded", function() {
         const authPaths = ['/user/login', '/user/signup', '/user/forgot-password', '/user/verify-otp', '/user/add-address','/user/verify-email-change-otp','/user/changepass'];
         const isAuthPage = authPaths.some(path => window.location.pathname.includes(path));

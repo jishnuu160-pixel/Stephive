@@ -44,39 +44,49 @@ export const getCategoriesPage = async (queryParams) => {
 export const createCategory = async (body) => {
    const { categoryName, description, parentCategory, discountValue } = body;
 
-   const nameRegex=/^[A-Za-z\s]+$/;
-   if(!categoryName?.trim() && !description?.trim()){
+   const nameRegex = /^[A-Za-z\s]+$/;
+   const trimmedName = categoryName?.trim();
+   const trimmedDesc = description?.trim();
+   const resolvedParent = parentCategory || null;
+
+   if (!trimmedName && !trimmedDesc) {
       throw new Error("Category and description is required");
-   } else if(!nameRegex.test(categoryName) && !nameRegex.test(description)){
+   } else if (!nameRegex.test(trimmedName) && !nameRegex.test(trimmedDesc)) {
       throw new Error("Category and description should contain letters.");
    }
 
-
-   if (!categoryName?.trim()) {
+   if (!trimmedName) {
       throw new Error("Category name is required");
-   } else if(!nameRegex.test(categoryName)){
+   } else if (!nameRegex.test(trimmedName)) {
       throw new Error("Category should contain letters.");
    }
 
-   if (!description?.trim()) {
+   if (!trimmedDesc) {
       throw new Error("Description is required");
-   }  else if(!nameRegex.test(description)){
+   } else if (!nameRegex.test(trimmedDesc)) {
       throw new Error("Description should contain letters.");
    }
 
-   const existingCategory = await categoryRepo.findCategoryByNameAndParent(categoryName.trim(), parentCategory || null);
+   if (resolvedParent) {
+      const parentDoc = await categoryRepo.findCategoryById(resolvedParent);
+      if (parentDoc && parentDoc.name.localeCompare(trimmedName, undefined, { sensitivity: 'accent' }) === 0) {
+         throw new Error("A subcategory cannot have the same name as its parent category.");
+      }
+   }
+
+   const existingCategory = await categoryRepo.findCategoryByNameAndParent(trimmedName, resolvedParent);
 
    if (existingCategory) {
       throw new Error('Category already exists.');
    }
 
    const categoryData = {
-      name: categoryName.trim(),
-      description: description?.trim() || '', 
-      parentCategory: parentCategory || null, 
+      name: trimmedName,
+      description: trimmedDesc || '', 
+      parentCategory: resolvedParent, 
       isListed: true, 
       offer: {
-         discountValue: discountValue ? parseInt(discountValue) : 0,
+         discountValue: discountValue ? parseInt(discountValue, 10) : 0,
          offerType: 'Percentage',
          isActive: Number(discountValue) > 0
       }
@@ -92,25 +102,37 @@ export const updateCategory = async (categoryId, body) => {
       throw new Error('Category name and description fields are required.');
    }
 
-   const nameRegex=/^[A-Za-z\s]+$/;
+   const nameRegex = /^[A-Za-z\s]+$/;
+   const trimmedName = categoryName?.trim();
+   const trimmedDesc = description?.trim();
+   const resolvedParent = parentCategory || null;
 
-    if (!categoryName?.trim()) {
+   if (!trimmedName) {
       throw new Error("Category name is required");
-   } else if(!nameRegex.test(categoryName)){
+   } else if (!nameRegex.test(trimmedName)) {
       throw new Error("Category should contain letters.");
    }
 
-   if (!description?.trim()) {
+   if (!trimmedDesc) {
       throw new Error("Description is required");
-   } else if(!nameRegex.test(description)){
+   } else if (!nameRegex.test(trimmedDesc)) {
       throw new Error("Description should contain letters.");
    }
 
+   if (resolvedParent === categoryId) {
+      throw new Error('A category cannot be its own parent.');
+   }
 
-   
+   if (resolvedParent) {
+      const parentDoc = await categoryRepo.findCategoryById(resolvedParent);
+      if (parentDoc && parentDoc.name.localeCompare(trimmedName, undefined, { sensitivity: 'accent' }) === 0) {
+         throw new Error("A subcategory cannot have the same name as its parent category.");
+      }
+   }
+
    const duplicate = await categoryRepo.findCategoryByNameAndParent(
-       categoryName.trim(), 
-       parentCategory || null,
+       trimmedName, 
+       resolvedParent,
        categoryId 
    );
 
@@ -121,13 +143,13 @@ export const updateCategory = async (categoryId, body) => {
    const updatedCategory = await categoryRepo.updateCategory(
          categoryId,
          {
-            name: categoryName.trim(),
-            description: description.trim(),
-            parentCategory: parentCategory || null,
+            name: trimmedName,
+            description: trimmedDesc,
+            parentCategory: resolvedParent,
             offer: {
-               discountValue: discountValue ? parseInt(discountValue) : 0,
+               discountValue: discountValue ? parseInt(discountValue, 10) : 0,
                offerType: 'Percentage',
-               isActive: discountValue && parseInt(discountValue) > 0
+               isActive: discountValue && parseInt(discountValue, 10) > 0
             }
          }
       );

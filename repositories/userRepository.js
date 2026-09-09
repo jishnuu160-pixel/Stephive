@@ -13,9 +13,10 @@ export const findByPhone = async (phoneNumber) => {
 };
 
 export const findByEmailWithPassword = async (email) => {
-    return await User.findOne({ email }).select('+password');
+    return await User.findOne({
+        email: email.trim().toLowerCase()
+    }).select('+password');
 };
-
 
 export const createUser = async (data) => {
     try {
@@ -118,6 +119,15 @@ export const updateUserInfo = async (userId, updateData) => {
     }
 };
 
+export const updateUserById = async (userId, updateData) => {
+    return await User.findByIdAndUpdate(
+        userId,
+        updateData,
+        {
+            new: true
+        }
+    );
+};
 
 export const findById = async (userId) => {
     try {

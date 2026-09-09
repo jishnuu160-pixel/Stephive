@@ -271,7 +271,7 @@
 }
 
 /* --- 5. MODALS (CRITICAL FOR FUNCTIONALITY) --- */
-.modal-overlay {
+.modal-overlay-category {
     position: fixed;
     top: 0;
     left: 0;
@@ -287,8 +287,9 @@
 
 .modal-container {
     background-color: #ffffff;
-    width: 100%;
-    max-width: 480px;
+    width: 90%;
+    max-width: 420px;
+    max-height: 430px;
     border-radius: 12px;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -316,7 +317,7 @@
 }
 
 .modal-title {
-    font-size: 1.1rem;
+    font-size: 14px;
     font-weight: 700;
     color: #0f172a;
     margin: 0;
@@ -351,17 +352,17 @@
 }
 
 /* --- 6. FORM CONTROLS & ERROR CONTAINERS --- */
-.form-group {
-    margin-bottom: 16px;
+.form-group-category {
+    margin-bottom: 13px;
 }
 
 .form-group:last-child {
     margin-bottom: 0;
 }
 
-.form-label {
+.form-group-category .form-label {
     display: block;
-    font-size: 0.85rem;
+    font-size: 12px;
     font-weight: 600;
     color: #334155;
     margin-bottom: 6px;
@@ -370,10 +371,10 @@
 .form-input, 
 .form-select {
     width: 100%;
-    padding: 10px 14px;
+    padding: 7px 12px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: 12px;
     background-color: #ffffff;
     color: #0f172a;
     outline: none;

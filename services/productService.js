@@ -59,11 +59,8 @@ export const attachOfferPricing = async (productDoc) => {
 
     let productDiscountAmt = 0;
     let productDiscountPct = 0;
-
     let categoryDiscountAmt = 0;
     let categoryDiscountPct = 0;
-
-    // ---------------- PRODUCT OFFERS ----------------
 
     const productOffers = Array.isArray(product.offer)
         ? product.offer
@@ -101,10 +98,7 @@ export const attachOfferPricing = async (productDoc) => {
     }
 
 
-    // ---------------- CATEGORY OFFERS ----------------
-
     const categoryId = product.Category?._id || product.Category;
-
     if (categoryId) {
         const category = await mongoose
             .model('Category')
@@ -112,9 +106,6 @@ export const attachOfferPricing = async (productDoc) => {
             .populate('parentCategory');
 
         if (category) {
-
-            // -------- SUBCATEGORY OFFER --------
-
             const categoryOffers = Array.isArray(category.offer)
                 ? category.offer
                 : category.offer
@@ -151,9 +142,6 @@ export const attachOfferPricing = async (productDoc) => {
                     categoryDiscountPct = Math.round(discountPct);
                 }
             }
-
-
-            // -------- PARENT CATEGORY OFFER --------
 
             const parentCat = category.parentCategory;
 
@@ -197,9 +185,6 @@ export const attachOfferPricing = async (productDoc) => {
         }
     }
 
-
-// ---------------- FINAL OFFER ----------------
-
 let effectiveDiscount = 0;
 let maxDiscountAmount = 0;
 
@@ -240,95 +225,169 @@ export const getShopProducts = async (req) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 9;
         const skip = (page - 1) * limit;
-        const startIndex = skip;
 
         const allCategories = await findAllCategories();
 
         const isCategoryActive = (cat) => {
-            if (cat.isUnlisted === true || cat.isUnlisted === 'true') return false;
-            if (cat.isListed === false || cat.isListed === 'false') return false;
-            
+            if (cat.isUnlisted === true || cat.isUnlisted === 'true') {
+                return false;
+            }
+
+            if (cat.isListed === false || cat.isListed === 'false') {
+                return false;
+            }
+
             if (cat.parentCategory) {
-                const parent = allCategories.find(c => c._id.toString() === (cat.parentCategory._id || cat.parentCategory).toString());
-                if (parent && (parent.isUnlisted === true || parent.isUnlisted === 'true' || parent.isListed === false || parent.isListed === 'false')) {
+                const parent = allCategories.find(
+                    c =>
+                        c._id.toString() ===
+                        (cat.parentCategory._id || cat.parentCategory).toString()
+                );
+
+                if (
+                    parent &&
+                    (
+                        parent.isUnlisted === true ||
+                        parent.isUnlisted === 'true' ||
+                        parent.isListed === false ||
+                        parent.isListed === 'false'
+                    )
+                ) {
                     return false;
                 }
             }
+
             return true;
         };
 
         const activeCategoryObjectIds = allCategories
             .filter(cat => cat.parentCategory !== null && isCategoryActive(cat))
-            .map(cat => new mongoose.Types.ObjectId(cat._id));  
+            .map(cat => new mongoose.Types.ObjectId(cat._id));
 
-        let searchFilter = { 
+        let searchFilter = {
             isListed: true,
-            Category: { $in: activeCategoryObjectIds } 
+            Category: { $in: activeCategoryObjectIds }
         };
+
 
         if (req.query.gender) {
             searchFilter.gender = req.query.gender;
         }
 
         if (req.query.search?.trim()) {
-            searchFilter.productName = { $regex: req.query.search.trim(), $options: 'i' };
+            searchFilter.productName = {
+                $regex: req.query.search.trim(),
+                $options: 'i'
+            };
         }
 
         if (req.query.category) {
-            const selectedNames = Array.isArray(req.query.category) ? req.query.category : [req.query.category];
-        
-            const matchingCategories = await productRepo.getCategoryIdsByNames(selectedNames);
+            const selectedNames = Array.isArray(req.query.category)
+                ? req.query.category
+                : [req.query.category];
+
+            const matchingCategories =
+                await productRepo.getCategoryIdsByNames(selectedNames);
+
             const targetIds = matchingCategories.map(c => c._id);
-        
+
             if (targetIds.length > 0) {
-                searchFilter.Category = { $in: targetIds };
+                searchFilter.Category = {
+                    $in: targetIds
+                };
             }
         }
 
         if (req.query.brand) {
-            const brandIds = Array.isArray(req.query.brand) ? req.query.brand : [req.query.brand];
-            searchFilter.brand = { $in: brandIds };
-        }
+            const brandIds = Array.isArray(req.query.brand)
+                ? req.query.brand
+                : [req.query.brand];
 
-        if (req.query.price && req.query.price !== 'all') {
-            if (req.query.price === 'under5k') searchFilter.regularPrice = { $lt: 5000 };
-            else if (req.query.price === '5k-10k') searchFilter.regularPrice = { $gte: 5000, $lte: 10000 };
-            else if (req.query.price === 'above10k') searchFilter.regularPrice = { $gt: 10000 };
+            searchFilter.brand = {
+                $in: brandIds
+            };
         }
 
         if (req.query.material) {
-            searchFilter.material = { $regex: new RegExp(`^${req.query.material}$`, 'i') };
+            searchFilter.material = {
+                $regex: new RegExp(
+                    `^${req.query.material}$`,
+                    'i'
+                )
+            };
         }
 
         const filterForOptions = { ...searchFilter };
+
         delete filterForOptions.brand;
         delete filterForOptions.material;
 
-        const [rawProducts, totalProducts, rawBrands, rawMaterials] = await Promise.all([
-            productRepo.findProducts(searchFilter, getSort(req.query.sort), skip, limit), 
-            productRepo.countProducts(searchFilter),
-            productRepo.distinctBrandsByQuery(filterForOptions),
-            productRepo.distinctMaterials(filterForOptions)      
-        ]);
+        const [rawProducts, rawBrands, rawMaterials] =
+            await Promise.all([
+                productRepo.findProducts(
+                    searchFilter,
+                    getSort(req.query.sort),
+                    0,
+                    0
+                ),
+                productRepo.distinctBrandsByQuery(
+                    filterForOptions
+                ),
+                productRepo.distinctMaterials(
+                    filterForOptions
+                )
+            ]);
 
-
-        const products = await Promise.all(
-            rawProducts.map(prodDoc => attachOfferPricing(prodDoc))
+        let productsWithOfferPricing = await Promise.all(
+            rawProducts.map(prodDoc =>
+                attachOfferPricing(prodDoc)
+            )
         );
 
+        if (req.query.price === 'under5k') {
+            productsWithOfferPricing =
+                productsWithOfferPricing.filter(
+                    product => product.salePrice < 5000
+                );
+        } else if (req.query.price === '5k-10k') {
+            productsWithOfferPricing =
+                productsWithOfferPricing.filter(
+                    product =>
+                        product.salePrice >= 5000 &&
+                        product.salePrice <= 10000
+                );
+        } else if (req.query.price === 'above10k') {
+            productsWithOfferPricing =
+                productsWithOfferPricing.filter(
+                    product => product.salePrice > 10000
+                );
+        }
+        if (req.query.sort === 'low-high') {
+            productsWithOfferPricing.sort(
+                (a, b) => a.salePrice - b.salePrice
+            );
+        } else if (req.query.sort === 'high-low') {
+            productsWithOfferPricing.sort(
+                (a, b) => b.salePrice - a.salePrice
+            );
+        }
+
+        const totalProducts = productsWithOfferPricing.length;
+        const totalPages = Math.ceil(totalProducts / limit);
+        const products = productsWithOfferPricing.slice( skip,skip + limit);
         const brands = rawBrands.map(brandName => ({
             name: brandName,
-            isSelected: Array.isArray(req.query.brand) 
-                ? req.query.brand.includes(brandName) 
-                : req.query.brand === brandName 
+            isSelected: Array.isArray(req.query.brand)
+                ? req.query.brand.includes(brandName)
+                : req.query.brand === brandName
         }));
 
         const materials = rawMaterials.map(m => ({
-            name: m,
-            isSelected: req.query.material === m
-        }));   
+              name: m,
+              isSelected:
+                req.query.material === m
+        }));
 
-        const totalPages = Math.ceil(totalProducts / limit);
 
         const categoryMap = {};
         allCategories.forEach(cat => {
@@ -336,26 +395,34 @@ export const getShopProducts = async (req) => {
                 if (!categoryMap[cat.name]) {
                     categoryMap[cat.name] = false;
                 }
+
                 if (isCategoryActive(cat)) {
                     categoryMap[cat.name] = true;
                 }
             }
         });
 
-        const filteredCategoriesForUI = Object.keys(categoryMap)
-            .filter(catName => categoryMap[catName]) 
-            .map(catName => ({
-                name: catName,
-                isSelected: req.query.category 
-                    ? (Array.isArray(req.query.category) ? req.query.category.includes(catName) : req.query.category === catName) 
-                    : false
-            }));
+        const filteredCategoriesForUI =
+            Object.keys(categoryMap)
+                .filter(
+                    catName => categoryMap[catName]
+                )
+                .map(catName => ({
+                    name: catName,
 
+                    isSelected: req.query.category
+                        ? (
+                            Array.isArray(req.query.category)
+                                ? req.query.category.includes(catName)
+                                : req.query.category === catName
+                        )
+                        : false
+                }));
         return {
             products,
             materials,
             brands,
-            startIndex,
+            startIndex: skip,
             currentPage: page,
             totalPages: totalPages || 1,
             hasNextPage: page < totalPages,
@@ -366,7 +433,6 @@ export const getShopProducts = async (req) => {
             categories: filteredCategoriesForUI
         };
     } catch (error) {
-        console.error("Error inside getShopProducts:", error);
         throw error;
     }
 };

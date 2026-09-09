@@ -103,7 +103,7 @@
 <div class="admin-toast-container"></div>
 
 <!-- Add Category Modal -->
-<div id="addCategoryModal" class="modal-overlay">
+<div id="addCategoryModal" class="modal-overlay-category">
     <div class="modal-container">
         <div class="modal-header">
             <h4 class="modal-title">Add Category</h4>
@@ -113,17 +113,17 @@
             <div id="addErrorContainer" class="error-container"></div>
             
             <div class="modal-body">
-                <div class="form-group">
+                <div class="form-group-category">
                     <label class="form-label">Category Name</label>
                     <input type="text" name="categoryName" placeholder="e.g., Running, Casual, Boots" class="form-input">
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group-category">
                     <label class="form-label">Description</label>
                     <input type="text" name="description" placeholder="Footwear for athletic activities" class="form-input">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group-category">
                     <label class="checkbox-label">
                         <input type="checkbox" id="isParentCheckboxAdd" checked onchange="toggleParentField(this.checked, 'parentCategoryWrapperAdd', 'addParentSelect')">
                         <span class="checkbox-text">Set as Parent Category</span>
@@ -132,7 +132,7 @@
 
                <div id="parentCategoryWrapperAdd" class="parent-wrapper-add" style="display: none;">
                    <div class="parent-inner-grid">
-                       <div class="form-group">
+                       <div class="form-group-category">
                            <label class="form-label">Parent Category</label>
                            <select id="addParentSelect" name="parentCategory" class="form-select cursor-pointer" disabled>
                                {{#each @root.parentCategories}}
@@ -153,7 +153,7 @@
 </div>
 
 <!-- Edit Category Modal -->
-<div id="editCategoryModal" class="modal-overlay">
+<div id="editCategoryModal" class="modal-overlay-category">
     <div class="modal-container">
         <div class="modal-header">
             <h4 class="modal-title">Edit Category</h4>
@@ -164,17 +164,17 @@
             <div id="editErrorContainer" class="error-container"></div>
             
             <div class="modal-body">
-                <div class="form-group">
+                <div class="form-group-category">
                     <label class="form-label">Category Name</label>
                     <input type="text" id="editCategoryName" name="categoryName" placeholder="e.g., Running, Casual, Boots" class="form-input">
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group-category">
                     <label class="form-label">Description</label>
                     <input type="text" id="editDescription" name="description" placeholder="Footwear for athletic activities" class="form-input">
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group-category">
                     <label class="checkbox-label">
                         <input type="checkbox" id="isParentCheckbox" onchange="toggleParentField(this.checked, 'parentCategoryWrapper', 'editParentCategory')">
                         <span class="checkbox-text">Set as Parent Category</span>
@@ -182,7 +182,7 @@
                 </div>
 
                <div id="parentCategoryWrapper" class="parent-wrapper">
-                   <div class="form-group">
+                   <div class="form-group-category">
                        <label class="form-label">Parent Category</label>
                        <select id="editParentCategory" name="parentCategory" class="form-select">
                            {{#each @root.parentCategories}}

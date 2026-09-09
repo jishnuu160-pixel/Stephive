@@ -200,19 +200,27 @@ export const postLogin = async (req, res) => {
 export const postForgot = async (req, res) => {
     try {
         const { email } = req.body;
- 
+
         if (!email || email.trim() === "") {
             return res.redirect('/user/forgot-password?error=' + encodeURIComponent("Please enter your email address."));
         }
-        await userService.sendOTP(email);
-  
-        req.session.otpExpiryTime=Date.now() + 60000;
 
-        req.session.otpTarget='forgot';
-        req.session.email=email;
-        res.redirect('/user/verify-otp');
+        await userService.sendOTP(email);
+
+        req.session.otpExpiryTime = Date.now() + 60000;
+        req.session.otpTarget = 'forgot';
+        req.session.email = email.trim();
+
+        req.session.save((err) => {
+            if (err) {
+                console.error("Session save error:", err);
+            }
+            return res.redirect('/user/verify-otp');
+        });
+
     } catch (err) {
-        res.redirect('/user/forgot-password?error=' + encodeURIComponent(err.message));
+        console.error("Post Forgot Error:", err);
+        return res.redirect('/user/forgot-password?error=' + encodeURIComponent(err.message || "Failed to send OTP. Please try again."));
     }
 };
 
@@ -274,20 +282,26 @@ export const postResetPassword = async (req, res) => {
 
 
 export const getVerifyOTP = (req, res) => {
-    const email = req.query.email;
-    const error = req.query.error || req.session.errorMessage;
-    const target = req.query.target || req.session.otpTarget;
 
-    delete req.session.errorMessage;
-    delete req.session.otpTarget;
+  const target =req.query.target ||req.session.otpTarget ||(req.session.signupData ? 'signup' : '');
+  const email =req.session.email ||req.session.signupData?.email;
+
+   if (!target || !email) {
+    return res.redirect('/user/login');
+   }
+
+   const error =req.query.error || req.session.errorMessage;
+
+   delete req.session.errorMessage;
 
     res.render('user/verify-otp', {
-        email: email,
-        error: error,
-        target: target,
-        isPasswordUpdate: req.query.isPasswordUpdate === 'true',
-        otpExpiryTime: req.session.otpExpiryTime
-    });
+                email,
+                error,
+                target,
+                isPasswordUpdate:req.query.isPasswordUpdate === 'true',
+                otpExpiryTime:req.session.otpExpiryTime
+});
+
 };
 
 
@@ -392,25 +406,26 @@ export const getResetPassword = (req, res) => {
 };
 
 
-export const userLogout = (req, res) => {
-    delete req.session.user;
+export const userLogout = (req, res, next) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Logout error:", err);
+            return next(err);
+        }
 
-    if (req.session.passport) {
-        delete req.session.passport.user;
-    }
+        res.clearCookie("connect.sid");
 
-    req.user = null;
+        res.setHeader(
+            "Cache-Control",
+            "no-store, no-cache, must-revalidate, private"
+        );
 
-    req.flash("success","Logout successfully");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
 
-    req.session.save((err) => {
-        if (err) console.error("Session save error:", err);
-        
-        res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate');
-        res.redirect('/user/login');
+        return res.redirect("/user/login");
     });
 };
-
 
 export const getProfile = async (req, res) => {
     try {
@@ -638,20 +653,6 @@ export const getEditProfile = async (req, res) => {
 };
 
 
-export const sendUpdatePasswordOTP = async (req, res) => {
-    try {
-        const email = req.session.user.email;
-        req.session.email = email;
-
-        await userService.sendOTP(email);
-
-        req.session.otpExpiryTime = Date.now() + 60000; 
-
-        res.redirect(`/user/verify-otp?target=updatepassword`);
-    } catch (err) {
-        res.redirect('/user/profile?error=Could not send verification code');
-    }
-};
 
 
 export const getVerifyPasswordOTP = (req, res) => {
@@ -702,82 +703,106 @@ export const getChangeEmail = (req, res) => {
 
 export const postChangeEmail = async (req, res) => {
     try {
-        const userId = req.session?.user?._id || req.session?.user?.id;
-        const currentEmail = req.session?.user?.email;
+        const userId =req.session?.user?._id ||req.session?.user?.id;
+        const currentEmail =req.session?.user?.email;
         const { newEmail } = req.body;
 
-        console.log("Post Change Email - Resolved User ID:", userId);
-
         if (!userId) {
-            throw new Error("User session not found or expired. Please log in again.");
+            throw new Error(
+                "User session not found or expired. Please log in again."
+            );
         }
 
-        await userService.changeEmailService(userId, currentEmail, newEmail);
+        await userService.changeEmailService(
+            userId,
+            currentEmail,
+            newEmail
+        );
 
-        req.session.pendingEmail = newEmail.trim().toLowerCase();
-        req.session.otpTarget = 'email-change'; 
+        req.session.pendingEmail =newEmail.trim().toLowerCase();
+        req.session.otpTarget = 'email-change';
 
-        req.session.save((err) => {
-            if (err) console.error("Session Save Error:", err);
-            return res.redirect('/user/verify-email-change-otp');
+        return req.session.save((err) => {
+           if (err) {
+                console.error("Session Save Error:",err);
+
+                req.flash('error','Something went wrong. Please try again.');
+
+                return res.redirect(
+                    '/user/change-email'
+                );
+            }
+            return res.redirect(
+                '/user/verify-email-change-otp'
+            );
         });
-
     } catch (error) {
-        console.log("error:", error);
-        return res.render('user/change-email', { 
-            user: req.session.user,
-            errorMessage: error.message
-        });
+        console.error(
+            "Change Email Error:",
+            error.message
+        );
+
+        return res.redirect(
+            '/user/change-email'
+        );
     }
 };
 
 
 export const getChangePassword = (req, res) => {
-    if (!req.query.verified) {
-        return res.redirect('/user/profile'); 
-    }
-
-    res.render('user/changePass', {
-        email: req.query.email,
-        target: 'updatepassword',
-        title: "Create New Password",
-        isLoggedIn: true 
+    return res.render('user/changePass', {
+        title: "Change Password"
     });
+
 };
 
 
 export const postChangePassword = async (req, res) => {
-    const { email, password, confirmPassword } = req.body;
-    
-
-    const targetEmail = email || req.session.email;
     try {
-        if (password !== confirmPassword) {
-            return res.render('user/changePass', { 
-                error: "New passwords do not match", 
-                email, 
-                isLoggedIn: true 
-            });
-        }else if (!password?.trim() || !confirmPassword?.trim()) {
-            return res.render('user/changePass', {
-                error: "Please fill in both password fields.",
-                email: targetEmail,
-                isLoggedIn: true
-        });
-    }
+        const {currentPassword,password,confirmPassword} = req.body;
+        const userId =req.session.user.id ||req.session.user._id;
 
-        await userService.changePasswordWithOld(targetEmail, password);
-        delete req.session.email;
-        
-        req.session.success='Password Updated Successfully';
-        req.session.save(() => {
+        if (!currentPassword ||!password ||!confirmPassword) {
+            return res.render('user/changePass', {
+                error: 'Please fill in all password fields.'
+            });
+        }
+
+        if (password !== confirmPassword) {
+            return res.render('user/changePass', {
+                error: 'New password and confirm password do not match.'
+            });
+        }
+
+        if (currentPassword === password) {
+            return res.render('user/changePass', {
+                error: 'New password cannot be the same as your current password.'
+            });
+        }
+
+        const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
+        if (!passwordRegex.test(password)) {
+            return res.render('user/changePass', {
+                error:
+                    'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.'
+            });
+        }
+
+        await userService.changePasswordWithOld(
+            userId,
+            currentPassword,
+            password
+        );
+
+        req.session.success ='Password updated successfully';
+
+        return req.session.save(() => {
             res.redirect('/user/profile');
         });
-    } catch (err) {
-        res.render('user/changePass', { 
-            error: err.message, 
-            email: targetEmail,
-            isLoggedIn: false 
+    } catch (error) {
+        return res.render('user/changePass', {
+            error: error.message
         });
     }
 };
@@ -958,12 +983,11 @@ export const resendSignupOTP = async (req, res) => {
 
         req.session.otp = newOtp;
         req.session.otpExpiryTime = Date.now() + 60 * 1000;
-
+        req.session.success='A new OTP has been sent to your email.';
         req.session.save((err) => {
             if (err) {
                 console.error("Session Save Error on Resend:", err);
-            }
-            req.session.success='A new OTP has been sent to your email.';
+            }    
             return res.redirect('/user/verify-otp?target=signup');
         });
 
@@ -992,7 +1016,6 @@ export const postVerifyEmailChangeOTP = async (req, res) => {
         }
 
         const otp = Array.isArray(req.body.otp) ? req.body.otp.join('') : req.body.otp;
-
         const newEmail = await userService.verifyEmailChangeOTP(userId, otp);
 
         req.session.user.email = newEmail;

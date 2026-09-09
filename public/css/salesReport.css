@@ -126,6 +126,20 @@
         display: none;
     }
 
+    .btn-csv, .btn-pdf {
+    background-color: #ffffff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    padding: 4px 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
     /* Style each table row to look like an individual card */
     .orders-table tr {
         background: #ffffff;
@@ -241,9 +255,9 @@
 .filter-main-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 20px;
     width: 100%;
 }
 
@@ -251,10 +265,6 @@
 .preset-filters {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
-    background: #f1f5f9;
-    padding: 4px;
-    border-radius: 8px;
 }
 
 .btn-preset {
@@ -363,7 +373,7 @@
     background-color: #ffffff;
     color: #334155;
     border: 1px solid #cbd5e1;
-    padding: 8px 16px;
+    padding: 8px 12px;
     border-radius: 8px;
     font-size: 0.825rem;
     font-weight: 600;

@@ -19,7 +19,8 @@ const clearUserSession = (req) => {
     delete req.session.user;
 
     if (req.session.passport) {
-        delete req.session.passport.user;
+        delete req.session.user;
+        delete req.session.passport;
     }
 };
 
@@ -48,7 +49,7 @@ export const isUserAuthenticated = async (req, res, next) => {
             clearUserSession(req);
 
             return req.session.save(() => {
-
+             if (err) console.error("Session save error:", err);
                 if (isApiRequest(req)) {
                     return res.status(HTTP_STATUS.UNAUTHORIZED).json({
                         success: false,
@@ -125,15 +126,12 @@ export const isUserLoggedOut = (req, res, next) => {
 /* ---------------- PREVENT CACHE ---------------- */
 
 export const preventCache = (req, res, next) => {
-
     res.setHeader(
         "Cache-Control",
-        "no-cache, no-store, must-revalidate"
+        "no-store, no-cache, must-revalidate, private, proxy-revalidate"
     );
-
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
-
     return next();
 };
 
@@ -165,6 +163,7 @@ export const injectNavbarData = async (req, res, next) => {
         if (user.isBlocked) {
             clearUserSession(req);
             return req.session.save(() => {
+                if (err) console.error("Session save error:", err);
                 if (isApiRequest(req)) {
                     return res.status(HTTP_STATUS.FORBIDDEN).json({
                         success: false,

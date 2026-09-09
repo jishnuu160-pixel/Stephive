@@ -8,7 +8,6 @@ import { generateOTP } from '../utils/otpUtils.js';
 import { sendOtpEmail } from '../utils/sendOtpEmail.js';
 
 
-
 export const signup = async (data) => {
     const { fullName, email, phoneNumber, password, referralCode } = data;
     const phoneStr = phoneNumber ? phoneNumber.toString() : '';
@@ -167,27 +166,60 @@ export const verifyOTP = async (email, otp) => {
 };
 
 
-export const changePasswordWithOld = async (email, newPassword) => {
+export const changePasswordWithOld = async ( userId,currentPassword,newPassword) => {
 
-    const cleanEmail = email ? email.trim().toLowerCase() : '';
-    if (!cleanEmail) {
-        throw new Error("Email is required for password change.");
+    if (!userId) {
+        throw new Error(
+            "User session not found. Please log in again."
+        );
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!newPassword || !passwordRegex.test(newPassword)) {
-        throw new Error("Must be 8+ chars with uppercase, lowercase, number, and symbol.");
+    if (!currentPassword || !newPassword) {
+        throw new Error("All password fields are required.");
     }
 
-    const user = await userRepo.findByEmailWithPassword(email);
-    if (!user) {
-        throw new Error("User not found");
+    const user = await userRepo.findById(userId);
+
+    if (!user) { throw new Error("User not found.");}
+
+    const isCurrentPasswordCorrect =
+        await bcrypt.compare(
+            currentPassword,
+            user.password
+        );
+
+    if (!isCurrentPasswordCorrect) {
+        throw new Error("Current password is incorrect.");
     }
 
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    const isSamePassword =
+        await bcrypt.compare(
+            newPassword,
+            user.password
+        );
 
-    return await userRepo.updateUser(cleanEmail, { password: hashedPassword });
+    if (isSamePassword) {
+        throw new Error("New password cannot be the same as your current password.");
+    }
+
+    const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+        throw new Error(
+            "Password must be at least 8 characters and include uppercase, lowercase, number, and symbol."
+        );
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const updatedUser = await userRepo.updateUserById(userId,{password: hashedPassword});
+
+    if (!updatedUser) {
+        throw new Error(
+            "Failed to update password."
+        );
+    }
+    return updatedUser;
 };
 
 export const verifySignupSession = (session, submittedOtp) => {
@@ -697,7 +729,6 @@ export const verifyEmailChangeOTP = async (userId, submittedOtp) => {
         error.otpExpiryTime = new Date(user.otpExpiry).getTime();
         throw error;
     }
-
     const newEmail = user.pendingEmail;
 
     await userRepo.updateUserInfo(userId, { 
@@ -706,7 +737,6 @@ export const verifyEmailChangeOTP = async (userId, submittedOtp) => {
         otp: null,
         otpExpiry: null
     });
-
     return newEmail;
 };
 
@@ -717,8 +747,7 @@ export const resendEmailChangeOTPService = async (userId, sessionPendingEmail) =
     
     if (!user || !targetEmail) {
         throw new Error("No pending email change found.");
-    }
-    
+    } 
     await changeEmailService(userId, user.email, targetEmail);
     
     return targetEmail;
@@ -801,7 +830,6 @@ export const validateSignupInitial = async (data) => {
             throw new Error("Invalid referral code."); 
         }
     }
-
     return true;
 };
 

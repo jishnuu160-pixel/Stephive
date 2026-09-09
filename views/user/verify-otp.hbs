@@ -16,6 +16,7 @@
             <input type="hidden" id="serverExpiryTime" value="{{otpExpiryTime}}">
             <input type="hidden" name="email" value="{{email}}"> 
             <input type="hidden" name="target" value="{{target}}"> 
+            
             {{#if isPasswordUpdate}}
                <input type="hidden" name="isPasswordUpdate" value="true">
             {{/if}}
@@ -58,91 +59,143 @@
     </div>
 </section>
 
-<div id="toast-container"></div>
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const inputs = document.querySelectorAll(".otp");
     const hiddenOtp = document.getElementById("fullOtp");
     const form = document.getElementById("otpForm");
-    const jsErrorBox = document.getElementById("js-error-message"); 
-
+    const jsErrorBox = document.getElementById("js-error-message");
     const serverError = document.querySelector(".server-error");
+
     if (serverError) {
         setTimeout(() => {
             serverError.style.display = "none";
         }, 3000);
     }
 
+
     const updateHiddenInput = () => {
         let otp = "";
-        inputs.forEach(i => otp += i.value);
+
+        inputs.forEach(input => {
+            otp += input.value;
+        });
+
         hiddenOtp.value = otp;
     };
 
     inputs.forEach((input, index) => {
+
         input.addEventListener("input", (e) => {
-            if (e.inputType === "deleteContentBackward") return; 
+            input.value = input.value.replace(/\D/g, "");
+
+            if (e.inputType === "deleteContentBackward") {
+                updateHiddenInput();
+                return;
+            }
+
             if (input.value && index < inputs.length - 1) {
                 inputs[index + 1].focus();
             }
+
             updateHiddenInput();
         });
 
+
         input.addEventListener("keydown", (e) => {
-            if (e.key === "Backspace" && !input.value && index > 0) {
+
+            if (
+                e.key === "Backspace" &&
+                !input.value &&
+                index > 0
+            ) {
                 inputs[index - 1].focus();
             }
+
         });
 
         input.addEventListener("paste", (e) => {
-            const data = e.clipboardData.getData("text").split("");
-            if (data.length === inputs.length) {
-                inputs.forEach((inp, i) => inp.value = data[i]);
-                updateHiddenInput();
-                inputs[inputs.length - 1].focus();
-            }
+            e.preventDefault();
+
+            const data = e.clipboardData
+                .getData("text")
+                .replace(/\D/g, "")
+                .slice(0, 6);
+
+            data.split("").forEach((digit, i) => {
+
+                if (inputs[i]) {
+                    inputs[i].value = digit;
+                }
+
+            });
+
+            updateHiddenInput();
+
+            inputs[
+                Math.min(data.length, inputs.length) - 1
+            ].focus();
+
         });
+
     });
+
 
     form.addEventListener("submit", (e) => {
+
         updateHiddenInput();
+
         if (hiddenOtp.value.length !== 6) {
+
             e.preventDefault();
+
             if (jsErrorBox) {
-                jsErrorBox.innerText = "Please enter the full 6-digit code!";
-                jsErrorBox.style.display = "block";
-                setTimeout(() => {
-                    jsErrorBox.style.display = "none";
-                }, 3000);
+
+                jsErrorBox.innerText ="Please enter the full 6-digit code!";
+                jsErrorBox.style.display ="block";
             }
         }
+
     });
+    const timerDisplay =document.getElementById("timer");
+    const timerContainer =document.getElementById("timer-container");
+    const resendLink =document.getElementById("resend-link");
+    const serverExpiryInput =document.getElementById("serverExpiryTime");
 
-    const timerDisplay = document.getElementById("timer");
-    const timerContainer = document.getElementById("timer-container");
-    const resendLink = document.getElementById("resend-link");
-    const serverExpiryInput = document.getElementById("serverExpiryTime");
-
-    if (serverExpiryInput && timerDisplay && timerContainer && resendLink) {
+    if (serverExpiryInput && timerDisplay && timerContainer && resendLink
+    ) {
         const expiryTime = parseInt(serverExpiryInput.value, 10) || (Date.now() + 60000);
+        const calculatedTimeLeft = Math.max( 0,Math.floor((expiryTime - Date.now()) / 1000));
+
+        const initialTimeLeft = Math.min(60,calculatedTimeLeft);
+        const timerStartedAt = Date.now();
+
+        let countdownInterval;
 
         const updateTimer = () => {
-            const timeLeft = Math.max(0, Math.floor((expiryTime - Date.now()) / 1000));
-            const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-            const seconds = String(timeLeft % 60).padStart(2, '0');
+            const elapsedSeconds = Math.floor(
+                (Date.now() - timerStartedAt) / 1000
+            );
 
-            timerDisplay.innerText = `${minutes}:${seconds}`;
+            const timeLeft = Math.max(0,initialTimeLeft - elapsedSeconds);
+            const minutes = String(
+                Math.floor(timeLeft / 60)
+            ).padStart(2, "0");
+
+            const seconds = String(
+                timeLeft % 60
+            ).padStart(2, "0");
+
+            timerDisplay.innerText =`${minutes}:${seconds}`;
 
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
-                timerContainer.style.display = "none";
-                resendLink.style.display = "inline"; 
+                timerContainer.style.display ="none";
+                resendLink.style.display ="inline";
             }
         };
-
         updateTimer();
-        const countdownInterval = setInterval(updateTimer, 1000);
+     countdownInterval = setInterval(updateTimer, 1000);
     }
 });
 </script>

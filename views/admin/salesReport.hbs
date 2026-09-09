@@ -45,42 +45,42 @@
               </div>
 
               <!-- Filter & Action Section -->
-              <form action="/admin/salesReport" method="GET" class="filter-card">
-                <div class="filter-main-row">
-                  
-                  <!-- Preset Quick Filters -->
-                  <div class="preset-filters">
-                    <button type="submit" name="filter" value="daily" class="btn-preset">Daily</button>
-                    <button type="submit" name="filter" value="weekly" class="btn-preset">Weekly</button>
-                    <button type="submit" name="filter" value="yearly" class="btn-preset">Yearly</button>
-                  </div>
+            <form action="/admin/salesReport" method="GET" class="filter-card">
+    <div class="filter-main-row">
+      
+      <!-- Preset Quick Filters -->
+      <div class="preset-filters">
+        <button type="submit" name="filter" value="daily" class="btn-preset">Daily</button>
+        <button type="submit" name="filter" value="weekly" class="btn-preset">Weekly</button>
+        <button type="submit" name="filter" value="yearly" class="btn-preset">Yearly</button>
+      </div>
 
-                  <!-- Date Inputs & Filter Submit -->
-                  <div class="filter-inputs">
-                    <div class="input-group">
-                      <label for="startDate">Start Date</label>
-                      <input type="date" id="startDate" name="startDate" value="{{startDate}}" />
-                    </div>
-                    <div class="input-group">
-                      <label for="endDate">End Date</label>
-                      <input type="date" id="endDate" name="endDate" value="{{endDate}}" />
-                    </div>
-                    <button type="submit" class="btn-filter">Filter</button>
-                    <a href="/admin/salesReport" class="btn-reset-filter">Reset</a>
-                  </div>
+      <!-- Date Inputs & Filter Submit -->
+      <div class="filter-inputs">
+        <div class="input-group">
+          <label for="startDate">Start Date</label>
+          <input type="date" id="startDate" name="startDate" value="{{startDate}}" min="{{minDate}}" max="{{maxDate}}" />
+        </div>
+        <div class="input-group">
+          <label for="endDate">End Date</label>
+          <input type="date" id="endDate" name="endDate" value="{{endDate}}" min="{{minDate}}" max="{{maxDate}}" />
+        </div>
+        <button type="submit" class="btn-filter">Filter</button>
+        <a href="/admin/salesReport" class="btn-reset-filter">Reset</a>
+      </div>
 
-                </div>
+    </div>
 
-                <!-- Export Action Buttons -->
-                <div class="action-buttons">
-                  <button type="button" class="btn-csv" onclick="downloadFile('csv')">
-                    <span class="btn-icon">📄</span> Download CSV
-                  </button>
-                  <button type="button" class="btn-pdf" onclick="downloadFile('pdf')">
-                    <span class="btn-icon">📥</span> Download PDF
-                  </button>
-                </div>
-              </form>
+    <!-- Export Action Buttons -->
+    <div class="action-buttons">
+      <button type="button" class="btn-csv" onclick="downloadFile('csv')">
+        <span class="btn-icon">📄</span> Download CSV
+      </button>
+      <button type="button" class="btn-pdf" onclick="downloadFile('pdf')">
+        <span class="btn-icon">📥</span> Download PDF
+      </button>
+    </div>
+  </form>
             </div>
 
             <!-- Orders Table Section -->

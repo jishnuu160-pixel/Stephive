@@ -40,11 +40,13 @@ const getDateRangeFromQuery = (query) => {
 export const viewSalesReport = async (req, res) => {
     try {
         const { start, end } = getDateRangeFromQuery(req.query);
-        
         const report = await salesService.generateReport(start, end);
+        
+        const { minDate, maxDate } = await salesService.getDateBounds();
 
         const formattedStartDate = start ? start.toLocaleDateString('en-CA') : '';
         const formattedEndDate = end ? end.toLocaleDateString('en-CA') : '';
+        const currentDate = new Date().toLocaleDateString('en-CA');
 
         res.render('admin/salesReport', {
             admin: true,
@@ -53,7 +55,10 @@ export const viewSalesReport = async (req, res) => {
             activePage: 'sales',
             startDate: formattedStartDate,
             endDate: formattedEndDate,
-            filter: req.query.filter || 'daily'
+            minDate,
+            maxDate,
+            currentDate,
+            filter: req.query.filter || ((req.query.startDate && req.query.endDate) ? '' : 'daily')
         });
     } catch (error) {
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send('Server Error');

@@ -10,6 +10,10 @@ export const countProducts = async (searchFilter) => {
      );
 };
 
+export const findProductsByAggregation = async (pipeline) => {
+    return await Product.aggregate(pipeline);
+};
+
 export const findProductById = async (productId) => {
    return await Product.findById(productId)
       .populate({

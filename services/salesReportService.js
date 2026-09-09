@@ -38,3 +38,11 @@ export const generateReport = async (startDate, endDate) => {
         }
     };
 };
+
+export const getDateBounds = async () => {
+    const bounds = await salesRepo.getOrderDateBounds();
+    return {
+        minDate: bounds.minDate ? new Date(bounds.minDate).toLocaleDateString('en-CA') : '',
+        maxDate: bounds.maxDate ? new Date(bounds.maxDate).toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA')
+    };
+};
